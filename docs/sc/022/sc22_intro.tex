@@ -31,13 +31,13 @@ the text that you should type to initiate the described action.
 \label{sec:computing}
 
 Compared with SCUBA-2 observations, POL-2 observations are far less
-memory-intensive to reduce. POL-2 time-series data is down-sampled to
+memory-intensive to reduce. POL-2 time-series data are down-sampled to
 2~Hz as a part of the reduction process. Assuming a typical 35-minute
 POL-2 observation, the reduction requires 35~GB of memory (in
 comparison with SCUBA-2 maps that may require up to 96~GB of memory).
 
 The main consideration for POL-2 reductions is processing power. PCA calculations in
-\makemap\ can be lengthy so fast processors with lots of cores are advised.
+\makemap\ can be lengthy, so fast processors with lots of cores are advised.
 
 
 \section{\xlabel{software}Before you start: software}
@@ -169,30 +169,32 @@ in SUN/95.
 \hline
 \textbf{Help\newline command} & \textbf{Description} & \textbf{Usage}\\
 \hline
-\task{showme} & If you know the name of the Starlink document you want to view,
-                use \task{showme}. When run, it launches a new web page or tab
-                displaying the hypertext version of the document. &
+\task{showme} & If the name of the Starlink document to be viewed is known, then
+                \task{showme} can be used. When run, the default browser opens a new
+                web page or tab displaying the hypertext version of the document. &
 \texttt{\%~showme~sun95}\\
 \hline
 \task{findme} & \task{findme} searches Starlink documents for a keyword. When
-                run, it launches a new web page or tab listing the results. &
+                run, the default browser opens a new web page or tab listing the results. &
                 \texttt{\% findme~kappa}\\
 \hline
 \task{docfind} & \task{docfind} searches the internal list files for keywords. It then
-                 searches the document titles. The result is displayed using the
+                 searches the document titles. The results are displayed using the
                  Unix \task{more} command. & \texttt{\%~docfind~kappa}\\
 \hline
-Run routines with prompts & You can run any routine with the option
-                            \texttt{prompt} after the command. This will
-                            prompt for every parameter available. If you
-                            then want a further description of any parameter,
-                            type \texttt{?} at the relevant prompt. &
+Run (non-script) routines with prompts & Any routine that is not implemented by a script
+                            (i.e. all compiled commands written in C or Fortran) may be run with
+                           the  \texttt{prompt} option after the command. This will
+                            prompt for every parameter available. If a further
+                            description of any parameter in needed,
+                            type \texttt{?} at the relevant prompt. Note that this option is not available
+                            for \texttt{pol2map} (because it is script-based).&
                             \texttt{\%~makemap~prompt~\newline\~\%~REF~-~Ref.~NDF~/!/$>$~?}\\
 \hline
 Google & A simple Google search such as ``\texttt{starlink kappa fitslist}''
 will usually return links to the appropriate documents. However,
 the results may include links to out-of-date versions of the
-document hosted at non-Starlink sites. You should always look for results in
+document hosted at non-Starlink sites. Users should always look for results in
 \texttt{"www.starlink.ac.uk/docs} (or \texttt{"www.starlink.ac.uk/devdocs}
 for the current development version of the document). & \\
 \hline
