@@ -7,9 +7,9 @@ process is presented here first, followed by a discussion of the specific
 details. It should be noted that this same procedure is used irrespective
 of whether single or multiple observations are to be reduced.
 
-The following description assumes that the \texttt{makemap} command is
+The following description assumes that the \task{makemap} command is
 being used to create maps. Section \ref{sec:skyloop} explains the effects
-of using the \texttt{skyloop} command in place of \texttt{makemap}.
+of using the \task{skyloop} command in place of \task{makemap}.
 
 The data reduction process can be broken down into three main stages --
 referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure~\ref{fig:pol2drflow}.
@@ -59,7 +59,7 @@ where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
 of the contiguous chunk of data used to create the map, and is usually
 0003.
 
-A co-add is then formed by adding all these maps together. Each individual map
+A coadd is then formed by adding all these maps together. Each individual map
 is then compared to the co-add, in order to determine a pointing correction
 to be applied to the observation in future. These corrections are stored
 in the FITS header of the individual maps.
@@ -108,17 +108,17 @@ Section~\ref{sec:calcqu}) to produce maps of Q and U, as well as I.
 
 An option exists to use the \SMURF\ \skyloop\  command to generate maps
 in place of the \SMURF\ \makemap\ command. Each invocation of the
-\makemap\ command creates a single map from the time-series data
+\task{makemap} command creates a single map from the time-series data
 for a single observation. If multiple observations are processed together,
-multiple invocations of \makemap\ are used and the resulting maps are
+multiple invocations of \task{makemap} are used and the resulting maps are
 co-added before moving on to the next step, as indicated in
-Figure~\ref{fig:pol2drflow}. The \skyloop\ command, on the other hand,
+Figure~\ref{fig:pol2drflow}. The \task{skyloop} command, on the other hand,
 will process multiple observations in a single invocation, creating a combined
-map from all observations. Thus, when using \skyloop\ ,
+map from all observations. Thus, when using \task{skyloop},
 Figure~\ref{fig:pol2drflow} would be effectively changed such that each occurrence
-of ``three invocations of makemaps feeding one co-add" would be replaced
-by a single invocation of ``\skyloop\ ". See section~\ref{sec:tailoredDR}
-for more information about the effects of using \skyloop\ .
+of ``three invocations of \task{makemap} feeding one co-add" would be replaced
+by a single invocation of ``\task{skyloop}". See section~\ref{sec:tailoredDR}
+for more information about the effects of using \task{skyloop}.
 
 \section{\xlabel{calcqu}CALCQU}
 \label{sec:calcqu}
@@ -154,10 +154,10 @@ in the Q and U maps. However, there is evidence that the IP is not
 constant across the focal plane, resulting in spatial variations in the
 background of the Q and U maps.
 
-For non-POL-2 data, the background is removing using a simple common-mode
+For non-POL-2 data, the background is removed using a simple common-mode
 model, in which the mean of the bolometer values is found at each time
 slice and is then removed from the individual bolometer values. This
-ignores any spatial variations in the background and so fails to remove
+ignores any spatial variations in the background, and so fails to remove
 the background properly in POL-2 Q and U maps.
 
 To fix this, a second stage of background removal is used when processing
@@ -166,12 +166,11 @@ is based upon a Principal Component Analysis (PCA) of the 1280
 time-streams in each sub-array (the Q and U data are processed
 separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
-are assumed to represent the spatially varying background signal and are
-removed, leaving just the astronomical signal. You may specify the number of
-components to remove, via a \task{makemap} configuration
+are assumed to represent the spatially-varying background signal and are
+removed, leaving just the astronomical signal. The user may specify the number
+of components to remove, via a \task{makemap} configuration
 parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
-the reduction command for POL-2
-data, provides suitable defaults for this parameter.
+the reduction command for POL-2 data, provides suitable defaults for this parameter.
 
 \begin{itemize}
 \item first stage uses \param{pca.pcathresh} = -50
@@ -182,9 +181,9 @@ On each \task{makemap} iteration, the PCA process removes the background (thus
 reducing the noise in the map) but also removes some of the astronomical
 signal. The amount of astronomical signal removed will be greater for
 larger values of \texttt{pca.pcathresh}. However, this astronomical
-signal is still present in the original time-series data and so can be
+signal is still present in the original time-series data, and so can be
 recovered if sufficient \task{makemap} iterations are performed. In other words,
-using larger values of \param{pca.pcathresh} slows down the rate at
+the use of larger values of \param{pca.pcathresh} slows down the rate at
 which astronomical signal is transferred from the time-series data to the
 map, thus increasing the number of iterations required to recover the
 full astronomical signal in the map.
@@ -196,17 +195,17 @@ run on non-polarimetric SCUBA-2 data, see \cref{Appendix}{app:pca}{}.
 
 
 \section{\xlabel{masking}Masking}
-A mask is a two-dimensional array which has the same shape and size as
-the final map, and which is used to indicate where the source is
+A mask is a two-dimensional array that has the same shape and size as
+the final map, and that is used to indicate where the source is
 expected to fall within the map. `Bad' pixel values within a mask
 indicate background pixels, and `good' pixel values indicate source
-pixels. Masks are used for two main purposes.
+pixels. Masks are used for two main purposes:
 
 \begin{enumerate}
 \item They prevent the growth of gradients and other artificial large
   scale structures within the map.  For this purpose, the astronomical
   signal at all background pixels defined by the mask is forced to
-  zero at the end of each iteration within \makemap\ (except for the
+  zero at the end of each iteration within \task{makemap} (except for the
   final iteration).
 \item They prevent bright sources polluting the evaluation of the
   various noise models (PCA, COM, FLT) used within \task{makemap}. Source
@@ -215,7 +214,7 @@ pixels. Masks are used for two main purposes.
 
 
 The \poltwomap\ script uses different masks for these two purposes -- the
-``AST'' mask and the ``PCA'' mask.  The PCA mask is in general less
+``AST'' mask and the ``PCA'' mask.  The PCA mask is, in general, less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
 generated automatically within \task{pol2map}, or be specified by a fixed
@@ -235,12 +234,12 @@ If \param{MAPVAR} is set \texttt{TRUE}, the variances in the co-added I, Q and U
 are formed from the spread of pixel data values between the individual
 observation maps. If \param{MAPVAR} is \texttt{FALSE} (the default), the variances in
 the co-added maps are formed by propagating the pixel variance values
-created by \makemap\ from the individual observation maps (these are
-based on the spread of I, Q or U values that fall in each pixel).
+created by \task{makemap} from the individual observation maps (these are
+based on the spread of I, Q or U values that fall within each pixel).
 
 Use \param{MAPVAR}=\texttt{TRUE} only if enough observations are available to make the
 variances between them meaningful. A general lower limit on its value
-is difficult to define, but is advised a minimum of 10 observations.
+is difficult to define, but a minimum of 10 observations is advised.
 
 
 If a test of the effect of this option is required on a field for which
@@ -258,7 +257,7 @@ variances in \file{imapvar.sdf}, \file{qmapvar.sdf} and
 these variances will then be used to form the errors in the
 \file{cat$\_$mapvar.FIT} catalogue.
 
-In general, within the source regions the variances created using
+In general, within the source regions, the variances created using
 \param{MAPVAR}=\texttt{TRUE} will be larger than those created using
 using \param{MAPVAR}=\texttt{FALSE} (within background regions there
 should be little difference).  This is partly caused by residual
@@ -268,11 +267,11 @@ bright point sources if \param{MAPVAR}=\texttt{TRUE}.
 It is also partly caused by intrinisic instabilities within the iterative
 map-making algorithm, which allow low-level artifical extended structures
 to develop within the source regions defined by the AST mask. Such
-artificial structures will vary from observation to observation and so
+artificial structures will vary from observation to observation, and so
 will contribute to the variances calculated using \param{MAPVAR}=\texttt{TRUE}.
 
 Two options are provided by \task{pol2map} that may be useful in reducing
-the larger than expected dispersion between maps made from different
+the larger-than-expected dispersion between maps made from different
 observations:
 
 \begin{enumerate}
@@ -281,15 +280,15 @@ observations:
 weight, which will be used when forming the coadd of all observations.
 This will affect both the data values and the variances in the resulting
 coadd. The purpose of these weights is to down-weight observations that
-produce maps that very dissimilar to maps made from the other observations.
+produce maps that are very dissimilar to maps made from the other observations.
 
 Without this parameter setting, the coadd is formed using weights equal
 to the reciprocal of the pixel variance values in each individual
 observation's map. As mentioned above, these pixel variance values can
-sometimes seriously under-estimate the dispersion between observations.
-For instance, observations that are clearly bad (out of focus for
-instance) can have relatively low pixel variance values, and thus get
-included with high weight in the coadd.
+sometimes seriously underestimate the dispersion between observations.
+For instance, observations that are clearly bad (e.g. out of focus) can have
+relatively low pixel variance values, and thus be included with high weights
+in the final coadd.
 
 If the \param{OBSWEIGHT} parameter is set \texttt{TRUE}, each observation
 is given an additional weight that is used to factor the per-pixel
@@ -307,29 +306,29 @@ manner are normalised to have a median value of 1.0, and any normalised
 weights larger than 1.0 are reduced to 1.0. An improved coadd is then
 formed using these observation weights.
 
-Another iteration is then performed in which individual maps are compared
+Another iteration is then performed, in which individual maps are compared
 with this improved coadd and new weights are derived. This iterative
 process continues until the typical error in the middle of the coadd
 stops falling significantly.
 
 \item  Setting the parameter \param{SKYLOOP}=\texttt{TRUE} when running
 \task{pol2map}  will cause maps to be made using the
-\xref{SMURF:\task{skyloop}}{sc21}{skyloop} command instead of
+\xref{SMURF:\task{skyloop}}{sc21}{skyloop} command, instead of
 \task{makemap}. In the context of the \task{skyloop} documentation, one
 ``chunk'' of data usually corresponds to a single observation.
 
 A single invocation of \task{skyloop} creates an I, Q or U map from all
-supplied observations, using a method that attempt to minimise the
+supplied observations, using a method that attempts to minimise the
 intrinsic instabilities of the map-making algorithm within the AST mask.
-Note, convergence can require a significantly greater number of iterations
-when using \task{skyloop} than when using \task{makemap}. Also,
+It should be noted that convergence can require a significantly greater number
+of iterations when using \task{skyloop} than when using \task{makemap}. Also,
 \task{skyloop} requires much more disk space than \task{makemap}.
 
 The \task{skyloop} command combines all observations together at each
 iteration of the map-making algorithm. Since the spurious large-scale
 structures created at each iteration are independent of each other,
 taking the mean of the maps after each iteration reduces the level of such
-structures, and prevents them growing in amplitude on successive
+structures, and prevents them from growing in amplitude on successive
 iterations due to the instability in the map-making algorithm.
 
 \end{enumerate}
@@ -350,7 +349,7 @@ also be used at step 1.
 The following panels show the effects of using \param{SKYLOOP}. and
 \param{OBSWEIGHT} on a total intensity mosaic of 21 observations. All
 data value maps are shown with a single scaling, and all standard
-deviation maps are shown with a single scaling (different to the scaling
+deviation maps are shown with a single scaling (different from the scaling
 for the data value maps):
 
 \newlength{\picwid}
