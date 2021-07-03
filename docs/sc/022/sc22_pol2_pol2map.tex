@@ -2,10 +2,14 @@
 \label{sec:dr}
 \section{\xlabel{dataflow}The Data Flow}
 
-POL-2 data reduction is an involved process for which a broad overview
-is first presented here before the specific details are discussed. It
-is noted that this same procedure is used irrespective of whether a
-single or multiple observations are to be reduced.
+POL-2 data reduction is an involved process. A broad overview of this
+process is presented here first, followed by a discussion of the specific
+details. It should be noted that this same procedure is used irrespective
+of whether single or multiple observations are to be reduced.
+
+The following description assumes that the \texttt{makemap} command is
+being used to create maps. Section \ref{sec:skyloop} explains the effects
+of using the \texttt{skyloop} command in place of \texttt{makemap}.
 
 The data reduction process can be broken down into three main stages --
 referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure~\ref{fig:pol2drflow}.
@@ -33,10 +37,10 @@ reduction routine (see \cref{Chapter}{sec:rundr}{}).
 
 \subsubsection*{The process}
 The analysed intensity values in the raw data time-streams are first
-converted into Q, U and I time-streams using the
-\xref{SMURF:\task{calcqu}}{sun258}{CALCQU} command (these are stored
-for future use in the directory \texttt{qudata}, specified by the
-\param{QUDIR} parameter in the example command below).
+flat-fielded and converted into Q, U and I time-streams using the
+\xref{SMURF:\task{calcqu}}{sun258}{CALCQU} command. These time-streams
+are stored for future use in the directory \texttt{qudata}, specified by the
+\param{QUDIR} parameter in the example command below.
 
 The \xref{SMURF:makemap}{sun258}{MAKEMAP} command is then used to
 create a separate map from the I time-stream for each observation,
