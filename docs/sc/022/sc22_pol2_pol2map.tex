@@ -127,14 +127,19 @@ In addition to the POL-2 data reduction building on the
 existing SCUBA-2 map-maker, \poltwomap\ also relies on the \SMURF\
 command \task{CALQU}.
 
-This \xref{calcqu}{sun258}{CALCQU} tool creates time series holding Q and U values from a set of POL-2
-time series holding raw data values. The supplied time-series data files are first
-flat-fielded, cleaned and concatenated, before being used to create
-the Q and U values. The Q and U time-series are down-sampled to 2Hz
-(\emph{i.e.} they contain two Q or U samples per second), and are
-chosen to minimise the sum of the squared residuals between the measured
-raw data values and the expected values given by Equation~\ref{eqn:idet}.
+This \xref{calcqu}{sun258}{CALCQU} tool uses time-series files holding Q
+and U values from a set of POL-2 time series holding raw data values.
+The supplied time-series data files are flat-fielded, cleaned and concatenated,
+before being used to establish Q, U and I values for each bolometer. The Q
+and U time-series are split into blocks of adjacent time slices. Fits
+using these sets of blocks are then used to derive Q, U and I values, and
+multiple 2D images are created as the telescope slowly moves across the sky.
 
+Separate Q, U and I estimates are made for each half revolution of the HWP.
+The ''Data" values in the returned NDFs are the means of these estimates. If
+there are four or more estimates per bolometer, the output will also contain
+''Variance" values for each bolometer (which represent the error on
+the final mean value, not the variances of the individual values).
 
 \section{\xlabel{pca}PCA}
 \label{sec:pca}
