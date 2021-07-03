@@ -60,7 +60,7 @@ of the contiguous chunk of data used to create the map, and is usually
 0003.
 
 A co-add is then formed by adding all these maps together. Each individual map
-is then compared to the co-add in order to determine a pointing correction
+is then compared to the co-add, in order to determine a pointing correction
 to be applied to the observation in future. These corrections are stored
 in the FITS header of the individual maps.
 
@@ -74,7 +74,7 @@ improvements come from
 \item applying the pointing corrections determined in Step~1
 \item the use of an increased number of PCA components
   (\texttt{pca.pcathresh=-150})
-\item using a single fixed mask for all observations. The mask is
+\item using a single, fixed mask for all observations. The mask is
   determined from the preliminary co-add I map and thus includes
   fainter structure than would be used if the mask was based on only
   one observation.
@@ -92,16 +92,33 @@ catalogue is created.
 \section{\xlabel{makemap}MAKEMAP}
 
 The POL-2 data reduction builds upon the existing SCUBA-2 Dynamic
-Iterative Map-Maker, hereafter just referred to as the map-maker. This
+Iterative Map-Maker, hereafter just referred to as the ``map-maker". This
 is the tool used to produce SCUBA-2 maps, and is invoked by the
 \SMURF\ \makemap\ command. It performs some
 pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
-In \poltwomap\ the map-maker is used in conjunction with
+In \poltwomap\ , the map-maker is used in conjunction with
 \xref{calcqu}{sun258}{CALCQU} (see
 Section~\ref{sec:calcqu}) to produce maps of Q and U, as well as I.
+
+\section{\xlabel{skyloop}SKYLOOP}
+\label{sec:skyloop}
+
+An option exists to use the \SMURF\ \skyloop\  command to generate maps
+in place of the \SMURF\ \makemap\ command. Each invocation of the
+\makemap\ command creates a single map from the time-series data
+for a single observation. If multiple observations are processed together,
+multiple invocations of \makemap\ are used and the resulting maps are
+co-added before moving on to the next step, as indicated in
+Figure~\ref{fig:pol2drflow}. The \skyloop\ command, on the other hand,
+will process multiple observations in a single invocation, creating a combined
+map from all observations. Thus, when using \skyloop\ ,
+Figure~\ref{fig:pol2drflow} would be effectively changed such that each occurrence
+of ``three invocations of makemaps feeding one co-add" would be replaced
+by a single invocation of ``\skyloop\ ". See section~\ref{sec:tailoredDR}
+for more information about the effects of using \skyloop\ .
 
 \section{\xlabel{calcqu}CALCQU}
 \label{sec:calcqu}
