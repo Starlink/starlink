@@ -129,7 +129,7 @@ modify its behaviour in various ways. To see a full list, type
 \end{terminalv}
 
 
-\section{\xlabel{how-step1}pol2map -- producing the initial I map.}
+\section{\xlabel{how-step1}pol2map -- producing the initial I map}
 \label{sec:how-step1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
@@ -140,9 +140,9 @@ initial I map.  In this first step:
 % pol2map in=^myfiles.list iout=iauto qout=! uout=! mapdir=maps qudir=qudata
 \end{terminalv}
 
-the file \texttt{myfiles.lis} contains a list of the raw data
+The file \texttt{myfiles.lis} contains a list of the raw data
 files to be included in the map, and could (for instance) look like
-this.
+this:
 
 \begin{terminalv}
 % cat myfiles.lis
@@ -152,28 +152,26 @@ this.
 /jcmtdata/raw/scuba2/s8d/20160125/00043/*
 \end{terminalv}
 
-This uses all available data for all four 850\,$\mu$m sub-arrays, for
+This uses all available data from all four 850\,$\mu$m sub-arrays, for
 Observation 43 taken on 25th January 2016\footnote{The input files
   should all be for a single waveband from one or more POL-2
-  observations -- do not mix files from different wavebands and/or
-  astronomical regions}. In addition, the data used in this example
-also comes from Observations 56 and 59 taken on January 11th 2016 (UT).
+  observations. Users should not mix files from different wavebands and/or
+  astronomical regions.}. In addition, the data used in this example
+also come from Observations 56 and 59 taken on January 11th 2016 (UT).
 
 \begin{tip}
-  An up-caret ( $ \hat{} $ ) is required any time you are reading in a
-  group text file in Starlink. For the map-maker this includes the
+  An up-caret ( $ \hat{} $ ) is required any time the user is reading in
+  a group text file in Starlink. For the map-maker, this includes the
   configuration file (a group of configuration parameters) and the
   list of input files (a group of NDFs \emph{e.g.} \texttt{in= $
     \hat{} $ myfiles.lis}).
 
-  To check if the files are POL-2 files, run the \smurf\ command
-  \xref{pol2check}{sun258}{POL2CHECK}.
-\begin{terminalv}
-% pol2check ^myfiles.list
-\end{terminalv}
+  Note that the \poltwomap\ script also invokes the \ \smurf\
+  \xref{pol2check}{sun258}{POL2CHECK} command, in order to 
+  first ensure that the input files are actually POL-2 files.
 \end{tip}
 
-Note that \texttt{qout} and \texttt{uout} are set to null values as no
+Note that \texttt{qout} and \texttt{uout} are set to null values, as no
 Q or U maps are required to be produced during this initial step 1
 reduction stage.
 
@@ -206,25 +204,25 @@ for future use
 
 \end{terminalv}
 
-The files and folders produced in this reduction are described below.
+The files and folders produced by this reduction process are described below.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
   various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \task{pol2map}
-  command (\task{pol2map} is a Python script, which runs various other
-  Starlink tasks behind the scenes to perform the bulk of the work).
+  command (\task{pol2map} is actually a Python script that runs various other
+  Starlink tasks behind the scenes in order to perform the bulk of the work).
 
 \item[\file{qudata/}] A folder containing the I, Q and U time-series data
-  for each sub array for each observation (these are produced by
-  \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}).
+  for each sub array for each observation. Tthese are produced by
+  \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}.
 
 \item[\file{maps/}] A folder containing the individual I maps from
   each separate observation. These will have names that end with
   \file{$\_$imap.sdf}.
 
-\item[\file{iauto.sdf}] Output total intensity map (the term ``auto'' is
+\item[\file{iauto.sdf}] Output total intensity map. The included term ``auto'' is
 used to indicate that it was created using an automatically generated
-AST mask).
+AST mask.
 
 \end{aligndesc}
 
