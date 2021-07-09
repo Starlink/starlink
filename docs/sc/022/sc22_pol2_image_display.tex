@@ -19,7 +19,7 @@ the drop-down menu option \texttt{File / Open} to load the file
 \file{mycat.FIT}. This should then populate the lower part of the window
 with the contents of this polarimetry catalogue file.  Each of the vectors
 in this file will be automatically overlaid on the main image window
-(see Figure~\ref{fig:gaiavectorsopen}).
+(see \cref{Figure}{fig:gaiavectorsopen}{}).
 
 \begin{figure}[t!]
 \begin{center}
@@ -58,7 +58,7 @@ the associated error value for that intensity (Column~DI). To remove
 all of these extraneous vectors, either press control-X or use the
 drop-down menu option \texttt{Edit / Cut}.  This should leave just a
 small number of vectors clustering around the target object (see
-Figure~\ref{fig:gaiavectorssecond}).
+\cref{Figure}{fig:gaiavectorssecond}{}).
 
 \begin{figure}[t!]
 \begin{center}
@@ -76,7 +76,7 @@ Figure~\ref{fig:gaiavectorssecond}).
 
 Zooming in on the central region of the map, it can already be seen
 that the level of vector ordering (and hence polarisation) is quite
-low (see Figure~\ref{fig:gaiavectorsfinal}). If needed it is
+low (see \cref{Figure}{fig:gaiavectorsfinal}{}). If needed it is
 possible to change the scaling by selecting the Rendering tab in the
 \texttt{GAIA: Polarimetry} window, and increasing the vector scale.
 
@@ -303,7 +303,7 @@ Convert into a PDF file and remove blank margins (if required).
 \caption [Vector map with contour map in polplot]{Result from Example~2:
   Producing a vector map over a contour map. This plot uses the default
 PGPLOT fonts for annotation -- note the difference to the fonts used in
-Figure~\ref{fig:kappa-plot1}. \label{fig:kappa-plot2}}
+\cref{Figure}{fig:kappa-plot1}{}. \label{fig:kappa-plot2}}
 \end{center}
 \end{figure}
 
@@ -416,7 +416,7 @@ Unlike the other tools described above, \textsc{Topcat} cannot visualise the
 catalogue as a set of vectors. However, it goes well beyond the
 facilities of the other tools in allowing you to explore correlations
 between different quantities in the catalogue via two- and three-dimensional
-scatter plots -- see Figure~\ref{fig:topcat}. It can also be used to
+scatter plots -- see \cref{Figure}{fig:topcat}{}. It can also be used to
 cross-correlate two different
 catalogues, create subsets of the catalogue, create new columns
 containing related quantities, \emph{etc}. It also allows the modified
@@ -425,7 +425,9 @@ that any new catalogue will not contain the WCS information required
 by other Starlink applications to perform WCS-related operations such as
 displaying annotated axes and aligning data-sets. However, this WCS
 information can be copied back into the new catalogue using the
-\xref{polwcscopy}{sun223}{POLWCSCOPY} command. See Section~\ref{sec:wcscopy}.
+\xref{polwcscopy}{sun223}{POLWCSCOPY} command. See
+\cref{Section}{sec:wcscopy}{Adding WCS information back into a vector
+catalogue}.
 
 \begin{figure}[t!]
 \begin{center}
