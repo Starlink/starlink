@@ -905,6 +905,7 @@ appear as an individual observation.  The right-hand panel of Figure
 \end{aligndesc}
 
 \subsection{Reference}
+\label{sec:reference_mode}
 
 \begin{aligndesc}
 \item[\textbf{Position-switch}]
@@ -4006,6 +4007,12 @@ Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD --- a
 PIpeline for Combining and Analyzing Reduced Data},
 \xref{Starlink User Note 265}{sun265}{}
 
+\bibitem{COHRS}
+Dempsey, J.~T.,Thomas, H.~S. and Currie, M.~J., 2013,
+\htmladdnormallink{\textit{CO (3 - 2) High-resolution Survey of the Galactic
+Plane: R1}}{http://dx.doi.org/10.11570/13.0002}, Astrophys.J. Supp., 209, 8
+(DOI: 10.1088/0067-0049/209/1/8)
+
 \bibitem{oracdr_infra}
 Jenness~T. \& Economou~F., 2015,
 \htmladdnormallink{\textit{ORAC-DR: A generic data reduction pipeline
@@ -5199,5 +5206,189 @@ VELRES\_13CO   & Velocity resolution for the second line ($^{13}$CO here). \\
 \hline
 \end{tabular}
 \end{table}
+
+
+\chapter{Removal of reference signal}
+\label{app:remove_ref_signal}
+
+During heterodyne observations, the telescope switches (see
+\cref{Section}{sec:reference_mode}{reference observing mode}) between
+observing your target and a nearby reference position.  The latter's
+spectrum is subtracted from the target data in order to subtract the
+sky-background signal.
+
+In most cases, this reference location will be devoid of source
+emission.  However, around the Galactic Plane and especially the
+Galactic Centre, it can be problematic to find a reference position
+that's pointing at sky, even with a position switch.  Should the
+reference measurement include a source, its signal will be subtracted
+from all the spectra in your data, appearing one or more absorption
+lines.  If the absorption occurs where your target has strong emission
+across a wide range of frequencies, the absorption feature can easily
+be camouflaged.  Even it is located where there is weak or no target
+signal, a strong absorption feature will slightly bias the baseline
+fitting.  So if your data has such artefacts, it is worth trying to
+correct them.
+
+A simple approach for removal is to interpolate across the absorption
+feature, but this does assume that the target emission is not varying
+across the width of the absorption line or lines.  If the absorption
+is located clear of your source's emission, it is possible to merely
+mask the feature with \chpix.  The following example masks all spectra
+witihn the time-series cube \file{ts\_cube} between 3.5 and 7.8\kms.
+
+\begin{terminalv}
+% chpix ts_cube ts_cube_refmasked section="'3.5:7.8,,'" bad
+\end{terminalv}
+
+\begin{figure}[h!] \begin{center}
+\includegraphics[width=0.95\linewidth]{sc20_refspec_gaia_polygon}
+\typeout{sc20_refspec_gaia_polygon.png inserted on page \arabic{page}}
+\caption[Using \gaia\ to define background regions]{\label{fig:GAIA_Polygon}
+  This shows a spectral cube collapsed to two dimensions with the
+  \guiwindow{Collapse} tag, on which a polygonal region of background
+  is outlined. First select the median \guiwindow{Combination method}
+  and then the polygon \guiwindow{Define region} button (both ringed).
+  Click the left mouse button to add points, and double-click to
+  complete the polygon.  Vertices may be dragged or new vertices
+  added. See the \gaia\ help for details.}
+\end{center}
+\end{figure}
+
+\begin{figure}[h!] \begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_refspec_gaia_save}
+\typeout{sc20_refspec_gaia_save.png inserted on page \arabic{page}}
+\caption[Using \gaia\ to define background
+regions]{\label{fig:GAIA_save_spectrum}
+  This shows a median spectrum from a \gaia\ region defined
+  as in \cref{Figure}{fig:GAIA_Polygon}{}.  Use the marked
+  \guiwindow{File} menu and choose \guiwindow{Save as NDF} to save the
+   created spectrum.}
+\end{center}
+\end{figure}
+
+The basis of a better method is to attempt to determine the reference
+spectrum.  One such approach is to identify regions with none or
+minimal target emission in your reduced spectral cube, mask these,
+then form the median spectrum of the remainder.  Regions to include or
+exclude may be defined with ARD regions in a text file, possibly
+created with \gaia (see \cref{Section}{sec:collapse}{Cropping your
+map}); or using the shape selection in the \gaia\ cube-manipulation
+controls, especially the polygon (see
+\cref{Figure}{fig:GAIA_Polygon}{}).  The resultant spectrum may be
+saved (see \cref{Figure}{fig:GAIA_save_spectrum}{}). In practice this
+median spectrum will likely still have some target emission and
+possibly a non-flat baseline, which need to be removed. One approach
+is to smooth the spectrum with a wide kernel---essentially a low-pass
+filter---and then subtract the smoothed spectrum from the original.
+Finally, since we are only interested in the aborption features, set
+all the non-line elements to 0.  In the
+\cref{Figure}{fig:GAIA_save_spectrum}{} example that is between 4.7
+and 6.3 \kms.
+
+\begin{terminalv}
+% block median_sky_spectrum smoothed_spectrum 21
+% sub median_sky_spectrum smoothed_spectrum flat_spectrum
+% chpix flat_spectrum ref_spectrum section="':4.7,6.3:'" 0
+\end{terminalv}
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.9\linewidth]{sc20_refspec_manual}
+\typeout{sc20_refspec_manual.png inserted on page \arabic{page}}
+\caption[An estimated reference spectrum]{\label{fig::estimated_refspec}
+  An extract from an estimated spectrum derived from the methods outlined
+  in the test. Note that beyond the lines, pixel values are zero so as
+  not to add noise to the cube once the reference spectrum is subtracted.}
+\end{center}
+\end{figure}
+
+To apply this to your cube, enlarge it to the dimensions of your cube.
+The value of the AXES parameter will depend on whether you intend to
+subtract the reference spectrum from the raw time series, or from the
+position-position-velocity (PPV) reduced cube.  For the time series
+
+\begin{terminalv}
+% manic ref_spectrum ref_ts_cube axes="[1,0,0]"  lbound="[1,1]" ubound="[14,4202]"
+\end{terminalv}
+
+and for the PPV
+\begin{terminalv}
+% manic ref_spectrum ref_ppv_cube axes="[0,0,1]"  lbound="[-122,-124]" ubound="[126,125]"
+\end{terminalv}
+
+\param{AXES} specifies the axis to retain (\texttt{1}) or new
+dimensions to grow (\texttt{0}).  The pixel bounds of the new axes are
+given repectively by \param{LBOUND} and \param{UBOUND} arrays.  In the
+time-series example, there are 14 receptors and 4202 spectra.  You can
+find the bounds of your cube with \ndftrace.
+
+\begin{terminalv}
+% ndftrace cube | grep "Pixel bounds"
+\end{terminalv}
+
+
+\section{Remove the reference signal using ORAC-DR}
+
+A number of recipe parameters are provided for the attempted removal
+of reference signal, and are listed in
+\cref{Table}{tab:refspec_params}{a table}.
+For Galactic Plann surveys the following combination have worked
+moderately well.
+
+\begin{terminalv}
+CLUMP_METHOD = clumpfind
+SUBTRACT_REF_EMISSION = 1
+REF_EMISSION_MASK_SOURCE = both
+REF_EMISSION_COMBINE_REFPOS = 1
+REF_EMISSION_BOXSIZE = 19
+\end{terminalv}
+
+You may need to enlarge \param{REF\_EMISSION\_BOXSIZ} should your data
+have narrow velocity channels.  An example of using these settings
+that successfully removed the reference signal from some Galactic Plane
+data is shown in \cref{Figure}{fig::oracdr_refspec_example}{the plot below}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=1.0\linewidth]{sc20_refspec_oracdr}
+\typeout{sc20_refspec_oracdr.png inserted on page \arabic{page}}
+\caption[Examples of reference-signal removal in \oracdr]{\label{fig::oracdr_refspec_example}
+  Part of a mean spectrum collapsed over a COHRS\cite{COHRS} tile in the
+  Galactic Plane.  The red curve shows the original uncorrected spectrum
+  and the blue curve is the re-processed spectrum, where the absorption
+  feature is removed within \oracdr\ using the primary set of recipe
+  parameters listed in the text above.}
+\end{center}
+\end{figure}
+
+
+The algorithm used by \oracdr\ does not always remove all of
+the lines, and in rare cases leaves lines unchanged.  For these
+recalcitrant lines some additional facilities are provided, where you
+set the velocity limits of the reference absorption line.
+
+\begin{terminalv}
+SUBTRACT_REF_SPECTRUM = 1
+REF_SPECTRUM_COMBINE_REFPOS = 1
+REF_SPECTRUM_REGIONS = 7.6:13.8
+\end{terminalv}
+
+\param{REF\_SPECTRUM\_REGIONS} sets a comma-separated list of the
+velocity ranges of the absorption lines.
+
+If that does not work, you can provide your own estimated reference
+spectrum, containing zeroed data values outside of the line extent, as
+described earlier and shown in
+\cref{Figure}{fig::estimated_refspec}{}.  You then supply its file
+name using the recipe parameter shown below.
+
+\begin{terminalv}
+REF_SPECTRUM_FILE = ref_spectrum
+\end{terminalv}
+
+The algorithms used are described in a forthcoming COHRS \cite{COHRS}
+Second Release paper.
+
 
 \end{document}
