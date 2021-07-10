@@ -422,7 +422,7 @@ existing I maps listed below:
 The output vector catalogue contains a range of values derived by
 \poltwomap\ for each pixel contained within the I map. Intensity values and
 errors in the
-catalogue are expressed in units of mJy/beam.  If desired it is possible
+catalogue are expressed in units of mJy/beam.  If desired, it is possible
 to switch the catalogue to units of pW by using \texttt{Jy=no} on the \poltwomap\
 command line.  The columns are listed below.
 
@@ -443,6 +443,8 @@ command line.  The columns are listed below.
 \item[\texttt{DANG}] Error in ANG
 \item[\texttt{PI}] Polarised intensity (I$_{\textnormal{p}}$)
 \item[\texttt{DPI}] Error in polarised intensity
+\item[\texttt{AST}] Integer values that indicate if the corresponding vector position is inside the AST mask. If the vector is outside the mask, the corresponding column for the mask will have a blank/null value. Vectors that are inside a mask will have a non-zero integer value for the corresponding column. Each ``island'' within a mask (i.e. a contiguous group of source pixels) will have a different integer value assigned, starting at 1. All vectors within an island  are assigned the integer value of the island. 
+\item[\texttt{PCA}] Contains integer values that indicate if the corresponding vector position is inside the PCA mask. Value conventions are the same as for the \texttt{AST} column (above).
 \end{aligndesc}
 
 
