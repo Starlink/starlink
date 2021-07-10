@@ -461,20 +461,19 @@ and without the polarimeter inserted. Such observations have been done on Uranus
 Mars and Jupiter. The second type of losses can be measured with a source of know polarization.
 
 To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion
-Factor, FCF, must be applied to the data. For POL-2 the FCFs are quoted in terms of
-the SCUBA-2 FCF.
+Factor, FCF, must be applied to the data. For POL-2, the FCFs are quoted in terms of
+the non-polarimetric SCUBA-2 FCFs.
 
-At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCFs for POL-2
-are found to be a factor of 1.35 and 1.96 times higher than the
-standard SCUBA-2 FCF for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}, respectively.
-
+POL-2 FCFs are now applied automatically within \poltwomap\ when catalogue columns
+in mJy/beam are required by the user, i.e. if the \poltwomap\ parameter \texttt{JY} is set
+to \texttt{TRUE} (the default option). The current version of \poltwomap\ uses the new,
+revised POL-2 FCFs for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}.
 
 \section{\xlabel{tweaking}Changing pixel size in pol2map}
 \label{sec:pol2map-pixelsize}
 
-Inevitably, as with unpolarised SCUBA-2 data reduction, it will
-probably be necessary for you to tweak the \poltwomap\ reduction for
-specific situations.
+Inevitably, as with unpolarised SCUBA-2 data reduction, users will sometimes find it
+necessary to fine-tune the \poltwomap\ reduction process for specific situations.
 
 The bin size within the final vector catalogue is controlled by the
 \param{BINSIZE} parameter in the \SMURF\ \poltwomap\ command.
@@ -484,11 +483,11 @@ The bin size within the final vector catalogue is controlled by the
 \end{terminalv}
 
 Changing the catalogue bin size in this way does not change the pixel
-size of the maps created \poltwomap\. Instead, the maps are binned up
+size of the maps created \poltwomap. Instead, the maps are binned up
 to the requested bin size before the catalogue is created. There is
 another parameter, called \param{PIXSIZE}, which controls the map pixel
-size, but it is usually advisable to leave this at its default value
-as the map pixel size can affect the behaviour of the iterative algorithm
+size, but it is usually advisable to leave this at its default value. This is
+because the map pixel size can affect the behaviour of the iterative algorithm
 used to create maps.
 
 
