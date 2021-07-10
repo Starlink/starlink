@@ -3,9 +3,9 @@
 \label{sec:rundr}
 
 The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction --
-  The Theory}, described how \pol2map\ produces I, Q and U maps from raw
+  The Theory}, described how \poltwomap\ produces I, Q and U maps from raw
 POL-2 data.  It showed that this reduction process -- which uses
-\pol2map\ -- comprises three steps.
+\task{pol2map} -- comprises three steps.
 
 As with the other Python scripts in \SMURF, it is possible to get more
 information about the available parameters by running either:
@@ -20,20 +20,20 @@ command.
 
 \section{\xlabel{how-pol2map}How to use pol2map}
 
-Before running \pol2map\ directly, it is necessary to ensure that
+Before running \poltwomap\ directly, it is necessary to ensure that
 the \starlink\ environment has been initialised and the \smurf\
 package started (see \cref{Section}{sec:starinit}{Initialising
   Starlink} and \cref{Section}{sec:packinit}{KAPPA and SMURF for data
   processing}).
 
-This chapter describes how to run \pol2map\ firstly to produce an
+This chapter describes how to run \task{pol2map} firstly to produce an
 initial I map and then again to produce the final I, Q, U maps and
 vector catalogue as described in Section~\ref{sec:how-step1}.
 
-To run \pol2map\, values should normally be supplied for the following
+To run \task{pol2map}, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
   ``command-line parameters'' that are supplied on the
-  \pol2map\ command line, and ``configuration parameters'' that
+  \task{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
   \emph{command-line} parameter called \param{CONFIG}.}, in order to
@@ -85,10 +85,10 @@ the parameter if no value is supplied on the command line.
   set to be \texttt{TRUE}). [\texttt{!}]
 \end{aligndesc}
 
-Some additional command-line parameters are required when \pol2map\ is
+Some additional command-line parameters are required when \task{pol2map} is
 used for the second time -- as discussed in Section~\ref{sec:how-step23}
 -- to produce the final I, Q, U maps and vector catalogue\footnote{This
-second usage of \pol2map\ includes both ``Run 2'' and ``Run 3'' in
+second usage of \task{pol2map} includes both ``Run 2'' and ``Run 3'' in
 Figure~\ref{fig:pol2drflow}.}.
 
 \begin{aligndesc}
@@ -121,7 +121,7 @@ Figure~\ref{fig:pol2drflow}.}.
   output vector catalogue specified by the parameter \param{CAT}. [\texttt{FALSE}]
 \end{aligndesc}
 
-The \pol2map\ command provides many other parameters that may be used to
+The \task{pol2map} command provides many other parameters that may be used to
 modify its behaviour in various ways. To see a full list, type
 
 \begin{terminalv}
@@ -133,7 +133,7 @@ modify its behaviour in various ways. To see a full list, type
 \label{sec:how-step1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
-  Theory},\pol2map\ must first be run on the raw data to produce an
+  Theory}, \poltwomap\ must first be run on the raw data to produce an
 initial I map.  In this first step:
 
 \begin{terminalv}
@@ -166,7 +166,7 @@ also come from Observations 56 and 59 taken on January 11th 2016 (UT).
   list of input files (a group of NDFs \emph{e.g.} \texttt{in= $
     \hat{} $ myfiles.lis}).
 
-  Note that the \pol2map\ script also invokes the \ \smurf\
+  Note that the \poltwomap\ script also invokes the \ \smurf\
   \xref{pol2check}{sun258}{POL2CHECK} command, in order to 
   first ensure that the input files are actually POL-2 files.
 \end{tip}
@@ -175,7 +175,7 @@ Note that \texttt{qout} and \texttt{uout} are set to null values, as no
 Q or U maps are required to be produced during this initial step 1
 reduction stage.
 
-The following shows the output from running this initial \pol2map\
+The following shows the output from running this initial \task{pol2map}
 command.
 
 \begin{terminalv}
@@ -208,8 +208,8 @@ The files and folders produced by this reduction process are described below.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \pol2map\
-  command (\pol2map\ is actually a Python script that runs various other
+  various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \task{pol2map}
+  command (\task{pol2map} is actually a Python script that runs various other
   Starlink tasks behind the scenes in order to perform the bulk of the work).
 
 \item[\file{qudata/}] A folder containing the I, Q and U time-series data
@@ -267,7 +267,7 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 \label{sec:how-step23}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
-  Theory}, the I map output from the initial run of \pol2map\ is used to
+  Theory}, the I map output from the initial run of \poltwomap\ is used to
 derive the final I, Q and U maps. If requested, a vector catalogue is
 also produced.
 
@@ -279,11 +279,11 @@ run via a single command.
           maskout1=astmask maskout2=pcamask ipref=iext cat=mycat debias=yes
 \end{terminalv}
 
-The following shows the output from running this second \pol2map\
-command. First, \pol2map\ produces new I maps for each map, correcting
+The following shows the output from running this second \task{pol2map}
+command. First, \task{pol2map} produces new I maps for each map, correcting
 the position using the correction stored in the old I
 map\footnote{This correction is found by aligning the old I map with the
-\file{iauto.sdf} map.}, and then co-adds all the observations.
+\file{iauto.sdf} map.}, and then coadds all the observations.
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -305,7 +305,7 @@ Masking will be based on SNR values in 'iauto'.
 Coadding I maps from all observations:
 \end{terminalv}
 
-As \pol2map\ continues, the Q and U maps are produced, again with
+As \task{pol2map} continues, the Q and U maps are produced, again with
 pointing corrections. This is followed by the creation of the output
 vector catalogue.
 
@@ -341,11 +341,11 @@ Creating the output catalogue: 'mycat'...
 \end{terminalv}
 
 
-The output of this final run of \pol2map\ is as follows.
+The output of this final run of \task{pol2map} is as follows.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  \pol2map\ command. Note previous log files are moved to a new name
+  pol2map command. Note previous log files are moved to a new name
   such as \texttt{pol2map.log.1}.
 
 \item[\file{astmask.sdf}] The AST mask used in the creation
@@ -369,7 +369,7 @@ The output of this final run of \pol2map\ is as follows.
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
 
 \item[\file{mycat.FIT}] The output vector catalogue containing a
-  range of values derived by \pol2map\ for each pixel contained within
+  range of values derived by \task{pol2map} for each pixel contained within
   the I map.
 
 \end{aligndesc}
@@ -382,7 +382,7 @@ The output of this final run of \pol2map\ is as follows.
 \label{fig:gaia-iext}
 \caption [Final I map in GAIA]{
   \small Left: I map, \file{iauto}, as produced by the automask on the first pass
-         of \pol2map\. Right: Final I map, \file{iext}, as viewed in \GAIA.
+         of \task{pol2map}. Right: Final I map, \file{iext}, as viewed in \GAIA.
          The flatter background is due to the increase in \param{pca.pcathresh}.
 }
 \end{center}
@@ -420,10 +420,10 @@ existing I maps listed below.
 
 
 The output vector catalogue contains a range of values derived by
-\pol2map\ for each pixel contained within the I map. Intensity values and
+\poltwomap\ for each pixel contained within the I map. Intensity values and
 errors in the
 catalogue are expressed in units of mJy/beam.  If desired it is possible
-to switch the catalogue to units of pW by using \texttt{Jy=no} on the \pol2map\
+to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2map}
 command line.  The columns are listed below.
 
 \begin{aligndesc}
@@ -450,7 +450,7 @@ command line.  The columns are listed below.
 \label{sec:pol2map-fcf}
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
-POL-2 is not a perfect polarimeter. Its wire grid absorbs and scatters incoming
+POL-2 is not a perfect polarimiter. Its wire grid absorbs and scatters incoming
 signal so the modulation amplitude is lower than for a perfect polarimeter.
 In addition cross polarization and depolarization decreases the modulation
 amplitude without decreasing the power in the transmitted signal. The first
@@ -471,18 +471,18 @@ standard SCUBA-2 FCF for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}, resp
 \label{sec:pol2map-pixelsize}
 
 Inevitably, as with unpolarised SCUBA-2 data reduction, it will
-probably be necessary for you to tweak the \pol2map\ reduction for
+probably be necessary for you to tweak the \poltwomap\ reduction for
 specific situations.
 
 The bin size within the final vector catalogue is controlled by the
-\param{BINSIZE} parameter in the \SMURF\ \pol2map\ command.
+\param{BINSIZE} parameter in the \SMURF\ \task{pol2map} command.
 
 \begin{terminalv}
 % pol2map binsize=12
 \end{terminalv}
 
 Changing the catalogue bin size in this way does not change the pixel
-size of the maps created \pol2map\. Instead, the maps are binned up
+size of the maps created \task{pol2map}. Instead, the maps are binned up
 to the requested bin size before the catalogue is created. There is
 another parameter, called \param{PIXSIZE}, which controls the map pixel
 size, but it is usually advisable to leave this at its default value
