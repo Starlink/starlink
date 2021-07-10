@@ -5,7 +5,7 @@
 The POL-2 instrument is a linear polarimetry module for the
 Submillimetre Common User Bolometer Array-2 (SCUBA-2), a 10,000
 bolometer camera on the JCMT \cite{Friberg} \cite{Bastien2011}.  POL-2
-in itself is not a detector - thus requiring SCUBA-2 and its detectors
+in itself is not a detector---thus requiring SCUBA-2 and its detectors
 for operation. SCUBA-2 (and consequently POL-2) operates simultaneously
 at both 850 and \SI{450}{\micro\metre}.
 
@@ -75,7 +75,7 @@ that varies with elevation but which is always smaller than 0.03.
 \subsection*{How POL-2 works}
 
 POL-2 is located in front of the window to the SCUBA-2 instrument (as
-is seen in Figure~\ref{fig:pol2sc2}), and covers the full field of
+is seen in \cref{Figure}{fig:pol2sc2}{}), and covers the full field of
 view of SCUBA-2. The POL-2 polarimeter uses three optical components
 that cover the full field of SCUBA-2:
 
@@ -86,8 +86,8 @@ that cover the full field of SCUBA-2:
 \item a second wire-grid polariser used as an analyser.
 \end{enumerate}
 
-These components can be seen in Figure~\ref{fig:pol2sc2}.  A schematic
-of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
+These components can be seen in \cref{Figure}{fig:pol2sc2}{}.  A schematic
+of POL-2 is given in \cref{Figure}{fig:pol2sc2diagram}{}.
 
 \begin{figure}[t!]
 \begin{center}
@@ -102,7 +102,7 @@ of POL-2 is given in Figure~\ref{fig:pol2sc2diagram}.
 Rotating the HWP rotates any linearly polarised component of incoming
 radiation. The HWP rotates this incoming linear polarisation with
 twice the speed of the HWP angle ($\delta$) producing the
-\emph{effective analyser} position ($\phi$ - as defined in
+\emph{effective analyser} position ($\phi$---as defined in
 \xref{the POLPACK documentation}{sun223}{thepolarimeter}), such that:
 
 
@@ -168,7 +168,7 @@ respectively \cite{Savini}.
 The HWP rotates the incoming linear polarisation with twice the speed
 of the wave plate angle.  The HWP is typically rotated at 2\,Hz,
 providing a fast modulation of any linear polarisation by 8\,Hz (see
-Equation~\ref{eqn:idet}).  The data acquisition rate is $\sim$175\,Hz, yielding
+\cref{Equation}{eqn:idet}{}).  The data acquisition rate is $\sim$175\,Hz, yielding
 20\,samples per cycle.  The atmosphere is stable on the order of 2\,Hz and
 can be removed.
 
@@ -212,7 +212,7 @@ can be removed.
 At the angular resolution of JCMT, planets such as Uranus should
 appear as unpolarised point sources.  In practice, however, POL-2
 observations of such sources exhibit a measurable level of
-polarisation -- albeit typically less than 1.5\% at 850\,$\mu$m. This
+polarisation---albeit typically less than 1.5\% at 850\,$\mu$m. This
 is evidence that some part of the incoming astronomical radiation is
 being partially polarised by one or more of the components of the
 telescope/POL-2/SCUBA-2 that are in the light path. This polarisation
@@ -250,7 +250,7 @@ Whilst flat mirrors or surfaces will produce a small, constant
 polarisation across the beam, curved mirrors and other structures (for
 example the secondary mirror supports) will produce more complex
 polarisation effects, and these may distort the beam shape.
-Side-lobes can often show up with strong (typically 10-20\%)
+Side-lobes can often show up with strong (typically 10--20\%)
 polarisation but these effects are usually far from the
 main-beam. Calculations of typical antenna patterns for symmetrical
 Cassegrain antennas have not predicted strong polarisation in the main
@@ -290,8 +290,8 @@ for a slower telescope scanning speed.
 \label{fig:scancompsrison}
 \caption [Scan Pattern Comparison]{Left: Scan pattern from a typical
   SCUBA-2 CV\_Daisy observation. Right: Scan pattern from a POL-2
-  Daisy. The standard POLCV\_DAISY scan parameters are given in Table
-  \ref{tab:scanpar} }
+  Daisy. The standard POLCV\_DAISY scan parameters are given in
+  \cref{Table}{tab:scanpar}{} }
 \end{center}
 \end{figure}
 
@@ -310,7 +310,7 @@ on the sky. The default pixel size provided by \texttt{pol2map} is 4\si{\arcseco
 at both 850 and 450.
 
 The standard POLCV\_DAISY scan parameters are given in
-Table~\ref{tab:scanpar} and shown in Figure~\ref{fig:scandetail}.
+\cref{Table}{tab:scanpar}{} and shown in \cref{Figure}{fig:scandetail}{}.
 
 \begin{table}[h!]
 \begin{center}
@@ -340,7 +340,7 @@ Half-wave plate rotation frequency& \SI{2}{Hz}\\
 \caption [Detail of POL-2 Scan Pattern]{Detail of
   POLCV\_DAISY. $R_{0}$ is the map pattern radius, $R_{\textnormal{t}}$ the turn
   radius, and $R_{\textnormal{a}}$ is the nominal avoidance radius. For more
-  details see Table~\ref{tab:scanpar}.}
+  details see \cref{Table}{tab:scanpar}{}.}
 \label{fig:scandetail}
 \end{center}
 \end{figure}
@@ -439,8 +439,8 @@ sub-array for Observation 34 taken on 12\textsuperscript{th} January
 Raw POL-2 data come in uncalibrated units. The first calibration step
 is to scale the raw data to units of picowatts (pW) by applying the
 flat-field solution. This step is performed internally by the \SMURF\
-command \xref{\task{calcqu}}{sun258}{CALCQU} -- used to calculate
-I, Q and U time-streams from the raw data -- but can be done manually
+command \xref{\task{calcqu}}{sun258}{CALCQU}---used to calculate
+I, Q and U time-streams from the raw data---but can be done manually
 when examining the raw data.
 
 If the purpose of a given POL-2 observation is to determine the

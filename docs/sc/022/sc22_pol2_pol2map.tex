@@ -8,11 +8,12 @@ details. It should be noted that this same procedure is used irrespective
 of whether single or multiple observations are to be reduced.
 
 The following description assumes that the \task{makemap} command is
-being used to create maps. Section \ref{sec:skyloop} explains the effects
+being used to create maps. \cref{Section}{sec:skyloop}{SKYLOOP} explains the effects
 of using the \task{skyloop} command in place of \task{makemap}.
 
 The data reduction process can be broken down into three main stages --
-referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure~\ref{fig:pol2drflow}.
+referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in
+\cref{Figure}{fig:pol2drflow}{}.
 
 \begin{figure}[t!]
 \begin{center}
@@ -29,7 +30,7 @@ referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in Figure~\ref{fig:pol2drflow}
 
 \subsection*{Step 1}
 
-The initial step of the process (see Run~1 in Figure~\ref{fig:pol2drflow})
+The initial step of the process (see Run~1 in \cref{Figure}{fig:pol2drflow}{})
 creates a preliminary co-added total intensity
 (I) map from the raw data files for all observations provided to the
 reduction routine (see \cref{Chapter}{sec:rundr}{}).
@@ -46,7 +47,7 @@ The \xref{SMURF:makemap}{sun258}{MAKEMAP} command is then used to
 create a separate map from the I time-stream for each observation,
 using SNR-based ``auto-masking'' to define the background regions that
 are to be set to zero at the end of each iteration. This step uses a
-PCA threshold of 50 (see Section~\ref{sec:pca} for more details).
+PCA threshold of 50 (see \cref{Section}{sec:pca}{PCA} for more details).
 
 \texttt{pca.pcathresh = -50}
 
@@ -59,8 +60,8 @@ where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
 of the contiguous chunk of data used to create the map, and is usually
 0003.
 
-A coadd is then formed by adding all these maps together. Each individual map
-is then compared to the co-add, in order to determine a pointing correction
+A co-add is then formed by adding all these maps together. Each individual map
+is then compared with the co-add, in order to determine a pointing correction
 to be applied to the observation in future. These corrections are stored
 in the FITS header of the individual maps.
 
@@ -68,7 +69,7 @@ in the FITS header of the individual maps.
 \subsection*{Step 2}
 
 In the second step of the process (see Run~2 in
-Figure~\ref{fig:pol2drflow}) an improved I map is produced. These
+\cref{Figure}{fig:pol2drflow}{}) an improved I map is produced. These
 improvements come from
 \begin{enumerate}
 \item applying the pointing corrections determined in Step~1
@@ -83,7 +84,7 @@ improvements come from
 \subsection*{Step 3}
 
 In the third step of the reduction process (see Run~3 in
-Figure~\ref{fig:pol2drflow}), both the Q and U maps are produced. The production
+\cref{Figure}{fig:pol2drflow}{}), both the Q and U maps are produced. The production
 of the Q and U maps requires the Q and U time-series data (produced in
 Step~1), the final I map (produced in Step~2) and the output masks (also
 produced in Step~2). Once the Q and U maps are produced a final vector
@@ -101,7 +102,7 @@ time-series data to produce a final science map.
 
 In \poltwomap\ , the map-maker is used in conjunction with
 \xref{calcqu}{sun258}{CALCQU} (see
-Section~\ref{sec:calcqu}) to produce maps of Q and U, as well as I.
+\cref{Section}{sec:calcqu}{CALCQU}) to produce maps of Q and U, as well as I.
 
 \section{\xlabel{skyloop}SKYLOOP}
 \label{sec:skyloop}
@@ -112,12 +113,13 @@ in place of the \SMURF\ \makemap\ command. Each invocation of the
 for a single observation. If multiple observations are processed together,
 multiple invocations of \task{makemap} are used and the resulting maps are
 co-added before moving on to the next step, as indicated in
-Figure~\ref{fig:pol2drflow}. The \task{skyloop} command, on the other hand,
+\cref{Figure}{fig:pol2drflow}{}. The \task{skyloop} command, on the other hand,
 will process multiple observations in a single invocation, creating a combined
 map from all observations. Thus, when using \task{skyloop},
-Figure~\ref{fig:pol2drflow} would be effectively changed such that each occurrence
+\cref{Figure}{fig:pol2drflow}{} would be effectively changed such that each occurrence
 of ``three invocations of \task{makemap} feeding one co-add" would be replaced
-by a single invocation of ``\task{skyloop}". See section~\ref{sec:tailoredDR}
+by a single invocation of ``\task{skyloop}". See
+\cref{Section}{sec:tailoredDR}{Tailoring a reduction}
 for more information about the effects of using \task{skyloop}.
 
 \section{\xlabel{calcqu}CALCQU}
@@ -147,8 +149,8 @@ the final mean value, not the variances of the individual values).
 One difference between the reduction of SCUBA-2 data and POL-2 data is the
 method used to remove the sky background.  The sky background is usually
 very large compared with the astronomical signal, and both are subject to
-the same form of instrumental polarisation (IP -- see Section~\ref{sec:ip}).
-This
+the same form of instrumental polarisation (IP---see
+\cref{Section}{sec:ip}{Instrumental Polarisation}). This
 IP acting on the high sky background values causes high background values
 in the Q and U maps. However, there is evidence that the IP is not
 constant across the focal plane, resulting in spatial variations in the
@@ -166,7 +168,7 @@ is based upon a Principal Component Analysis (PCA) of the 1280
 time-streams in each sub-array (the Q and U data are processed
 separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
-are assumed to represent the spatially-varying background signal and are
+are assumed to represent the spatially varying background signal and are
 removed, leaving just the astronomical signal. The user may specify the number
 of components to remove, via a \task{makemap} configuration
 parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
@@ -213,7 +215,7 @@ pixels. Masks are used for two main purposes:
 \end{enumerate}
 
 
-The \poltwomap\ script uses different masks for these two purposes -- the
+The \poltwomap\ script uses different masks for these two purposes---the
 ``AST'' mask and the ``PCA'' mask.  The PCA mask is, in general, less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
@@ -276,39 +278,39 @@ observations:
 
 \begin{enumerate}
 \item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
-\poltwomap\ will cause each observation to be assigned a separate
-weight, which will be used when forming the coadd of all observations.
+\poltwomap\  will cause each observation to be assigned a separate
+weight, which will be used when forming the co-add of all observations.
 This will affect both the data values and the variances in the resulting
-coadd. The purpose of these weights is to down-weight observations that
+co-add. The purpose of these weights is to down-weight observations that
 produce maps that are very dissimilar to maps made from the other observations.
 
-Without this parameter setting, the coadd is formed using weights equal
+Without this parameter setting, the co-add is formed using weights equal
 to the reciprocal of the pixel variance values in each individual
 observation's map. As mentioned above, these pixel variance values can
 sometimes seriously underestimate the dispersion between observations.
 For instance, observations that are clearly bad (e.g. out of focus) can have
 relatively low pixel variance values, and thus be included with high weights
-in the final coadd.
+in the final co-add.
 
 If the \param{OBSWEIGHT} parameter is set \texttt{TRUE}, each observation
 is given an additional weight that is used to factor the per-pixel
 weights derived from the pixel variance values, in order to down-weight
 observations that are clearly bad. To form these weights, an initial
-coadd is formed using equal weights for all observations. The maps made
-from the individual observations are then compared to this initial coadd,
+co-add is formed using equal weights for all observations. The maps made
+from the individual observations are then compared with this initial co-add,
 and each observation is assigned a weight equal to the reciprocal of the
 mean squared residual between the individual observation's map and the
-initial coadd (any required pointing correction is applied to the
+initial co-add (any required pointing correction is applied to the
 individual observation map before forming these residuals). The
 calculation of the mean squared residual is limited to those pixels
 inside the AST mask (i.e. source pixels). The weights derived in this
 manner are normalised to have a median value of 1.0, and any normalised
-weights larger than 1.0 are reduced to 1.0. An improved coadd is then
+weights larger than 1.0 are reduced to 1.0. An improved co-add is then
 formed using these observation weights.
 
 Another iteration is then performed, in which individual maps are compared
-with this improved coadd and new weights are derived. This iterative
-process continues until the typical error in the middle of the coadd
+with this improved co-add and new weights are derived. This iterative
+process continues until the typical error in the middle of the co-add
 stops falling significantly.
 
 \item  Setting the parameter \param{SKYLOOP}=\texttt{TRUE} when running
