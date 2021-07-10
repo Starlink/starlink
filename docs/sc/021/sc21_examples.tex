@@ -210,7 +210,7 @@ The recipe processes each observation twice, a standard reduction
 first, then a re-run with a fake point source added to the time
 series (see parameter ``\xparam{FAKEMAP}{fakemap}''). This produces
 a co-added signal map (\file{\_wmos}) and a
-coadded PSF map (\file{\_mappsf}).
+co-added PSF map (\file{\_mappsf}).
 
 \begin{tip}
 The recipe name \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be used
@@ -245,7 +245,7 @@ is determined automatically, but the method may fail if the box is too
 small.
 
 If you decide to re-run this step you first co-add all the
-\file{\_mappsf} files to create a coadded PSF using the \picard\ recipe
+\file{\_mappsf} files to create a co-added PSF using the \picard\ recipe
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}.
 \begin{terminalv}
 % picard MOSAIC_JCMT_IMAGES *_mappsf
@@ -254,7 +254,7 @@ Next create a parameter file (\file{recpars.lis}) for the jack-knife
 recipe (\drrecipe{SCUBA2\_JACKKNIFE}) containing the following lines.
 \begin{terminalv}
 [SCUBA2_JACKKNIFE]
-PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
+PSF_MATCHFILTER = <name_of_above_co-added_PSF>.sdf
 \end{terminalv}
 Another option for this parameter file is \param{WHITEN\_BOX} to set the
 size of the region used to calculate the angular power spectrum.
