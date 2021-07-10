@@ -217,7 +217,7 @@ The \poltwomap\ script uses different masks for these two purposes -- the
 ``AST'' mask and the ``PCA'' mask.  The PCA mask is, in general, less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
-generated automatically within \task{pol2map}, or be specified by a fixed
+generated automatically within \poltwomap, or be specified by a fixed
 external NDF.
 
 
@@ -270,13 +270,13 @@ to develop within the source regions defined by the AST mask. Such
 artificial structures will vary from observation to observation, and so
 will contribute to the variances calculated using \param{MAPVAR}=\texttt{TRUE}.
 
-Two options are provided by \task{pol2map} that may be useful in reducing
+Two options are provided by \poltwomap\ that may be useful in reducing
 the larger-than-expected dispersion between maps made from different
 observations:
 
 \begin{enumerate}
 \item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
-\task{pol2map}  will cause each observation to be assigned a separate
+\poltwomap\ will cause each observation to be assigned a separate
 weight, which will be used when forming the coadd of all observations.
 This will affect both the data values and the variances in the resulting
 coadd. The purpose of these weights is to down-weight observations that
@@ -312,7 +312,7 @@ process continues until the typical error in the middle of the coadd
 stops falling significantly.
 
 \item  Setting the parameter \param{SKYLOOP}=\texttt{TRUE} when running
-\task{pol2map}  will cause maps to be made using the
+\poltwomap\ will cause maps to be made using the
 \xref{SMURF:\task{skyloop}}{sc21}{skyloop} command, instead of
 \task{makemap}. In the context of the \task{skyloop} documentation, one
 ``chunk'' of data usually corresponds to a single observation.
