@@ -22,7 +22,7 @@ referred to as ``Run 1'', ``Run 2'' and ``Run 3'' in
 \caption [POL-2 Data Flow]{ The data flow of the POL-2 data reduction
   method is presented. In this example, three POL-2 observations are
   reduced and combined in various stages and combination to produce I,
-  Q and U maps and a vector catalogue.  }
+  Q, and U maps and a vector catalogue.  }
 \label{fig:pol2drflow}
 \end{center}
 \end{figure}
@@ -230,14 +230,14 @@ external NDF.
 \subsection*{Variances between POL-2 maps}
 
 \param{MAPVAR} is a \poltwomap\ parameter that controls how the variances in the
-co-added I, Q and U maps are formed.
+co-added I, Q, and U maps are formed.
 
-If \param{MAPVAR} is set \texttt{TRUE}, the variances in the co-added I, Q and U maps
+If \param{MAPVAR} is set \texttt{TRUE}, the variances in the co-added I, Q, and U maps
 are formed from the spread of pixel data values between the individual
 observation maps. If \param{MAPVAR} is \texttt{FALSE} (the default), the variances in
 the co-added maps are formed by propagating the pixel variance values
 created by \task{makemap} from the individual observation maps (these are
-based on the spread of I, Q or U values that fall within each pixel).
+based on the spread of I, Q, or U values that fall within each pixel).
 
 Use \param{MAPVAR}=\texttt{TRUE} only if enough observations are available to make the
 variances between them meaningful. A general lower limit on its value
@@ -245,7 +245,7 @@ is difficult to define, but a minimum of 10 observations is advised.
 
 
 If a test of the effect of this option is required on a field for which
-the I, Q and U maps from a set of individual observations are already
+the I, Q, and U maps from a set of individual observations are already
 available, the following may be done:
 
 \begin{terminalv}
@@ -253,7 +253,7 @@ available, the following may be done:
                    ipcor=no cat=cat_mapvar debias=yes
 \end{terminalv}
 
-assuming that the I, Q and U maps are in directory \file{maps}. The
+assuming that the I, Q, and U maps are in directory \file{maps}. The
 variances in \file{imapvar.sdf}, \file{qmapvar.sdf} and
 \file{umapvar.sdf} will be calculated using the new method, and
 these variances will then be used to form the errors in the
@@ -319,7 +319,7 @@ stops falling significantly.
 \task{makemap}. In the context of the \task{skyloop} documentation, one
 ``chunk'' of data usually corresponds to a single observation.
 
-A single invocation of \task{skyloop} creates an I, Q or U map from all
+A single invocation of \task{skyloop} creates an I, Q, or U map from all
 supplied observations, using a method that attempts to minimise the
 intrinsic instabilities of the map-making algorithm within the AST mask.
 It should be noted that convergence can require a significantly greater number

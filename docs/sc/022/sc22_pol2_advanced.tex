@@ -15,7 +15,7 @@ For further ideas, see \cref{Section}{sec:tailoredDR}{Tailoring a reduction}.
 \section{\xlabel{addingdata}Adding new observations}
 
 This section describes the six-step process of combining data for one
-or more new POL-2 observations into existing I, Q and U maps and vector
+or more new POL-2 observations into existing I, Q, and U maps and vector
 catalogue created by an earlier run of \task{pol2map}.
 
 \begin{enumerate}
@@ -136,7 +136,7 @@ pixels and 7\si{\arcsecond} pixels.
 % sqorst  mode=pixelscale pixscale=\'7,7,7E-05\' in=pcamask12 out=pcamask7
 \end{terminalv}
 
-\item Create the 7\si{\arcsecond} externally masked I, Q and U maps
+\item Create the 7\si{\arcsecond} externally masked I, Q, and U maps
   using the above 7\si{\arcsecond} masks (note the \texttt{mask}
   parameter value is enclosed in single \emph{and} double quotes).
 
@@ -196,17 +196,17 @@ Systems (WCS) in two different forms:
 \item The catalogue contains ``RA'' and ``Dec'' columns that hold the sky position
 (FK5, J2000) of each vector, in radians.
 \item The catalogue header contains a Starlink ``WCS FrameSet'' which defines
-(amongst other things) the projection from pixel coordinates within the I, Q and
+(amongst other things) the projection from pixel coordinates within the I, Q, and
 U mosaics, to RA and Dec. This FrameSet is used by Starlink software, together
 with the pixels coordinates stored in the ``X'' and ``Y'' columns, to determine
 the RA and Dec of each vector. The WCS FrameSet also defines the polarimetric
-reference direction used by the Q, U and ANG values. See
+reference direction used by the Q, U, and ANG values. See
 ``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
 within \xref{SUN/95}{sun95}{} (the \KAPPA\ manual) for more information on
 the ways in which Starlink software handles WCS information.
 \end{enumerate}
 
-Starlink software such as \polpack, \Kappa\ and \gaia\ rely on the WCS
+Starlink software such as \polpack, \Kappa, and \gaia\ rely on the WCS
 FrameSet for all WCS-related operations (drawing annotated axes, aligning
 data sets, \emph{etc}). Thus problems are likely if the WCS FrameSet is
 removed from the vector catalogue. This could happen for instance if you
