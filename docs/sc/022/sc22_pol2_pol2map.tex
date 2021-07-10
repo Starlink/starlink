@@ -169,7 +169,7 @@ time-streams in each sub-array (the Q and U data are processed
 separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
 are assumed to represent the spatially varying background signal and are
-removed, leaving just the astronomical signal. The user may specify the number
+removed, leaving just the astronomical signal. You may specify the number
 of components to remove, via a \task{makemap} configuration
 parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
 the reduction command for POL-2 data, provides suitable defaults for this parameter.
@@ -267,7 +267,7 @@ uncorrected pointing errors, which have a particularly large effect near
 bright point sources if \param{MAPVAR}=\texttt{TRUE}.
 
 It is also partly caused by intrinisic instabilities within the iterative
-map-making algorithm, which allow low-level artifical extended structures
+map-making algorithm, which allow low-level artificial extended structures
 to develop within the source regions defined by the AST mask. Such
 artificial structures will vary from observation to observation, and so
 will contribute to the variances calculated using \param{MAPVAR}=\texttt{TRUE}.
