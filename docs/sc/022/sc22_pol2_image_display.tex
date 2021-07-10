@@ -5,15 +5,15 @@
 
 The \starlink\ package \gaia\ can be used to inspect the results of
 the data reduction.  To plot the output vector catalogue onto the
-final total intensity map first open up the I map in \GAIA.
+final total intensity map, first open up the I map in \GAIA.
 
 \begin{terminalv}
 % gaia iext.sdf
 \end{terminalv}
 
 
-In the main \GAIA\ window, select the drop-down menu option
-\texttt{Image Analysis / Polarimetry toolbox…}. This should launch a
+From the main \GAIA\ window, select the drop-down menu option
+\texttt{Image Analysis / Polarimetry toolbox}. This should launch a
 new toolbox window entitled \texttt{GAIA: Polarimetry}. From this window, use
 the drop-down menu option \texttt{File / Open} to load the file
 \file{mycat.FIT}. This should then populate the lower part of the window
@@ -34,8 +34,8 @@ in this file will be automatically overlaid on the main image window
 \end{figure}
 
 In order to filter the number of overlaid vectors down to a more
-useful number and size, you can use various options in the
-\texttt{GAIA: Polarimetry} toolbox. First, select the
+useful number and size, the various options in the
+\texttt{GAIA: Polarimetry} toolbox can be used. First, select the
 \texttt{Rendering} tab on the
 left hand side. This will reveal a panel that will indicate which
 quantities are currently being used for the vector overlays. In this
@@ -58,7 +58,8 @@ the associated error value for that intensity (Column~DI). To remove
 all of these extraneous vectors, either press control-X or use the
 drop-down menu option \texttt{Edit / Cut}.  This should leave just a
 small number of vectors clustering around the target object (see
-\cref{Figure}{fig:gaiavectorssecond}{}).
+\cref{Figure}{fig:gaiavectorssecond}{})
+\footnote{This example is provided here for simplicity. It should be noted, however, that a selection criterion following the general format of ''\$I/\$DI<10 || \$AST==0'' might actually further improve some selections, as it makes use of the \texttt{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
 
 \begin{figure}[t!]
 \begin{center}
@@ -74,11 +75,10 @@ small number of vectors clustering around the target object (see
 \end{center}
 \end{figure}
 
-Zooming in on the central region of the map, it can already be seen
-that the level of vector ordering (and hence polarisation) is quite
-low (see \cref{Figure}{fig:gaiavectorsfinal}{}). If needed it is
-possible to change the scaling by selecting the Rendering tab in the
-\texttt{GAIA: Polarimetry} window, and increasing the vector scale.
+Zooming in on the central region of the map makes it possible to view
+the vectors near the target object (see \cref{Figure}{fig:gaiavectorsfinal}{}).
+If needed, it is possible to change the vector scale by selecting the Rendering
+tab in the \texttt{GAIA: Polarimetry} window.
 
 
 \begin{figure}[t!]
