@@ -68,8 +68,8 @@ catalogue created by an earlier run of \task{pol2map}.
 
 \item If the mask has changed significantly and all observations need
   to be reprocessed using the new mask, remove the existing
-  externally-masked maps so that they will be re-created by the next
-  invocation of \task{pol2map}.  Note -- this will increase the length of time
+  externally masked maps so that they will be re-created by the next
+  invocation of \task{pol2map}.  Note that this will increase the length of time
   taken by Step~6 enormously.
 
   Ensure the new auto-masked co-add is used in place of the old one to
@@ -149,7 +149,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 \begin{tip}
   Using larger pixels usually produces slower convergence, so the
-  above process will take longer than usual -- be patient!
+  above process will take longer than usual---be patient!
 
   Using larger pixels can sometimes encourage smooth blobs and other
   artificial features to appear in the map. The \file{iauto12.sdf} file
@@ -211,7 +211,7 @@ FrameSet for all WCS-related operations (drawing annotated axes, aligning
 data sets, \emph{etc}). Thus problems are likely if the WCS FrameSet is
 removed from the vector catalogue. This could happen for instance if you
 use inappropriate software to process an existing catalogue, creating a
-new output catalogue -- the WCS FrameSet may not be copied to the output
+new output catalogue---the WCS FrameSet may not be copied to the output
 catalogue, causing subsequent WCS-related operations to fail. It is safe
 to use \POLPACK, \KAPPA, \GAIA\ and \xref{\textsc{Cursa}}{sun190}{}) as
 all these packages copy the WCS FrameSet to any new output catalogues.

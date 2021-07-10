@@ -60,8 +60,8 @@ where \texttt{<CHUNK$\_$NUM>} indicates the raw data file at the start
 of the contiguous chunk of data used to create the map, and is usually
 0003.
 
-A coadd is then formed by adding all these maps together. Each individual map
-is then compared to the co-add, in order to determine a pointing correction
+A co-add is then formed by adding all these maps together. Each individual map
+is then compared with the co-add, in order to determine a pointing correction
 to be applied to the observation in future. These corrections are stored
 in the FITS header of the individual maps.
 
@@ -149,7 +149,7 @@ the final mean value, not the variances of the individual values).
 One difference between the reduction of SCUBA-2 data and POL-2 data is the
 method used to remove the sky background.  The sky background is usually
 very large compared with the astronomical signal, and both are subject to
-the same form of instrumental polarisation (IP -- see
+the same form of instrumental polarisation (IP---see
 \cref{Section}{sec:ip}{Instrumental Polarisation}). This
 IP acting on the high sky background values causes high background values
 in the Q and U maps. However, there is evidence that the IP is not
@@ -168,7 +168,7 @@ is based upon a Principal Component Analysis (PCA) of the 1280
 time-streams in each sub-array (the Q and U data are processed
 separately). The PCA process identifies the strongest time-dependent
 components that are present within multiple bolometers. These components
-are assumed to represent the spatially-varying background signal and are
+are assumed to represent the spatially varying background signal and are
 removed, leaving just the astronomical signal. The user may specify the number
 of components to remove, via a \task{makemap} configuration
 parameter called \xparam{PCA.PCATHRESH}{pca.pcathresh} although \poltwomap,
@@ -215,7 +215,7 @@ pixels. Masks are used for two main purposes:
 \end{enumerate}
 
 
-The \poltwomap\ script uses different masks for these two purposes -- the
+The \poltwomap\ script uses different masks for these two purposes---the
 ``AST'' mask and the ``PCA'' mask.  The PCA mask is, in general, less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
@@ -278,39 +278,39 @@ observations:
 
 \begin{enumerate}
 \item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
-\poltwomap\ will cause each observation to be assigned a separate
-weight, which will be used when forming the coadd of all observations.
+\poltwomap\  will cause each observation to be assigned a separate
+weight, which will be used when forming the co-add of all observations.
 This will affect both the data values and the variances in the resulting
-coadd. The purpose of these weights is to down-weight observations that
+co-add. The purpose of these weights is to down-weight observations that
 produce maps that are very dissimilar to maps made from the other observations.
 
-Without this parameter setting, the coadd is formed using weights equal
+Without this parameter setting, the co-add is formed using weights equal
 to the reciprocal of the pixel variance values in each individual
 observation's map. As mentioned above, these pixel variance values can
 sometimes seriously underestimate the dispersion between observations.
 For instance, observations that are clearly bad (e.g. out of focus) can have
 relatively low pixel variance values, and thus be included with high weights
-in the final coadd.
+in the final co-add.
 
 If the \param{OBSWEIGHT} parameter is set \texttt{TRUE}, each observation
 is given an additional weight that is used to factor the per-pixel
 weights derived from the pixel variance values, in order to down-weight
 observations that are clearly bad. To form these weights, an initial
-coadd is formed using equal weights for all observations. The maps made
-from the individual observations are then compared to this initial coadd,
+co-add is formed using equal weights for all observations. The maps made
+from the individual observations are then compared with this initial co-add,
 and each observation is assigned a weight equal to the reciprocal of the
 mean squared residual between the individual observation's map and the
-initial coadd (any required pointing correction is applied to the
+initial co-add (any required pointing correction is applied to the
 individual observation map before forming these residuals). The
 calculation of the mean squared residual is limited to those pixels
 inside the AST mask (i.e. source pixels). The weights derived in this
 manner are normalised to have a median value of 1.0, and any normalised
-weights larger than 1.0 are reduced to 1.0. An improved coadd is then
+weights larger than 1.0 are reduced to 1.0. An improved co-add is then
 formed using these observation weights.
 
 Another iteration is then performed, in which individual maps are compared
-with this improved coadd and new weights are derived. This iterative
-process continues until the typical error in the middle of the coadd
+with this improved co-add and new weights are derived. This iterative
+process continues until the typical error in the middle of the co-add
 stops falling significantly.
 
 \item  Setting the parameter \param{SKYLOOP}=\texttt{TRUE} when running
