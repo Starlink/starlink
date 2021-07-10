@@ -283,7 +283,7 @@ The following shows the output from running this second \poltwomap\
 command. First, \poltwomap\ produces new I maps for each map, correcting
 the position using the correction stored in the old I
 map\footnote{This correction is found by aligning the old I map with the
-\file{iauto.sdf} map.}, and then coadds all the observations.
+\file{iauto.sdf} map.}, and then co-adds all the observations.
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -345,7 +345,7 @@ The output of this final run of \poltwomap\ is as follows.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  pol2map command. Note previous log files are moved to a new name
+  \poltwomap\ command. Note previous log files are moved to a new name
   such as \texttt{pol2map.log.1}.
 
 \item[\file{astmask.sdf}] The AST mask used in the creation
@@ -368,7 +368,7 @@ The output of this final run of \poltwomap\ is as follows.
 \item[\file{uext.sdf}] The U map (\emph{i.e.} the intensity of the radiation
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
 
-\item[\file{mycat.FIT}] The output vector catalogue containing a
+\item[\file{mycat.FIT}] The output vector catalogue, containing a
   range of values derived by \poltwomap\ for each pixel contained within
   the I map.
 
@@ -382,7 +382,7 @@ The output of this final run of \poltwomap\ is as follows.
 \label{fig:gaia-iext}
 \caption [Final I map in GAIA]{
   \small Left: I map, \file{iauto}, as produced by the automask on the first pass
-         of \poltwomap\. Right: Final I map, \file{iext}, as viewed in \GAIA.
+         of \poltwomap. Right: Final I map, \file{iext}, as viewed with \GAIA.
          The flatter background is due to the increase in \param{pca.pcathresh}.
 }
 \end{center}
@@ -402,8 +402,8 @@ The output of this final run of \poltwomap\ is as follows.
 
 
 
-The maps folder now contains individual Q and U maps alongside the
-existing I maps listed below.
+The maps folder now contains individual Q and U maps, alongside the
+existing I maps listed below:
 
 \begin{terminalv}
 20160112_00056_0003_Imap.sdf  20160112_00059_0003_Imap.sdf  20160125_00043_0003_Imap.sdf
@@ -450,7 +450,7 @@ command line.  The columns are listed below.
 \label{sec:pol2map-fcf}
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
-POL-2 is not a perfect polarimiter. Its wire grid absorbs and scatters incoming
+POL-2 is not a perfect polarimeter. Its wire grid absorbs and scatters incoming
 signal so the modulation amplitude is lower than for a perfect polarimeter.
 In addition cross polarization and depolarization decreases the modulation
 amplitude without decreasing the power in the transmitted signal. The first
