@@ -50,7 +50,7 @@ Selecting tab, and set the Expression field to be the following:
 $I/$DI<10
 \end{terminalv}
 
-\emph{Ensure you press return after entering in the above expression}.
+\emph{Ensure that ``Return'' is pressed after entering the above expression}.
 
 The above expression selects the data points in the polarimetry table
 that have an associated total intensity (Column~I) less than 10 times
@@ -69,7 +69,7 @@ small number of vectors clustering around the target object (see
   to display via the expression \$I/\$DI$>$10. This will only plot
   vectors with an intensity signal-to-noise
   ratio greater than 10 in \GAIA. To ensure that this is specified,
-  ensure you press the carriage return after entering the expression.
+  ensure that ``Return'' is pressed after entering the expression.
 }
 \label{fig:gaiavectorssecond}
 \end{center}
@@ -112,30 +112,28 @@ Note that in the following examples, it will be necessary to ensure
 that only the vectors to be plotted are included in the file
 \file{mycat.FIT}.
 
-There are two main ways to do this---either by saving the output
-catalogue from \GAIA\ or using the Starlink package
-\xref{\textsc{Cursa}}{sun190}{} to manipulate
-the catalogue you produced.  To use \textsc{Cursa} simply run:
+There are two main ways to do this\ ---\ either by saving the output
+catalogue from \xref{\textsc{Gaia}}{sun214}{}\ or using the Starlink package
+\xref{\textsc{Polpack}}{sun223}{} to manipulate
+the catalogue produced by the user.  To use \polpack\, simply run:
 
 \begin{terminalv}
-% cursa
+% polpack
 \end{terminalv}
 
-then to select the vectors of interest:
+To then select the vectors of interest:
 
 \begin{terminalv}
-% catselect catin=mycat.FIT catout=selcat.FIT norejcat seltyp=e "expr='i>10*di'"
+% polselect in=mycat.FIT out=selcat.FIT mode=expr "exp=?i>10*di && (ast>0)?"
 \end{terminalv}
 
-and it is also possible to crop images using catselect, by using the
-expression command.  In this example we use only pixels above $-$10 on
-the $y$ axis.
-
-\begin{terminalv}
-% catselect catin=mycat.FIT catout=selcat.FIT norejcat seltyp=e "expr='i>10*di and y>-10'"
-\end{terminalv}
-
-
+The use of the \xref{\textsc{Polpack}}{sun223}{} \task{polselect} command is
+generally recommended over the use of the \xref{\textsc{Cursa}}{sun190}{} \task{catselect}
+command when working with POL-2 datasets, as it provides a greater number of options
+specifically designed for use with POL-2 data. For example, \task{polselect} offers
+additional modes that allow the specific selection of vectors that are located within a given
+region on the sky (specified by an ARD or AST region description), or which correspond to
+pixels with good values in a specified mask NDF. 
 
 
 \begin{tip}
@@ -162,23 +160,23 @@ described in \xref{SUN/95: Descriptions of Frame Attributes}{sun95}{ap_frmatt}.
 \subsection{\xlabel{kappa-example1} Example 1 -- a vector map with no background}
 \label{section:kappa-example1}
 
-In this section an output file: \file{plot1.pdf} is created from the input
+In this example, an output file, \file{plot1.pdf}, is created from the input
 catalogue \file{mycat.FIT}.
 
-Select a higher quality PostScript font (Times New Roman in this case).
+Select a higher quality PostScript font (Times New Roman in this case):
 
 \begin{terminalv}
 setenv PGPLOT_PS_FONT Times
 \end{terminalv}
 
-Select the PostScript graphics device, writing to file \file{plot1.ps}.
+Select the PostScript graphics device, writing to file \file{plot1.ps}:
 
 \begin{terminalv}
 gdset plot1.ps/acps
 \end{terminalv}
 
 For convenience, create a text file holding the main plotting style for
-\xref{polplot}{sun223}{POLPLOT}.
+\xref{polplot}{sun223}{POLPLOT}:
 
 \begin{terminalv}
 % cat sty
@@ -189,7 +187,7 @@ format(2)=dms
 \end{terminalv}
 
 Likewise, create a text file holding the style for the vector length
-key.
+key:
 
 \begin{terminalv}
 % cat ksty
@@ -198,17 +196,17 @@ drawtitle=0
 \end{terminalv}
 
 
-Plot the vector map (the \texttt{vscale} parameter controls the vector
+Plot the vector map. The \texttt{vscale} parameter controls the vector
 scale, and the \texttt{keyvec} parameter controls the length of the
 vector used as the key. There are many other parameters that can be
-used to control the behaviour of \task{polplot}---see the \polpack\
-manual (\xref{SUN/223}{sun223}{}).
+used to control the behaviour of \task{polplot}\ ---\ see the \polpack\
+manual (\xref{SUN/223}{sun223}{}):
 
 \begin{terminalv}
 % polplot selcat.FIT  style=^sty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
-Convert the map into a PDF file and remove blank margins (if required).
+Convert the map into a PDF file and remove blank margins (if required):
 
 \begin{terminalv}
 % ps2pdf plot1.ps temp.pdf
@@ -219,7 +217,7 @@ Convert the map into a PDF file and remove blank margins (if required).
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot1.png}
-\caption [Vector map with polplot]{ Result from Example 1: Producing a
+\caption [Vector map with polplot]{ Results of Example 1: Producing a
   vector map with no background using \task{polplot}.}
 \label{fig:kappa-plot1}
 \end{center}
@@ -229,14 +227,14 @@ Convert the map into a PDF file and remove blank margins (if required).
 \label{section:kappa-example2}
 
 
-In this section we create an output file: \file{plot2.pdf} from the input
+In this example, an output file, \file{plot2.pdf}, is created from the input
 catalogue \file{mycat.FIT}.
 
 Select the PostScript graphics device, writing to file \file{plot2.ps}.
-Note, in this example we do not assign a value to the \texttt{PLOT\_PS\_FONT}
-environment variable. This means the resulting plot uses the default PGPLOT
-fonts rather than the higher quality PostScript fonts used in the previous
-example.
+Note that in this example, a value is not assigned to the \texttt{PLOT\_PS\_FONT}
+environment variable. This means that the resulting plot uses the default PGPLOT
+fonts, rather than the higher quality PostScript fonts used in the previous
+example:
 
 \begin{terminalv}
 % gdset plot2.ps/acps
@@ -255,14 +253,14 @@ format(2)=dms
 \end{terminalv}
 
 
-Produce the contour map as follows.
+Produce the contour map as follows:
 
 \begin{terminalv}
 % contour iext\(0~50,0~50\) mode=perc percentiles=\[88,90,92,94,96,98\] style=^sty key=no
 \end{terminalv}
 
 
-Modify the above style for the vector map to produce black vectors.
+Modify the above style for the vector map to produce black vectors:
 
 \begin{terminalv}
 % cat vsty
@@ -271,7 +269,7 @@ colour(curves)=black
 \end{terminalv}
 
 
-Set the style for the vector length key.
+Set the style for the vector length key:
 
 
 \begin{terminalv}
@@ -282,14 +280,14 @@ drawtitle=0
 \end{terminalv}
 
 Plot the vector map over the contour map. The vectors and contours are
-aligned automatically in sky coordinates.
+aligned automatically in sky coordinates:
 
 \begin{terminalv}
 % polplot selcat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
 
-Convert into a PDF file and remove blank margins (if required).
+Convert into a PDF file and remove blank margins (if required):
 
 \begin{terminalv}
 % ps2pdf plot2.ps temp.pdf
@@ -300,9 +298,9 @@ Convert into a PDF file and remove blank margins (if required).
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot2.png}
 
-\caption [Vector map with contour map in polplot]{Result from Example~2:
+\caption [Vector map with contour map in polplot]{Results of Example~2:
   Producing a vector map over a contour map. This plot uses the default
-PGPLOT fonts for annotation---note the difference to the fonts used in
+PGPLOT fonts for annotation\ ---\ note the difference to the fonts used in
 \cref{Figure}{fig:kappa-plot1}{}. \label{fig:kappa-plot2}}
 \end{center}
 \end{figure}
@@ -311,9 +309,9 @@ PGPLOT fonts for annotation---note the difference to the fonts used in
 \label{section:kappa-example3}
 
 
-In this section we create an output file: \file{plot3.pdf} from the input
-catalogue \file{mycat.FIT}. First select the appropriate PostScript
-device (we use the default PGPLOT fonts again, as in the last example).
+In this example, an output file, \file{plot3.pdf}, is created from the input
+catalogue \file{mycat.FIT}. First, select the appropriate PostScript
+device (the default PGPLOT fonts are use again, as in the previous example):
 
 \begin{terminalv}
 % gdset plot3.ps/acps
@@ -321,7 +319,7 @@ device (we use the default PGPLOT fonts again, as in the last example).
 
 
 To ensure a monochrome colour table is used for the image run
-\xref{\task{lutgrey}}{sun95}{LUTGREY}.
+\xref{\task{lutgrey}}{sun95}{LUTGREY}:
 
 \begin{terminalv}
 % lutgrey
@@ -340,9 +338,9 @@ format(2)=dms
 \end{terminalv}
 
 
-The following function is used to reduce the dynamic range in the map (so
-that we can see structure in the faint bits without saturating the
-brightest regions).
+The following function is used to reduce the dynamic range in the map. This
+allows the user to be able to see structure in the fainter parts, without saturating the
+brightest regions):
 
 \begin{terminalv}
 maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
@@ -351,7 +349,7 @@ maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
 
 Display the image, using a reduced range of colours (pens) so
 that the darkest regions are grey rather than black.  This means the
-black vectors can still be seen within the dark regions.
+black vectors can still be seen within the dark regions:
 
 \begin{terminalv}
 % display tmp1\(0~50,0~50\) mode=perc percentiles=\[2,98\] style=^sty \
@@ -359,7 +357,7 @@ black vectors can still be seen within the dark regions.
 \end{terminalv}
 
 
-Modify the above style for the vector map to produce wider vectors.
+Modify the above style for the vector map to produce wider vectors:
 
 \begin{terminalv}
 % cat vsty
@@ -368,7 +366,7 @@ width(curves)=3
 \end{terminalv}
 
 
-Set the style for the vector length key.
+Set the style for the vector length key:
 
 \begin{terminalv}
 % cat ksty
@@ -378,14 +376,14 @@ drawtitle=0
 \end{terminalv}
 
 
-Plot the vector map over the contour map. The vectors are aligned automatically with the map.
+Plot the vector map over the contour map. The vectors are aligned automatically with the map:
 
 \begin{terminalv}
 % polplot selcat.FIT axes=no clear=no style=^vsty keystyle=^ksty vscale=20 keyvec=20
 \end{terminalv}
 
 
-Convert into a PDF file and remove blank margins (if required).
+Convert into a PDF file and remove blank margins (if required):
 
 \begin{terminalv}
 % ps2pdf plot3.ps temp.pdf
@@ -396,8 +394,8 @@ Convert into a PDF file and remove blank margins (if required).
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.75\linewidth]{sc22-kappa-plots-plot3.png}
-\caption [Vector map with negative image in polplot]{Result from
-  Example 3: Producing a vector map over a negative image.\label{fig:kappa-plot3}}
+\caption [Vector map with negative image in polplot]{Results of
+Example 3: Producing a vector map over a negative image.\label{fig:kappa-plot3}}
 \end{center}
 \end{figure}
 
@@ -412,22 +410,21 @@ instance:
 % topcat -f fits mycat.FIT
 \end{terminalv}
 
-Unlike the other tools described above, \textsc{Topcat} cannot visualise the
-catalogue as a set of vectors. However, it goes well beyond the
-facilities of the other tools in allowing you to explore correlations
+Unlike the other tools described above, \textsc{Topcat} cannot produce a
+visualisation of the catalogue as a set of vectors. However, it goes well beyond
+the facilities of the other tools in allowing the user to explore correlations
 between different quantities in the catalogue via two- and three-dimensional
-scatter plots---see \cref{Figure}{fig:topcat}{}. It can also be used to
-cross-correlate two different
-catalogues, create subsets of the catalogue, create new columns
+scatter plots---see \cref{Figure}{fig:topcat}{}. It can also be used to cross-correlate
+two different catalogues, create subsets of a catalogue, create new columns
 containing related quantities, \emph{etc}. It also allows the modified
-catalogue to be saved to a new catalogue file on disk. However, beware
-that any new catalogue will not contain the WCS information required
-by other Starlink applications to perform WCS-related operations such as
-displaying annotated axes and aligning data-sets. However, this WCS
-information can be copied back into the new catalogue using the
-\xref{polwcscopy}{sun223}{POLWCSCOPY} command. See
-\cref{Section}{sec:wcscopy}{Adding WCS information back into a vector
-catalogue}.
+catalogue to be saved to a new catalogue file on disk. However, users should be
+aware that any such new catalogue will not contain the WCS information required
+by other Starlink applications to perform WCS-related operations, such as
+displaying annotated axes and aligning data-sets. This WCS
+information can be copied back into the new catalogue, however, using the
+\xref{polwcscopy}{sun223}{POLWCSCOPY} command
+(\cref{Section}{sec:wcscopy}{Adding WCS information back into a vector
+catalogue}).
 
 \begin{figure}[t!]
 \begin{center}
