@@ -20,11 +20,11 @@ then it is almost always easier (and the process more robust) for a user to simp
 re-run the reduction process ''from scratch'' for the whole, augmented dataset.
 Despite the associated additional processor time cost, therefore, users are generally
 recommended to adopt this approach, rather than to attempt to combine new
-observations with pre-existing \task{pol2map} reduction products.
+observations with pre-existing \poltwomap\ reduction products.
 
 For completeness, however, this section describes the six-step process of
 combining data for one or more new POL-2 observations into existing I, Q,
-and U maps and vector catalogue created by an earlier run of \task{pol2map}. 
+and U maps and vector catalogue created by an earlier run of \poltwomap. 
 \begin{enumerate}
 
 \item Create a text file listing all the existing auto-masked I maps
@@ -76,7 +76,7 @@ and U maps and vector catalogue created by an earlier run of \task{pol2map}.
 \item If the mask has changed significantly and all observations need
   to be reprocessed using the new mask, or if \task{skyloop} is being used,
   remove the existing externally masked maps so that they will be re-created by
-  the next invocation of \task{pol2map}.  Note that this will increase the length of
+  the next invocation of \poltwomap.  Note that this will increase the length of
   time taken by Step~6 enormously.
 
   Ensure that the new auto-masked co-add is used in place of the old one, in order to
@@ -178,7 +178,7 @@ The error on the IP is reported to be of the order of 0.5\%.  It is
 possible to investigate the effects of the systematic error in IP by
 creating maps using the upper and lower limits on the IP value. The
 \task{makemap} configuration parameter called \xparam{IPOFFSET}{ipoffset}
-can be used to conduct such an investigation. To use it, run \task{pol2map} twice,
+can be used to conduct such an investigation. To use it, run \poltwomap\ twice,
 as follows:
 
 \begin{terminalv}
@@ -187,7 +187,7 @@ as follows:
 \end{terminalv}
 
 This will produce maps using the upper and lower IP limits (a range of
-0.5\%). If \task{pol2map} has already been run on POL-2 data, then a file will
+0.5\%). If \poltwomap\ has already been run on POL-2 data, then a file will
 already exist that was created using the mean IP (the mean IP is used
 if \param{ipoffset} is omitted from the configuration value, or the
 configuration parameter itself is omitted).
@@ -196,7 +196,7 @@ configuration parameter itself is omitted).
 
 
 \section{\label{sec:wcscopy}Adding WCS information back into a vector catalogue}
-Vector catalogues produced by \task{pol2map} contain information about World Coordinate
+Vector catalogues produced by \poltwomap\ contain information about World Coordinate
 Systems (WCS) in two different forms:
 
 \begin{enumerate}
@@ -230,7 +230,7 @@ FrameSet to any new output catalogues. Unfortunately, the popular
 
 For this reason, \POLPACK\ contains a command that can be used to copy the
 WCS FrameSet from one catalogue to another.  For example: a user creates
-the catalogue \file{mycat.FIT} using \task{pol2map}, uses \textsc{Topcat}
+the catalogue \file{mycat.FIT} using \poltwomap, uses \textsc{Topcat}
 to remove low signal-to-noise vectors, an then saves the results to a new catalogue
 called \file{selcat.FIT}. The WCS FrameSet would then be missing from \file{selcat.FIT},
 and so it would be necessary to copy it back into place again from the original catalogue
@@ -246,6 +246,46 @@ This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
 
 
 
+\section{\xlabel{vectorerrorremodelling}Re-modelling the error estimates in a POL-2 vector catalogue}
 
 
+If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the I, Q and U error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \poltwomap\ to create a vector catalogue, then each I, Q or U error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I, Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (the noise level increases towards the edge of the map due to there being fewer bolometer samples per pixel near the edge):
 
+(FIGURE TO BE ADDED HERE - SEE https://www.eaobservatory.org/jcmt/2020/06/re-modelling-the-error-estimates-in-a-pol2-vector-catalogue/)
+
+The uncertainty on the error estimate can cause some vectors that are clearly wrong (e.g. because they are very different to nearby vectors) to have anomalously low error estimates and so to be included in the set of ``good'' vectors (i.e. vectors that pass some suitable selection criterion based on the noise estimates).
+
+One simple solution to this could be to apply some spatial smoothing to the error estimates. This would be a reasonable thing to do if there were no compact sources in the map. The errors close to a compact source are generally higher than those in a background region because of factors such as pointing errors, calibration errors, etc. These factors cause a compact source to appear slightly different in each observation, and so cause higher error estimates in the vector catalogue. The above error estimates map shows this effect in the higher values at the very centre. Simply smoothing this map would spread that central feature out, artificially decreasing the peak error and increasing the errors in the neighbouring background pixels.
+
+An alternative to smoothing is to split the total noise up into several different components, create a model of each component , and then add the models together. The \task{pol2noise} script in \smurf\ enables the user to re-model the noise estimates in a vector catalogue using such an approach. This facility is used by setting \texttt{MODE=REMODEL} on the \task{pol2noise} command line:
+
+\begin{terminalv}
+% pol2noise mycat.FIT mode=remodel out=newcat.FIT exptime=iext debiastype=mas
+\end{terminalv}
+
+
+This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three component model of the noise in each quantity, and then errors for the derived quantities (PI, P and ANG) are found. New values of PI and P are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total intensity coadd map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total intensity error estimates look like this:
+
+(FIGURE TO BE ADDED HERE)
+
+Most of the noise has gone without reducing the resolution. The script displays the original and re-modelled error estimates for each Stokes parameter (I, Q and U), the residuals between the two and a scatter plot. The best-fitting straight line through the scatter plot is also displayed:
+
+(FIGURE TO BE ADDED HERE)
+
+The three components used to model the error on each Stokes parameter (I, Q or U) are described below:
+
+\begin{enumerate}
+\item {\bf The background component:} This is derived from an exposure time map  (obtained from
+iext.sdf in the above example). The background component is equal to $A.tB$, where $t$ is 
+the exposure time at each pixel and $A$ and $B$ are constants determined by doing a linear fit 
+between
+the log of the noise estimate in the catalogue (DQ, DU or DI) and the log of the exposure time
+(in practice, $B$ is usually close to -0.5). The fit excludes bright source areas, but also excludes a
+thin rim around the edge of the map where the original noise estimates are subject to large
+inaccuracies. Since the exposure time map is usually very much smoother than the original
+noise estimates, the background component is also much smoother.
+\item {\bf The source component:} This represents the extra noise found in and around compact sources caused by pointing errors, calibration errors, etc. The background component is first subtracted from the catalogue noise estimates and the residual noise values are then modelled using a collection of Gaussians. This modeling is done using the \texttt{GaussClumps} algorithm provided by the \task{findclumps} command in the Starlink \cupid\ package. The noise residuals are first divided into a number of ?islands?, each island being a collection of contiguous pixels with  noise residual significantly higher than zero (this is done using the \texttt{FellWalker} algorithm in \cupid). The \texttt{GaussClumps} algorithm is then used to model the noise residuals in each island. The resulting model is smoothed lightly using a Gaussian kernel of FWHM 1.2 pixels.
+\item {\bf The residual component:} This represents any noise not accounted for by the other two models. The noise residuals are first found by subtracting the other two components from the original catalogue noise estimates. Any strong outlier values are removed and the results are smoothed more heavily using a Gaussian kernel of FWHM 4 pixels.
+\end{enumerate}
+
+The final model is the sum of the above three components. The new DI, DQ and DU values are found independently using the above method. The errors for the derived quantities (DPI, DP and DANG) are then found from DQ, DU and DI using the usual error popagation formulae. Finally new P and PI values are found using a specified form of de-biasing (controlled by the parameter \texttt{DEBIASTYPE}).
