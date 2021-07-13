@@ -124,7 +124,8 @@ second usage of \poltwomap\ includes both ``Run 2'' and ``Run 3'' in
 \end{aligndesc}
 
 The \poltwomap\ command provides many other parameters that may be used to
-modify its behaviour in various ways. To see a full list, type
+modify its behaviour in various ways. To see a full list, type the
+following.
 
 \begin{terminalv}
 % pol2map --help
@@ -142,9 +143,9 @@ initial $I$ map.  In this first step:
 % pol2map in=^myfiles.list iout=iauto qout=! uout=! mapdir=maps qudir=qudata
 \end{terminalv}
 
-The file \texttt{myfiles.lis} contains a list of the raw data
+where the file \texttt{myfiles.lis} contains a list of the raw data
 files to be included in the map, and could (for instance) look like
-this:
+this.
 
 \begin{terminalv}
 % cat myfiles.lis
@@ -154,12 +155,12 @@ this:
 /jcmtdata/raw/scuba2/s8d/20160125/00043/*
 \end{terminalv}
 
-This uses all available data from all four 850\,$\mu$m sub-arrays, for
-Observation 43 taken on 25th January 2016\footnote{The input files
+This uses all available data from all four \SI{850}{\micro\metre} sub-arrays, for
+  Observation~43 taken on 2016 January 25\footnote{The input files
   should all be for a single waveband from one or more POL-2
   observations. Users should not mix files from different wavebands and/or
   astronomical regions.}. In addition, the data used in this example
-also come from Observations 56 and 59 taken on January 11th 2016 (UT).
+  also come from Observations~56 and 59 taken on 2016 January 11 (UT).
 
 \begin{tip}
   An up-caret ( $ \hat{} $ ) is required any time the user is reading in
@@ -174,7 +175,7 @@ also come from Observations 56 and 59 taken on January 11th 2016 (UT).
 \end{tip}
 
 Note that \texttt{qout} and \texttt{uout} are set to null values, as no
-$Q$ or $U$ maps are required to be produced during this initial step~1
+$Q$ or $U$ maps are required to be produced during this initial Step~1
 reduction stage.
 
 The following shows the output from running this initial \poltwomap\
@@ -223,8 +224,8 @@ The files and folders produced by this reduction process are described below.
   \file{$\_$imap.sdf}.
 
 \item[\file{iauto.sdf}] Output total intensity map. The included term ``auto'' is
-used to indicate that it was created using an automatically generated
-AST mask.
+  used to indicate that it was created using an automatically generated
+  AST mask.
 
 \end{aligndesc}
 
@@ -456,11 +457,11 @@ command line.  The columns are listed below.
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
 POL-2 is not a perfect polarimeter. Its wire grid absorbs and scatters incoming
 signal so the modulation amplitude is lower than for a perfect polarimeter.
-In addition cross polarization and depolarization decreases the modulation
+In addition cross polarisation and depolarisation decreases the modulation
 amplitude without decreasing the power in the transmitted signal. The first
 type of inefficiencies can be measured by comparing normal SCUBA-2 maps with
 and without the polarimeter inserted. Such observations have been done on Uranus,
-Mars and Jupiter. The second type of losses can be measured with a source of know polarization.
+Mars and Jupiter. The second type of losses can be measured with a source of known polarisation.
 
 To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion
 Factor, FCF, must be applied to the data. For POL-2, the FCFs are quoted in terms of

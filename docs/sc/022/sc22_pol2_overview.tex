@@ -221,7 +221,7 @@ is referred to as "Instrumental Polarisation" (IP).
 In order to establish the true $Q$ and $U$ from an astronomical source, it
 is necessary to correct for this effect. For the case of a low degree
 of polarisation in the incoming radiation and a low degree of IP, the
-following is a good approximation for correcting the measurement for
+following expressions provide good approximations to correct the measurement for
 the effects of the IP:
 
 \begin{equation}
@@ -261,20 +261,20 @@ above considerations above (though typically less than 1.5\% of the
 total intensity), and has the following distinctive features:
 
 \begin{enumerate}
-\item the polarisation intensity is elevation-dependent,
-\item there is ellipticity of the beam and it is elevation-dependent, and
+\item the polarisation intensity is elevation dependent,
+\item there is ellipticity of the beam and it is elevation dependent, and
 \item the beam is elongated in the horizontal direction.
 \end{enumerate}
 
 The dominant source of IP at the JCMT is the woven Goretex membrane,
 used as a wind blind.  This membrane introduces both losses and
-polarisation. This effect is elevation-dependent.
+polarisation. This effect is elevation dependent.
 
 
 \section{\xlabel{obs_modes}Observing mode}
 \label{sec:mmodes}
 
-The standard POL-2 observing mode, POLCV\_DAISY, is a “scan and spin”
+The standard POL-2 observing mode, POLCV\_DAISY, is a ``scan and spin''
 mode, in which the telescope is moving continuously in a Daisy-type
 pattern while the HWP spins.
 
@@ -304,10 +304,10 @@ reduction splits the data stream into short segments and determines a
 pair of $Q$ and $U$ values from each segment.
 
 The length of each data segment is defined \textit{primarily} by the time taken for
-the HWP to make a single rotation (0.5 s). The scan speed of
+the HWP to make a single rotation (0.5\,s). The scan speed of
 8\si{\arcsecond}/s was chosen to make this correspond to 4\si{\arcsecond}
 on the sky. The default pixel size provided by \texttt{pol2map} is 4\si{\arcsecond}
-at both 850 and 450.
+at both 850 and \SI{450}{\micro\metre}.
 
 The standard POLCV\_DAISY scan parameters are given in
 \cref{Table}{tab:scanpar}{} and shown in \cref{Figure}{fig:scandetail}{}.
@@ -318,7 +318,7 @@ The standard POLCV\_DAISY scan parameters are given in
 \hline
 Parameter & Value\\
 \hline
-Half-wave plate rotation frequency& \SI{2}{Hz}\\
+Half-wave plate-rotation frequency& \SI{2}{Hz}\\
  Antenna scanning speed & 8\si{\arcsecond}/s\\
  R$_{0}$ (map pattern radius)\textdagger
 & 133\si{\arcsecond}\\
@@ -411,7 +411,7 @@ file size); all of the scans in between are science scans.
 -rw-r--r-- 1 jcmtarch jcmt 7.9M Jan 12  2016 s8a20160112_00056_0029.sdf
 \end{terminalv}
 
-The SCUBA-2 data acquisition (DA) system writes out a data file every
+The SCUBA-2 data-acquisition (DA) system writes out a data file every
 30\,seconds; each of which contains 22\,MB of data. The final file listed above
 is a flat-field scan, which will usually be smaller (7.9\,MB in this example). Note
 that all of these files are written out eight times, once for each of the eight

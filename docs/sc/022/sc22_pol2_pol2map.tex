@@ -1,6 +1,6 @@
 \chapter{\xlabel{pol2_dr_theory}POL-2 Data Reduction -- The Theory}
 \label{sec:dr}
-\section{\xlabel{dataflow}The Data Flow}
+\section{\xlabel{dataflow}The data flow}
 
 POL-2 data reduction is an involved process. A broad overview of this
 process is presented here first, followed by a discussion of the specific
@@ -72,9 +72,9 @@ In the second step of the process (see Run~2 in
 \cref{Figure}{fig:pol2drflow}{}) an improved I map is produced. These
 improvements come from
 \begin{enumerate}
-\item applying the pointing corrections determined in Step~1
+\item applying the pointing corrections determined in Step~1,
 \item the use of an increased number of PCA components
-  (\texttt{pca.pcathresh=-150})
+  (\texttt{pca.pcathresh=-150}), and
 \item using a single, fixed mask for all observations. The mask is
   determined from the preliminary co-added $I$ map and thus includes
   fainter structure than would be used if the mask was based on only
@@ -100,7 +100,7 @@ pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
-In \poltwomap\ , the map-maker is used in conjunction with
+In \poltwomap, the map-maker is used in conjunction with
 \xref{calcqu}{sun258}{CALCQU} (see
 \cref{Section}{sec:calcqu}{CALCQU}) to produce maps of $Q$ and $U$, as well as $I$.
 
@@ -135,7 +135,7 @@ The supplied time-series data files are flat-fielded, cleaned and concatenated,
 before being used to establish $Q$, $U$ and $I$ values for each bolometer. The $Q$
 and $U$ time-series are split into blocks of adjacent time slices. Fits
 using these sets of blocks are then used to derive Q, U and I values, and
-multiple 2D images are created as the telescope slowly moves across the sky.
+multiple two-dimensional images are created as the telescope slowly moves across the sky.
 
 Separate $Q$, $U$, and $I$ estimates are made for each half revolution of the HWP.
 The ''Data" values in the returned NDFs are the means of these estimates. If
@@ -274,7 +274,7 @@ will contribute to the variances calculated using \param{MAPVAR}=\texttt{TRUE}.
 
 Two options are provided by \poltwomap\ that may be useful in reducing
 the larger-than-expected dispersion between maps made from different
-observations:
+observations.
 
 \begin{enumerate}
 \item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
@@ -340,19 +340,19 @@ values for both \param{OBSWEIGHT} and \param{SKYLOOP}.
 
 \begin{center}
 \emph{Note, it is not recommended to use \param{MAPVAR}=\texttt{TRUE} or
-\param{SKYLOOP}=\texttt{TRUE} on step 1 (i.e. when creating the auto-masked
+\param{SKYLOOP}=\texttt{TRUE} on Step~1 (i.e. when creating the auto-masked
 maps). Doing so is of no benefit to the final maps and can cause problems
 such as negative bowling.}
 \end{center}
 
-If the \param{OBSWEIGHT} parameter is used at step 2 or 3, then it must
-also be used at step 1.
+If the \param{OBSWEIGHT} parameter is used at Steps~2 or 3, then it must
+also be used at Step~1.
 
-The following panels show the effects of using \param{SKYLOOP}. and
-\param{OBSWEIGHT} on a total intensity mosaic of 21 observations. All
-data value maps are shown with a single scaling, and all standard
-deviation maps are shown with a single scaling (different from the scaling
-for the data value maps):
+The following panels show the effects of using \param{SKYLOOP} and
+\param{OBSWEIGHT} on a total-intensity mosaic of 21 observations. All
+data-value maps are shown with a single scaling, and all standard-deviation
+maps are shown with a single scaling (different from the scaling
+for the data-value maps).
 
 \newlength{\picwid}
 \latexhtml{\setlength{\picwid}{0.3\linewidth}}{\setlength{\picwid}{0.9\linewidth}}
@@ -403,7 +403,7 @@ Data value & Std. Dev. (MAPVAR=no) & Std. Dev. (MAPVAR=yes) \\
 
 \vspace{5mm}
 
-For comparison, below are the equivalent auto-masked maps made by Step~1:
+For comparison, below are the equivalent auto-masked maps made by Step~1.
 
 \vspace{5mm}
 \begin{tabular}{|ccc|}

@@ -85,7 +85,7 @@ tab in the \texttt{GAIA: Polarimetry} window.
 \begin{center}
 \includegraphics[width=0.44\linewidth]{sc22-gaia-plot-vectors-5.png}
 \includegraphics[width=0.52\linewidth]{sc22-gaia-plot-vectors-7.png}
-\caption [Over Plotting Vectors in GAIA]{ Left: Selected vectors are
+\caption [Over Plotting Vectors in GAIA]{ Left: selected vectors are
   marked in blue in this example, Right: after removal of selected
   vectors all that remains are the vectors on the (zoomed) regions
   where \$I/\$DI $>$ 10.}
@@ -115,13 +115,13 @@ that only the vectors to be plotted are included in the file
 There are two main ways to do this\ ---\ either by saving the output
 catalogue from \xref{\textsc{Gaia}}{sun214}{}\ or using the Starlink package
 \xref{\textsc{Polpack}}{sun223}{} to manipulate
-the catalogue produced by the user.  To use \polpack\, simply run:
+the catalogue produced by the user.  To use \polpack, simply run:
 
 \begin{terminalv}
 % polpack
 \end{terminalv}
 
-To then select the vectors of interest:
+then select the vectors of interest.
 
 \begin{terminalv}
 % polselect in=mycat.FIT out=selcat.FIT mode=expr "exp=?i>10*di && (ast>0)?"
@@ -199,7 +199,7 @@ drawtitle=0
 Plot the vector map. The \texttt{vscale} parameter controls the vector
 scale, and the \texttt{keyvec} parameter controls the length of the
 vector used as the key. There are many other parameters that can be
-used to control the behaviour of \task{polplot}\ ---\ see the \polpack\
+used to control the behaviour of \task{polplot}---see the \polpack\
 manual (\xref{SUN/223}{sun223}{}):
 
 \begin{terminalv}
@@ -300,7 +300,7 @@ Convert into a PDF file and remove blank margins (if required):
 
 \caption [Vector map with contour map in polplot]{Results of Example~2:
   Producing a vector map over a contour map. This plot uses the default
-PGPLOT fonts for annotation\ ---\ note the difference to the fonts used in
+PGPLOT fonts for annotation---note the difference to the fonts used in
 \cref{Figure}{fig:kappa-plot1}{}. \label{fig:kappa-plot2}}
 \end{center}
 \end{figure}
