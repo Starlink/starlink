@@ -67,9 +67,9 @@ U = U_{\textnormal{m}} - I. ip_{\textnormal{u}}
 \end{equation}
 
 where $Q_{\textnormal{m}}$ and $U_{\textnormal{m}}$ are the
-measured values of Q and U before correction for instrumental
+measured values of $Q$ and $U$ before correction for instrumental
 polarisation (IP) is applied. The IP correction is the product of the total
-intensity (I) and a factor ($ip_{\textnormal{q}}$ or $ip_{\textnormal{u}}$)
+intensity ($I$) and a factor ($ip_{\textnormal{q}}$ or $ip_{\textnormal{u}}$)
 that varies with elevation but which is always smaller than 0.03.
 
 \subsection*{How POL-2 works}
@@ -131,9 +131,9 @@ $\sim$cos($\phi$) while the power is $\sim$cos$^{2}$($\phi$).
 
 
 The radiation passing through the polarimeter is detected by
-SCUBA-2. The detected intensity (I$_{\textnormal{detected}}$) is a combination of
-\emph{both} the unpolarised intensity (I$_{\textnormal{unpolarised}}$) and the
-linearly polarised intensity (I$_{\textnormal{p}}$)\footnote{The total intensity of
+SCUBA-2. The detected intensity ($I_{\textnormal{detected}}$) is a combination of
+\emph{both} the unpolarised intensity ($I_{\textnormal{unpolarised}}$) and the
+linearly polarised intensity ($I_{\textnormal{p}}$)\footnote{The total intensity of
 the source, $I$, is $I_{\textnormal{unpolarised}} + I_{\textnormal{p}}$.}. This detected intensity can be
 described by:
 
@@ -218,7 +218,7 @@ being partially polarised by one or more of the components of the
 telescope/POL-2/SCUBA-2 that are in the light path. This polarisation
 is referred to as "Instrumental Polarisation" (IP).
 
-In order to establish the true Q and U from an astronomical source, it
+In order to establish the true $Q$ and $U$ from an astronomical source, it
 is necessary to correct for this effect. For the case of a low degree
 of polarisation in the incoming radiation and a low degree of IP, the
 following is a good approximation for correcting the measurement for
@@ -440,7 +440,7 @@ Raw POL-2 data come in uncalibrated units. The first calibration step
 is to scale the raw data to units of picowatts (pW) by applying the
 flat-field solution. This step is performed internally by the \SMURF\
 command \xref{\task{calcqu}}{sun258}{CALCQU}---used to calculate
-I, Q, and U time-streams from the raw data---but can be done manually
+$I$, $Q$, and $U$ time-streams from the raw data---but can be done manually
 when examining the raw data.
 
 If the purpose of a given POL-2 observation is to determine the

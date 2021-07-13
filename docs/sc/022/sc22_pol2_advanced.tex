@@ -23,15 +23,15 @@ recommended to adopt this approach, rather than to attempt to combine new
 observations with pre-existing \poltwomap\ reduction products.
 
 For completeness, however, this section describes the six-step process of
-combining data for one or more new POL-2 observations into existing I, Q,
-and U maps and vector catalogue created by an earlier run of \poltwomap. 
+combining data for one or more new POL-2 observations into existing $I$, $Q$,
+and $U$ maps and vector catalogue created by an earlier run of \poltwomap.
 \begin{enumerate}
 
-\item Create a text file listing all the existing auto-masked I maps
+\item Create a text file listing all the existing auto-masked $I$ maps
   for individual observations stored in the directory specified by
   Parameter \param{MAPDIR}, and then add in the raw data files for the new
-  observations. The auto-masked I maps have names that end in
-  \file{$\_$imap.sdf}:
+  observations. The auto-masked $I$ maps have names that end in
+  \file{$\_$imap.sdf}.
 
 \begin{terminalv}
 % ls maps/*imap.sdf > infiles.list
@@ -39,7 +39,7 @@ and U maps and vector catalogue created by an earlier run of \poltwomap.
 \end{terminalv}
 
 
-\item Create a new auto-masked, co-added I map including the new
+\item Create a new auto-masked, co-added $I$ map including the new
   observation. The \xref{calcqu}{sun258}{CALCQU} and \makemap\ commands
   will be run on the new
   data and the resulting maps combined with the existing maps derived
@@ -143,9 +143,9 @@ pixels and 7\si{\arcsecond} pixels are compared.
 % sqorst  mode=pixelscale pixscale=\'7,7,7E-05\' in=pcamask12 out=pcamask7
 \end{terminalv}
 
-\item Create the 7\si{\arcsecond} externally masked I, Q, and U maps
-  using the above 7\si{\arcsecond} masks (note that the \texttt{mask}
-  parameter value is enclosed in single \emph{and} double quotes):
+\item Create the 7\si{\arcsecond} externally masked $I$, $Q$, and $U$ maps
+  using the above 7\si{\arcsecond} masks (note the \texttt{mask}
+  parameter value is enclosed in single \emph{and} double quotes).
 
 \begin{terminalv}
 % pol2map in=qudata/\* iout=iext7 qout=qext7 uout=uext7 masktype=mask \
@@ -203,11 +203,11 @@ Systems (WCS) in two different forms:
 \item The catalogue contains ``RA'' and ``Dec'' columns that hold the sky position
 (FK5, J2000) of each vector, in radians.
 \item The catalogue header contains a Starlink ``WCS FrameSet'' which defines
-(amongst other things) the projection from pixel coordinates within the I, Q, and
-U mosaics, to RA and Dec. This FrameSet is used by Starlink software, together
+(amongst other things) the projection from pixel coordinates within
+the $I$, $Q$, and $U$ mosaics, to RA and Dec. This FrameSet is used by Starlink software, together
 with the pixels coordinates stored in the ``X'' and ``Y'' columns, to determine
 the RA and Dec of each vector. The WCS FrameSet also defines the polarimetric
-reference direction used by the Q, U, and ANG values. See
+reference direction used by the $Q$, $U$, and ANG values. See
 ``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
 within \xref{SUN/95}{sun95}{} (the \KAPPA\ manual) for more information on
 the ways in which Starlink software handles WCS information.
