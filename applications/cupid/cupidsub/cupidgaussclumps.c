@@ -577,7 +577,7 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
       } else {
         msgOutiff( MSG__DEBUG1, "",
                    "Fits attempted for %d candidate clumps (%d failed).",
-                   status, (int)( niter - iclump ), niter );
+                   status, niter, (int)( niter - iclump ) );
       }
 
 /* Free resources */
