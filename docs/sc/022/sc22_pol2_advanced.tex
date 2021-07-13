@@ -103,7 +103,7 @@ and U maps and vector catalogue created by an earlier run of \task{pol2map}.
 \section{\xlabel{pixelsize}Experimenting with pixel sizes}
 
 Currently,the default map pixel size is 4\si{\arcsecond} at both
-450 and \SI{450}{\micro\metre}. The pixel size is controlled by the
+850 and \SI{450}{\micro\metre}. The pixel size is controlled by the
 \param{PIXSIZE} parameter in the \smurf\ \poltwomap\ command:
 
 \begin{terminalv}
@@ -112,8 +112,8 @@ Currently,the default map pixel size is 4\si{\arcsecond} at both
 
 
 The following four-step example shows how to investigate the impact of
-changing pixel size.  In this example, we compare 12\si{\arcsecond}
-pixels and 7\si{\arcsecond} pixels.
+changing pixel size.  In this example, 12\si{\arcsecond}
+pixels and 7\si{\arcsecond} pixels are compared.
 
 \begin{enumerate}
 \item Begin with an auto-masked total-intensity map from the raw
@@ -126,7 +126,7 @@ pixels and 7\si{\arcsecond} pixels.
 
 
 \item Create AST and PCA masks with 12\si{\arcsecond} pixels from the
-  \file{iauto12.sdf} file.
+  \file{iauto12.sdf} file:
 
 
 \begin{terminalv}
@@ -144,8 +144,8 @@ pixels and 7\si{\arcsecond} pixels.
 \end{terminalv}
 
 \item Create the 7\si{\arcsecond} externally masked I, Q, and U maps
-  using the above 7\si{\arcsecond} masks (note the \texttt{mask}
-  parameter value is enclosed in single \emph{and} double quotes).
+  using the above 7\si{\arcsecond} masks (note that the \texttt{mask}
+  parameter value is enclosed in single \emph{and} double quotes):
 
 \begin{terminalv}
 % pol2map in=qudata/\* iout=iext7 qout=qext7 uout=uext7 masktype=mask \
@@ -155,8 +155,8 @@ pixels and 7\si{\arcsecond} pixels.
 \end{enumerate}
 
 \begin{tip}
-  Using larger pixels usually produces slower convergence, so the
-  above process will take longer than usual---be patient!
+  Using larger pixels usually produces slower convergence, and so the
+  above process will take longer than usual\ ---\ be patient!
 
   Using larger pixels can sometimes encourage smooth blobs and other
   artificial features to appear in the map. The \file{iauto12.sdf} file
@@ -168,7 +168,7 @@ pixels and 7\si{\arcsecond} pixels.
 
   It is usually advisable to leave \param{PIXSIZE} at its default value
   and instead use the \param{BINSIZE} parameter to control the bin size in
-  the vector catalogue---see \cref{Section}{sec:pol2map-pixelsize}{Changing pixel size in pol2map}).
+  the vector catalogue\ ---\ see \cref{Section}{sec:pol2map-pixelsize}{Changing pixel size in pol2map}).
 \end{tip}
 
 \section{\xlabel{IPerror}Investigating systematic error in IP}
@@ -178,16 +178,16 @@ The error on the IP is reported to be of the order of 0.5\%.  It is
 possible to investigate the effects of the systematic error in IP by
 creating maps using the upper and lower limits on the IP value. The
 \task{makemap} configuration parameter called \xparam{IPOFFSET}{ipoffset}
-can be used to do such an
-investigation. To use it, run \task{pol2map} twice as follows:
+can be used to conduct such an investigation. To use it, run \task{pol2map} twice,
+as follows:
 
 \begin{terminalv}
 % pol2map config="ipoffset=-0.25"
 % pol2map config="ipoffset=0.25"
 \end{terminalv}
 
-to produce maps using the upper and lower IP limits (a range of
-0.5\%). If \task{pol2map} has already been run on POL-2 data then a file will
+This will produce maps using the upper and lower IP limits (a range of
+0.5\%). If \task{pol2map} has already been run on POL-2 data, then a file will
 already exist that was created using the mean IP (the mean IP is used
 if \param{ipoffset} is omitted from the configuration value, or the
 configuration parameter itself is omitted).
@@ -215,32 +215,34 @@ the ways in which Starlink software handles WCS information.
 
 Starlink software such as \polpack, \Kappa, and \gaia\ rely on the WCS
 FrameSet for all WCS-related operations (drawing annotated axes, aligning
-data sets, \emph{etc}). Thus problems are likely if the WCS FrameSet is
-removed from the vector catalogue. This could happen for instance if you
-use inappropriate software to process an existing catalogue, creating a
-new output catalogue---the WCS FrameSet may not be copied to the output
-catalogue, causing subsequent WCS-related operations to fail. It is safe
-to use \POLPACK, \KAPPA, \GAIA\ and \xref{\textsc{Cursa}}{sun190}{}) as
-all these packages copy the WCS FrameSet to any new output catalogues.
-Unfortunately, the popular \topcat\ catalogue browser (see
+data sets, \emph{etc}). Thus, problems are likely to arise if the WCS FrameSet
+is removed from the vector catalogue. This could happen if (for instance)
+inappropriate software is used to process an existing catalogue, creating a
+new output catalogue. Under such circumstances, the WCS FrameSet might
+not be copied to the output catalogue, causing subsequent WCS-related
+operations to fail. It is safe to use \POLPACK, \KAPPA, \GAIA\ and
+\xref{\textsc{Cursa}}{sun190}{}), as all these packages copy the WCS
+FrameSet to any new output catalogues. Unfortunately, the popular
+\topcat\ catalogue browser (see
 \url{http://www.starlink.ac.uk/topcat/}) and the STILTS package
 (\url{http://www.starlink.ac.uk/stilts/}) upon which it is based, do
 \emph{not} copy the WCS FrameSet to any output catalogues.
 
 For this reason, \POLPACK\ contains a command that can be used to copy the
-WCS FrameSet from one catalogue to another.  Say for instance you create
-catalogue \file{mycat.FIT} using \task{pol2map}, and then use \textsc{Topcat} to remove
-low signal-to-noise vectors, saving the results to a new catalogue called
-\file{selcat.FIT}. The WCS FrameSet will be missing from \file{selcat.FIT},
-and so we need to copy it back again from the original catalogue \file{mycat.FIT}.
-To do this we use the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}'' command:
+WCS FrameSet from one catalogue to another.  For example: a user creates
+the catalogue \file{mycat.FIT} using \task{pol2map}, uses \textsc{Topcat}
+to remove low signal-to-noise vectors, an then saves the results to a new catalogue
+called \file{selcat.FIT}. The WCS FrameSet would then be missing from \file{selcat.FIT},
+and so it would be necessary to copy it back into place again from the original catalogue
+file, \file{mycat.FIT}. To do this, the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}''
+command can be used:
 
 \begin{terminalv}
 % polwcscopy in=selcat ref=mycat out=selcat2
 \end{terminalv}
 
-This creates a third catalogue \file{selcat2.FIT}, which is a copy of
-\file{selcat.FIT} but with WCS inherited from \file{mycat.FIT}.
+This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
+\file{selcat.FIT}, but with the WCS information inherited from \file{mycat.FIT}.
 
 
 
