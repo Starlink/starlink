@@ -113,6 +113,8 @@ F77_SUBROUTINE(cmult)( INTEGER(STATUS) ){
 *     12-JUL-2021 (DSB):
 *        Multiple Variance arrays by the square of the supplied constant.
 *        This code was accidentally omitted when converting from Fortran to C.
+*     13-JUL-2021 (DSB):
+*        No need to propagate Variances from input to output.
 *     {enter_further_changes_here}
 
 *-
@@ -148,8 +150,8 @@ F77_SUBROUTINE(cmult)( INTEGER(STATUS) ){
    parGet0d( "SCALAR", &cons, STATUS );
 
 /* Create a new output NDF based on the input NDF. Propagate the WCS, axis,
-   quality, units and variance components. */
-   lpgProp( ndf1, "WCS,Axis,Quality,Units,Variance", "OUT", &ndf2, STATUS );
+   quality and units components. */
+   lpgProp( ndf1, "WCS,Axis,Quality,Units", "OUT", &ndf2, STATUS );
 
 /* See if the input NDF has a variance component and set the list of
    components to process accordingly. */
