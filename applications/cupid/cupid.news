@@ -6,6 +6,11 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.7
+
+   - A bug has been fixed in the FINDCLUMPS GaussClumps algorithm that
+   could in some cases cause very poor fitting of clumps within 3D arrays.
+
 Changes introduced at V2.6
 
    - The FINDCLUMPS GaussClumps algorithm has a new configuration

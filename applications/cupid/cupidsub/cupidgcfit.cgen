@@ -121,6 +121,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
 *        Ensure returned spatial position angle is in the range +/- PI.
 *     8-APR-2020 (DSB):
 *        Set the relative function change convergence criterion.
+*     13-JUL-2021 (DSB):
+*        If the background level is fixed, re-order the parameters 
+*        before making any use of the parameters. Previously, the 
+*        spatial position angle was being misused as the velocity 
+*        axis position if the backround was fixed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -268,6 +273,13 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
       }
    }
 
+/* If the background level was kept fixed at its initial value move the
+   background level back to its original position in "x". */
+   if( cupidGC.fixback ) {
+      for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
+      x[ 1 ] = bg;
+   }
+
 /* Ensure the spatial position angle is in the range +/- PI */
    x[ 6 ] = fmod( x[ 6 ], 2*AST__DPI );
    if( x[ 6 ] > 0.0 ) {
@@ -277,25 +289,10 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
    }
 
 /* Check the size of the fitted model is significant. */
-   if( cupidGC.fixback ) {
-      if( x[ 2 ] < 0.5 ) ret = 0;
-      if( cupidGC.ndim > 1 ) {
-         if( x[ 4 ] < 0.5 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 7 ] < 0.5 ) ret = 0;
-      }
-   } else {
-      if( x[ 3 ] < 0.5 ) ret = 0;
-      if( cupidGC.ndim > 1 ) {
-         if( x[ 5 ] < 0.5 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
-      }
-   }
-
-/* If the background level was kept fixed at its initial value move the
-   background level back to its original position in "x". */
-   if( cupidGC.fixback ) {
-      for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
-      x[ 1 ] = bg;
+   if( x[ 3 ] < 0.5 ) ret = 0;
+   if( cupidGC.ndim > 1 ) {
+      if( x[ 5 ] < 0.5 ) ret = 0;
+      if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
    }
 
 /* Return the final chi-squared value */
