@@ -249,11 +249,19 @@ This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
 \section{\xlabel{vectorerrorremodelling}Re-modelling the error estimates in a POL-2 vector catalogue}
 
 
-If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the I, Q and U error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \poltwomap\ to create a vector catalogue, then each I, Q or U error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I, Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (the noise level increases towards the edge of the map due to there being fewer bolometer samples per pixel near the edge):
+If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the I, Q and U error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \poltwomap\ to create a vector catalogue, then each I, Q or U error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I, Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (\cref{Figure}{fig:originalerrors}{}).
 
-(FIGURE TO BE ADDED HERE - SEE https://www.eaobservatory.org/jcmt/2020/06/re-modelling-the-error-estimates-in-a-pol2-vector-catalogue/)
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-ophl1688-noise_on_error-1.png}
+\caption [Original Error Estimates in POL-2 Vector Catalogue for Oph L1688]{
+  The initial total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688. Note that the noise level increases towards the edge of the map due to there being fewer bolometer samples per pixel near the edge.
+\label{fig:originalerrors}
+}
+\end{center}
+\end{figure}
 
-The uncertainty on the error estimate can cause some vectors that are clearly wrong (e.g. because they are very different to nearby vectors) to have anomalously low error estimates and so to be included in the set of ``good'' vectors (i.e. vectors that pass some suitable selection criterion based on the noise estimates).
+The uncertainty on the error estimate can cause some vectors that are clearly wrong (e.g. because they are very different from nearby vectors) to have anomalously low error estimates and so to be included in the set of ``good'' vectors (i.e. vectors that pass some suitable selection criterion based on the noise estimates).
 
 One simple solution to this could be to apply some spatial smoothing to the error estimates. This would be a reasonable thing to do if there were no compact sources in the map. The errors close to a compact source are generally higher than those in a background region because of factors such as pointing errors, calibration errors, etc. These factors cause a compact source to appear slightly different in each observation, and so cause higher error estimates in the vector catalogue. The above error estimates map shows this effect in the higher values at the very centre. Simply smoothing this map would spread that central feature out, artificially decreasing the peak error and increasing the errors in the neighbouring background pixels.
 
@@ -264,13 +272,30 @@ An alternative to smoothing is to split the total noise up into several differen
 \end{terminalv}
 
 
-This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three component model of the noise in each quantity, and then errors for the derived quantities (PI, P and ANG) are found. New values of PI and P are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total intensity coadd map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total intensity error estimates look like this:
+This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three component model of the noise in each quantity, and then errors for the derived quantities (PI, P and ANG) are found. New values of PI and P are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total intensity coadd map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total intensity error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
 
-(FIGURE TO BE ADDED HERE)
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-ophl1688-pol2-noise-remod-1.png}
+\caption [Remodelled Error Estimates in POL-2 Vector Catalogue for Oph L1688]{
+  The re-modelled total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688. Note the reduced noise in comparison to \cref{Figure}{fig:originalerrors}{}.
+\label{fig:newerrors}
+}
+\end{center}
+\end{figure}
 
-Most of the noise has gone without reducing the resolution. The script displays the original and re-modelled error estimates for each Stokes parameter (I, Q and U), the residuals between the two and a scatter plot. The best-fitting straight line through the scatter plot is also displayed:
+Most of the noise has gone without reducing the resolution. The script displays the original and re-modelled error estimates for each Stokes parameter (I, Q and U), the residuals between the two and a scatter plot (\cref{Figure}{fig:remodellingwindow}{}). The best-fitting straight lines through each scatter plot are also displayed.
 
-(FIGURE TO BE ADDED HERE)
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-ophl1688-pol2noise-fitting-1.png}
+\caption [Plotting Window produced During POL-2 Vector Catalogue Error Estimate Remodelling for Oph L1688]{Example of the output displayed during the POL-2
+vector catalogue error estimate re-modelling process. Comparison Stokes parameter
+(I, Q and U) plots are shown, together with residuals images and associated straight line fits.
+}
+\label{fig:remodellingwindow}
+\end{center}
+\end{figure}
 
 The three components used to model the error on each Stokes parameter (I, Q or U) are described below:
 
