@@ -269,7 +269,6 @@ An alternative to smoothing is to split the total noise up into several differen
 % pol2noise mycat.FIT mode=remodel out=newcat.FIT exptime=iext debiastype=mas
 \end{terminalv}
 
-
 This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three component model of the noise in each quantity, and then errors for the derived quantities (PI, P and ANG) are found. New values of PI and P are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total intensity coadd map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total intensity error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
 
 \begin{figure}[ht!]
@@ -314,7 +313,6 @@ noise estimates, the background component is also much smoother.
 The final model is the sum of the above three components. The new DI, DQ and DU values are found independently using the above method. The errors for the derived quantities (DPI, DP and DANG) are then found from DQ, DU and DI using the usual error propagation formulae. Finally new P and PI values are found using a specified form of de-biasing (controlled by the parameter \texttt{DEBIASTYPE}).
 
 
-
 \section{\xlabel{vectoredebiaschanging}Changing the de-biasing in a POL-2 vector catalogue}
 
 The new \task{poledit} command in the Starlink \POLPACK\ package has an option to recalculate the PI (polarised intensity) and P (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with:
@@ -338,8 +336,41 @@ This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-poledit-debias.png}
 \caption [The effects of using the various \task{poledit} debias options]{
-  The effects of using the various \task{poledit} debias options. The horizontal axis is PI/DPI (polarised intensity signal to noise ratio) with no de-biasing. The vertical axis is the new PI/DPI value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'')
+  The effects of using the various \task{poledit} debias options. The horizontal axis is PI/DPI (polarised intensity signal to noise ratio) with no de-biasing. The vertical axis is the new PI/DPI value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'').
 \label{fig:poleditdebias-1}
 }
 \end{center}
 \end{figure}
+
+
+\section{\xlabel{smooth450}Smoothing 450 \SI{}{\micro\metre} POL-2 maps to 850 \SI{}{\micro\metre} map resolution}
+
+The \poltwomap\ script has a parameter, \param{SMOOTH450}, to enable the user to smooth
+\SI{450}{\micro\metre} POL-2 maps to the same resolution as their \SI{850}{\micro\metre} counterparts. It is only accessed when processing \SI{450}{\micro\metre} data, and defaults to \texttt{False}, which results in no changes to the behaviour of \poltwomap. If \param{SMOOTH450} is set to \texttt{True}, \poltwomap\ performs an additional smoothing that results in the resolution of the resulting I, Q and U coadds (and the vector catalogue) being degraded to the resolution expected for \SI{850}{\micro\metre} data. This allows 450 and 850 \SI{}{\micro\metre} results to be compared more easily. A side-effect of the smoothing is that the noise levels in the final \SI{450}{\micro\metre} maps and catalogues is lower.
+
+The smoothing is applied to the I, Q and U maps made from each individual observation before using them to form the I, Q and U coadds. The same smoothing kernel is used for I, Q and U and is formed by deconvolving the expected \SI{850}{\micro\metre} beam shape using the expected \SI{450}{\micro\metre} beam shape as the PSF (Point Spread Function). The ``expected'' beam shapes are two-component Gaussians as described in \cite{dempsey12}.
+
+\cref{Figure}{fig:smooth450psf}{} shows the effect of the \param{SMOOTH450} on the mean radial total intensity profile of 3C279 determined from 25 POL-2 observations.. It can be seen that the smoothed 450 curve is very similar to the 850 curve.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-smooth450-psf-1.png}
+\caption [PSF plot showing the effect of the \poltwomap\ \param{SMOOTH450} parameter.]{
+  The mean radial total intensity profile of 3C279 determined from 25 POL-2 observations. The black curve shows the \SI{450}{\micro\metre} profile produced using \param{SMOOTH450} = \texttt{NO} (the default), the red curve shows the \SI{450}{\micro\metre} profile produced using \param{SMOOTH450} = \texttt{YES} and the blue curve shows the \SI{850}{\micro\metre} profile.
+\label{fig:smooth450psf}
+}
+\end{center}
+\end{figure}
+
+\cref{Figure}{fig:smooth450map}{} shows an example of the effect of the \param{SMOOTH450} on a vector map for POL-2 observations of the molecular cloud DR21. The main difference is that there are many more red vectors than blue vectors. This is because the smoothing introduced by \param{SMOOTH450} has reduced the noise level, thus allowing more vectors to pass the above selection criterion.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-smooth450-450nosmo-1.png}
+\caption [Example vector map showing the effect of the \poltwomap\ \param{SMOOTH450} parameter.]{
+  \SI{450}{\micro\metre} POL-2 vector maps created from four observations of DR21, both with and without the use of the \param{SMOOTH450} parameter. The blue vectors were created with \param{SMOOTH450} = \texttt{NO}, and the red vectors with \param{SMOOTH450} = \texttt{YES}. Both red and blue used the same selection criterion (\texttt{i>5*di \&\& dp <0.5 \&\& dang < 10}).
+\label{fig:smooth450map}
+}
+\end{center}
+\end{figure}
+
