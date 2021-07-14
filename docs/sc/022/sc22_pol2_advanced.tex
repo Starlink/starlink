@@ -449,7 +449,7 @@ the rest of the \makemap\ or \skyloop\ output.  However, the log file can be ver
 so finding the relevant information may not be straightforward, particularly for users unfamiliar 
 with the screen output usually created by \makemap\ or \skyloop.
 
-To help with this, a simple python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}} is available, which searches a specified \poltwomap\ log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
+To help with this, a simple python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}.} is available, which searches a specified \poltwomap\ log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
 
 \begin{terminalv}
 % pol2logcheck.py omc1/pol2map.log.3
@@ -460,3 +460,71 @@ omc1/pol2map.log.3:
   The following observation(s) failed to converge:
     20190104 #14
 \end{terminalv}
+
+
+\section{\xlabel{combiningfields}Combining multiple POL-2 fields}
+
+To combine POL-2 observations for multiple overlapping fields, the best way to proceed is probably as follows\footnote{This method requires the use of a Starlink build from 9th June, 2019 or later.}:
+
+\begin{enumerate}
+\item Run `step 1' independently for each field. In other words, use \poltwomap\ to create an 
+auto-masked total intensity map for each field. The following assumes that \poltwomap\ is run 
+within directories called \file{field1}, \file{field2}, etc, to create the auto-masked maps and the I/
+Q/U time-stream data for each field.
+
+\item Co-add the auto-masked total intensity maps for all fields. First, create a text file holding 
+the paths to the separate auto-masked total intensity maps, and then run \poltwomap\ as 
+follows:
+
+\begin{terminalv}
+        % more infiles
+        field1/iauto
+        field2/iauto
+        % pol2map in=^infiles iout=iauto_mosaic \
+                  qout=! uout=! multiobject=yes
+\end{terminalv}
+
+\item Run `step 2' and `step 3' for each field, using the mosaic created above as the mask field 
+for all fields. For instance, for the first field:
+
+\begin{terminalv}
+        % cd field1
+        % pol2map in=qudata/\* iout=iext qout=! \
+                  uout=! mapdir=maps mapvar=yes \
+                  skyloop=yes mask=../iauto_mosaic 
+        % pol2map in=qudata/\* iout=! qout=qext \
+                  uout=uext mapdir=maps mapvar=yes \
+                  skyloop=yes mask=../iauto_mosaic \
+                  ipref=iext cat=mycat debias=yes
+\end{terminalv}
+
+\item Then, do the same for \file{field2}, \file{field3}, etc. If preferred, steps 2 and 3 can be 
+combined into a single invocation of \poltwomap:
+
+\begin{terminalv}
+        % cd field1
+        % pol2map in=qudata/\* iout=iext qout=qext \
+                  uout=uext mapdir=maps mapvar=yes \
+                  skyloop=yes mask=../iauto_mosaic \
+                  ipref=iext cat=mycat debias=yes
+\end{terminalv}
+
+\item Co-add the external-masked I/Q/U maps for all fields and create a vector catalogue from 
+the co-added maps. First, create a text file holding the paths to the external-masked I/Q/U maps 
+for all fields, and then run pol2map as follows:
+
+ \begin{terminalv}
+        % more infiles
+        field1/iext
+        field1/qext
+        field1/uext
+        field2/iext
+        field2/qext
+        field2/uext
+        % pol2map in=^infiles iout=iext_mosaic \
+                  qout=qext_mosaic uout=uext_mosaic \
+                  multiobject=yes cat=mycat_mosaic \
+                  debias=yes ipcor=no
+\end{terminalv}
+
+\end{enumerate}
