@@ -441,3 +441,22 @@ ast.zero_snrlo = 1.5
 Any values not specified will retain their default values listed above.
 
 
+\section{\xlabel{checkingconvergence}Checking for convergence in pol2map log files}
+
+When processing POL-2 data, it is important to know that the map-making algorithm converged 
+correctly for all observations. This information is available in the \poltwomap log file, along with 
+the rest of the \makemap\ or \skyloop\ output.  However, the log file can be very long, and 
+so finding the relevant information may not be straightforward, particularly for users unfamiliar 
+with the screen output usually created by \makemap\ or \skyloop.
+
+To help with this, a simple python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}} is available, which searches a specified \poltwomap\ log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
+
+\begin{terminalv}
+% pol2logcheck.py omc1/pol2map.log.3
+
+omc1/pol2map.log.3: 
+
+ Looks like a step 1 log file
+  The following observation(s) failed to converge:
+    20190104 #14
+\end{terminalv}
