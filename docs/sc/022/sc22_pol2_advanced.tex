@@ -306,7 +306,7 @@ the log of the noise estimate in the catalogue (DQ, DU or DI) and the log of the
 thin rim around the edge of the map where the original noise estimates are subject to large
 inaccuracies. Since the exposure time map is usually very much smoother than the original
 noise estimates, the background component is also much smoother.
-\item {\bf The source component:} This represents the extra noise found in and around compact sources caused by pointing errors, calibration errors, etc. The background component is first subtracted from the catalogue noise estimates and the residual noise values are then modelled using a collection of Gaussians. This modeling is done using the \texttt{GaussClumps} algorithm provided by the \task{findclumps} command in the Starlink \cupid\ package. The noise residuals are first divided into a number of ?islands?, each island being a collection of contiguous pixels with  noise residual significantly higher than zero (this is done using the \texttt{FellWalker} algorithm in \cupid). The \texttt{GaussClumps} algorithm is then used to model the noise residuals in each island. The resulting model is smoothed lightly using a Gaussian kernel of FWHM 1.2 pixels.
+\item {\bf The source component:} This represents the extra noise found in and around compact sources caused by pointing errors, calibration errors, etc. The background component is first subtracted from the catalogue noise estimates and the residual noise values are then modelled using a collection of Gaussians. This modeling is done using the \texttt{GaussClumps} algorithm provided by the \task{findclumps} command in the Starlink \cupid\ package. The noise residuals are first divided into a number of ``islands'', each island being a collection of contiguous pixels with  noise residual significantly higher than zero (this is done using the \texttt{FellWalker} algorithm in \cupid). The \texttt{GaussClumps} algorithm is then used to model the noise residuals in each island. The resulting model is smoothed lightly using a Gaussian kernel of FWHM 1.2 pixels.
 \item {\bf The residual component:} This represents any noise not accounted for by the other two models. The noise residuals are first found by subtracting the other two components from the original catalogue noise estimates. Any strong outlier values are removed and the results are smoothed more heavily using a Gaussian kernel of FWHM 4 pixels.
 \end{enumerate}
 
@@ -322,7 +322,7 @@ The new \task{poledit} command in the Starlink \POLPACK\ package has an option t
 % poledit mycat newcat mode=debias debiastype=mas
 \end{terminalv}
 
-This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new P and PI columns re-calculated from the existing Q, U, I and DPI values using the ?Modified Asymptotic? (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored). The options for the \param{DEBIASTYPE} parameter are:
+This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new P and PI columns re-calculated from the existing Q, U, I and DPI values using the ``Modified Asymptotic'' (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored). The options for the \param{DEBIASTYPE} parameter are:
 
 \begin{enumerate}
 \item {\bf MAS:} De-bias using the modified asymptotic estimator;
@@ -373,4 +373,71 @@ The smoothing is applied to the I, Q and U maps made from each individual observ
 }
 \end{center}
 \end{figure}
+
+
+\section{\xlabel{controllingpol2mapmasks}Controlling the masks used by pol2map}
+
+As noted earlier, the map-making process used by the \poltwomap command uses two masks, each of which divides the field up into source and background regions:
+
+\begin{enumerate}
+\item {\bf The AST mask:} This is used to define the background regions that are to be forced to zero after each iteration of the map-maker algorithm (except the last iteration). This form of masking helps prevent the growth of artificial large scale structures within the map. Any real astronomical signal present within the masked background regions will tend to be suppressed in the final map, so it is important that the AST mask correctly identifies regions of significant emission down to a low level.
+\item {\bf The PCA mask:} This is used to define the source regions that are to be excluded from the Principal Component Analysis. This analysis is used to remove the correlated backgrounds in the bolometer time stream data. The time-stream data for astronomical sources are not correlated across bolometers, and so tend to disrupt the PCA. For this reason source regions are excluded from the analysis.
+\end{enumerate}
+
+Two separate masks are used because experience has shown that disruption of the PCA is caused mainly by the brighter central source regions. Consequently, the source regions within the PCA mask can  be smaller than the source regions within the AST mask, as illustrated in \cref{Figure}{fig:mapmasks}{}.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc-22-map-masks-1.png}
+\caption [Example POL-2 map of DR21, showing the difference between the two \poltwomap\ masks.]{A total intensity map of DR 21, showing the AST mask in green and the slightly smaller PCA mask in blue.
+\label{fig:mapmasks}
+}
+\end{center}
+\end{figure}
+
+Default masks are created automatically by \poltwomap\ in a manner specified by the \param{MASK} parameter.
+
+\begin{enumerate}
+\item On `step 1' of a typical POL-2 data reduction, \param{MASK} is left at its default value of
+\texttt{Auto}, causing new masks to be generated automatically at the end of each iteration of 
+the map-making algorithm. This ``auto-masking'' process identifies an initial set of sources by 
+thresholding the current map estimate at the SNR value specified by configuration parameter 
+\param{xxx.ZERO\_SNR}, where \texttt{xxx} is either \texttt{AST} or \texttt{PCA}, depending on 
+which mask is being generated. Each of these initial source regions is then expanded to include 
+adjoining pixels down to the SNR level specified by configuration parameter 
+\param{xxx.ZERO\_SNRLO}.
+\item On `step 2' and `step 3' of a typical POL-2 data reduction, \param{MASK} is set to the 
+coadd of all the total intensity maps created at step 1. The \poltwomap\ script first creates a pair 
+of AST and PCA masks from the supplied coadded map, and then uses these masks on all 
+iterations of the map-making algorithm \footnote{For completeness, it should be mentioned that the COM and FLT models are also masked, in addition to the AST and PCA models. At step 1 (the auto-masking stage), the masking of COM and FLT is controlled by a similar set of configuration parameters to those of AST or PCA, except that \texttt{xxx} becomes \texttt{COM} or \texttt{FLT}. At steps 2 and 3 (the external-masking stages), the COM and FLT models are masked using the PCA mask generated by \task{findclumps}, and so COM and FLT masking cannot be controlled independently of the PCA mask.}. The \task{findclumps} command in the Starlink \CUPID\ 
+package is used by \poltwomap\ to create the masks. The process used by \task{findclumps} is 
+the same as describe above for step 1 -- initial sources are defined by a fixed SNR threshold 
+within the supplied coadd and these are then extended down to a lower SNR threshold. The 
+\poltwomap\ command sets these threshold values to the values of the four configuration 
+parameters listed above -- \param{AST.ZERO\_SNR}, \param{AST.ZERO\_SNRLO}, 
+\param{PCA.ZERO\_SNR} and \param{PCA.ZERO\_SNRLO}.
+\end{enumerate}
+
+These configuration parameter all default to the following values specified in the \poltwomap\ 
+script:
+
+\begin{terminalv}
+AST.ZERO_SNR = 3 
+AST.ZERO_SNRLO = 2 
+PCA.ZERO_SNR = 5 
+PCA.ZERO_SNRLO = 3
+\end{terminalv}
+
+To investigate the effects of changing these values, new values can be supplied, using the 
+\param{CONFIG} parameter of the \poltwomap\ command \footnote{Note that prior to 10th July, 2019, this method could only be used at step 1 (the supplied settings were ignored if supplied at step 2 or 3). Later versions of \poltwomap\ do not suffer from this limitation -- the supplied values are honoured at all steps.}. For instance:
+
+\begin{terminalv}
+% more conf
+ast.zero_snr = 2.5
+ast.zero_snrlo = 1.5
+% pol2map config=^conf
+\end{terminalv}
+
+Any values not specified will retain their default values listed above.
+
 
