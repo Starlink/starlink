@@ -245,9 +245,7 @@ This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
 \file{selcat.FIT}, but with the WCS information inherited from \file{mycat.FIT}.
 
 
-
 \section{\xlabel{vectorerrorremodelling}Re-modelling the error estimates in a POL-2 vector catalogue}
-
 
 If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the I, Q and U error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \poltwomap\ to create a vector catalogue, then each I, Q or U error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I, Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (\cref{Figure}{fig:originalerrors}{}).
 
@@ -313,4 +311,35 @@ noise estimates, the background component is also much smoother.
 \item {\bf The residual component:} This represents any noise not accounted for by the other two models. The noise residuals are first found by subtracting the other two components from the original catalogue noise estimates. Any strong outlier values are removed and the results are smoothed more heavily using a Gaussian kernel of FWHM 4 pixels.
 \end{enumerate}
 
-The final model is the sum of the above three components. The new DI, DQ and DU values are found independently using the above method. The errors for the derived quantities (DPI, DP and DANG) are then found from DQ, DU and DI using the usual error popagation formulae. Finally new P and PI values are found using a specified form of de-biasing (controlled by the parameter \texttt{DEBIASTYPE}).
+The final model is the sum of the above three components. The new DI, DQ and DU values are found independently using the above method. The errors for the derived quantities (DPI, DP and DANG) are then found from DQ, DU and DI using the usual error propagation formulae. Finally new P and PI values are found using a specified form of de-biasing (controlled by the parameter \texttt{DEBIASTYPE}).
+
+
+
+\section{\xlabel{vectoredebiaschanging}Changing the de-biasing in a POL-2 vector catalogue}
+
+The new \task{poledit} command in the Starlink \POLPACK\ package has an option to recalculate the PI (polarised intensity) and P (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with:
+
+\begin{terminalv}
+% polpack
+% poledit mycat newcat mode=debias debiastype=mas
+\end{terminalv}
+
+This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new P and PI columns re-calculated from the existing Q, U, I and DPI values using the ?Modified Asymptotic? (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored). The options for the \param{DEBIASTYPE} parameter are:
+
+\begin{enumerate}
+\item {\bf MAS:} De-bias using the modified asymptotic estimator;
+\item {\bf AS:} De-bias using the asymptotic estimator;
+\item {\bf None:} Do not include any de-biasing.
+\end{enumerate}
+
+\cref{Figure}{fig:poleditdebias-1}{} shows the results of using the \task{poledit} command with the various  \param{DEBIASTYPE} parameter options listed above.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[width=0.46\linewidth]{sc22-poledit-debias.png}
+\caption [The effects of using the various \task{poledit} debias options]{
+  The effects of using the various \task{poledit} debias options. The horizontal axis is PI/DPI (polarised intensity signal to noise ratio) with no de-biasing. The vertical axis is the new PI/DPI value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'')
+\label{fig:poleditdebias-1}
+}
+\end{center}
+\end{figure}
