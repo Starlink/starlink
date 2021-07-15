@@ -13,9 +13,9 @@ final total intensity map, first open up the I map in \GAIA.
 
 
 From the main \GAIA\ window, select the drop-down menu option
-\texttt{Image Analysis / Polarimetry toolbox}. This should launch a
-new toolbox window entitled \texttt{GAIA: Polarimetry}. From this window, use
-the drop-down menu option \texttt{File / Open} to load the file
+\guithing{Image Analysis / Polarimetry toolbox}. This should launch a
+new toolbox window entitled \guithing{GAIA: Polarimetry}. From this window, use
+the drop-down menu option \guithing{File / Open} to load the file
 \file{mycat.FIT}. This should then populate the lower part of the window
 with the contents of this polarimetry catalogue file.  Each of the vectors
 in this file will be automatically overlaid on the main image window
@@ -35,8 +35,8 @@ in this file will be automatically overlaid on the main image window
 
 In order to filter the number of overlaid vectors down to a more
 useful number and size, the various options in the
-\texttt{GAIA: Polarimetry} toolbox can be used. First, select the
-\texttt{Rendering} tab on the
+\guithing{GAIA: Polarimetry} toolbox can be used. First, select the
+\guithing{Rendering} tab on the
 left hand side. This will reveal a panel that will indicate which
 quantities are currently being used for the vector overlays. In this
 case, the Vector length is taken from the \catcol{P} column of the table, and
@@ -44,7 +44,7 @@ the Vector angles are taken from the \catcol{ANG} column.
 
 Currently the figure has too many vectors to be scientifically
 meaningful. To filter out most of the extraneous vectors, click on the
-Selecting tab, and set the Expression field to be the following:
+\guithing{Selecting} tab, and set the \guithing{Expression} field to be the following:
 
 \begin{terminalv}
 $I/$DI<10
@@ -56,7 +56,7 @@ The above expression selects the data points in the polarimetry table
 that have an associated total intensity (Column~\catcol{I}) less than 10 times
 the associated error value for that intensity (Column~\catcol{DI}). To remove
 all of these extraneous vectors, either press control-X or use the
-drop-down menu option \texttt{Edit / Cut}.  This should leave just a
+drop-down menu option \guithing{Edit / Cut}.  This should leave just a
 small number of vectors clustering around the target object (see
 \cref{Figure}{fig:gaiavectorssecond}{})
 \footnote{This example is provided here for simplicity. It should be noted, however, that a selection criterion following the general format of ``\$I/\$DI<10 || \$AST==0`` might actually further improve some selections, as it makes use of the \catcol{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
@@ -78,8 +78,8 @@ small number of vectors clustering around the target object (see
 
 Zooming in on the central region of the map makes it possible to view
 the vectors near the target object (see \cref{Figure}{fig:gaiavectorsfinal}{}).
-If needed, it is possible to change the vector scale by selecting the \texttt{Rendering}
-tab in the \texttt{GAIA: Polarimetry} window.
+If needed, it is possible to change the vector scale by selecting the \guithing{Rendering}
+tab in the \guiwindow{GAIA: Polarimetry} window.
 
 
 \begin{figure}[t!]
