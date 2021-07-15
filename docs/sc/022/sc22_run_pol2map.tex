@@ -430,24 +430,24 @@ to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2
 command line.  The columns are listed below.
 
 \begin{aligndesc}
-\item[\texttt{X}] Pixel coordinate at the centre of the pixel
-\item[\texttt{Y}] Pixel coordinate at the centre of the pixel
-\item[\texttt{RA}] RA coordinate at the centre of the pixel
-\item[\texttt{Dec}] Dec coordinate at the centre of the pixel
-\item[\texttt{I}] Total intensity
-\item[\texttt{DI}] Error in $I$
-\item[\texttt{Q}] Stokes $Q$ parameter
-\item[\texttt{DQ}] Error in $Q$
-\item[\texttt{U}] Stokes $U$ parameter
-\item[\texttt{DU}] Error in $U$
-\item[\texttt{P}] Percentage polarisation
-\item[\texttt{DP}] Error in $P$
-\item[\texttt{ANG}] Angle of polarisation
-\item[\texttt{DANG}] Error in ANG
-\item[\texttt{PI}] Polarised intensity ($I_{\textnormal{p}}$)
-\item[\texttt{DPI}] Error in polarised intensity
-\item[\texttt{AST}] Integer values that indicate if the corresponding vector position is inside the AST mask. If the vector is outside the mask, the corresponding column for the mask will have a blank/null value. Vectors that are inside a mask will have a non-zero integer value for the corresponding column. Each ``island'' within a mask (i.e. a contiguous group of source pixels) will have a different integer value assigned, starting at 1. All vectors within an island  are assigned the integer value of the island. 
-\item[\texttt{PCA}] Contains integer values that indicate if the corresponding vector position is inside the PCA mask. Value conventions are the same as for the \texttt{AST} column (above).
+\item[\catcol{X}] Pixel coordinate at the centre of the pixel
+\item[\catcol{Y}] Pixel coordinate at the centre of the pixel
+\item[\catcol{RA}] RA coordinate at the centre of the pixel
+\item[\catcol{Dec}] Dec coordinate at the centre of the pixel
+\item[\catcol{I}] Total intensity
+\item[\catcol{DI}] Error in \catcol{I}
+\item[\catcol{Q}] Stokes $Q$ parameter
+\item[\catcol{DQ}] Error in \catcol{Q}
+\item[\catcol{U}] Stokes $U$ parameter
+\item[\catcol{DU}] Error in \catcol{U}
+\item[\catcol{P}] Percentage polarisation
+\item[\catcol{DP}] Error in \catcol{P}
+\item[\catcol{ANG}] Angle of polarisation
+\item[\catcol{DANG}] Error in \catcol{ANG}
+\item[\catcol{PI}] Polarised intensity ($I_{\textnormal{p}}$)
+\item[\catcol{DPI}] Error in polarised intensity
+\item[\catcol{AST}] Integer values that indicate if the corresponding vector position is inside the AST mask. If the vector is outside the mask, the corresponding column for the mask will have a blank/null value. Vectors that are inside a mask will have a non-zero integer value for the corresponding column. Each ``island'' within a mask (i.e. a contiguous group of source pixels) will have a different integer value assigned, starting at 1. All vectors within an island are assigned the integer value of the island. 
+\item[\catcol{PCA}] Contains integer values that indicate if the corresponding vector position is inside the PCA mask. Value conventions are the same as for the \catcol{AST} column (above).
 \end{aligndesc}
 
 

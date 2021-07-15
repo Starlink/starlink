@@ -39,8 +39,8 @@ useful number and size, the various options in the
 \texttt{Rendering} tab on the
 left hand side. This will reveal a panel that will indicate which
 quantities are currently being used for the vector overlays. In this
-case, the Vector length is taken from the P column of the table, and
-the Vector angles are taken from the ANG column.
+case, the Vector length is taken from the \catcol{P} column of the table, and
+the Vector angles are taken from the \catcol{ANG} column.
 
 Currently the figure has too many vectors to be scientifically
 meaningful. To filter out most of the extraneous vectors, click on the
@@ -53,13 +53,13 @@ $I/$DI<10
 \emph{Ensure that ``Return'' is pressed after entering the above expression}.
 
 The above expression selects the data points in the polarimetry table
-that have an associated total intensity (Column~I) less than 10 times
-the associated error value for that intensity (Column~DI). To remove
+that have an associated total intensity (Column~\catcol{I}) less than 10 times
+the associated error value for that intensity (Column~\catcol{DI}). To remove
 all of these extraneous vectors, either press control-X or use the
 drop-down menu option \texttt{Edit / Cut}.  This should leave just a
 small number of vectors clustering around the target object (see
 \cref{Figure}{fig:gaiavectorssecond}{})
-\footnote{This example is provided here for simplicity. It should be noted, however, that a selection criterion following the general format of ''\$I/\$DI<10 || \$AST==0'' might actually further improve some selections, as it makes use of the \texttt{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
+\footnote{This example is provided here for simplicity. It should be noted, however, that a selection criterion following the general format of ``\$I/\$DI<10 || \$AST==0`` might actually further improve some selections, as it makes use of the \catcol{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
 
 \begin{figure}[t!]
 \begin{center}

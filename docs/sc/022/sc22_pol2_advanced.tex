@@ -199,14 +199,14 @@ Vector catalogues produced by \poltwomap\ contain information about World Coordi
 Systems (WCS) in two different forms:
 
 \begin{enumerate}
-\item The catalogue contains ``RA'' and ``Dec'' columns that hold the sky position
+\item The catalogue contains \catcol{RA} and \catcol{Dec} columns that hold the sky position
 (FK5, J2000) of each vector, in radians.
 \item The catalogue header contains a Starlink ``WCS FrameSet'' which defines
 (amongst other things) the projection from pixel coordinates within
 the $I$, $Q$, and $U$ mosaics, to RA and Dec. This FrameSet is used by Starlink software, together
-with the pixels coordinates stored in the ``X'' and ``Y'' columns, to determine
+with the pixels coordinates stored in the \catcol{X} and \catcol{Y} columns, to determine
 the RA and Dec of each vector. The WCS FrameSet also defines the polarimetric
-reference direction used by the $Q$, $U$, and ANG values. See
+reference direction used by the \catcol{Q}, \catcol{U}, and \catcol{ANG} values. See
 ``\xref{Using World Co-ordinate Systems}{sun95}{se_wcsuse}''
 within \xref{SUN/95}{sun95}{} (the \KAPPA\ manual) for more information on
 the ways in which Starlink software handles WCS information.
@@ -246,7 +246,7 @@ This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
 
 \section{\xlabel{vectorerrorremodelling}Re-modelling the error estimates in a POL-2 vector catalogue}
 
-If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the I, Q and U error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \poltwomap\ to create a vector catalogue, then each I, Q or U error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I, Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (\cref{Figure}{fig:originalerrors}{}).
+If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the \catcol{I}, \catcol{Q}, and \catcol{U} error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \task{pol2map} to create a vector catalogue, then each \catcol{DI}, \catcol{DQ}, or \catcol{DU} error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I$ Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (\cref{Figure}{fig:originalerrors}{}).
 
 \begin{figure}[ht!]
 \begin{center}
@@ -268,7 +268,7 @@ An alternative to smoothing is to split the total noise up into several differen
 % pol2noise mycat.FIT mode=remodel out=newcat.FIT exptime=iext debiastype=mas
 \end{terminalv}
 
-This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three component model of the noise in each quantity, and then errors for the derived quantities (PI, P and ANG) are found. New values of PI and P are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total intensity coadd map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total intensity error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
+This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three-component model of the noise in each quantity, and then errors for the derived quantities (\catcol{PI}, \catcol{P}, and \catcol{ANG}) are found. New values of \catcol{PI} and \catcol{P} are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total-intensity co-add map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total-intensity error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
 
 \begin{figure}[ht!]
 \begin{center}
@@ -309,19 +309,19 @@ noise estimates, the background component is also much smoother.
 \item {\bf The residual component:} This represents any noise not accounted for by the other two models. The noise residuals are first found by subtracting the other two components from the original catalogue noise estimates. Any strong outlier values are removed and the results are smoothed more heavily using a Gaussian kernel of FWHM 4 pixels.
 \end{enumerate}
 
-The final model is the sum of the above three components. The new DI, DQ and DU values are found independently using the above method. The errors for the derived quantities (DPI, DP and DANG) are then found from DQ, DU and DI using the usual error propagation formulae. Finally new P and PI values are found using a specified form of de-biasing (controlled by the parameter \texttt{DEBIASTYPE}).
+The final model is the sum of the above three components. The new \catcol{DI}, \catcol{DQ}, and \catcol{DU} values are found independently using the above method. The errors for the derived quantities (\catcol{DPI}, \catcol{DP}, and \catcol{DANG}) are then found from \catcol{DQ}, \catcol{DU}, and \catcol{DI} using the usual error propagation formulae. Finally new \catcol{P} and \catcol{PI} values are found using a specified form of de-biasing (controlled by the parameter \param{DEBIASTYPE}).
 
 
 \section{\xlabel{vectoredebiaschanging}Changing the de-biasing in a POL-2 vector catalogue}
 
-The new \poledit\ command in the Starlink \POLPACK\ package has an option to recalculate the PI (polarised intensity) and P (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with:
+The new \poledit\ command in the Starlink \POLPACK\ package has an option to recalculate the \catcol{PI} (polarised intensity) and \catcol{P} (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with the following commands.
 
 \begin{terminalv}
 % polpack
 % poledit mycat newcat mode=debias debiastype=mas
 \end{terminalv}
 
-This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new P and PI columns re-calculated from the existing Q, U, I and DPI values using the ``Modified Asymptotic'' (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored). The options for the \param{DEBIASTYPE} parameter are:
+This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new \catcol{P} and \catcol{PI} columns re-calculated from the  existing \catcol{Q}, \catcol{U}, \catcol{I}, and \catcol{DPI} values using the ``Modified Asymptotic'' (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored).  The options for the \param{DEBIASTYPE} parameter are:
 
 \begin{enumerate}
 \item {\bf MAS:} De-bias using the modified asymptotic estimator;
@@ -335,7 +335,7 @@ This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc22-poledit-debias.png}
 \caption [The effects of using the various \task{poledit} debias options]{
-  The effects of using the various \task{poledit} debias options. The horizontal axis is PI/DPI (polarised intensity signal to noise ratio) with no de-biasing. The vertical axis is the new PI/DPI value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'').
+  The effects of using the various \task{poledit} debias options. The horizontal axis is \catcol{PI/DPI} (polarised intensity signal-to-noise ratio) with no de-biasing. The vertical axis is the new \catcol{PI/DPI} value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'').
 \label{fig:poleditdebias-1}
 }
 \end{center}
