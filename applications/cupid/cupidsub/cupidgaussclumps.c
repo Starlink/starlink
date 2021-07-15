@@ -172,6 +172,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     9-APR-2020 (DSB):
 *        - Allow edge clumps to be retained using config parameter AllowEdge.
 *        - Added argument nrej.
+*     14-JUL-2021 (DSB):
+*        Report progress towards completion if msg filter is VERB or higher.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -457,6 +459,22 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
                      area_below++;
                   } else {
                      area_below = 0;
+                  }
+
+/* Report progress towards completion. */
+                  if( maxclump != VAL__MAXI ) {
+                     msgOutiff( MSG__VERB, "", "%zu clumps found (terminate at %zu)",
+                                status, iclump, maxclump );
+                  }
+                  msgOutiff( MSG__VERB, "", "Data sum in clumps: %g (terminate at %g)",
+                             status, sumclumps, sumdata );
+                  if( peaks_below > 1 ) {
+                     msgOutiff( MSG__VERB, "", "%d consecutive clumps below threshold peak (terminate at %d)",
+                                status, peaks_below, npad );
+                  }
+                  if( area_below > 1 ) {
+                     msgOutiff( MSG__VERB, "", "%zu consecutive clumps below threshold area (terminate at %d)",
+                                status, area_below, npad );
                   }
 
 /* If the maximum number of clumps have now been found, exit.*/
