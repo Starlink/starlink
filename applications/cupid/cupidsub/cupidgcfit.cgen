@@ -122,9 +122,9 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
 *     8-APR-2020 (DSB):
 *        Set the relative function change convergence criterion.
 *     13-JUL-2021 (DSB):
-*        If the background level is fixed, re-order the parameters 
-*        before making any use of the parameters. Previously, the 
-*        spatial position angle was being misused as the velocity 
+*        If the background level is fixed, re-order the parameters
+*        before making any use of the parameters. Previously, the
+*        spatial position angle was being misused as the velocity
 *        axis position if the backround was fixed.
 *     {enter_further_changes_here}
 
@@ -162,6 +162,17 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
 
    } else {
       n = CUPID__GCNP3;
+   }
+
+/* The minimiser uses the offsets from the peak position as the
+   parameters to be minimised, rather than the absolute coordinate
+   value. The offsets are initially zero. */
+   x[ 2 ] = 0.0;
+   if( cupidGC.ndim > 1 ) {
+      x[ 4 ] = 0.0;
+      if( cupidGC.ndim > 2 ) {
+         x[ 7 ] = 0.0;
+      }
    }
 
 /* If the background level is to remain fixed at its initial value (i.e. be
@@ -293,6 +304,15 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
    if( cupidGC.ndim > 1 ) {
       if( x[ 5 ] < 0.5 ) ret = 0;
       if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
+   }
+
+/* Convert peak offsets to peak positions. */
+   x[ 2 ] += cupidGC.x_max[ 0 ];
+   if( cupidGC.ndim > 1 ) {
+      x[ 4 ] += cupidGC.x_max[ 1 ];
+      if( cupidGC.ndim > 2 ) {
+         x[ 7 ] += cupidGC.x_max[ 2 ];
+      }
    }
 
 /* Return the final chi-squared value */

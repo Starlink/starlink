@@ -17,7 +17,7 @@ extern CupidGC cupidGC;
 
 
 
-double cupidGCModel( int ndim, double *x, double *par, int what,
+double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
                      int newx, int newp, int *status ){
 /*
 *+
@@ -31,8 +31,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCModel( int ndim, double *x, double *par, int what,
-*                          int newx, int newp, int *status )
+*     double cupidGCModel( int ndim, double *x, double *par, double *ref,
+*                          int what, int newx, int newp, int *status )
 
 *  Description:
 *     This function evaluates the Gaussian model defined by the supplied
@@ -59,13 +59,13 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *
 *           par[0]: Intrinsic peak intensity of clump ("a0" in Stutski & Gusten)
 *           par[1]: Constant intensity offset ("b0" in Stutski & Gusten)
-*           par[2]: Model centre on axis 0 ("x1_0" in Stutski & Gusten)
+*           par[2]: Model centre offset on axis 0 ("x1_0" in Stutski & Gusten)
 *           par[3]: Intrinsic FWHM on axis 0 ("D_xi_1" in Stutski & Gusten)
-*           par[4]: Model centre on axis 1 ("x2_0" in Stutski & Gusten)
+*           par[4]: Model centre offset on axis 1 ("x2_0" in Stutski & Gusten)
 *           par[5]: Intrinsic FWHM on axis 1 ("D_xi_2" in Stutski & Gusten)
 *           par[6]: Spatial orientation angle ("phi" in Stutski & Gusten)
 *                   In rads, positive from +ve GRID1 axis to +ve GRID2 axis.
-*           par[7]: Model centre on velocity axis ("v_0" in Stutski & Gusten)
+*           par[7]: Model centre offset on velocity axis ("v_0" in Stutski & Gusten)
 *           par[8]: Intrinsic FWHM on velocity axis ("D_xi_v" in Stutski &
 *                                                     Gusten)
 *           par[9]: Axis 0 of internal velocity gradient vector ("alpha_0"
@@ -73,6 +73,13 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *           par[10]: Axis 1 of internal velocity gradient vector ("alpha_1"
 *                   in Stutski & Gusten), in vel. pixels per spatial pixel.
 *
+*     ref
+*        Pointer to an array of "ndim" elements, holding the GRID coords
+*        (within the user-supplied NDF) of the reference position. The
+*        model centre offsets supplied in elements 2, 4 and 7 of the
+*        "par" array are added onto this reference position to get the
+*        GRID positions of the Gaussian model peak. If "ref" is NULL, 
+*        then the reference position is assumed to be zero on each axis.
 *     what
 *        If negative, then the function value at "x" is returned.
 *        Otherwise, the partial derivative of the model value with
@@ -127,6 +134,8 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 *  History:
 *     13-OCT-2005 (DSB):
 *        Original version.
+*     14-JUL-2021 (DSB):
+*        Added argument "ref".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -222,6 +231,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 /* Offset in pixels on axis 0 of the supplied position from the peak. */
       x0_off = x[ 0 ] - par[ 2 ];
+      if( ref ) x0_off -= ref[ 0 ];
 
 /* The 1D scalar value passed to the exp() function (excluding a factor of
    -4.ln(2) ) */
@@ -233,6 +243,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 
 /* Offset in pixels on axis 1 of the supplied position from the peak. */
          x1_off = x[ 1 ] - par[ 4 ];
+         if( ref ) x1_off -= ref[ 1 ];
 
 /* The offsets along the principle (rotated) axes of the 2D spatial
    ellipse */
@@ -249,6 +260,7 @@ double cupidGCModel( int ndim, double *x, double *par, int what,
 /* Offset in pixels on the velocity axis of the supplied position from the
    peak. */
             v_off = x[ 2 ] - par[ 7 ];
+            if( ref ) v_off -= ref[ 2 ];
 
 /* The total offset in pixels on the velocity axis, including velocity
    gradient. */

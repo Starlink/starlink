@@ -261,9 +261,9 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
       pdiff = peakfactor*par[ 0 ] + par[ 1 ] - cupidGC.ymax;
 
 /* The offset from the model centre to the data peak */
-      x0_off = par[ 2 ] - cupidGC.x_max[ 0 ];
-      if( ndim > 1 ) x1_off = par[ 4 ] - cupidGC.x_max[ 1 ];
-      if( ndim > 2 ) v_off = par[ 7 ] - cupidGC.x_max[ 2 ];
+      x0_off = par[ 2 ];
+      if( ndim > 1 ) x1_off = par[ 4 ];
+      if( ndim > 2 ) v_off = par[ 7 ];
 
 /* Initialise the total chi squared value */
       chisq = 0.0;
@@ -289,7 +289,8 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 /* Get the Gaussian model value at the centre of the current pixel. Store
    the residual between the Gaussian model at the centre of the current
    pixel and the current pixel's data value. */
-         m = cupidGCModel( ndim, x, par, -1, 1, ( iel == 0 ), status );
+         m = cupidGCModel( ndim, x, par, cupidGC.x_max, -1, 1, ( iel == 0 ),
+                           status );
          res = *py - m;
 
 /* If the changing of the model parameters make little difference to the
@@ -419,13 +420,13 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
          msgOutif( MSG__DEBUG3, "", "      Peak intensity: ^V", status );
          msgSetd( "V", par[ 1 ] );
          msgOutif( MSG__DEBUG3, "", "      Constant background: ^V", status );
-         msgSetd( "V", par[ 2 ] );
+         msgSetd( "V", cupidGC.x_max[ 0 ] + par[ 2 ] );
          msgOutif( MSG__DEBUG3, "", "      Centre on 1st axis: ^V", status );
          msgSetd( "V", par[ 3 ] );
          msgOutif( MSG__DEBUG3, "", "      FWHM on 1st axis: ^V", status );
 
          if( ndim > 1 ) {
-            msgSetd( "V", par[ 4 ] );
+            msgSetd( "V", cupidGC.x_max[ 1 ] + par[ 4 ] );
             msgOutif( MSG__DEBUG3, "", "      Centre on 2nd axis: ^V", status );
             msgSetd( "V", par[ 5 ] );
             msgOutif( MSG__DEBUG3, "", "      FWHM on 2nd axis: ^V", status );
@@ -433,7 +434,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
             msgOutif( MSG__DEBUG3, "", "      Position angle: ^V", status );
 
             if( ndim > 2 ) {
-               msgSetd( "V", par[ 7 ] );
+               msgSetd( "V", cupidGC.x_max[ 2 ] + par[ 7 ] );
                msgOutif( MSG__DEBUG3, "", "      Centre on vel axis: ^V", status );
                msgSetd( "V", par[ 8 ] );
                msgOutif( MSG__DEBUG3, "", "      FWHM on vel axis: ^V", status );
@@ -465,7 +466,7 @@ double cupidGCChiSq( int ndim, double *xpar, int xwhat, int newp,
 
 /* Get the rate of change of the Gaussian model value with respect to the
    required parameter, at the centre of the current pixel. */
-         g = cupidGCModel( ndim, x, par, what, 1, 0, status );
+         g = cupidGCModel( ndim, x, par, cupidGC.x_max, what, 1, 0, status );
 
 /* Increment the running sum of the returned value. */
          ret += *pr*g;

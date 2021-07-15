@@ -274,7 +274,7 @@ double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
 double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
 double cupidGCChiSq( int, double *, int, int, int * );
-double cupidGCModel( int, double *, double *, int, int, int, int * );
+double cupidGCModel( int, double *, double *, double *, int, int, int, int * );
 float cupidRanVal( int, float[2], int * );
 int *cupidRCA( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], double, int, int, int, int, int * );
 int *cupidRCA2( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], int * );

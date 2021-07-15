@@ -332,7 +332,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 /* Find the Gaussian model value at the current pixel. This excludes any
    background level because the background value in "par" was set to zero
    before entring this loop. */
-               m = cupidGCModel( ndim, xx, par, -1, 1, first, status );
+               m = cupidGCModel( ndim, xx, par, NULL, -1, 1, first, status );
                first = 0;
 
 /* If the model value is higher than the supplied limit, indicate that the
