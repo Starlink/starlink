@@ -198,7 +198,7 @@ void findback( int *status ){
 */
 
 /* Local Variables: */
-   CupidFindback0Data *job_data; /* Pointer to data for all jobs */
+   CupidFindback0Data *job_data = NULL; /* Pointer to data for all jobs */
    CupidFindback0Data *pdata; /* Pointer to data for current job */
    Grp *grp;                 /* GRP identifier for configuration settings */
    ThrWorkForce *wf = NULL;  /* Pool of persistent worker threads */

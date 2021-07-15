@@ -552,6 +552,10 @@ static void cupid1FitParabola( int nbin, double *hist, int box, int oper,
       a = dx/d;
       b = dy/d;
       c = dz/d;
+   } else {
+      a = 0.0;
+      b = 0.0;
+      c = 0.0;
    }
 
 /* Find the RMS residual. */

@@ -379,7 +379,7 @@ void makeclumps( int *status ) {
    MakeclumpsData *job_data;     /* Memory for job descriptions */
    MakeclumpsData *pdata;        /* Pointer to a single job description */
    ThrWorkForce *wf = NULL;      /* Pointer to a pool of worker threads */
-   char attr[ 11 ];              /* AST attribute name */
+   char attr[ 21 ];              /* AST attribute name */
    char shape[ 10 ];             /* Shape for spatial STC-S regions */
    char text[ 8 ];               /* Value of PARDIST parameter */
    const char *dom;              /* Pointer to AST Domain value */
@@ -610,7 +610,7 @@ void makeclumps( int *status ) {
       dist = 0;
    } else if( !strcmp( text, "NORMAL" ) ) {
       dist = 1;
-   } else if( !strcmp( text, "POISSON" ) ) {
+   } else {
       dist = 2;
    }
 
@@ -675,6 +675,8 @@ void makeclumps( int *status ) {
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
    grid_delta1 = (hdsdim)( 0.5 + ( (float) dims[ 0 ] - 2*grid )/grid_dims[ 0 ] );
+   grid_delta2 = 0.0;
+   grid_delta3 = 0.0;
 
    if( sdims > 1 ) {
 
