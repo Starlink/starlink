@@ -376,7 +376,7 @@ SCUBA-2 and POL-2 observations.
   Use the \Kappa\ command \xref{\task{fitslist}}{sun95}{FITSLIST} to
   see all FITS headers in a
   particular NDF. To obtain a specific header simply use the command
-  \xref{\task{fitsval}}{sun95}{FITSVAL} :
+  \fitsval:
   \begin{terminalv}
 % fitsval s8a20160112_00056_0001.sdf INBEAM
 pol
@@ -439,7 +439,7 @@ sub-array for Observation 34 taken on 12\textsuperscript{th} January
 Raw POL-2 data come in uncalibrated units. The first calibration step
 is to scale the raw data to units of picowatts (pW) by applying the
 flat-field solution. This step is performed internally by the \SMURF\
-command \xref{\task{calcqu}}{sun258}{CALCQU}---used to calculate
+command \calcqu---used to calculate
 $I$, $Q$, and $U$ time-streams from the raw data---but can be done manually
 when examining the raw data.
 

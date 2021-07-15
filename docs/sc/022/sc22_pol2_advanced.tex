@@ -24,7 +24,7 @@ observations with pre-existing \poltwomap\ reduction products.
 
 For completeness, however, this section describes the six-step process of
 combining data for one or more new POL-2 observations into existing $I$, $Q$,
-and $U$ maps and vector catalogue created by an earlier run of \poltwomap.
+and $U$ maps and vector catalogue created by an earlier run of \task{pol2map}.
 \begin{enumerate}
 
 \item Create a text file listing all the existing auto-masked $I$ maps
@@ -40,8 +40,7 @@ and $U$ maps and vector catalogue created by an earlier run of \poltwomap.
 
 
 \item Create a new auto-masked, co-added $I$ map including the new
-  observation. The \xref{calcqu}{sun258}{CALCQU} and \makemap\ commands
-  will be run on the new
+  observation. The \calcqu\ and \makemap\ commands   will be run on the new
   data and the resulting maps combined with the existing maps derived
   from the older observations to create the new map:
 
@@ -76,7 +75,7 @@ and $U$ maps and vector catalogue created by an earlier run of \poltwomap.
 \item If the mask has changed significantly and all observations need
   to be reprocessed using the new mask, or if \task{skyloop} is being used,
   remove the existing externally masked maps so that they will be re-created by
-  the next invocation of \poltwomap.  Note that this will increase the length of
+  the next invocation of \task{pol2map}.  Note that this will increase the length of
   time taken by Step~6 enormously.
 
   Ensure that the new auto-masked co-add is used in place of the old one, in order to
@@ -187,7 +186,7 @@ as follows:
 \end{terminalv}
 
 This will produce maps using the upper and lower IP limits (a range of
-0.5\%). If \poltwomap\ has already been run on POL-2 data, then a file will
+0.5\%). If \task{pol2map} has already been run on POL-2 data, then a file will
 already exist that was created using the mean IP (the mean IP is used
 if \param{ipoffset} is omitted from the configuration value, or the
 configuration parameter itself is omitted).
@@ -220,8 +219,8 @@ is removed from the vector catalogue. This could happen if (for instance)
 inappropriate software is used to process an existing catalogue, creating a
 new output catalogue. Under such circumstances, the WCS FrameSet might
 not be copied to the output catalogue, causing subsequent WCS-related
-operations to fail. It is safe to use \POLPACK, \KAPPA, \GAIA\ and
-\xref{\textsc{Cursa}}{sun190}{}), as all these packages copy the WCS
+operations to fail. It is safe to use \POLPACK, \KAPPA, \GAIA, and
+\CURSAref, as all these packages copy the WCS
 FrameSet to any new output catalogues. Unfortunately, the popular
 \topcat\ catalogue browser (see
 \url{http://www.starlink.ac.uk/topcat/}) and the STILTS package
@@ -315,7 +314,7 @@ The final model is the sum of the above three components. The new DI, DQ and DU 
 
 \section{\xlabel{vectoredebiaschanging}Changing the de-biasing in a POL-2 vector catalogue}
 
-The new \task{poledit} command in the Starlink \POLPACK\ package has an option to recalculate the PI (polarised intensity) and P (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with:
+The new \poledit\ command in the Starlink \POLPACK\ package has an option to recalculate the PI (polarised intensity) and P (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with:
 
 \begin{terminalv}
 % polpack
@@ -429,7 +428,7 @@ PCA.ZERO_SNRLO = 3
 \end{terminalv}
 
 To investigate the effects of changing these values, new values can be supplied, using the 
-\param{CONFIG} parameter of the \poltwomap\ command \footnote{Note that prior to 10th July, 2019, this method could only be used at step 1 (the supplied settings were ignored if supplied at step 2 or 3). Later versions of \poltwomap\ do not suffer from this limitation -- the supplied values are honoured at all steps.}. For instance:
+\param{CONFIG} parameter of the \task{pol2map} command \footnote{Notethat prior to 10th July, 2019, this method could only be used at step 1 (the supplied settings were ignored if supplied at steps 2 or 3). Later versions of \task{pol2map} do not suffer from this limitation -- the supplied values are honoured at all steps.}.  Here is an example.
 
 \begin{terminalv}
 % more conf
@@ -444,12 +443,12 @@ Any values not specified will retain their default values listed above.
 \section{\xlabel{checkingconvergence}Checking for convergence in pol2map log files}
 
 When processing POL-2 data, it is important to know that the map-making algorithm converged 
-correctly for all observations. This information is available in the \poltwomap log file, along with 
+correctly for all observations. This information is available in the \poltwomap\ log file, along with 
 the rest of the \makemap\ or \skyloop\ output.  However, the log file can be very long, and 
 so finding the relevant information may not be straightforward, particularly for users unfamiliar 
-with the screen output usually created by \makemap\ or \skyloop.
+with the screen output usually created by \task{makemap} or \task{skyloop}.
 
-To help with this, a simple python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}.} is available, which searches a specified \poltwomap\ log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
+To help with this, a simple Python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}.} is available, which searches a specified \task{pol2map} log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
 
 \begin{terminalv}
 % pol2logcheck.py omc1/pol2map.log.3
@@ -467,14 +466,14 @@ omc1/pol2map.log.3:
 To combine POL-2 observations for multiple overlapping fields, the best way to proceed is probably as follows\footnote{This method requires the use of a Starlink build from 9th June, 2019 or later.}:
 
 \begin{enumerate}
-\item Run `step 1' independently for each field. In other words, use \poltwomap\ to create an 
-auto-masked total intensity map for each field. The following assumes that \poltwomap\ is run 
-within directories called \file{field1}, \file{field2}, etc, to create the auto-masked maps and the I/
 Q/U time-stream data for each field.
+\item Run `step 1' independently for each field. In other words, use \poltwomap\ to create an 
+auto-masked total-intensity map for each field. The following assumes that \task{pol2map} is run 
+within directories called \file{field1}, \file{field2}, etc, to create the auto-masked maps and the I/
 
-\item Co-add the auto-masked total intensity maps for all fields. First, create a text file holding 
-the paths to the separate auto-masked total intensity maps, and then run \poltwomap\ as 
 follows:
+\item Co-add the auto-masked total-intensity maps for all fields. First, create a text file holding 
+the paths to the separate auto-masked total-intensity maps, and then run \task{pol2map} as 
 
 \begin{terminalv}
         % more infiles
@@ -498,8 +497,8 @@ for all fields. For instance, for the first field:
                   ipref=iext cat=mycat debias=yes
 \end{terminalv}
 
-\item Then, do the same for \file{field2}, \file{field3}, etc. If preferred, steps 2 and 3 can be 
-combined into a single invocation of \poltwomap:
+\item then, do the same for \file{field2}, \file{field3}, etc. If preferred, Steps~2 and 3 can be 
+combined into a single invocation of \task{pol2map}:
 
 \begin{terminalv}
         % cd field1
@@ -511,7 +510,7 @@ combined into a single invocation of \poltwomap:
 
 \item Co-add the external-masked I/Q/U maps for all fields and create a vector catalogue from 
 the co-added maps. First, create a text file holding the paths to the external-masked I/Q/U maps 
-for all fields, and then run pol2map as follows:
+for all fields, and then run \task{pol2map} as follows:
 
  \begin{terminalv}
         % more infiles

@@ -39,7 +39,7 @@ reduction routine (see \cref{Chapter}{sec:rundr}{}).
 \subsubsection*{The process}
 The analysed intensity values in the raw data time-streams are first
 flat-fielded and converted into $Q$, $U$, and $I$ time-streams using the
-\xref{SMURF:\task{calcqu}}{sun258}{CALCQU} command. These time-streams
+\calcqu\ command. These time-streams
 are stored for future use in the directory \texttt{qudata}, specified by the
 \param{QUDIR} parameter in the example command below.
 
@@ -100,8 +100,7 @@ pre-processing steps to clean the data, solves for multiple signal
 components using an iterative algorithm, and bins the resulting
 time-series data to produce a final science map.
 
-In \poltwomap, the map-maker is used in conjunction with
-\xref{calcqu}{sun258}{CALCQU} (see
+In \poltwomap, the map-maker is used in conjunction with \calcqu\ (see
 \cref{Section}{sec:calcqu}{CALCQU}) to produce maps of $Q$ and $U$, as well as $I$.
 
 \section{\xlabel{skyloop}SKYLOOP}
@@ -215,7 +214,7 @@ The \poltwomap\ script uses different masks for these two purposes---the
 ``AST'' mask and the ``PCA'' mask.  The PCA mask is, in general, less
 extensive than the AST mask, with the source areas being restricted to
 the brighter inner regions.  Each of these two masks can either be
-generated automatically within \poltwomap, or be specified by a fixed
+generated automatically within \task{pol2map}, or be specified by a fixed
 external NDF.
 
 
@@ -274,7 +273,7 @@ observations.
 
 \begin{enumerate}
 \item Setting the parameter \param{OBSWEIGHT}=\texttt{TRUE} when running
-\poltwomap\  will cause each observation to be assigned a separate
+\task{pol2map}  will cause each observation to be assigned a separate
 weight, which will be used when forming the co-add of all observations.
 This will affect both the data values and the variances in the resulting
 co-add. The purpose of these weights is to down-weight observations that

@@ -5,7 +5,7 @@
 The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction --
   The Theory}, described how \poltwomap\ produces $I$, $Q$, and $U$ maps from raw
 POL-2 data.  It showed that this reduction process----which uses
-\poltwomap---comprises three steps.
+\task{pol2map}---comprises three steps.
 
 As with the other Python scripts in \SMURF, it is possible to get more
 information about the available parameters by running either:
@@ -26,15 +26,15 @@ package started (see \cref{Section}{sec:starinit}{Initialising
   Starlink} and \cref{Section}{sec:packinit}{KAPPA and SMURF for data
   processing}).
 
-This chapter describes how to run \poltwomap\ firstly to produce an
+This chapter describes how to run \task{pol2map} firstly to produce an
 initial $I$ map; and then again to produce the final $I$, $Q$, and $U$ maps
 and a vector catalogue, as described in \cref{Section}{sec:how-step1}{
 pol2map -- producing the initial $I$ map}.
 
-To run \poltwomap, values should normally be supplied for the following
+To run \task{pol2map}, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
   ``command-line parameters'' that are supplied on the
-  \poltwomap\ command line, and ``configuration parameters'' that
+  \task{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
   \emph{command-line} parameter called \param{CONFIG}.}, in order to
@@ -90,7 +90,7 @@ Some additional command-line parameters are required when \poltwomap\ is
 used for the second time---as discussed in
 \cref{Section}{sec:how-step23}{pol2map -- producing the $I$, $Q$, $U$ maps
 and catalogue}---to produce the final $I$, $Q$, $U$ maps and vector catalogue\footnote{This
-second usage of \poltwomap\ includes both ``Run 2'' and ``Run 3'' in
+second usage of \task{pol2map} includes both ``Run 2'' and ``Run 3'' in
 \cref{Figure}{fig:pol2drflow}{}.}.
 
 \begin{aligndesc}
@@ -123,7 +123,7 @@ second usage of \poltwomap\ includes both ``Run 2'' and ``Run 3'' in
   output vector catalogue specified by the parameter \param{CAT}. [\texttt{FALSE}]
 \end{aligndesc}
 
-The \poltwomap\ command provides many other parameters that may be used to
+The \task{pol2map} command provides many other parameters that may be used to
 modify its behaviour in various ways. To see a full list, type the
 following.
 
@@ -178,7 +178,7 @@ Note that \texttt{qout} and \texttt{uout} are set to null values, as no
 $Q$ or $U$ maps are required to be produced during this initial Step~1
 reduction stage.
 
-The following shows the output from running this initial \poltwomap\
+The following shows the output from running this initial \task{pol2map}
 command.
 
 \begin{terminalv}
@@ -212,12 +212,12 @@ The files and folders produced by this reduction process are described below.
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
   various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \poltwomap\
-  command (\poltwomap\ is actually a Python script that runs various other
+  command (\task{pol2map}\ is actually a Python script that runs various other
   Starlink tasks behind the scenes in order to perform the bulk of the work).
 
 \item[\file{qudata/}] A folder containing the $I$, $Q$, and $U$ time-series data
-  for each sub array for each observation. Tthese are produced by
-  \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}.
+  for each sub array for each observation. These are produced by
+  \task{calcqu} (see  \cref{Section}{sec:calcqu}{CALCQU}).
 
 \item[\file{maps/}] A folder containing the individual $I$ maps from
   each separate observation. These will have names that end with
@@ -282,8 +282,8 @@ run via a single command.
           maskout1=astmask maskout2=pcamask ipref=iext cat=mycat debias=yes
 \end{terminalv}
 
-The following shows the output from running this second \poltwomap\
-command. First, \poltwomap\ produces new $I$ maps for each map, correcting
+The following shows the output from running this second \task{pol2map}
+command. First, \task{pol2map} produces new $I$ maps for each map, correcting
 the position using the correction stored in the old $I$
 map\footnote{This correction is found by aligning the old $I$ map with the
 \file{iauto.sdf} map.}, and then co-adds all the observations.
@@ -308,7 +308,7 @@ Masking will be based on SNR values in 'iauto'.
 Coadding I maps from all observations:
 \end{terminalv}
 
-As \poltwomap\ continues, the $Q$ and $U$ maps are produced, again with
+As \task{pol2map} continues, the $Q$ and $U$ maps are produced, again with
 pointing corrections. This is followed by the creation of the output
 vector catalogue.
 
@@ -348,7 +348,7 @@ The output of this final run of \poltwomap\ is as follows.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  \poltwomap\ command. Note previous log files are moved to a new name
+  \task{pol2map} command. Note previous log files are moved to a new name
   such as \texttt{pol2map.log.1}.
 
 \item[\file{astmask.sdf}] The AST mask used in the creation
@@ -372,7 +372,7 @@ The output of this final run of \poltwomap\ is as follows.
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
 
 \item[\file{mycat.FIT}] The output vector catalogue, containing a
-  range of values derived by \poltwomap\ for each pixel contained within
+  range of values derived by \task{pol2map} for each pixel contained within
   the $I$ map.
 
 \end{aligndesc}
@@ -426,7 +426,7 @@ The output vector catalogue contains a range of values derived by
 \poltwomap\ for each pixel contained within the I map. Intensity values and
 errors in the
 catalogue are expressed in units of mJy/beam.  If desired, it is possible
-to switch the catalogue to units of pW by using \texttt{Jy=no} on the \poltwomap\
+to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2map}
 command line.  The columns are listed below.
 
 \begin{aligndesc}
@@ -468,8 +468,8 @@ Factor, FCF, must be applied to the data. For POL-2, the FCFs are quoted in term
 the non-polarimetric SCUBA-2 FCFs.
 
 POL-2 FCFs are now applied automatically within \poltwomap\ when catalogue columns
-in mJy/beam are required by the user, i.e. if the \poltwomap\ parameter \texttt{JY} is set
-to \texttt{TRUE} (the default option). The current version of \poltwomap\ uses the new,
+in mJy/beam are required by the user, i.e. if the \task{pol2map} parameter \texttt{JY} is set
+to \texttt{TRUE} (the default option). The current version of \task{pol2map} uses the new,
 revised POL-2 FCFs for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}.
 
 \section{\xlabel{tweaking}Changing pixel size in pol2map}
@@ -479,7 +479,7 @@ Inevitably, as with unpolarised SCUBA-2 data reduction, users will sometimes fin
 necessary to fine-tune the \poltwomap\ reduction process for specific situations.
 
 The bin size within the final vector catalogue is controlled by the
-\param{BINSIZE} parameter in the \SMURF\ \poltwomap\ command.
+\param{BINSIZE} parameter in the \SMURF\ \task{pol2map} command.
 
 \begin{terminalv}
 % pol2map binsize=12
