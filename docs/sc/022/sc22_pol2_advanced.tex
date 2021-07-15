@@ -1,7 +1,6 @@
 \chapter{\xlabel{pol2_advanced}POL-2 -- Advanced Data Reduction}
 \label{sec:advanced}
 
-
 The \poltwomap\ tool for reducing POL-2 data was originally released for
 general science community use several years ago. The fact that its
 development remains ongoing directly reflects the continuing advances
@@ -59,7 +58,7 @@ and $U$ maps and vector catalogue created by an earlier run of \task{pol2map}.
   \param{MASKOUT1} and \param{MASKOUT2} parameters (see Step~3 in
   \cref{Section}{sec:dr}{POL-2 Data Reduction -- The Theory}). To
   create the new masks that would be generated from the new
-  auto-masked map, use this command:
+  auto-masked map, use this command.
 
 \begin{terminalv}
 % pol2map  in=^infiles iout=! qout=! uout=! mapdir=maps mask=iauto_new \
@@ -103,7 +102,7 @@ and $U$ maps and vector catalogue created by an earlier run of \task{pol2map}.
 
 Currently,the default map pixel size is 4\si{\arcsecond} at both
 850 and \SI{450}{\micro\metre}. The pixel size is controlled by the
-\param{PIXSIZE} parameter in the \smurf\ \poltwomap\ command:
+\param{PIXSIZE} parameter in the \smurf\ \poltwomap\ command.
 
 \begin{terminalv}
 % pol2map pixsize=12
@@ -125,7 +124,7 @@ pixels and 7\si{\arcsecond} pixels are compared.
 
 
 \item Create AST and PCA masks with 12\si{\arcsecond} pixels from the
-  \file{iauto12.sdf} file:
+  \file{iauto12.sdf} file.
 
 
 \begin{terminalv}
@@ -178,7 +177,7 @@ possible to investigate the effects of the systematic error in IP by
 creating maps using the upper and lower limits on the IP value. The
 \task{makemap} configuration parameter called \xparam{IPOFFSET}{ipoffset}
 can be used to conduct such an investigation. To use it, run \poltwomap\ twice,
-as follows:
+as follows.
 
 \begin{terminalv}
 % pol2map config="ipoffset=-0.25"
@@ -215,7 +214,7 @@ the ways in which Starlink software handles WCS information.
 Starlink software such as \polpack, \Kappa, and \gaia\ rely on the WCS
 FrameSet for all WCS-related operations (drawing annotated axes, aligning
 data sets, \emph{etc}). Thus, problems are likely to arise if the WCS FrameSet
-is removed from the vector catalogue. This could happen if (for instance)
+is removed from the vector catalogue. This could happen if, for instance,
 inappropriate software is used to process an existing catalogue, creating a
 new output catalogue. Under such circumstances, the WCS FrameSet might
 not be copied to the output catalogue, causing subsequent WCS-related
@@ -230,11 +229,11 @@ FrameSet to any new output catalogues. Unfortunately, the popular
 For this reason, \POLPACK\ contains a command that can be used to copy the
 WCS FrameSet from one catalogue to another.  For example: a user creates
 the catalogue \file{mycat.FIT} using \poltwomap, uses \textsc{Topcat}
-to remove low signal-to-noise vectors, an then saves the results to a new catalogue
+to remove low signal-to-noise vectors, and then saves the results to a new catalogue
 called \file{selcat.FIT}. The WCS FrameSet would then be missing from \file{selcat.FIT},
 and so it would be necessary to copy it back into place again from the original catalogue
-file, \file{mycat.FIT}. To do this, the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}''
-command can be used:
+file, \file{mycat.FIT}. To do this, run the ``\xref{polwcscopy}{sun223}{POLWCSCOPY}''
+command.
 
 \begin{terminalv}
 % polwcscopy in=selcat ref=mycat out=selcat2
@@ -246,128 +245,246 @@ This would create a third catalogue \file{selcat2.FIT}, which would be a copy of
 
 \section{\xlabel{vectorerrorremodelling}Re-modelling the error estimates in a POL-2 vector catalogue}
 
-If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script, the \catcol{I}, \catcol{Q}, and \catcol{U} error estimates in the resulting vector catalogue will be based on the spread of pixel values at each point on the sky in the I, Q and U maps made from individual observations. Thus, if 20 observations are processed by \task{pol2map} to create a vector catalogue, then each \catcol{DI}, \catcol{DQ}, or \catcol{DU} error estimate in the vector catalogue will be based on the spread of 20 independent measurements of I$ Q or U.  Even though 20 observations is a lot of POL-2 data, 20 is still a fairly small number from which to produce an accurate estimate of the error. Consequently, it is usual to see a large level of random ``noise'' on the error estimates, as in the following example, which shows the total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688 (\cref{Figure}{fig:originalerrors}{}).
+If the \texttt{MAPVAR=YES} option is used when running the \smurf\ \poltwomap\ script,
+the \catcol{I}, \catcol{Q}, and \catcol{U} error estimates in the resulting vector catalogue will be based
+on the spread of pixel values at each point on the sky in the $I$,
+$Q$, and $U$ maps made from individual observations. Thus, if 20 observations are
+processed by \task{pol2map} to create a vector catalogue, then each
+\catcol{DI}, \catcol{DQ}, or \catcol{DU} error estimate in the vector catalogue will be based on the spread of 20
+independent measurements of $I$, $Q$, or $U$.  Even though 20 observations is a lot of
+POL-2 data, 20 is still a fairly small number from which to produce an accurate
+estimate of the error. Consequently, it is usual to see a large level of random
+``noise'' on the error estimates, as in the following example, which
+shows the total-intensity ($I$) error estimates taken from a 12\si{\arcsecond} vector
+catalogue near Ophiuchus L\,1688 (\cref{Figure}{fig:originalerrors}{}).
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-ophl1688-noise_on_error-1.png}
-\caption [Original Error Estimates in POL-2 Vector Catalogue for Oph L1688]{
-  The initial total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688. Note that the noise level increases towards the edge of the map due to there being fewer bolometer samples per pixel near the edge.
+\caption [Original Error Estimates in POL-2 Vector Catalogue for Oph L\,1688]{
+  The initial total-intensity ($I$) error estimates taken from a 12\si{\arcsecond} vector
+  catalogue near Ophiuchus L\,1688. Note that the noise level increases towards the edge
+  of the map due to there being fewer bolometer samples per pixel near the edge.
 \label{fig:originalerrors}
 }
 \end{center}
 \end{figure}
 
-The uncertainty on the error estimate can cause some vectors that are clearly wrong (e.g. because they are very different from nearby vectors) to have anomalously low error estimates and so to be included in the set of ``good'' vectors (i.e. vectors that pass some suitable selection criterion based on the noise estimates).
+The uncertainty on the error estimate can cause some vectors that are clearly
+wrong (e.g. because they are very different from nearby vectors) to have
+anomalously low error estimates and so to be included in the set of ``good''
+vectors (i.e. vectors that pass some suitable selection criterion based on the
+noise estimates).
 
-One simple solution to this could be to apply some spatial smoothing to the error estimates. This would be a reasonable thing to do if there were no compact sources in the map. The errors close to a compact source are generally higher than those in a background region because of factors such as pointing errors, calibration errors, etc. These factors cause a compact source to appear slightly different in each observation, and so cause higher error estimates in the vector catalogue. The above error estimates map shows this effect in the higher values at the very centre. Simply smoothing this map would spread that central feature out, artificially decreasing the peak error and increasing the errors in the neighbouring background pixels.
+One simple solution to this could be to apply some spatial smoothing
+to the error estimates. This would be a reasonable thing to do if
+there were no compact sources in the map. The errors close to a
+compact source are generally higher than those in a background region
+because of factors such as pointing errors and calibration errors.
+These factors cause a compact source to appear slightly different in
+each observation, and so cause higher error estimates in the vector
+catalogue. The above error estimates map shows this effect in the
+higher values at the very centre. Simply smoothing this map would
+spread that central feature out, artificially decreasing the peak
+error and increasing the errors in the neighbouring background pixels.
 
-An alternative to smoothing is to split the total noise up into several different components, create a model of each component , and then add the models together. The \task{pol2noise} script in \smurf\ enables the user to re-model the noise estimates in a vector catalogue using such an approach. This facility is used by setting \texttt{MODE=REMODEL} on the \task{pol2noise} command line:
+An alternative to smoothing is to split the total noise up into
+several different components, create a model of each component, and
+then add the models together. The \task{pol2noise} script in \smurf\
+enables the user to re-model the noise estimates in a vector catalogue
+using such an approach. This facility is used by setting
+\texttt{MODE=REMODEL} on the \task{pol2noise} command line:
 
 \begin{terminalv}
 % pol2noise mycat.FIT mode=remodel out=newcat.FIT exptime=iext debiastype=mas
 \end{terminalv}
 
-This  creates an output catalogue (\file{newcat.FIT}) holding a copy of the input catalogue (\file{mycat.FIT}), and then calculates new values for all the error columns in the output catalogue. The new I, Q and U error values are first derived from a three-component model of the noise in each quantity, and then errors for the derived quantities (\catcol{PI}, \catcol{P}, and \catcol{ANG}) are found. New values of \catcol{PI} and \catcol{P} are also found using the specified de-biasing algorithm. The file \file{iext.sdf} holds the total-intensity co-add map created by \poltwomap\ and is used to define the total exposure time in each pixel. The re-modelled total-intensity error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
+This creates an output catalogue (\file{newcat.FIT}) holding a copy of
+the input catalogue (\file{mycat.FIT}), and then calculates new values
+for all the error columns in the output catalogue. The new $I$, $Q$,
+and $U$ error values are first derived from a three-component model of
+the noise in each quantity, and then errors for the derived quantities
+(\catcol{PI}, \catcol{P}, and \catcol{ANG}) are found. New values of
+\catcol{PI} and \catcol{P} are also found using
+the specified de-biasing algorithm. The file \file{iext.sdf} holds the
+total-intensity co-add map created by \poltwomap\ and is used to define
+the total exposure time in each pixel. The re-modelled total-intensity
+error estimates are shown in (\cref{Figure}{fig:newerrors}{}).
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-ophl1688-pol2-noise-remod-1.png}
-\caption [Remodelled Error Estimates in POL-2 Vector Catalogue for Oph L1688]{
-  The re-modelled total intensity (I) error estimates taken from a 12\si{\arcsecond} vector catalogue near Ophiuchus L 1688. Note the reduced noise in comparison to \cref{Figure}{fig:originalerrors}{}.
+\caption [Remodelled Error Estimates in POL-2 Vector Catalogue for Oph L\,1688]{
+  The re-modelled total-intensity ($I$) error estimates taken from a 12\si{\arcsecond}
+  vector catalogue near Ophiuchus L\,1688. Note the reduced noise in
+  comparison with \cref{Figure}{fig:originalerrors}{}.
 \label{fig:newerrors}
 }
 \end{center}
 \end{figure}
 
-Most of the noise has gone without reducing the resolution. The script displays the original and re-modelled error estimates for each Stokes parameter (I, Q and U), the residuals between the two and a scatter plot (\cref{Figure}{fig:remodellingwindow}{}). The best-fitting straight lines through each scatter plot are also displayed.
+Most of the noise has gone without reducing the resolution. The script
+displays the original and re-modelled error estimates for each Stokes
+parameter ($I$, $Q$, and $U$), the residuals between the two, and a scatter
+plot (\cref{Figure}{fig:remodellingwindow}{}). The best-fitting
+straight lines through each scatter plot are also displayed.
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc22-ophl1688-pol2noise-fitting-1.png}
-\caption [Plotting Window produced During POL-2 Vector Catalogue Error Estimate Remodelling for Oph L1688]{Example of the output displayed during the POL-2
+\caption [Plotting Window produced During POL-2 Vector Catalogue Error
+Estimate Remodelling for Oph L\,1688]{Example of the output displayed during the POL-2
 vector catalogue error estimate re-modelling process. Comparison Stokes parameter
-(I, Q and U) plots are shown, together with residuals images and associated straight line fits.
+($I$, $Q$, and $U$) plots are shown, together with residuals images and associated
+straight-line fits.
 }
 \label{fig:remodellingwindow}
 \end{center}
 \end{figure}
 
-The three components used to model the error on each Stokes parameter (I, Q or U) are described below:
+The three components used to model the error on each Stokes parameter($I$, $V$,
+or $U$) are described below.
 
 \begin{enumerate}
-\item {\bf The background component:} This is derived from an exposure time map  (obtained from
-iext.sdf in the above example). The background component is equal to $A.tB$, where $t$ is 
-the exposure time at each pixel and $A$ and $B$ are constants determined by doing a linear fit 
-between
-the log of the noise estimate in the catalogue (DQ, DU or DI) and the log of the exposure time
-(in practice, $B$ is usually close to -0.5). The fit excludes bright source areas, but also excludes a
-thin rim around the edge of the map where the original noise estimates are subject to large
-inaccuracies. Since the exposure time map is usually very much smoother than the original
-noise estimates, the background component is also much smoother.
-\item {\bf The source component:} This represents the extra noise found in and around compact sources caused by pointing errors, calibration errors, etc. The background component is first subtracted from the catalogue noise estimates and the residual noise values are then modelled using a collection of Gaussians. This modeling is done using the \texttt{GaussClumps} algorithm provided by the \task{findclumps} command in the Starlink \cupid\ package. The noise residuals are first divided into a number of ``islands'', each island being a collection of contiguous pixels with  noise residual significantly higher than zero (this is done using the \texttt{FellWalker} algorithm in \cupid). The \texttt{GaussClumps} algorithm is then used to model the noise residuals in each island. The resulting model is smoothed lightly using a Gaussian kernel of FWHM 1.2 pixels.
-\item {\bf The residual component:} This represents any noise not accounted for by the other two models. The noise residuals are first found by subtracting the other two components from the original catalogue noise estimates. Any strong outlier values are removed and the results are smoothed more heavily using a Gaussian kernel of FWHM 4 pixels.
+\item {\bf The background component:} This is derived from an exposure-time
+map (obtained from \file{iext.sd}f in the above example). The background
+component is equal to $A.tB$, where $t$ is the exposure time at each pixel,
+and $A$ and $B$ are constants determined by doing a linear fit between the log
+of the noise estimate in the catalogue (\catcol{DQ}, \catcol{DU}, or \catcol{DI}) and the log of the
+exposure time (in practice, $B$ is usually close to -0.5). The fit excludes
+bright source areas, but also excludes a thin rim around the edge of the map
+where the original noise estimates are subject to large inaccuracies. Since
+the exposure-time map is usually very much smoother than the original noise
+estimates, the background component is also much smoother. \item {\bf The
+source component:} This represents the extra noise found in and around compact
+sources caused by pointing errors, calibration errors, etc. The background
+component is first subtracted from the catalogue noise estimates and the
+residual noise values are then modelled using a collection of Gaussians. This
+modelling is done using the \texttt{GaussClumps} algorithm provided by the
+\task{findclumps} command in the Starlink \cupid\ package. The noise residuals
+are first divided into a number of ``islands'', each island being a collection
+of contiguous pixels with noise residual significantly higher than zero (this
+is done using the \texttt{FellWalker} algorithm in \cupid). The
+\texttt{GaussClumps} algorithm is then used to model the noise residuals in
+each island. The resulting model is smoothed lightly using a Gaussian kernel
+of FWHM 1.2 pixels.
+
+\item {\bf The residual component:} This represents any noise not accounted
+for by the other two models. The noise residuals are first found by
+subtracting the other two components from the original catalogue noise
+estimates. Any strong outlier values are removed and the results are smoothed
+more heavily using a Gaussian kernel of FWHM 4 pixels.
 \end{enumerate}
 
-The final model is the sum of the above three components. The new \catcol{DI}, \catcol{DQ}, and \catcol{DU} values are found independently using the above method. The errors for the derived quantities (\catcol{DPI}, \catcol{DP}, and \catcol{DANG}) are then found from \catcol{DQ}, \catcol{DU}, and \catcol{DI} using the usual error propagation formulae. Finally new \catcol{P} and \catcol{PI} values are found using a specified form of de-biasing (controlled by the parameter \param{DEBIASTYPE}).
+The final model is the sum of the above three components. The new
+\catcol{DI}, \catcol{DQ}, and
+\catcol{DU} values are found independently using the above method. The errors for the
+derived quantities (\catcol{DPI}, \catcol{DP}, and \catcol{DANG}) are then found
+from \catcol{DQ}, \catcol{DU}, and \catcol{DI} using the usual error-propagation
+formulae. Finally new \catcol{P} and \catcol{PI} values are found
+using a specified form of de-biasing (controlled by the Parameter
+\param{DEBIASTYPE}).
 
 
 \section{\xlabel{vectoredebiaschanging}Changing the de-biasing in a POL-2 vector catalogue}
 
-The new \poledit\ command in the Starlink \POLPACK\ package has an option to recalculate the \catcol{PI} (polarised intensity) and \catcol{P} (percentage polarisation) values using a specified form of de-biasing. If the existing catalogue is in file \file{mycat.FIT}, this can be done with the following commands.
+The new \poledit\ command in the Starlink \POLPACK\ package has an option
+to recalculate the \catcol{PI} (polarised intensity) and \catcol{P} (percentage polarisation)
+values using a specified form of de-biasing. If the existing catalogue is in
+file \file{mycat.FIT}, this can be done with the following commands.
 
 \begin{terminalv}
 % polpack
 % poledit mycat newcat mode=debias debiastype=mas
 \end{terminalv}
 
-This will create a new file, \file{newcat.FIT}, containing a copy of \file{mycat.FIT}, but with new \catcol{P} and \catcol{PI} columns re-calculated from the  existing \catcol{Q}, \catcol{U}, \catcol{I}, and \catcol{DPI} values using the ``Modified Asymptotic'' (MAS) bias estimator (any de-biasing used to create the original catalogue is ignored).  The options for the \param{DEBIASTYPE} parameter are:
+This will create a new file, \file{newcat.FIT}, containing a copy of
+\file{mycat.FIT}, but with new \catcol{P} and \catcol{PI} columns re-calculated from the
+existing \catcol{Q}, \catcol{U}, \catcol{I}, and \catcol{DPI} values using the ``Modified Asymptotic'' (MAS) bias
+estimator (any de-biasing used to create the original catalogue is ignored).
+The options for the \param{DEBIASTYPE} parameter are:
 
 \begin{enumerate}
-\item {\bf MAS:} De-bias using the modified asymptotic estimator;
-\item {\bf AS:} De-bias using the asymptotic estimator;
-\item {\bf None:} Do not include any de-biasing.
+\item {\bf MAS:} de-bias using the modified asymptotic estimator;
+\item {\bf AS:} de-bias using the asymptotic estimator; and
+\item {\bf None:} do not include any de-biasing.
 \end{enumerate}
 
-\cref{Figure}{fig:poleditdebias-1}{} shows the results of using the \task{poledit} command with the various  \param{DEBIASTYPE} parameter options listed above.
+\cref{Figure}{fig:poleditdebias-1}{} shows the results of using the
+\task{poledit} command with the various \param{DEBIASTYPE} parameter options
+listed above.
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc22-poledit-debias.png}
 \caption [The effects of using the various \task{poledit} debias options]{
-  The effects of using the various \task{poledit} debias options. The horizontal axis is \catcol{PI/DPI} (polarised intensity signal-to-noise ratio) with no de-biasing. The vertical axis is the new \catcol{PI/DPI} value created with each of the \param{DEBIASTYPE} options listed above (red is ``AS'', blue is ``MAS'' and green is ``None'').
+  The effects of using the various \task{poledit} debias options. The horizontal axis
+  is \catcol{PI/DPI} (polarised intensity signal-to-noise ratio) with no de-biasing. The vertical
+  axis is the new \catcol{PI/DPI} value created with each of the \param{DEBIASTYPE} options listed
+  above (red is ``AS'', blue is ``MAS'', and green is ``None'').
 \label{fig:poleditdebias-1}
 }
 \end{center}
 \end{figure}
 
 
-\section{\xlabel{smooth450}Smoothing 450 \SI{}{\micro\metre} POL-2 maps to 850 \SI{}{\micro\metre} map resolution}
+\section{\xlabel{smooth450}Smoothing 450-\SI{}{\textbf{\micro\metre}}
+POL-2 maps to 850-\SI{}{\textbf{\micro\metre}}-map resolution}
 
 The \poltwomap\ script has a parameter, \param{SMOOTH450}, to enable the user to smooth
-\SI{450}{\micro\metre} POL-2 maps to the same resolution as their \SI{850}{\micro\metre} counterparts. It is only accessed when processing \SI{450}{\micro\metre} data, and defaults to \texttt{False}, which results in no changes to the behaviour of \poltwomap. If \param{SMOOTH450} is set to \texttt{True}, \poltwomap\ performs an additional smoothing that results in the resolution of the resulting I, Q and U coadds (and the vector catalogue) being degraded to the resolution expected for \SI{850}{\micro\metre} data. This allows 450 and 850 \SI{}{\micro\metre} results to be compared more easily. A side-effect of the smoothing is that the noise levels in the final \SI{450}{\micro\metre} maps and catalogues is lower.
+\SI{450}{\micro\metre} POL-2 maps to the same resolution as their \SI{850}{\micro\metre}
+counterparts. It is only accessed when processing \SI{450}{\micro\metre} data, and defaults
+to \texttt{False}, which results in no changes to the behaviour of \poltwomap. If
+\param{SMOOTH450} is set to \texttt{True}, \poltwomap\ performs an additional smoothing
+that results in the resolution of the resulting
+$I$, $Q$, and $U$ co-adds (and the vector catalogue) being degraded to the resolution expected
+for \SI{850}{\micro\metre} data. This allows 450 and 850 \SI{}{\micro\metre} results to be
+compared more easily. A side-effect of the smoothing is that the noise
+levels in the final \SI{450}{\micro\metre} maps and catalogues is lower.
 
-The smoothing is applied to the I, Q and U maps made from each individual observation before using them to form the I, Q and U coadds. The same smoothing kernel is used for I, Q and U and is formed by deconvolving the expected \SI{850}{\micro\metre} beam shape using the expected \SI{450}{\micro\metre} beam shape as the PSF (Point Spread Function). The ``expected'' beam shapes are two-component Gaussians as described in \cite{dempsey12}.
+The smoothing is applied to the $I$, $Q$, and $U$ maps made from each
+individual observation before using them to form the $I$, $Q$, and $U$ co-adds. The
+same smoothing kernel is used for $I$, $Q$, and $U$ and is formed by deconvolving the
+expected \SI{850}{\micro\metre} beam shape using the expected
+\SI{450}{\micro\metre} beam shape as the PSF (Point Spread Function). The
+``expected'' beam shapes are two-component Gaussians as described in
+\cite{dempsey12}.
 
-\cref{Figure}{fig:smooth450psf}{} shows the effect of the \param{SMOOTH450} on the mean radial total intensity profile of 3C279 determined from 25 POL-2 observations.. It can be seen that the smoothed 450 curve is very similar to the 850 curve.
+\cref{Figure}{fig:smooth450psf}{} shows the effect of the \param{SMOOTH450} on
+the mean radial total-intensity profile of 3C\,279 determined from 25 POL-2
+observations. It can be seen that the smoothed \SI{450}{\micro\metre} curve is
+very similar to the \SI{850}{\micro\metre} curve.
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.9\linewidth]{sc22-smooth450-psf-1.png}
 \caption [PSF plot showing the effect of the \poltwomap\ \param{SMOOTH450} parameter.]{
-  The mean radial total intensity profile of 3C279 determined from 25 POL-2 observations. The black curve shows the \SI{450}{\micro\metre} profile produced using \param{SMOOTH450} = \texttt{NO} (the default), the red curve shows the \SI{450}{\micro\metre} profile produced using \param{SMOOTH450} = \texttt{YES} and the blue curve shows the \SI{850}{\micro\metre} profile.
+  The mean radial total-intensity profile of 3C\,279 determined from 25 POL-2 observations.
+  The black curve shows the \SI{450}{\micro\metre} profile produced using
+  \param{SMOOTH450} = \texttt{NO} (the default), the red curve shows the \SI{450}{\micro\metre}
+  profile produced using \param{SMOOTH450} = \texttt{YES} and the blue curve shows the
+  \SI{850}{\micro\metre} profile.
 \label{fig:smooth450psf}
 }
 \end{center}
 \end{figure}
 
-\cref{Figure}{fig:smooth450map}{} shows an example of the effect of the \param{SMOOTH450} on a vector map for POL-2 observations of the molecular cloud DR21. The main difference is that there are many more red vectors than blue vectors. This is because the smoothing introduced by \param{SMOOTH450} has reduced the noise level, thus allowing more vectors to pass the above selection criterion.
+\cref{Figure}{fig:smooth450map}{} shows an example of the effect of the
+\param{SMOOTH450} on a vector map for POL-2 observations of the molecular
+cloud DR\,21. The main difference is that there are many more red vectors than
+blue vectors. This is because the smoothing introduced by \param{SMOOTH450}
+has reduced the noise level, thus allowing more vectors to pass the above
+selection criterion.
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc22-smooth450-450nosmo-1.png}
 \caption [Example vector map showing the effect of the \poltwomap\ \param{SMOOTH450} parameter.]{
-  \SI{450}{\micro\metre} POL-2 vector maps created from four observations of DR21, both with and without the use of the \param{SMOOTH450} parameter. The blue vectors were created with \param{SMOOTH450} = \texttt{NO}, and the red vectors with \param{SMOOTH450} = \texttt{YES}. Both red and blue used the same selection criterion (\texttt{i>5*di \&\& dp <0.5 \&\& dang < 10}).
+  \SI{450}{\micro\metre} POL-2 vector maps created from four observations of
+  DR\,21, both with and without the use of the \param{SMOOTH450} parameter. The blue
+  vectors were created with \param{SMOOTH450} = \texttt{NO}, and the red vectors with
+  \param{SMOOTH450} = \texttt{YES}. Both red and blue used the same selection criterion
+  (\texttt{I>5*DI \&\& DP <0.5 \&\& DANG < 10}).
 \label{fig:smooth450map}
 }
 \end{center}
@@ -376,19 +493,36 @@ The smoothing is applied to the I, Q and U maps made from each individual observ
 
 \section{\xlabel{controllingpol2mapmasks}Controlling the masks used by pol2map}
 
-As noted earlier, the map-making process used by the \poltwomap command uses two masks, each of which divides the field up into source and background regions:
+As noted earlier, the map-making process used by the \poltwomap\ command uses
+two masks, each of which divides the field up into source and background
+regions.
 
 \begin{enumerate}
-\item {\bf The AST mask:} This is used to define the background regions that are to be forced to zero after each iteration of the map-maker algorithm (except the last iteration). This form of masking helps prevent the growth of artificial large scale structures within the map. Any real astronomical signal present within the masked background regions will tend to be suppressed in the final map, so it is important that the AST mask correctly identifies regions of significant emission down to a low level.
-\item {\bf The PCA mask:} This is used to define the source regions that are to be excluded from the Principal Component Analysis. This analysis is used to remove the correlated backgrounds in the bolometer time stream data. The time-stream data for astronomical sources are not correlated across bolometers, and so tend to disrupt the PCA. For this reason source regions are excluded from the analysis.
-\end{enumerate}
+\item {\bf The AST mask:} This is used to define the background regions that are to be 
+forced to zero after each iteration of the map-maker algorithm (except the last
+iteration). This form of masking helps prevent the growth of artificial large-scale 
+structures within the map. Any real astronomical signal present within the masked
+background regions will tend to be suppressed in the final map, so it is important
+that the AST mask correctly identifies regions of significant emission down to a low level.
 
-Two separate masks are used because experience has shown that disruption of the PCA is caused mainly by the brighter central source regions. Consequently, the source regions within the PCA mask can  be smaller than the source regions within the AST mask, as illustrated in \cref{Figure}{fig:mapmasks}{}.
+\item {\bf The PCA mask:} This is used to define the source regions that are
+to be excluded from the Principal Component Analysis. This analysis is used to
+remove the correlated backgrounds in the bolometer time-stream data. The
+time-stream data for astronomical sources are not correlated across
+bolometers, and so tend to disrupt the PCA. For this reason source regions are
+excluded from the analysis. \end{enumerate}
+
+Two separate masks are used because experience has shown that disruption of
+the PCA is caused mainly by the brighter central source regions. Consequently,
+the source regions within the PCA mask can be smaller than the source regions
+within the AST mask, as illustrated in \cref{Figure}{fig:mapmasks}{}.
 
 \begin{figure}[ht!]
 \begin{center}
 \includegraphics[width=0.7\linewidth]{sc-22-map-masks-1.png}
-\caption [Example POL-2 map of DR21, showing the difference between the two \poltwomap\ masks.]{A total intensity map of DR 21, showing the AST mask in green and the slightly smaller PCA mask in blue.
+\caption [Example POL-2 map of DR\,21, showing the difference between the two
+  \poltwomap\ masks.]{A total-intensity map of DR\,21, showing the AST mask in green and
+  the slightly smaller PCA mask in blue.
 \label{fig:mapmasks}
 }
 \end{center}
@@ -397,24 +531,35 @@ Two separate masks are used because experience has shown that disruption of the 
 Default masks are created automatically by \poltwomap\ in a manner specified by the \param{MASK} parameter.
 
 \begin{enumerate}
-\item On `step 1' of a typical POL-2 data reduction, \param{MASK} is left at its default value of
+\item On `Step~1' of a typical POL-2 data reduction, \param{MASK} is left at its default value of
 \texttt{Auto}, causing new masks to be generated automatically at the end of each iteration of 
 the map-making algorithm. This ``auto-masking'' process identifies an initial set of sources by 
-thresholding the current map estimate at the SNR value specified by configuration parameter 
+thresholding the current map estimate at the SNR value specified by Configuration Parameter 
 \param{xxx.ZERO\_SNR}, where \texttt{xxx} is either \texttt{AST} or \texttt{PCA}, depending on 
 which mask is being generated. Each of these initial source regions is then expanded to include 
-adjoining pixels down to the SNR level specified by configuration parameter 
+adjoining pixels down to the SNR level specified by Configuration Parameter 
 \param{xxx.ZERO\_SNRLO}.
-\item On `step 2' and `step 3' of a typical POL-2 data reduction, \param{MASK} is set to the 
-coadd of all the total intensity maps created at step 1. The \poltwomap\ script first creates a pair 
-of AST and PCA masks from the supplied coadded map, and then uses these masks on all 
-iterations of the map-making algorithm \footnote{For completeness, it should be mentioned that the COM and FLT models are also masked, in addition to the AST and PCA models. At step 1 (the auto-masking stage), the masking of COM and FLT is controlled by a similar set of configuration parameters to those of AST or PCA, except that \texttt{xxx} becomes \texttt{COM} or \texttt{FLT}. At steps 2 and 3 (the external-masking stages), the COM and FLT models are masked using the PCA mask generated by \task{findclumps}, and so COM and FLT masking cannot be controlled independently of the PCA mask.}. The \task{findclumps} command in the Starlink \CUPID\ 
-package is used by \poltwomap\ to create the masks. The process used by \task{findclumps} is 
-the same as describe above for step 1 -- initial sources are defined by a fixed SNR threshold 
-within the supplied coadd and these are then extended down to a lower SNR threshold. The 
-\poltwomap\ command sets these threshold values to the values of the four configuration 
-parameters listed above -- \param{AST.ZERO\_SNR}, \param{AST.ZERO\_SNRLO}, 
-\param{PCA.ZERO\_SNR} and \param{PCA.ZERO\_SNRLO}.
+
+\item On `Step~2' and `Step~3' of a typical POL-2 data reduction, \param{MASK}
+is set to the co-add of all the total-intensity maps created at Step~1. The
+\poltwomap\ script first creates a pair of AST and PCA masks from the supplied
+co-added map, and then uses these masks on all iterations of the map-making
+algorithm \footnote{For completeness, it should be mentioned that the COM and
+FLT models are also masked, in addition to the AST and PCA models. At Step~1
+(the auto-masking stage), the masking of COM and FLT is controlled by a
+similar set of configuration parameters to those of AST or PCA, except that
+\texttt{xxx} becomes \texttt{COM} or \texttt{FLT}.  At Steps~2 and 3 (the
+external-masking stages), the COM and FLT models are masked using the PCA mask
+generated by \task{findclumps}, and so COM and FLT masking cannot be
+controlled independently of the PCA mask.}. The \task{findclumps} command in
+the Starlink \CUPID\ package is used by \poltwomap\ to create the masks. The
+process used by \task{findclumps} is the same as describe above for
+Step~1--initial sources are defined by a fixed SNR threshold within the
+supplied co-add and these are then extended down to a lower SNR threshold. The
+\poltwomap\ command sets these threshold values to the values of the four
+configuration parameters listed above---\param{AST.ZERO\_SNR},
+\param{AST.ZERO\_SNRLO}, \param{PCA.ZERO\_SNR}, and \param{PCA.ZERO\_SNRLO}.
+
 \end{enumerate}
 
 These configuration parameter all default to the following values specified in the \poltwomap\ 
@@ -427,8 +572,12 @@ PCA.ZERO_SNR = 5
 PCA.ZERO_SNRLO = 3
 \end{terminalv}
 
-To investigate the effects of changing these values, new values can be supplied, using the 
-\param{CONFIG} parameter of the \task{pol2map} command \footnote{Notethat prior to 10th July, 2019, this method could only be used at step 1 (the supplied settings were ignored if supplied at steps 2 or 3). Later versions of \task{pol2map} do not suffer from this limitation -- the supplied values are honoured at all steps.}.  Here is an example.
+To investigate the effects of changing these values, new values can be supplied, using the
+\param{CONFIG} parameter of the \task{pol2map} command \footnote{Note that prior
+to 2019 July 10, this method could only be used at Step~1 (the supplied settings were ignored
+if supplied at Steps~2 or 3). Later versions of \task{pol2map} do not suffer from this
+limitation---the supplied values are honoured at all steps.}.  Here is an
+example.
 
 \begin{terminalv}
 % more conf
@@ -442,13 +591,18 @@ Any values not specified will retain their default values listed above.
 
 \section{\xlabel{checkingconvergence}Checking for convergence in pol2map log files}
 
-When processing POL-2 data, it is important to know that the map-making algorithm converged 
-correctly for all observations. This information is available in the \poltwomap\ log file, along with 
-the rest of the \makemap\ or \skyloop\ output.  However, the log file can be very long, and 
-so finding the relevant information may not be straightforward, particularly for users unfamiliar 
+When processing POL-2 data, it is important to know that the map-making algorithm converged
+correctly for all observations. This information is available in the \poltwomap\ log file, along with
+the rest of the \makemap\ or \skyloop\ output.  However, the log file can be very long, and
+so finding the relevant information may not be straightforward, particularly for users unfamiliar
 with the screen output usually created by \task{makemap} or \task{skyloop}.
 
-To help with this, a simple Python script called \file{pol2logcheck.py}\footnote{This script is available at \url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}.} is available, which searches a specified \task{pol2map} log file for the relevant information and reports any observations that did not converge. This can be used as in the following example:
+To help with this, a simple Python script called
+\file{pol2logcheck.py}\footnote{This script is available at
+\url{https://www.eao.hawaii.edu/~dberry/pol2logcheck.py}.} is available, which
+searches a specified \task{pol2map} log file for the relevant information and
+reports any observations that did not converge. This can be used as in the
+following example.
 
 \begin{terminalv}
 % pol2logcheck.py omc1/pol2map.log.3
@@ -463,17 +617,19 @@ omc1/pol2map.log.3:
 
 \section{\xlabel{combiningfields}Combining multiple POL-2 fields}
 
-To combine POL-2 observations for multiple overlapping fields, the best way to proceed is probably as follows\footnote{This method requires the use of a Starlink build from 9th June, 2019 or later.}:
+To combine POL-2 observations for multiple overlapping fields, the best way to
+proceed is probably as follows\footnote{This method requires the use of a
+Starlink build from 2019 June 9 or later.}.
 
 \begin{enumerate}
-Q/U time-stream data for each field.
-\item Run `step 1' independently for each field. In other words, use \poltwomap\ to create an 
-auto-masked total-intensity map for each field. The following assumes that \task{pol2map} is run 
-within directories called \file{field1}, \file{field2}, etc, to create the auto-masked maps and the I/
+\item Run `Step~1' independently for each field. In other words, use \poltwomap\ to create an
+auto-masked total-intensity map for each field. The following assumes that \task{pol2map} is run
+within directories called \file{field1}, \file{field2}, etc., to create the auto-masked maps
+and the $I$, $Q$, and $U$ time-stream data for each field.
 
-follows:
-\item Co-add the auto-masked total-intensity maps for all fields. First, create a text file holding 
-the paths to the separate auto-masked total-intensity maps, and then run \task{pol2map} as 
+\item Co-add the auto-masked total-intensity maps for all fields. First, create a text file holding
+the paths to the separate auto-masked total-intensity maps, and then run \task{pol2map} as
+follows.
 
 \begin{terminalv}
         % more infiles
@@ -483,7 +639,7 @@ the paths to the separate auto-masked total-intensity maps, and then run \task{p
                   qout=! uout=! multiobject=yes
 \end{terminalv}
 
-\item Run `step 2' and `step 3' for each field, using the mosaic created above as the mask field 
+\item Run `Step~2' and `Step~3' for each field, using the mosaic created above as the mask field 
 for all fields. For instance, for the first field:
 
 \begin{terminalv}
@@ -498,7 +654,7 @@ for all fields. For instance, for the first field:
 \end{terminalv}
 
 \item then, do the same for \file{field2}, \file{field3}, etc. If preferred, Steps~2 and 3 can be 
-combined into a single invocation of \task{pol2map}:
+combined into a single invocation of \task{pol2map}.
 
 \begin{terminalv}
         % cd field1
@@ -508,9 +664,10 @@ combined into a single invocation of \task{pol2map}:
                   ipref=iext cat=mycat debias=yes
 \end{terminalv}
 
-\item Co-add the external-masked I/Q/U maps for all fields and create a vector catalogue from 
-the co-added maps. First, create a text file holding the paths to the external-masked I/Q/U maps 
-for all fields, and then run \task{pol2map} as follows:
+\item Co-add the external-masked $I$, $Q$, and $U$ maps for all fields and create a vector
+catalogue from  the co-added maps. First, create a text file holding the paths to the
+external-masked  $I$, $Q$, and $U$ maps  for all fields, and then run \task{pol2map}
+as follows.
 
  \begin{terminalv}
         % more infiles

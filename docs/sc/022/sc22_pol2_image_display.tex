@@ -5,7 +5,7 @@
 
 The \starlink\ package \gaia\ can be used to inspect the results of
 the data reduction.  To plot the output vector catalogue onto the
-final total intensity map, first open up the I map in \GAIA.
+final total intensity map, first open up the $I$ map in \GAIA.
 
 \begin{terminalv}
 % gaia iext.sdf
@@ -39,8 +39,8 @@ useful number and size, the various options in the
 \guithing{Rendering} tab on the
 left hand side. This will reveal a panel that will indicate which
 quantities are currently being used for the vector overlays. In this
-case, the Vector length is taken from the \catcol{P} column of the table, and
-the Vector angles are taken from the \catcol{ANG} column.
+case, the vector length is taken from the \catcol{P} column of the table, and
+the vector angles are taken from the \catcol{ANG} column.
 
 Currently the figure has too many vectors to be scientifically
 meaningful. To filter out most of the extraneous vectors, click on the
@@ -59,14 +59,17 @@ all of these extraneous vectors, either press control-X or use the
 drop-down menu option \guithing{Edit / Cut}.  This should leave just a
 small number of vectors clustering around the target object (see
 \cref{Figure}{fig:gaiavectorssecond}{})
-\footnote{This example is provided here for simplicity. It should be noted, however, that a selection criterion following the general format of ``\$I/\$DI<10 || \$AST==0`` might actually further improve some selections, as it makes use of the \catcol{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
+\footnote{This example is provided here for simplicity. It should be noted, however,
+that a selection criterion following the general format of \texttt{\$I/\$DI<10 || \$AST==0}
+might actually further improve some selections, as it makes use of the
+\catcol{AST} column to remove vectors outside the \texttt{AST} mask (i.e. background vectors).}.
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-plot-vectors-4.png}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-plot-vectors-6.png}
 \caption [Selecting Vectors in GAIA]{Left: specifying vectors
-  to display via the expression \$I/\$DI$>$10. This will only plot
+  to display via the expression \texttt{\$I/\$DI$>$10}. This will only plot
   vectors with an intensity signal-to-noise
   ratio greater than 10 in \GAIA. To ensure that this is specified,
   ensure that ``Return'' is pressed after entering the expression.
@@ -98,9 +101,9 @@ tab in the \guiwindow{GAIA: Polarimetry} window.
 Finally it is useful for future use (as in the examples in the
 following sections) to save the final selection of vectors. To save the
 displayed vectors to a new catalogue, use the drop-down menu
-\texttt{File / Save} in the polarimetry toolbox.
+\guithing{File / Save} in the polarimetry toolbox.
 
-\section{\xlabel{kappa}KAPPA and polpack}
+\section{\xlabel{kappa}KAPPA and POLPACK}
 
 It is possible to use \Kappa\ and \polpack\ to create POL-2 plots.
 
@@ -141,7 +144,7 @@ pixels with good values in a specified mask NDF.
   environment variable.
 
 \begin{terminalv}
-setenv PGPLOT_PS_FONT Times
+% setenv PGPLOT_PS_FONT Times
 \end{terminalv}
 
 For more info, see
@@ -166,7 +169,7 @@ catalogue \file{mycat.FIT}.
 Select a higher quality PostScript font (Times New Roman in this case):
 
 \begin{terminalv}
-setenv PGPLOT_PS_FONT Times
+% setenv PGPLOT_PS_FONT Times
 \end{terminalv}
 
 Select the PostScript graphics device, writing to file \file{plot1.ps}:

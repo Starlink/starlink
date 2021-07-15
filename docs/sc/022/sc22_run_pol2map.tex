@@ -40,7 +40,7 @@ command-line parameters\footnote{Note the distinction between
   \emph{command-line} parameter called \param{CONFIG}.}, in order to
   produce the initial intensity image. Note that if a parameter description ends
   with a value in square brackets, it is the default value that will be used for
-the parameter if no value is supplied on the command line.
+  the parameter if no value is supplied on the command line.
 
 \begin{aligndesc}
 \item[\texttt{IN}] A list of input NDFs containing raw POL-2 data.
@@ -132,7 +132,7 @@ following.
 \end{terminalv}
 
 
-\section{\xlabel{how-step1}pol2map -- producing the initial $I$ map}
+\section{\xlabel{how-step1}pol2map -- producing the initial \textit{I} map}
 \label{sec:how-step1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
@@ -235,7 +235,7 @@ The output $I$ map, \file{iauto.sdf}, can be opened and viewed with \GAIA.
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc22-gaia-view-iauto.png}
 \label{fig:gaia-iauto}
-\caption [I map in GAIA]{
+\caption [$I$ map in GAIA]{
   \small The $I$ map, \file{iauto.sdf}, as viewed with \GAIA.
 }
 \end{center}
@@ -266,11 +266,11 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 \end{terminalv}
 
 
-\section{\xlabel{how-step23}pol2map -- producing the $I$, $Q$, $U$ maps and catalogue}
+\section{\xlabel{how-step23}pol2map -- producing the \textit{I}, \textit{V}, \textit{U} maps and catalogue}
 \label{sec:how-step23}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
-  Theory}, the I map output from the initial run of \poltwomap\ is used to
+  Theory}, the $I$ map output from the initial run of \poltwomap\ is used to
 derive the final $I$, $Q$, and $U$ maps. If requested, a vector catalogue is
 also produced.
 
@@ -366,7 +366,7 @@ The output of this final run of \poltwomap\ is as follows.
 
 \item[\file{maps/}] A folder containing the individual $I$, $Q$, and $U$
   maps from each separate observation. These will have names that end with
-  \file{$\_$Imap.sdf}, \file{$\_$Qmap.sdf} or \file{$\_$Umap.sdf}.
+  \file{$\_$Imap.sdf}, \file{$\_$Qmap.sdf}, or \file{$\_$Umap.sdf}.
 
 \item[\file{uext.sdf}] The $U$ map (\emph{i.e.} the intensity of the radiation
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
@@ -383,7 +383,7 @@ The output of this final run of \poltwomap\ is as follows.
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-iauto.png}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-iext.png}
 \label{fig:gaia-iext}
-\caption [Final I map in GAIA]{
+\caption [Final $I$ map in GAIA]{
   \small Left: $I$ map, \file{iauto}, as produced by the automask on the first pass
          of \poltwomap. Right: Final $I$ map, \file{iext}, as viewed with \GAIA.
          The flatter background is due to the increase in \param{pca.pcathresh}.
@@ -421,9 +421,8 @@ existing $I$ maps listed below.
 \section{\xlabel{vector-cat}Output vectors from pol2map}
 
 
-
 The output vector catalogue contains a range of values derived by
-\poltwomap\ for each pixel contained within the I map. Intensity values and
+\poltwomap\ for each pixel contained within the $I$ map. Intensity values and
 errors in the
 catalogue are expressed in units of mJy/beam.  If desired, it is possible
 to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2map}
@@ -446,8 +445,16 @@ command line.  The columns are listed below.
 \item[\catcol{DANG}] Error in \catcol{ANG}
 \item[\catcol{PI}] Polarised intensity ($I_{\textnormal{p}}$)
 \item[\catcol{DPI}] Error in polarised intensity
-\item[\catcol{AST}] Integer values that indicate if the corresponding vector position is inside the AST mask. If the vector is outside the mask, the corresponding column for the mask will have a blank/null value. Vectors that are inside a mask will have a non-zero integer value for the corresponding column. Each ``island'' within a mask (i.e. a contiguous group of source pixels) will have a different integer value assigned, starting at 1. All vectors within an island are assigned the integer value of the island. 
-\item[\catcol{PCA}] Contains integer values that indicate if the corresponding vector position is inside the PCA mask. Value conventions are the same as for the \catcol{AST} column (above).
+\item[\catcol{AST}] Integer values that indicate if the corresponding vector position is inside the
+                    AST mask. If the vector is outside the mask, the corresponding column for the
+                    mask will have a blank/null value. Vectors that are inside a mask will have a
+                    non-zero integer value for the corresponding column. Each ``island'' within a
+                    mask (i.e. a contiguous group of source pixels) will have a different integer
+                    value assigned, starting at 1. All vectors within an island  are assigned the
+                    integer value of the island.
+\item[\catcol{PCA}] Contains integer values that indicate if the corresponding vector position is
+                    inside the PCA mask. Value conventions are the same as for the \catcol{AST}
+                    column (above).
 \end{aligndesc}
 
 

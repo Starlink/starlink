@@ -69,7 +69,7 @@ in the FITS header of the individual maps.
 \subsection*{Step 2}
 
 In the second step of the process (see Run~2 in
-\cref{Figure}{fig:pol2drflow}{}) an improved I map is produced. These
+\cref{Figure}{fig:pol2drflow}{}) an improved $I$ map is produced. These
 improvements come from
 \begin{enumerate}
 \item applying the pointing corrections determined in Step~1,
@@ -126,13 +126,14 @@ for more information about the effects of using \task{skyloop}.
 
 In addition to the POL-2 data reduction building on the
 existing SCUBA-2 map-maker, \poltwomap\ also relies on the \SMURF\
-command \task{CALQU}.
+command \calcqu.
 
-This \xref{calcqu}{sun258}{CALCQU} tool creates time series holding I, Q
-and U values from a set of POL-2 time series holding raw data values. The
-supplied time-series data files are first flat-fielded, cleaned and concatenated,
-before being used to create the I, Q and U values. The I, Q and U time-series
-are down-sampled to 2Hz (i.e. they contain two I, Q or U samples per second),
+This \task{calcqu} tool creates time series holding $I$,
+$Q$, and $U$ values from a set of POL-2 time series holding raw data values.
+The supplied time-series data files are first flat-fielded, cleaned and concatenated,
+before being used to create the $I$, $Q$, and $U$ values. The $I$, $Q$,
+and $U$ time-series are down-sampled to 2Hz (i.e. they contain two $I$, $Q$,
+or $U$ samples per second),
 and are chosen to minimise the sum of the squared residuals between the
 measured raw data values and the expected values given by
 \cref{Equation}{eqn:idet}{}.
