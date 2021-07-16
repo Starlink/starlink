@@ -6,6 +6,7 @@
 #include "ast.h"
 #include "par.h"
 #include "prm.h"
+#include "prm_par.h"
 #include "star/pda.h"
 #include "star/thr.h"
 #include "cupid.h"
@@ -417,6 +418,7 @@ void makeclumps( int *status ) {
    hdsdim subnd[ 3 ];            /* Upper bounds of significant pixel axes */
    hdsdim ubnd[ 3 ];             /* Upper pixel bounds */
    int addnoise;                 /* Add Gaussian noise to output array? */
+   int curlev;                   /* MERS information level */
    int deconv;                   /* Store deconvolved clump properties */
    int dist;                     /* Clump parameters distribution */
    int grid;                     /* Border for regular grid (-ve if random) */
@@ -696,6 +698,9 @@ void makeclumps( int *status ) {
 /* Set the PDA random number seed to a non-repeatable value */
    kpg1Pseed( status );
 
+/* Get the MERS information level. */
+   curlev = msgIflev( NULL, status );
+
 /* Loop round creating clumps. Clumps that touch the edge of the output
    array will be ignored by cupidGCUpdateArrays, so we keep on looping
    until we have created the required number of clumps (but we do not do
@@ -763,9 +768,6 @@ void makeclumps( int *status ) {
          }
       }
 
-      msgOutiff( MSG__VERB, " ", "Creating clump %d at (%g,%g,%g)", status,
-                 nc, par[2], par[4], par[7] );
-
 /* Add the clump into the output array. This also creates a "Clump" NDF
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
@@ -780,6 +782,17 @@ void makeclumps( int *status ) {
       if( obj ) {
          datSize( obj, &st, status );
          nc = (int) st;
+
+/* Give a short or long descripton of the clump parameters, if a new
+   clump was created. */
+         if( nc == ncold + 1 ){
+            if( curlev == MSG__VERB  ){
+               msgOutf( " ", "Creating clump %d at (%g,%g,%g)", status,
+                        nc, par[2], par[4], par[7] );
+            } else if( curlev == MSG__DEBUG ) {
+               cupidGCListClump( nc, sdims, par, VAL__BADD, slbnd, rms, status );
+            }
+         }
 
 /* If an NDF was created, and if PRECAT is true, we create the clump a
    second time, but this time without any beam smoothing. These secondary
