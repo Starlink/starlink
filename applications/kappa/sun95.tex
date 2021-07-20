@@ -6053,6 +6053,11 @@ part of the \PGPLOT\  colour table that has not been reserved for annotation
 annotation \emph{palette}).  The context should usually make it obvious
 which understanding of the phrase `colour table' is being used.
 
+% Save current unit length for pictures.
+\newlength{\oldunit}
+\setlength{\oldunit}{\unitlength}
+\setlength{\unitlength}{3pt}
+
 \begin{center}
 \begin{picture}(136,28)
 % Thick outline.
@@ -6094,6 +6099,9 @@ which understanding of the phrase `colour table' is being used.
 \put(34,4){\makebox[100mm][c]{{\large Colour Table}}}
 \end{picture}
 \end{center}
+
+% Restore default unit length.
+\setlength{\unitlength}{\oldunit}
 
 \subsection{\xlabel{se_lookuptables}Lookup Tables\label{se:lookuptables}}
 
