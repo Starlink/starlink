@@ -117,8 +117,8 @@ that only the vectors to be plotted are included in the file
 \file{mycat.FIT}.
 
 There are two main ways to do this\ ---\ either by saving the output
-catalogue from \GAIAref\ or using the Starlink package \POLPACKref\ to manipulate
-the catalogue produced by the user.  To use \polpack, simply run:
+catalogue from \GAIAref\ or using the Starlink package \POLPACK\ to manipulate
+the catalogue produced by the user.  To use \POLPACK, simply run:
 
 \begin{terminalv}
 % polpack
@@ -130,7 +130,7 @@ then select the vectors of interest.
 % polselect in=mycat.FIT out=selcat.FIT mode=expr "exp='i>10*di && (ast>0)'"
 \end{terminalv}
 
-The use of the \POLPACKref\ \task{polselect} command is
+The use of the \POLPACK\ \task{polselect} command is
 generally recommended over the use of the \xref{\textsc{Cursa}}{sun190}{} \task{catselect}
 command when working with POL-2 datasets, as it provides a greater number of options
 specifically designed for use with POL-2 data. For example, \task{polselect} offers
@@ -138,9 +138,8 @@ additional modes that allow the specific selection of vectors that are located w
 region on the sky (specified by an \ARDref\ or AST region description), or which correspond to
 pixels with good values in a specified mask NDF. 
 
-
 \begin{tip}
-  For a better font on PGPLOT PostScript devices, set the following
+  For a better font on \PGPLOTref\ PostScript devices, set the following
   environment variable.
 
 \begin{terminalv}
