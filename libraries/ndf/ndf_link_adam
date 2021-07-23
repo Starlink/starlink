@@ -35,6 +35,14 @@
 #        Added AST_ linking and improved "awk" script.
 #     3-AUG-2018 (DSB):
 #        The C version of NDF does not use PSX or CHR.
+#     23-JUL-2021 (DSB):
+#        Previous versions included both libndf_adam and libndf in the
+#        returned list of libraries. But all functions required to implement
+#        the whole library are in libndf_adam and so libndf is not needed.
+#        Including libndf seems to cause problems on some versions of macos
+#        because both libraries include a function with the "constructor"
+#        attribute (ndf1GetCmdLine). To avoid this issue, remove libndf
+#        from the returned list of libraries.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -47,7 +55,7 @@
 #  Echo the NDF library reference, followed by the list of options for
 #  packages on which the NDF library depends. Pass the result through an
 #  awk script to remove duplicate library references.
-      echo -lndf_adam -lndf `ary_link_adam` `hds_link_adam` \
+      echo -lndf_adam `ary_link_adam` `hds_link_adam` \
            `err_link_adam` `ems_link_adam` `prm_link_adam` \
            `ast_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
