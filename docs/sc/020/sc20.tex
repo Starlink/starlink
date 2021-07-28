@@ -554,6 +554,12 @@ the position $l=10^\circ$, $b=0^\circ$.
 % ndfcopy `cube(10.0~25:0.0~25,)' newcube
 \end{terminalv}
 
+The extent of an NDF section can be specified as an arc-distance using WCS coordinates in the format of \guithing{"centre~extent"}.
+
+For instance \guithing{'image(10:12:30~40am,-23:23:43~40am)'} will create a section of extent 40 arc-minutes on both axes ("as" and "ad" can be used in place of "am", indicating arc-seconds and arc-degrees).
+
+This only works if the NDFs current Frame is a SkyFrame (an error is reported otherwise).
+
 \begin{tip}
 To help identify your sub-region in pixel co-ordinates, open your
 file in \gaia\ and change the built-in co-ordinates to PIXEL via
@@ -809,7 +815,7 @@ Auto-Correlation Spectrometer and Imaging System known simply as ACSIS
 ACSIS's 32 down-converter modules and available IF outputs from the
 different instruments, a number of bandwidth modes and corresponding
 frequency resolutions are available. Listed below are the most common
-ones. Visit the JCMT web pages for a full list.
+ones. Visit the JCMT \htmladdnormallink{ACSIS webpage}{https://www.eaobservatory.org/jcmt/instrumentation/heterodyne/acsis/} for a full list.
 
 \newpage
 \begin{table}[h!]
@@ -841,7 +847,7 @@ observation by the FITS header \param{SUBSYSNR}.
 
 You will find each subsystem number corresponds to a different
 molecule or transition (given by the FITS headers \param{MOLECULE} and
-\param{TRANSITI}). The most common pairings are
+\param{TRANSITI}). For example,
 C$^{18}$O\,(3-2)/$^{13}$CO\,(3-2) and DCN\,(5-4)/HCN\,(4-3) for HARP,
 $^{12}$CO/$^{13}$CO/C$^{18}$O for $`$\=U$`$\=u, and with the now retired
 RxA the common pairing was SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$).
@@ -849,7 +855,7 @@ RxA the common pairing was SiO\,(6$_0$-5$_0$)/SO\,(4$_3$-3$_4$).
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_stare}
-\includegraphics[width=5.2cm, height=5.2cm]{sc20_jiggle}
+\includegraphics[width=5.2cm, height=5.2cm]{sc20_jiggle_2021}
 \includegraphics[width=5.2cm, height=5.2cm]{sc20_raster}
 \caption[Stare, jiggle and raster observing modes]{\label{fig:harpmodes}
   (Left) Stare mode with HARP. (Right) Jiggle mapping with HARP.
@@ -879,10 +885,11 @@ A jiggle map is a common HARP observing mode. They are designed to
 fill in the 30\arcsec spacing between the HARP receptors resulting in a
 2\arcm$\times$2$\arcm$ map. This is achieved by 'jiggling' the secondary
 mirror in a 4$\times$4 or 5$\times$5 pattern to give a HARP4 or HARP5
-map respectively.  The HARP4 pattern has a 7.\uarcs5 pixels while the
+map respectively. The HARP4 pattern has a 7.\uarcs5 pixels while the
 HARP5 has 6\arcsec pixels, slightly under- and over-sampling compared
-with Nyquist. The central panel of \cref{Figure}{fig:harpmodes}{} shows a
-HARP5 jiggle pattern.
+with Nyquist. Other jiggle patterns are also available to be selected with the OT.
+The central panel of \cref{Figure}{fig:harpmodes}{} shows a
+HARP 3$\times$3 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target
 co-ordinates fall on one of the central four pixels, or map-centered where
@@ -3901,7 +3908,7 @@ The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
 are made available to PIs and co-Is through the CADC Advanced Search
 interface linked from the JCMT landing page
-(\url{http://www3.cadc-ccda.hia-iha.nrc-cnr c.gc.ca/jcmt/}).
+(\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
 registered by the EAO and thereby associated with the project code.
@@ -3918,14 +3925,14 @@ versus proprietary, raw versus reduced, and SCUBA-2 versus ACSIS data.
 \end{center}
 \end{figure}
 
-An important search option to be aware of is `Group Type', where your
-options are Simple, Night, Project and Public. Simple (which becomes
-`obs' on the result page) is an individual observation; night means
-the group file from the pipeline (these may or may not include more
-than one observation; the `Group Members' value will tell you); and the
-project option is generated if an entire project has been run through
-the pipeline and identical sources across the project are co-added
-into master group files.
+% An important search option to be aware of is `Group Type', where your
+% options are Simple, Night, Project and Public. Simple (which becomes
+% `obs' on the result page) is an individual observation; night means
+% the group file from the pipeline (these may or may not include more
+% than one observation; the `Group Members' value will tell you); and the
+% project option is generated if an entire project has been run through
+% the pipeline and identical sources across the project are co-added
+% into master group files.
 
 The format and file naming conventions are different in the JSA for
 \emph{reduced} data compared with merely running \ORACDR.  Reduced
@@ -3939,7 +3946,7 @@ but others include \file{rimg} and \file{rsp} for the representative
 image and spectrum.  The grouping algorithm is \file{obs} for a single
 observation, and \file{nit} where all the good data for an object observed
 with the same instrumental setup during a night are combined to create
-products of better quality.  A further grouping is \file{pro}) where
+products of better quality.  A further grouping is \file{pro} where
 matching observations within a project are combined, which may extend
 over many nights spanning years.
 
