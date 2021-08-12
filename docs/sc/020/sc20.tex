@@ -554,11 +554,15 @@ the position $l=10^\circ$, $b=0^\circ$.
 % ndfcopy `cube(10.0~25:0.0~25,)' newcube
 \end{terminalv}
 
-The extent of an NDF section can be specified as an arc-distance using WCS coordinates in the format of \guithing{"centre~extent"}.
+The extent of an NDF section can be specified as an arc-distance using
+WCS co-ordinates in the format of \guithing{"centre~extent"}.
 
-For instance \guithing{'image(10:12:30~40am,-23:23:43~40am)'} will create a section of extent 40 arc-minutes on both axes ("as" and "ad" can be used in place of "am", indicating arc-seconds and arc-degrees).
+For instance, \guithing{'image(10:12:30~40am,-23:23:43~40am)'} will
+create a section of extent 40 arcminutes on both axes ("as" and "ad"
+can be used in place of "am", indicating arcseconds and degrees).
 
-This only works if the NDFs current Frame is a SkyFrame (an error is reported otherwise).
+This only works if the NDF's current Frame is a SkyFrame (an error is
+reported otherwise).
 
 \begin{tip}
 To help identify your sub-region in pixel co-ordinates, open your
