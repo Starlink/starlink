@@ -551,6 +551,20 @@
 *     2020-12-04 (DSB):
 *        Calculate and report the weighted chi-squared, summed over all chunks.
 *        This primarily gives the chi-squared in the source regions.
+*     2021-08-12 (DSB):
+*        Move the code that exports cleaned data from within the iteration
+*        loop to immediately after the data is cleaned. Previously, any
+*        changes to the data that occurred after data cleaning but before
+*        the start of the iteration loop (e.g. IP subtraction and initial
+*        sky subtraction) were included in the exported data and could
+*        therefore be reapplied if the cleaned data was reused (e.g. in
+*        skyloop). A nasty consequence of this is that POL2 maps produced
+*        using skyloop will have had the IP correction applied twice -
+*        once before the cleaned data was exported on the first skyloop
+*        iteration, and then again at the start of each subsequent skyloop
+*        iteration. This means that POL2 maps produced using skyloop
+*        have had twice the amount of IP correction that they should have
+*        had.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -1158,7 +1172,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
          less than 0, the scale is a multiple of PIXSIZE. */
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
       if( (*status == SAI__OK) && (downsampscale < 0) ) {
-         downsampscale = abs(downsampscale) * pixsize;
+         downsampscale = fabs(downsampscale) * pixsize;
          astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
       }
 
@@ -1914,6 +1928,38 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                 status );
       }
 
+      /* Export the cleaned data here if desired */
+      if( exportclean ) {
+        msgOut( "", FUNC_NAME
+                ": Writing out clean data prior to map-making.",
+                status );
+
+        for( idx=0; idx<res[0]->ndat; idx++ ) {
+          int oldorder;
+          data = res[0]->sdata[idx];
+
+          /* create a file name with "_res_cln" suffix */
+          *name = 0;
+          if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
+          smf_stripsuffix( res[0]->sdata[idx]->file->name,
+                           SMF__DIMM_SUFFIX, name + strlen( name ), status );
+          one_strlcat( name, "_res_cln", sizeof(name), status );
+
+          /* Use the correct order */
+          oldorder = res[0]->sdata[idx]->isTordered;
+          smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
+          smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
+
+          smf_write_smfData( wf, res[0]->sdata[idx], NULL,
+                             name, NULL, 0, NDF__NOID,
+                             MSG__VERB, 0, NULL, NULL, status );
+
+          /* Revert the order */
+          smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
+          smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
+        }
+      }
+
       /*** TIMER ***/
       msgOutiff( SMF__TIMER_MSG, "", FUNC_NAME
                  ": ** %f s pre-conditioning data",
@@ -2210,8 +2256,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
           ********************************************************************* */
 
 
-          /* If first iteration report on initial stats and write out
-             cleaned data if requested. */
+          /* If first iteration report on initial stats. */
           if( iter == 0 ) {
 
             /* initial quality report */
@@ -2227,37 +2272,6 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
               errRep("", FUNC_NAME ": All bolos are bad", status );
             }
 
-            /* Export the cleaned data here if desired */
-            if( exportclean ) {
-              msgOut( "", FUNC_NAME
-                      ": Writing out clean data prior to map-making.",
-                      status );
-
-              for( idx=0; idx<res[0]->ndat; idx++ ) {
-                int oldorder;
-                data = res[0]->sdata[idx];
-
-                /* create a file name with "_res_cln" suffix */
-                *name = 0;
-                if( dumpdir ) one_strlcat( name, dumpdir, sizeof( name ), status );
-                smf_stripsuffix( res[0]->sdata[idx]->file->name,
-                                 SMF__DIMM_SUFFIX, name + strlen( name ), status );
-                one_strlcat( name, "_res_cln", sizeof(name), status );
-
-                /* Use the correct order */
-                oldorder = res[0]->sdata[idx]->isTordered;
-                smf_dataOrder( wf, res[0]->sdata[idx], 1, status );
-                smf_dataOrder( wf, qua[0]->sdata[idx], 1, status );
-
-                smf_write_smfData( wf, res[0]->sdata[idx], NULL,
-                                   name, NULL, 0, NDF__NOID,
-                                   MSG__VERB, 0, NULL, NULL, status );
-
-                /* Revert the order */
-                smf_dataOrder( wf, res[0]->sdata[idx], oldorder, status );
-                smf_dataOrder( wf, qua[0]->sdata[idx], oldorder, status );
-              }
-            }
           }
 
           msgOut(" ",
