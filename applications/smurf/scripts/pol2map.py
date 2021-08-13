@@ -175,8 +175,8 @@
 *     FCF = _REAL (Read)
 *        The FCF value that is used to convert I, Q and U values from pW
 *        to Jy/Beam. If a null (!) value is supplied a default value is
-*        used that depends on the waveband in use - 725.0 for 850 um and
-*        962.0 for 450 um. [!]
+*        used that depends on the waveband in use and the date of the
+*        observations being processed. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -771,6 +771,8 @@
 *    4-JUN-2021 (DSB):
 *       Add a PCA column to the final catalogue that indicates the island
 *       within the PCA mask that contains each vector.
+*    10-JUN-2021 (DSB):
+*       Use the updated SCUBA-2 FCF values, which depend on observation date.
 
 '''
 
@@ -1665,11 +1667,13 @@ try:
              "'{0} found in {1}.".format( filter, indata[0] ) )
 
 #  If we have 450 um data, see if the resulting maps and catalogues should be
-#  smoothed to the 850 um resolution.
+#  smoothed to the 850 um resolution. Also set the POL2 FCF degradation factor.
    if filter == 450:
       smooth450 = parsys["SMOOTH450"].value
+      degrade = 1.96
    else:
       smooth450 = False
+      degrade = 1.35
 
 #  See if we should use skyloop instead of makemap.
    skyloop = parsys["SKYLOOP"].value
@@ -1696,12 +1700,24 @@ try:
    if jy:
       fcf = parsys["FCF"].value
 
-#  If no FCF supplied, get the default FCF for the waveband
+#  If no FCF supplied, get the default FCF for the waveband, which
+#  depends on UT date (assume all data files are in the same FCF bin as
+#  the first data file).
       if fcf is None:
+         utdate = float( get_fits_header( indata[0], "UTDATE", report=True ))
          if filter == 450:
-            fcf = 962.0
+            if utdate < 20180630:
+               fcf_sc2 = 531.0
+            else:
+               fcf_sc2 = 472.0
          else:
-            fcf = 725.0
+            if utdate < 20161101:
+               fcf_sc2 = 525.0
+            elif utdate < 20180630:
+               fcf_sc2 = 516.0
+            else:
+               fcf_sc2 = 495.0
+         fcf = degrade*fcf_sc2
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
@@ -3380,7 +3396,7 @@ try:
          inbeam = get_fits_header( imap_cat, "INBEAM" )
          if not inbeam or ("pol" not in inbeam):
             tmp = NDG( 1 )
-            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=1.35".
+            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=degrade".
                  format(imap_cat,tmp ))
             imap_cat = tmp
 

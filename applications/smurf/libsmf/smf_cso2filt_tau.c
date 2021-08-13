@@ -37,9 +37,9 @@
 *  Notes:
 *     - Returns a value of VAL__BADD if status is set bad on entry
 *     - The tau relation is formulated as:
-*          tau_filt = a ( tau_cso + b )
+*          tau_filt = a ( tau_cso + b + c sqrt(tau_cso) )
 *       and the keymap should contain an entry named "taurelation_FILT"
-*       containing "a" and "b".
+*       containing "a", "b" and "c".
 *     - The routine will not attempt to guess a tau relation.
 *     - Since "b" is usually negative, the calculation is skipped if the
 *       CSO tau is zero. The routine returns a tau of 0.0.
@@ -98,7 +98,7 @@
 #include "smf.h"
 
 double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars, int *status) {
-  double coeffs[2];        /* Tau relation coefficients */
+  double coeffs[3];        /* Tau relation coefficients */
   size_t nvals;            /* Number of coefficients */
   double tau = VAL__BADD;  /* return filter tau */
 
@@ -113,7 +113,7 @@ double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars,
   if (csotau == 0.0) return 0.0;
 
   /* Get the coefficients */
-  smf_cso2filt_coeff( hdr, extpars, 2, coeffs, &nvals, status );
+  smf_cso2filt_coeff( hdr, extpars, 3, coeffs, &nvals, status );
 
   /* Now apply them */
   tau = smf_cso2filt_applycoeff( csotau, coeffs, status );

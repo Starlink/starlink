@@ -104,12 +104,12 @@
 *          CSOTAU or WVMRAW methods are used to determine the tau.
 *          The group should have the form:
 *
-*             ext.taurelation.<FILT> = (a,b)
+*             ext.taurelation.<FILT> = (a,b,c)
 *
-*          where <FILT> is the filter name and "a" and "b" are the
+*          where <FILT> is the filter name and "a", "b" and "c" are the
 *          coefficients for a relationship of the form
 *
-*             tau_filt = a ( tau_cso + b )
+*             tau_filt = a ( tau_cso + b + c sqrt(tau_cso) )
 *
 *          A null value will use the default relations. [!]
 *     TAUSRC = _CHAR (Read)
