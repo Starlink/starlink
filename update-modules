@@ -209,20 +209,14 @@ fi
 #  No modifications, or told to not check, so safe to check for updates. Note
 #  we always init to capture any new submodules added since the last update.
 
-git submodule init $submodule
+git submodule update --init --recursive $submodule
 if test "$?" != "0"; then
-   echo "ERROR: failed to initialise a submodule"
-   exit 1
-fi
-
-git submodule update $submodule
-if test "$?" != "0"; then
-   echo "ERROR: failed to update a submodule"
+   echo "ERROR: failed to initialise and/or update a submodule"
    exit 1
 fi
 
 #  Success output the status of the submodules.
-git submodule status $submodule | awk '{print "...",$2,$3}'
+git submodule status --recursive $submodule | awk '{print "...",$2,$3}'
 echo ""
 
 exit
