@@ -33,6 +33,7 @@
 /kapsub/kps1_inli.f
 /kapsub/kps1_inls.f
 /kapsub/kps1_lapl.f
+/kapsub/kps1_lft.c
 /kapsub/kps1_lft.f
 /kapsub/kps1_lftq.f
 /kapsub/kps1_lfts.f
@@ -41,6 +42,7 @@
 /kapsub/kps1_mdwt.f
 /kapsub/kps1_med.f
 /kapsub/kps1_mfad.f
+/kapsub/kps1_mfeb.c
 /kapsub/kps1_mfeb.f
 /kapsub/kps1_mfed.f
 /kapsub/kps1_mffr.f
