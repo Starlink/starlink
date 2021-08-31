@@ -91,6 +91,40 @@ beam (with a Gaussian profile), this peak value will be the total flux
 density of your source. For more information, see
 \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
+\subsection{Manually Applying the FCF}
+\label{subsec:ApplyingFCF}
+
+You can apply an FCF value using the \picard\ recipe
+\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
+By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
+value is presented at the beginning of \cref{Section}{sec:cmult}{Flux-conversion factors}
+or in \cref{Appendix}{app:fcfs}{FCFs by reduction date},
+depending on the observation date and Starlink version used. This produces a
+calibrated map with units of mJy/beam.
+
+You can supply a parameter file if you wish to use a different value
+for the FCF or use \fcfa. For example, the lines below are written in a parameter
+file called \file{cal.ini} to calibrate the data \file{mapinpW.sdf} with \fcfa=2.07:
+
+\begin{terminalv}
+[CALIBRATE_SCUBA2_DATA]
+FCF = 2.07
+FCF_CALTYPE = ARCSEC
+\end{terminalv}
+
+The default SCUBA-2 FCF will be used if not given and FCF\_CALTYPE may either
+be BEAM (default) or ARCSEC. The recipe will write out the calibrated
+file with a \file{\_cal} suffix and will change the units in the map
+header.
+
+\begin{terminalv}
+% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA  mapinpW.sdf
+\end{terminalv}
+
+Note that the recipe will also take account of the pixel size when
+applying \fcfa.
+
+
 \subsection{\xlabel{own_fcf}Determining your own flux-conversion factors}
 \label{sec:own_fcf}
 
@@ -168,38 +202,6 @@ uncertainties).
 %  using \fcfa.
 \end{enumerate}
 
-\subsection{Manually Applying the FCF}
-\label{subsec:ApplyingFCF}
-
-You can apply an FCF value using the \picard\ recipe
-\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
-By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
-value is presented at the beginning of \cref{Section}{sec:cmult}{Flux-conversion factors}
-or in \cref{Appendix}{app:fcfs}{FCFs by reduction date},
-depending on the observation date and Starlink version used. This produces a
-calibrated map with units of mJy/beam.
-
-You can supply a parameter file if you wish to use a different value
-for the FCF or use \fcfa. For example, the lines below are written in a parameter
-file called \file{cal.ini} to calibrate the data \file{mapinpW.sdf} with \fcfa=2.07:
-
-\begin{terminalv}
-[CALIBRATE_SCUBA2_DATA]
-FCF = 2.07
-FCF_CALTYPE = ARCSEC
-\end{terminalv}
-
-The default SCUBA-2 FCF will be used if not given and FCF\_CALTYPE may either
-be BEAM (default) or ARCSEC. The recipe will write out the calibrated
-file with a \file{\_cal} suffix and will change the units in the map
-header.
-
-\begin{terminalv}
-% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA  mapinpW.sdf
-\end{terminalv}
-
-Note that the recipe will also take account of the pixel size when
-applying \fcfa.
 
 \section{\xlabel{crop}Cropping your map}
 \label{sec:crop}
