@@ -26,7 +26,7 @@ dnl    /Perl to the prefix, rather than have that as part of the
 dnl    prefix (which is surprising) as we want to get a manifest
 dnl    file installed into the standard part of the tree and
 dnl    work in the standard tree to establish softlinks. This
-dnl    latter requirement is the stronger (could use STAR_MANIFEST_DIR 
+dnl    latter requirement is the stronger (could use STAR_MANIFEST_DIR
 dnl    to get the manifest file relocated).
 dnl
 dnl    Export the various FLAGS values to support config.site definitions
@@ -53,12 +53,17 @@ dnl    push it through as part of optimize.
       ldflags="\"-Dldflags=$LDFLAGS\""
    fi
 
+   cflags=
+   if test -n "$CFLAGS"; then
+      cflags="\"-Dccflags=$CFLAGS\""
+   fi
+
    cd perl; \
    rm -f config.sh ; \
-   eval "sh ./Configure -des -Dprefix=${prefix}/Perl $cc $ldflags -Doptimize=\"$args\""
+   eval "sh ./Configure -des -Dprefix=${prefix}/Perl $cc $cflags $ldflags -Doptimize=\"$args\""
 )
- 
-dnl    Install Perl using a staging area to get all files listed in 
+
+dnl    Install Perl using a staging area to get all files listed in
 dnl    in the manifest. Also install "starperl" script.
 STAR_SPECIAL_INSTALL_COMMAND([
    ( cd perl; $(MAKE) DESTDIR=$$DESTDIR install ); \
