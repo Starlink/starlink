@@ -2491,15 +2491,16 @@ C     These are the new numbers from astro-ph/0703640
 *        Half-power beam width of the second Gaussian component of the
 *        beam, in arcsec. Returned holding zero if NB is one.
 *     AMP1 = DOUBLE PRECISION (Returned)
-*        Amplitude of the first Gaussian component of the beam, in
-*        arcsec. Normalised so that AMP1 plus AMP2 is one.
+*        Amplitude of the first Gaussian component of the beam. Normalised
+*        so that AMP1 plus AMP2 is one.
 *     AMP2 = DOUBLE PRECISION (Returned)
-*        Amplitude of the second Gaussian component of the beam, in
-*        arcsec. Normalised so that AMP1 plus AMP2 is one. Returned equal
-*        to zero if NB is one.
+*        Amplitude of the second Gaussian component of the beam. Normalised
+*        so that AMP1 plus AMP2 is one. Returned equal to zero if NB is one.
 *     TBNORM = DOUBLE PRECISION (Returned)
-*        Either the numerical planetary brightness temperature at the
-*        required frequency, or the name of a 1-dimensional NDF. If an NDF
+*        The numerical planetary brightness temperature at the required
+*        frequency. This is obtained from environment parameter BTEMP,
+*        which may give the numerical planetary brightness temperature
+*        directly, or may be the name of a 1-dimensional NDF. If an NDF
 *        name is given, it chould contain the required brightness temperature
 *        as a function of frequency. The current WCS Frame should contain
 *        a single spectral axis giving frerquency in units of GHz. The
