@@ -92,6 +92,9 @@
 *        ringing  after the FLT model has been removed.
 *     2013-08-22 (DSB):
 *        Include extra checks for bad values stored for BADDA samples.
+*     20201-9-9 (DSB):
+*        Added time-based masking based on an FFCLEAN-like algorithm 
+*        prior to applying the filter. See parameter "flt.clip".
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -176,9 +179,12 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Local Variables */
   dim_t bolostep;               /* Number of bolos per thread */
+  int box;                      /* No. of samples across largest feature */
   size_t bstride;               /* bolo stride */
+  double clip;                  /* No of sigmas at which to clip within smf_ffmask */
   double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
+  int domask;                   /* Mask residuals prior to finding FLT? */
   int do_ringing;               /* Apply ringing filter? */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   dim_t i;                      /* Pixel index */
@@ -202,6 +208,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t nointslice;             /* number of time slices for noise */
   size_t noitstride;            /* Time stride for noise */
   int notfirst=0;               /* flag for delaying until after 1st iter */
+  size_t nsharp;                /* No. of samples within sharp features */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   int order_list;               /* List of models to re-order */
@@ -223,13 +230,15 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int whiten;                   /* Applying whitening filter? */
   double period;                /* Period of lowest passed frequency */
   int zeropad;                  /* Pad with zeros? */
+  size_t t_first;               /* Index of first usable time slice */
+  size_t t_last;                /* Index of last usable time slice */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
   /* See if a mask should be used to exclude bright source areas from
      the FLT model. */
-  mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, status );
+  mask = smf_get_mask( wf, SMF__FLT, keymap, dat, flags, &domask, status );
 
   /* If we have a mask, copy it into the quality array of the map.
      Also set map pixels that are not used (e.g. corner pixels, etc)
@@ -306,7 +315,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
      if( mask ) {
         ringmask = mask;
      } else {
-        ringmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+        ringmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, NULL, status );
      }
   }
 
@@ -334,6 +343,10 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* Allocate job data for threads. */
   job_data = astCalloc( nw, sizeof(*job_data) );
+
+  /* The number of samples set bad because they fall in sharp features
+     within the tim streams. */
+  nsharp = 0;
 
   /* Process each sub-array in turn. */
   for( idx=0; (*status==SAI__OK)&&(idx<res->ndat); idx++ ) {
@@ -424,7 +437,8 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
         smf_filter_fromkeymap( filt, kmap,
                                (flags & SMF__DIMM_LASTITER) ? "_LAST" : NULL,
-                               res->sdata[idx]->hdr, &dofft, &whiten, status );
+                               res->sdata[idx]->hdr, &dofft, &whiten,
+                               &box, status );
 
         if( *status == SMF__INFREQ ) {
           /* If a bad frequency was specified just annul the error and
@@ -481,6 +495,24 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             }
             thrWait( wf, status );
           }
+        }
+
+        /* If required, identifiy sharp features in the time-streams and
+           replace them with bad values. */
+        astMapGet0D( kmap, "CLIP", &clip );
+        if( clip > 0.0 && domask ){
+           smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
+                              &t_first, &t_last, status );
+           if( (int) t_first > box/2 ){
+              t_first -= box/2;
+           } else {
+              t_first = 0;
+           }
+           t_last += box/2;
+           if( t_last >= ntslice ) t_last = ntslice - 1;
+           nsharp += smf_ffmask( wf, model_data, qua_data, nbolo, ntslice,
+                                 tstride, bstride, t_first, t_last, box, clip,
+                                 status );
         }
 
         /* Apply the complementary filter to the copy of the
@@ -550,6 +582,12 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
     msgOutiff( MSG__VERB, "", "    normalized change in FLT model: %lg", status,
                dchisq );
   }
+
+  /* Print the number of samples masked due to being part of a sharp
+     feature in a time stream. */
+  if( nsharp ) msgOutiff( MSG__VERB, "", "    %zu samples masked as "
+                          "sharp features within the FLT model", status,
+                          nsharp );
 
   job_data = astFree( job_data );
   if( kmap ) kmap = astAnnul( kmap );
