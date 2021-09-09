@@ -15,7 +15,7 @@
 *  Invocation:
 *     unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 *                                  AstKeyMap *config, smfDIMMData *dat,
-*                                  int flags, int *status )
+*                                  int flags, int *domask, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -29,6 +29,13 @@
 *        Struct of pointers to information required by model calculation.
 *     flags = int (Given)
 *        Control flags.
+*     domask = int * (Returned)
+*        A flag is returned indicating if the xxx.ZERO_NITER config
+*        parameter indicates that a mask should or should not be applied.
+*        If this is returned as zero, then the returned function value
+*        will be NULL. If it is returned as non-zero, then the returned
+*        function value may or may not be NULL, depending on whether the
+*        other xxx.ZERO_yyy parameters indicate that a mask should be used.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -153,6 +160,8 @@
 *     5-MAR-2021 (DSB):
 *        Added parameter XXX.ZERO_MASK0 - specifies a different NDF mask
 *        for iteration zero.
+*     9-SEP-2021 (DSB):
+*        Added argument domask.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -203,7 +212,7 @@
 
 unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                              AstKeyMap *config, smfDIMMData *dat, int flags,
-                             int *status ) {
+                             int *domask0, int *status ) {
 
 /* Local Variables: */
    AstCircle *circle;         /* AST Region used to mask a circular area */
@@ -351,6 +360,10 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
       if( domask ) dat->allow_convergence = 0;
    }
 
+/* Return the domask flag if required. */
+   if( domask0 ) *domask0 = domask;
+
+/* Get the mask if required. */
    if( domask ) {
 
 /* Only return a mask if this is not the last iteration, or if ZERO_NOTLAST

@@ -374,7 +374,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
     /* Get a mask to apply to the map. This is determined by the "Zero_..."
        parameters in the configuration KeyMap. */
-    zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, status );
+    zmask = smf_get_mask( wf, SMF__AST, keymap, dat, flags, NULL, status );
 
     /* Reset the SMF__MAPQ_AST bit (but retain it on the last iteration so
       that it gets written to the quality component of the output NDF). */

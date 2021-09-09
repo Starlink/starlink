@@ -1105,6 +1105,11 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
                      int resids, int neg, double *sigma, int *status );
 
+size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
+                   dim_t nbolo, dim_t ntime, size_t tstride,
+                   size_t bstride, size_t t_first, size_t t_last,
+                   size_t box, double clip, int *status );
+
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 
 smfData *smf_fft_avpspec( const smfData *pspec, smf_qual_t *quality,
@@ -1134,7 +1139,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                             const char *qualifier, const smfHead *hdr,
-                            int *dofft, int *whiten, int *status );
+                            int *dofft, int *whiten, int *box, int *status );
 
 void smf_filter_getlowf( smfFilter *filt, smfHead *hdr, double *period,
                          int *status );
@@ -1439,7 +1444,7 @@ void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
 
 unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                              AstKeyMap *config, smfDIMMData *dat, int flags,
-                             int *status );
+                             int *domask, int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule,
                         const char **transition, int *status );

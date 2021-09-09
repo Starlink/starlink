@@ -101,7 +101,7 @@
 *        off the residuals. This option is selected by setting the
 *        SMF__DIMM_PCACOM bit in "flags".
 *     1-MAR-2017 (DSB):
-*        Fix bug in usage of freeze_flags parameter that caused flags 
+*        Fix bug in usage of freeze_flags parameter that caused flags
 *        always to be frozen on iteration 1 (if freeze_flags was set).
 
 *  Copyright:
@@ -312,7 +312,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    is being called as part of the PCA model, then use "PCA.xxx" keymap
    values to define the mask instead of "COM.xxx" values. */
    modeltype = ( flags & SMF__DIMM_PCACOM ) ? SMF__PCA : SMF__COM;
-   mask = lut ? smf_get_mask( wf, modeltype, keymap, dat, flags, status ) : NULL;
+   mask = lut ? smf_get_mask( wf, modeltype, keymap, dat, flags, NULL, status ) : NULL;
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)
@@ -624,7 +624,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
             filt = smf_create_smfFilter( res->sdata[0], status );
             smf_filter_fromkeymap( filt, kfmap,
                                    (flags & SMF__DIMM_LASTITER) ? "_LAST" : NULL,
-                                   res->sdata[0]->hdr, &dofft, &whiten, status );
+                                   res->sdata[0]->hdr, &dofft, &whiten,
+                                   NULL, status );
 
 /* Get the filter wisthd, in samples. */
             smf_filter_getlowf( filt, res->sdata[ 0 ]->hdr, &period, status );
