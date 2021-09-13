@@ -773,6 +773,8 @@
 *       within the PCA mask that contains each vector.
 *    10-JUN-2021 (DSB):
 *       Use the updated SCUBA-2 FCF values, which depend on observation date.
+*    13-SEP-2021 (DSB):
+*       If UTDATE is not present, use DATE-OBS to determine the FCF to use.
 
 '''
 
@@ -1704,7 +1706,17 @@ try:
 #  depends on UT date (assume all data files are in the same FCF bin as
 #  the first data file).
       if fcf is None:
-         utdate = float( get_fits_header( indata[0], "UTDATE", report=True ))
+         utdate = float( get_fits_header( indata[0], "UTDATE" ))
+         if utdate is None:
+            dateobs = get_fits_header( indata[0], "DATE-OBS" )
+            if dateobs is not None:
+               (date,time) = dateobs.split("T")
+               print( "DATE is {0}".format(date))
+               utdate = float( date.replace("-","") )
+            else:
+               raise starutil.InvalidParameterError("Neither 'UTDATE' nor "
+                      "'DATEOBS' FITS header found in {0}".format(indata[0]))
+
          if filter == 450:
             if utdate < 20180630:
                fcf_sc2 = 531.0
