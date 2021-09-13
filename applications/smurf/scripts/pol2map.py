@@ -1706,16 +1706,16 @@ try:
 #  depends on UT date (assume all data files are in the same FCF bin as
 #  the first data file).
       if fcf is None:
-         utdate = float( get_fits_header( indata[0], "UTDATE" ))
+         utdate = get_fits_header( indata[0], "UTDATE" )
          if utdate is None:
             dateobs = get_fits_header( indata[0], "DATE-OBS" )
             if dateobs is not None:
                (date,time) = dateobs.split("T")
-               print( "DATE is {0}".format(date))
                utdate = float( date.replace("-","") )
             else:
                raise starutil.InvalidParameterError("Neither 'UTDATE' nor "
-                      "'DATEOBS' FITS header found in {0}".format(indata[0]))
+                      "'DATE-OBS' FITS header found in {0}".format(indata[0]))
+         utdate = float( utdate )
 
          if filter == 450:
             if utdate < 20180630:
