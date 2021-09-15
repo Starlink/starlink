@@ -330,7 +330,7 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
                if( s2 > SMF__MINSTATSAMP ){
                   rms = sqrt( s1/s2 );
                } else {
-                  msgOutiff( MSG__DEBUG, "", "smf_ffmask: flagging "
+                  msgOutiff( MSG__VERB, "", "smf_ffmask: flagging "
                              "entire bad bolo %" DIM_T_FMT ", due to "
                              "insufficient samples", status, ibolo );
 
@@ -340,7 +340,7 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
                      pq += tstride;
                   }
 
-                  continue;
+                  break;
                }
 
 /* For all residuals greater than "clip" RMS, set the corresponding data
