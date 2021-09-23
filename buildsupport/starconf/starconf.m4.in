@@ -335,6 +335,7 @@ AC_ARG_WITH([fortran],
         fi,
         use_fortran="1")
 if test "$use_fortran" = "1"; then
+   AC_REQUIRE([AC_PROG_FC])
    AC_LANG_PUSH([Fortran])
    AC_LANG_CONFTEST([AC_LANG_SOURCE([
       PROGRAM conftest
