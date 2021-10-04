@@ -30,7 +30,7 @@
 *     separations in axis or polar co-ordinates depending on the
 *     selected constraints.  The routine also estimates the errors on
 *     the fitted parameters, and presents the results to a log file and
-*     the screen.  Amongst the results are the rms of the fit, the 
+*     the screen.  Amongst the results are the rms of the fit, the
 *     offset of the primary beam from a reference point, and the polar
 *     co-ordinates of secondary beams from the primary beam's location.
 *
@@ -107,7 +107,7 @@
 *        7 -- Is the shape parameter fixed?
 *        8 -- Is the beam fixed to be circular?
 *        9 -- Is the orientation of the Gaussian fixed?
-*        
+*
 *        Options 3 and 6 will set to .FALSE. if either is .TRUE. on
 *        entry and if MAP2 does not have the inverse transformation.
 *     AMPRAT( BF__MXPOS - 1 ) = REAL (Given)
@@ -228,6 +228,11 @@
 *        the shape exponent.
 *     2011 May 11 (MJC):
 *        Removed no-longer-used argument MAP3.
+*     4-POCT-2021 (DSB):
+*        Transform the supplied widths for each beam to pixels, rather
+*        than just transforming the first beam width and then copying to
+*        all other beams (the initial beam widths for all beams are
+*        supplied in FPAR, not just the first).
 *     {enter_further_changes_here}
 
 *-
@@ -663,43 +668,41 @@
       CALL AST_TRANN( MAP2, 1, 2, BF__MXPOS, PIXPOS, .TRUE., BF__NDIM,
      :                2, FPOS, STATUS )
 
+*  Convert the axis widths for each position.
+      DO I = 1, NPOS
+
 *  The supplied fixed widths are in the current Frame's co-ordinates.
 *  For fitting we need these to be in pixels.
-      IF ( FPAR( 3 ) .NE. VAL__BADD ) THEN
+         IF ( FPAR( 3 + ( I - 1 ) * BF__NCOEF ) .NE. VAL__BADD ) THEN
 
 *  Transform the centre and centre plus width from the PIXEL Frame
 *  of the NDF to the reporting Frame.
-         FPOS( 2, 1 ) = FPOS( 1, 1 )
-         FPOS( 2, 2 ) = FPOS( 1, 2 )
-         FPOS( 2, WAX ) = FPOS( 2, WAX ) + FPAR( 3 )
-         CALL AST_TRANN( MAP2, 2, 2, 2, FPOS, .FALSE., BF__NDIM, 2, POS,
-     :                   STATUS )
+            FPOS( 2, 1 ) = FPOS( 1, 1 )
+            FPOS( 2, 2 ) = FPOS( 1, 2 )
+            FPOS( 2, WAX ) = FPOS( 2, WAX ) +
+     :                       FPAR( 3 + ( I - 1 ) * BF__NCOEF )
+            CALL AST_TRANN( MAP2, 2, 2, 2, FPOS, .FALSE., BF__NDIM, 2,
+     :                      POS, STATUS )
 
-*  Assign the width in pixels to all the beam positions.
-         FPAR( 3 ) = ABS( POS( 1, WAX ) - POS( 2, WAX ) )
-         IF ( NPOS .GT. 1 ) THEN
-            DO I = 2, NPOS
-               FPAR( 3 + ( I - 1 ) * BF__NCOEF ) = FPAR( 3 )
-            END DO
+*  Assign the width in pixels to the beam position.
+            FPAR( 3 + ( I - 1 ) * BF__NCOEF ) = ABS( POS( 1, WAX ) -
+     :                                               POS( 2, WAX ) )
          END IF
-      END IF
 
 *  Repeat for the minor-axis width.
-      IF ( FPAR( 4 ) .NE. VAL__BADD ) THEN
-         FPOS( 2, 1 ) = FPOS( 1, 1 )
-         FPOS( 2, 2 ) = FPOS( 1, 2 )
-         FPOS( 2, WAX ) = FPOS( 2, WAX ) + FPAR( 4 )
-         CALL AST_TRANN( MAP2, 2, 2, 2, FPOS, .FALSE., BF__NDIM, 2, POS,
-     :                   STATUS )
+         IF ( FPAR( 4 + ( I - 1 ) * BF__NCOEF ) .NE. VAL__BADD ) THEN
+            FPOS( 2, 1 ) = FPOS( 1, 1 )
+            FPOS( 2, 2 ) = FPOS( 1, 2 )
+            FPOS( 2, WAX ) = FPOS( 2, WAX ) +
+     :                       FPAR( 4 + ( I - 1 ) * BF__NCOEF )
+            CALL AST_TRANN( MAP2, 2, 2, 2, FPOS, .FALSE., BF__NDIM, 2,
+     :                      POS, STATUS )
 
 *  Assign the width in pixels to all the beam positions.
-         FPAR( 4 ) = ABS( POS( 1, WAX ) - POS( 2, WAX ) )
-         IF ( NPOS .GT. 1 ) THEN
-            DO I = 2, NPOS
-               FPAR( 4 + ( I - 1 ) * BF__NCOEF ) = FPAR( 4 )
-            END DO
+            FPAR( 4 + ( I - 1 ) * BF__NCOEF ) = ABS( POS( 1, WAX ) -
+     :                                               POS( 2, WAX ) )
          END IF
-      END IF
+      END DO
 
 *  Map the data and variance of the selected ROI.
 *  ==============================================
