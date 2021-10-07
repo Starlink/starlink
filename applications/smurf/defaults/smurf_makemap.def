@@ -1450,9 +1450,9 @@ flt.apod = <undef>
 #               be caused by the action of the filter on the sharp features.
 #               It should usually be seen as an alternative to the
 #               masking controlled via the "flt.zero_" set of parameters.
-#               
+#
 #               Note, the masking described above can be restricted to selected
-#               iterations by setting a value for the parameter "flt.zero_niter". 
+#               iterations by setting a value for the parameter "flt.zero_niter".
 flt.clip = 0.0
 
 #-----------------------------------------------------------------
@@ -1935,7 +1935,7 @@ flt.zero_mask0 = <undef>
 #               parameter "ast.skip" are not included in the count of
 #               iterations. A negative value will disable all masking
 #               of the FLT model. This parameter controls the masking
-#               requested via parameter "flt.clip", in addition to the 
+#               requested via parameter "flt.clip", in addition to the
 #               masking requested via the "flt.zero_xxx" set of parameters.
 flt.zero_niter = 2
 
@@ -3401,3 +3401,4 @@ pca.perarray_last = <undef>
 pca.sig_limit = 0
 pca.sig_wing = 1.0
 pca.weight = 0
+pca.svd_eps=2E-15
