@@ -1391,7 +1391,7 @@
 *  Map some workspace for the coefficients, knots, scale factors,
 *  number of good values.
             NWS = MXKNOT * AREA
-            CALL PSX_CALLOC8( AREA, '_INTEGER8', IPGOOD, STATUS )
+            CALL PSX_CALLOC8( AREA, '_INT64', IPGOOD, STATUS )
             CALL PSX_CALLOC8( AREA, '_INTEGER', IPNC, STATUS )
             CALL PSX_CALLOC8( NWS, '_REAL', IPCOEF, STATUS )
             CALL PSX_CALLOC8( NWS, '_REAL', IPKNOT, STATUS )
