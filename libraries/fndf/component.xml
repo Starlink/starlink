@@ -4,7 +4,7 @@
 
 <component id="ndf" support="S">
   <version>1.13-0</version>
-  <path>libraries/ndf</path>
+  <path>libraries/fndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
   format for storing bulk data in the form of N-dimensional arrays of
