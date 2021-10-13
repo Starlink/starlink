@@ -36,7 +36,7 @@
 </component>
 
 <component id="atools" support="S">
-  <version>1.11</version>
+  <version>1.12</version>
   <path>applications/atools</path>
   <description>ATOOLS - AST applications</description>
   <abstract><p>
@@ -172,9 +172,9 @@ including FITS.
 </component>
 
 <component id="cupid" support="S">
-  <version>2.5</version>
+  <version>2.7</version>
   <path>applications/cupid</path>
-  <description>CUPID - AST applications</description>
+  <description>CUPID - Clump identification and analysis package</description>
   <abstract><p>
 CUPID is a package of applications which identify and analyse clumps of
 emission within one-, two- or three-dimensional data arrays.
@@ -593,7 +593,7 @@ and its coordinates are displayed.
 </component>
 
 <component id="fluxes" support="S">
-  <version>1.4-1</version>
+  <version>1.5-0</version>
   <path>applications/fluxes</path>
   <description>FLUXES - JCMT Postion and Flux Density Calibration</description>
   <abstract><p>
@@ -604,7 +604,7 @@ beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><link>fio</link><link>sla</link><link>mers</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><link>fio</link><link>sla</link><link>mers</link><link>grp</link><link>kaplibs</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -663,7 +663,7 @@ and the ability to query on-line (WWW) catalogues.
 </component>
 
 <component id="generic" support="S">
-  <version>1.3</version>
+  <version>1.4</version>
   <path>applications/generic</path>
   <description>A Utility for Compiling Generic Fortran Subroutines</description>
   <abstract><p>GENERIC is a utility which preprocesses a generic
@@ -722,7 +722,7 @@ package but have now been modified to run as normal Starlink tasks.
 </component>
 
 <component id="hdstrace" support="S">
-  <version>1.2-4</version>
+  <version>1.2-5</version>
   <path>applications/hdstrace</path>
   <description>HDSTRACE - Trace an HDS file</description>
   <abstract><p>
@@ -835,7 +835,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>2.6-4</version>
+  <version>2.6-12</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1526,7 +1526,7 @@ spectropolarimetry data, complimenting facilities available in TSP.
 </component>
 
 <component id="polpack" support="S">
-  <version>3.6-0</version>
+  <version>3.6-3</version>
   <path>applications/polpack</path>
   <description>POLPACK - An Imaging Polarimetry Reduction Package</description>
   <abstract><p>
@@ -1651,7 +1651,7 @@ package.
 </component>
 
 <component id="smurf" support="S">
-  <version>1.6.1</version>
+  <version>1.7.0</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -3151,7 +3151,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>9.0.3</version>
+  <version>9.2.5</version>
   <path>libext/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -3366,7 +3366,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ary" support="S">
-  <version>2.0</version>
+  <version>2.1</version>
   <path>libraries/ary</path>
   <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
   <abstract><p> The ARY library is a set of routines for accessing
@@ -3422,7 +3422,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="cat" support="S">
-  <version>8.4</version>
+  <version>9.0</version>
   <path>libraries/cat</path>
   <description>CAT -- Catalogue and Table Manipulation Library</description>
   <abstract><p>
@@ -3700,7 +3700,7 @@ No longer under active control.
 
 <component id="ndf" support="S">
   <version>1.13-0</version>
-  <path>libraries/ndf</path>
+  <path>libraries/fndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
   format for storing bulk data in the form of N-dimensional arrays of
@@ -4185,7 +4185,7 @@ independently of KAPPA.</p></abstract>
 </component>
 
 <component id="ndf" support="S">
-  <version>2.0</version>
+  <version>2.2</version>
   <path>libraries/ndf</path>
   <description>NDF - Routines for Accessing the Extensible N-Dimensional Data Format</description>
   <abstract><p>The Extensible N-Dimensional Data Format (NDF) is a
@@ -4390,214 +4390,6 @@ Ultrix and for SunOS and may still work for them.
   </developers>
   <documentation> sun114</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
-<component id="par" support="S">
-  <version>2.4-0</version>
-  <path>libraries/par</path>
-  <description>Interface to the ADAM Parameter System</description>
- <abstract><p>PAR is a library of Fortran subroutines that provides
-      convenient mechanisms for applications to exchange information
-      with the outside world, through input-output channels called
-      parameters.  Parameters enable a user to control an
-      application's behaviour.  PAR supports numeric, character, and
-      logical parameters, and is currently implemented only on top of
-      the ADAM parameter system.</p>
-    <p>The PAR library permits parameter values to be obtained,
-      without or with a variety of constraints.  Results may be put into
-      parameters to be passed onto other applications.  Other
-      facilities include setting a prompt string, and suggested defaults.</p>
-    <p>This document also introduces a preliminary C interface for the PAR
-      library -- this may be subject to change in the light of experience.</p>
-  </abstract>
-  <dependencies >
-    <build>pcs</build><build>cnf</build><build>generic</build><build>mers</build><build>pcs</build><build>sae</build><link>chr</link><link>mers</link><link>pcs</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <person>
-      <name>Malcolm J. Currie</name>
-      <uname>mjc</uname>
-      <email>mjc@star.rl.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-  </developers>
-  <documentation> sun114</documentation>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-</component>
-
-<component id="pcs" support="S">
-  <version>4.2-0</version>
-  <path>libraries/pcs</path>
-  <description>PCS -- Parameter and Communication Subsystems</description>
-  <abstract>
-    <p>Application programs often need to obtain parameter
-      values from a variety of sources and to communicate with other programs.
-      The Parameter and Communication Subsystems (PCS) are a set of
-      closely-related subroutine libraries which provide these
-      facilities for many Starlink applications and the associated
-      user-interfaces.</p>
-    <p>The PCS libraries will not generally be called directly by
-      application programs, but form a basic part of the Starlink
-      Software Environment which is described in Starlink Guide SG/4.
-      Additional notes on using it under Unix are given in Starlink
-      User Note SUN/144.</p>
-  </abstract>
-  <dependencies >
-    <build>cnf</build><build>ems</build><build>hds</build><build>hlp</build><build>mers</build><build>psx</build><build>sae</build><build option='link'>chr</build><link>chr</link><link>ems</link><link>hds</link><link>hlp</link><link>mers</link><link>psx</link><sourceset>messgen</sourceset>
-  </dependencies>
-  <developers>
-    <!-- The following people list was assembled from the individual
-         component.xml files when PCS was reorganised into a single
-         component.  The individual lists were assembled from evidence
-         within code comments.  There's a certain amount of
-         duplication, so that Alan Chipperfield appears numerous
-         times. -->
-
-    <person>
-      <name>John Cooke (REVAD::JAC)</name>
-    </person>
-    <person>
-      <name>Charlie Richardson (REVA::DCR)</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B.D.Kelly (REVAD::BDK)</name>
-    </person>
-    <person>
-      <name>Brian K McIlwrath</name>
-      <uname>bkm</uname>
-      <email>b.k.mcilwrath@rl.ac.uk</email>
-    </person>
-
-    <person><name>Ian Jenkins (IRJ)</name></person>
-    <person><name>Dennis Kelly (BDK)</name></person>
-    <person><name>Brian McIlwrath (BKM)</name></person>
-    <person><name>Alan Chipperfield (AJC)</name></person>
-    <person><name>David Terrett (DLT)</name></person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-    </person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B D Kelly, ROE</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>Jeremy Bailey (AAOEPP::JAB)</name>
-    </person>
-    <person>
-      <name>Alan Chipperfield (RLVAD::AJC)</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-    <person>
-      <name>Tim Jenness (JACH::TIMJ)</name>
-      <email>t.jenness@jach.hawaii.edu</email>
-    </person>
-
-    <person>
-      <name>B D Kelly (REVAD::BDK)</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield (RLVAD::AJC)</name>
-    </person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B D Kelly (ROE)</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@ral.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B D Kelly (ROE)</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B D Kelly</name>
-    </person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>A.J.Chipperfield@rl.ac.uk</email>
-    </person>
-
-    <person>
-      <name>B D Kelly</name>
-    </person>
-    <person>
-      <name>Alan J Chipperfield</name>
-      <uname>ajc</uname>
-      <email>a.j.chipperfield@rl.ac.uk</email>
-    </person>
-
-    <!-- I'll take this, since I've worked on it last, but we should
-         probably have more than one -->
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-      <role>owner</role>
-    </person>
-    <person>
-      <name>USSC</name>
-      <email>starlink@jiscmail.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>starlink@jiscmail.ac.uk</bugreports>
-  <copyright>
-    <year>1999-2004</year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
-  <notes><p>Documentation is in the pcs-docs subdirectory.</p></notes>
 </component>
 
 <component id="pcs" support="S">
