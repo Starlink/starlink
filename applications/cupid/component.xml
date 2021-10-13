@@ -5,7 +5,7 @@
 <component id="cupid" support="S">
   <version>2.7</version>
   <path>applications/cupid</path>
-  <description>CUPID - AST applications</description>
+  <description>CUPID - Clump identification and analysis package</description>
   <abstract><p>
 CUPID is a package of applications which identify and analyse clumps of
 emission within one-, two- or three-dimensional data arrays.
