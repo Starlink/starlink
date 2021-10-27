@@ -521,11 +521,12 @@
 *        (approximately) 8 arc-sec (the 450 um beam width) to
 *        (approximately) 13 arc-seconds (the 850 um beam width), and
 *        also reduces the noise. The smoothing kernel is derived from the
-*        two-component beam models described in the paper "SCUBA-2: on-sky
-*        calibration using submillimetre standard sources" (Dempsey et al,
-*        2018). If parameter MAPVAR is TRUE, the individual observation
-*        maps will be smoothed prior to determining the variances, thus
-*        ensuring that the resulting variances are still accurate. [FALSE]
+*        two-component beam models described in the paper "A Decade of
+*        SCUBA-2: A Comprehensive Guide to Calibrating 450 μm and 850 μm
+*        Continuum Data at the JCMT" (Mairs et al, 2021). If parameter
+*        MAPVAR is TRUE, the individual observation maps will be smoothed
+*        prior to determining the variances, thus ensuring that the
+*        resulting variances are still accurate. [FALSE]
 *     TRIM = _REAL (Read)
 *        This indicates how the edges of the final I, Q and U coadds should
 *        be trimmed to remove the noisey edges. If a null (!) value is
@@ -775,6 +776,9 @@
 *       Use the updated SCUBA-2 FCF values, which depend on observation date.
 *    13-SEP-2021 (DSB):
 *       If UTDATE is not present, use DATE-OBS to determine the FCF to use.
+*    27-OCT-2021 (DSB):
+*       Change JCMT beam shape parameters to those given in Mairs et al
+*       2021 (only affects the SMOOTH450 parameter).
 
 '''
 
@@ -829,7 +833,7 @@ def CheckNDF( param, ndf, pixsize, units ):
 
 
 #  A function to create an NDF holding a two-component beam shape, as
-#  defined in Dempsey et al 2018, using the supplied parameter values.
+#  defined in Mairs et al 2021, using the supplied parameter values.
 def Beam( alpha, beta, thetaM, thetaS, pixsize ):
 
 #  Create an image of the main beam using the supplied pixel size.
@@ -886,10 +890,10 @@ def Smooth450( inmap, outmap ):
       pixsize = math.sqrt( xsize*ysize )
 
 #  Create a pair of NDFs holding the expected model beam shape at
-#  450 um and at 850 um. The expected beams are defined in Dempsey et al
-#  2018.
-      b450 = Beam( 0.94, 0.06, 7.9, 25.0, pixsize )
-      b850 = Beam( 0.98, 0.02, 13.0, 48.0, pixsize )
+#  450 um and at 850 um. The expected beams are defined in Mairs et al
+#  2021.
+      b450 = Beam( 0.89, 0.11, 6.2, 18.8, pixsize )
+      b850 = Beam( 0.98, 0.02, 11.0, 49.1, pixsize )
 
 #  Deconvolve the 850 um beam using the 450 um beam as the PSF. The
 #  resulting map is the kernel that smooths a 450 um map so that the
