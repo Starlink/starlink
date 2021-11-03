@@ -104,7 +104,7 @@ void cupidGCcalcg( int n, double *x, int *nf, double *g ){
 
 /* Calculate the rate of change of the chi-squared with respect to this
    parameter. */
-      g[ ipar ] = cupidGCChiSq( cupidGC.ndim, x, ipar, newx, &status );
+      g[ ipar ] = cupidGCChiSq( cupidGC.wf, cupidGC.ndim, x, ipar, newx, &status );
 
 /* The second and subsequent passes through this loop use the same "x"
    position as the first. */

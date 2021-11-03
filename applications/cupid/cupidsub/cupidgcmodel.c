@@ -17,8 +17,9 @@ extern CupidGC cupidGC;
 
 
 
-double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
-                     int newx, int newp, int *status ){
+double cupidGCModel( int ndim, const double *x, const double *par,
+                     const double *ref, int what,
+                     CupidGCModelCache *cache, int *status ){
 /*
 *+
 *  Name:
@@ -31,8 +32,9 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 *     Starlink C
 
 *  Synopsis:
-*     double cupidGCModel( int ndim, double *x, double *par, double *ref,
-*                          int what, int newx, int newp, int *status )
+*     double cupidGCModel( int ndim, const double *x, const double *par,
+*                          const double *ref, int what,
+*                          CupidGCModelCache *cache, int *status )
 
 *  Description:
 *     This function evaluates the Gaussian model defined by the supplied
@@ -78,22 +80,15 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 *        (within the user-supplied NDF) of the reference position. The
 *        model centre offsets supplied in elements 2, 4 and 7 of the
 *        "par" array are added onto this reference position to get the
-*        GRID positions of the Gaussian model peak. If "ref" is NULL, 
+*        GRID positions of the Gaussian model peak. If "ref" is NULL,
 *        then the reference position is assumed to be zero on each axis.
 *     what
 *        If negative, then the function value at "x" is returned.
 *        Otherwise, the partial derivative of the model value with
 *        respect to the parameter "par[what]" is returned.
-*     newx
-*        If zero, it is assumed that "x" is the same as on the previous
-*        invocation of this function. This causes cached intermediate values
-*        to be re-used, thus speeding things up. A non-zero value should
-*        be supplied if "x" is not the saem as on the previous invocation.
-*     newp
-*        If zero, it is assumed that "par" is the same as on the previous
-*        invocation of this function. This causes cached intermediate values
-*        to be re-used, thus speeding things up. A non-zero value should
-*        be supplied if "par" is not the saem as on the previous invocation.
+*     cache
+*        Pointer to structure to store cached intermediate values
+*        to be re-used, thus speeding things up.
 *     status
 *        Pointer to the inherited status value.
 
@@ -136,6 +131,9 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 *        Original version.
 *     14-JUL-2021 (DSB):
 *        Added argument "ref".
+*     3-NOV-2021 (DSB):
+*        Replaced arguments "newx" and "newp" with "cache". This is for
+*        thread safety.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -145,31 +143,10 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 */
 
 /* Local Variables: */
-
    double demdp;           /* Rate of change of "em" wrt par[what] */
    double peakfactor_sq;   /* Square of the peak value factor */
    double t;               /* Temporary value */
    double ret;             /* Returned value */
-
-   static double X0;       /* Rotated spatial axis 0 offset */
-   static double X1;       /* Rotated spatial axis 1 offset */
-   static double cosv;     /* Cos of spatial rotation angle */
-   static double dv_sq;    /* Total FWHM in pixels on vel axis, squared */
-   static double dx0_sq;   /* Total FWHM in pixels on axis 0, squared */
-   static double dx1_sq;   /* Total FWHM in pixels on axis 1, squared */
-   static double em;       /* Scalar argument to exp function  */
-   static double expv;     /* Value of exp function */
-   static double f3;       /* Constant for gradient wrt p[3] */
-   static double f5;       /* Constant for gradient wrt p[5] */
-   static double f8;       /* Constant for gradient wrt p[8] */
-   static double m;        /* Finalmodel value */
-   static double peak;     /* Peak value after instrumental smoothing */
-   static double peakfactor;  /* Peak value factor */
-   static double sinv;     /* Sin of spatial rotation angle */
-   static double v_off;    /* Offset on vel axis from "x" to model peak */
-   static double vt_off;   /* Total offset on vel axis from "x" to model peak */
-   static double x0_off;   /* Offset on axis 0 from "x" to model peak */
-   static double x1_off;   /* Offset on axis 1 from "x" to model peak */
 
 /* Initialise */
    ret = VAL__BADD;
@@ -179,115 +156,115 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 
 /* If neccessary, re-calculate cached items which depend only on the values
    supplied in "par" (i.e. which do not depend on values supplied in "x"). */
-   if( newp ) {
+   if( cache->newp ) {
 
 /* The total FWHM in pixels on axis 0, squared. */
       t = par[ 3 ]*par[ 3 ];
-      dx0_sq = cupidGC.beam_sq + t;
-      f3 = cupidGC.beam_sq/( par[ 3 ]*dx0_sq );
+      cache->dx0_sq = cupidGC.beam_sq + t;
+      cache->f3 = cupidGC.beam_sq/( par[ 3 ]*cache->dx0_sq );
 
 /* The peak value factor (thsi takes account of the reduction in peak
    value caused by the instrumental smoothing). */
-      peakfactor_sq = t/dx0_sq;
+      peakfactor_sq = t/cache->dx0_sq;
 
 /* The rest are only calculated for 2 or 3 dimensions */
       if( ndim > 1 ) {
 
 /* The total FWHM in pixels on axis 1, squared. */
          t = par[ 5 ]*par[ 5 ];
-         dx1_sq = cupidGC.beam_sq + t;
-         f5 = cupidGC.beam_sq/( par[ 5 ]*dx1_sq );
+         cache->dx1_sq = cupidGC.beam_sq + t;
+         cache->f5 = cupidGC.beam_sq/( par[ 5 ]*cache->dx1_sq );
 
 /* The peak value factor */
-         peakfactor_sq *= t/dx1_sq;
+         peakfactor_sq *= t/cache->dx1_sq;
 
 /* Trig functions */
-         cosv = cos( par[ 6 ] );
-         sinv = sin( par[ 6 ] );
+         cache->cosv = cos( par[ 6 ] );
+         cache->sinv = sin( par[ 6 ] );
 
 /* The rest is only calculated for 3 dimensions */
          if( ndim > 2 ) {
 
 /* The total FWHM in pixels on the velocity axis, squared. */
             t = par[ 8 ]*par[ 8 ];
-            dv_sq = cupidGC.velres_sq + t;
-            peakfactor_sq *= t/dv_sq;
-            f8 = cupidGC.velres_sq/( par[ 8 ]*dv_sq );
+            cache->dv_sq = cupidGC.velres_sq + t;
+            peakfactor_sq *= t/cache->dv_sq;
+            cache->f8 = cupidGC.velres_sq/( par[ 8 ]*cache->dv_sq );
          }
       }
 
 /* The peak value */
       if( peakfactor_sq > 0.0 ) {
-         peakfactor = sqrt( peakfactor_sq );
+         cache->peakfactor = sqrt( peakfactor_sq );
       } else {
-         peakfactor = 0.0;
+         cache->peakfactor = 0.0;
       }
-      peak = par[ 0 ]*peakfactor;
+      cache->peak = par[ 0 ]*cache->peakfactor;
    }
 
 /* If neccessary, re-calculate cached items which depend both on "x" and
    "par" values. */
-   if( newp || newx ) {
+   if( cache->newp || cache->newx ) {
 
 /* Offset in pixels on axis 0 of the supplied position from the peak. */
-      x0_off = x[ 0 ] - par[ 2 ];
-      if( ref ) x0_off -= ref[ 0 ];
+      cache->x0_off = x[ 0 ] - par[ 2 ];
+      if( ref ) cache->x0_off -= ref[ 0 ];
 
 /* The 1D scalar value passed to the exp() function (excluding a factor of
    -4.ln(2) ) */
       if( ndim == 1 ) {
-         em = x0_off*x0_off/dx0_sq;
+         cache->em = cache->x0_off*cache->x0_off/cache->dx0_sq;
 
 /* The rest are only calculated for 2 or 3 dimensions */
       } else {
 
 /* Offset in pixels on axis 1 of the supplied position from the peak. */
-         x1_off = x[ 1 ] - par[ 4 ];
-         if( ref ) x1_off -= ref[ 1 ];
+         cache->x1_off = x[ 1 ] - par[ 4 ];
+         if( ref ) cache->x1_off -= ref[ 1 ];
 
 /* The offsets along the principle (rotated) axes of the 2D spatial
    ellipse */
-         X0 = x0_off*cosv + x1_off*sinv;
-         X1 = -x0_off*sinv + x1_off*cosv;
+         cache->X0 = cache->x0_off*cache->cosv + cache->x1_off*cache->sinv;
+         cache->X1 = -cache->x0_off*cache->sinv + cache->x1_off*cache->cosv;
 
 /* The scalar value passed to the exp() function (excluding a factor of
    -4.ln(2) ) */
-         em = ( X0*X0/dx0_sq ) + ( X1*X1/dx1_sq );
+         cache->em = ( cache->X0*cache->X0/cache->dx0_sq ) + ( cache->X1*cache->X1/cache->dx1_sq );
 
 /* The rest is only calculated for 3 dimensions */
          if( ndim > 2) {
 
 /* Offset in pixels on the velocity axis of the supplied position from the
    peak. */
-            v_off = x[ 2 ] - par[ 7 ];
-            if( ref ) v_off -= ref[ 2 ];
+            cache->v_off = x[ 2 ] - par[ 7 ];
+            if( ref ) cache->v_off -= ref[ 2 ];
 
 /* The total offset in pixels on the velocity axis, including velocity
    gradient. */
-            vt_off = v_off - par[ 9 ]*x0_off - par[ 10 ]*x1_off;
+            cache->vt_off = cache->v_off - par[ 9 ]*cache->x0_off - par[ 10 ]*cache->x1_off;
 
 /* The scalar value passed to the exp() function (excluding a factor of
    -4.ln(2) ) */
-            em += vt_off*vt_off/dv_sq;
+            cache->em += cache->vt_off*cache->vt_off/cache->dv_sq;
 
          }
       }
 
 /* The Gaussian term in the model. */
-      expv = exp( -K*em );
+      cache->expv = exp( -K*cache->em );
 
 /* The total model value. */
-      m = peak*expv + par[ 1 ];
+      cache->m = cache->peak*cache->expv + par[ 1 ];
 
    }
 
 /* If the function value is requested, return it. */
    if( what < 0 ) {
-      ret = m;
+      ret = cache->m;
 
 /* Need to calculate the gradient if a gradient is required. */
    } else if( what == 0 ) {
-      ret = peakfactor*expv;
+      ret = cache->peakfactor*cache->expv;
 
    } else if( what == 1 ) {
       ret = 1.0;
@@ -300,9 +277,9 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 /* Handle 1D problems */
       if( ndim == 1 ) {
          if( what == 2 ) {
-            demdp = -2*x0_off/dx0_sq;
+            demdp = -2*cache->x0_off/cache->dx0_sq;
          } else if( what == 3 ) {
-            demdp = x0_off/dx0_sq;
+            demdp = cache->x0_off/cache->dx0_sq;
             demdp = -2*demdp*demdp*par[ 3 ];
          } else {
             demdp = VAL__BADD;
@@ -313,22 +290,22 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
 
 /* Establish the contribution to "demdp" from the 2 spatial axes. */
          if( what == 2 ) {
-            demdp = -2*( X0*cosv/dx0_sq - X1*sinv/dx1_sq );
+            demdp = -2*( cache->X0*cache->cosv/cache->dx0_sq - cache->X1*cache->sinv/cache->dx1_sq );
 
          } else if( what == 3 ) {
-            demdp = X0/dx0_sq;
+            demdp = cache->X0/cache->dx0_sq;
             demdp = -2*demdp*demdp*par[ 3 ];
 
          } else if( what == 4 ) {
-            demdp = -2*( X0*sinv/dx0_sq + X1*cosv/dx1_sq );
+            demdp = -2*( cache->X0*cache->sinv/cache->dx0_sq + cache->X1*cache->cosv/cache->dx1_sq );
 
          } else if( what == 5 ) {
-            demdp = X1/dx1_sq;
+            demdp = cache->X1/cache->dx1_sq;
             demdp = -2*demdp*demdp*par[ 5 ];
 
          } else if( what == 6 ) {
-            demdp = -2*( X0*( x0_off*sinv - x1_off*cosv )/dx0_sq +
-                         X1*( x0_off*cosv + x1_off*sinv )/dx1_sq );
+            demdp = -2*( cache->X0*( cache->x0_off*cache->sinv - cache->x1_off*cache->cosv )/cache->dx0_sq +
+                         cache->X1*( cache->x0_off*cache->cosv + cache->x1_off*cache->sinv )/cache->dx1_sq );
          } else {
             demdp = VAL__BADD;
          }
@@ -337,23 +314,23 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
    appropriately. */
          if( ndim > 2 ) {
             if( what == 2 ) {
-               demdp += 2*par[ 9 ]*vt_off/dv_sq;
+               demdp += 2*par[ 9 ]*cache->vt_off/cache->dv_sq;
 
             } else if( what == 4 ) {
-               demdp += 2*par[ 10 ]*vt_off/dv_sq;
+               demdp += 2*par[ 10 ]*cache->vt_off/cache->dv_sq;
 
             } else if( what == 7 ) {
-               demdp = -2*vt_off/dv_sq;
+               demdp = -2*cache->vt_off/cache->dv_sq;
 
             } else if( what == 8 ) {
-               demdp = vt_off/dv_sq;
+               demdp = cache->vt_off/cache->dv_sq;
                demdp = -2*demdp*demdp*par[ 8 ];
 
             } else if( what == 9 ) {
-               demdp = -2*vt_off*x0_off/dv_sq;
+               demdp = -2*cache->vt_off*cache->x0_off/cache->dv_sq;
 
             } else if( what == 10 ) {
-               demdp = -2*vt_off*x1_off/dv_sq;
+               demdp = -2*cache->vt_off*cache->x1_off/cache->dv_sq;
 
             }
          }
@@ -369,17 +346,17 @@ double cupidGCModel( int ndim, double *x, double *par, double *ref, int what,
    clump because of the effect of instrumental smoothing. Add on
    appropriate terms. */
          if( what == 3 ) {
-            ret += f3;
+            ret += cache->f3;
 
          } else if( what == 5 ) {
-            ret += f5;
+            ret += cache->f5;
 
          } else if( what == 8 ) {
-            ret += f8;
+            ret += cache->f8;
          }
 
 /* Apply the final scaling */
-         ret *= peak*expv;
+         ret *= cache->peak*cache->expv;
 
       } else {
          *status = SAI__ERROR;

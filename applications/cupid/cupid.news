@@ -6,6 +6,10 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.8
+   - The GaussClumps algorithm within the findclumps command has been
+   multi-threaded and so runs roughly twice as fast.
+
 Changes introduced at V2.7
 
    - A bug has been fixed in the FINDCLUMPS GaussClumps algorithm that

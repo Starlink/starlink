@@ -173,6 +173,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 */
 
 /* Local Variables: */
+   CupidGCModelCache cache;
    AstKeyMap *extra;      /* Keymap holding extra diagnostic information */
    CGEN_TYPE r0;          /* Supplied residual at initial peak */
    CGEN_TYPE r;           /* Current residual value */
@@ -332,7 +333,9 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 /* Find the Gaussian model value at the current pixel. This excludes any
    background level because the background value in "par" was set to zero
    before entring this loop. */
-               m = cupidGCModel( ndim, xx, par, NULL, -1, 1, first, status );
+               cache.newx = 1;
+               cache.newp = first;
+               m = cupidGCModel( ndim, xx, par, NULL, -1, &cache, status );
                first = 0;
 
 /* If the model value is higher than the supplied limit, indicate that the

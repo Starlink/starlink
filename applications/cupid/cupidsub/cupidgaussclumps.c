@@ -5,6 +5,7 @@
 #include "ndf.h"
 #include "cupid.h"
 #include "star/hds.h"
+#include "star/thr.h"
 #include <math.h>
 #include <stdio.h>
 #include <signal.h>
@@ -22,9 +23,10 @@ jmp_buf CupidGCHere;
    this structure are initialised in cupidSetInit. */
 CupidGC cupidGC;
 
-HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void *ipd,
-                          double *ipv, double rms, AstKeyMap *config, int velax,
-                          double beamcorr[ 3 ], size_t *nrej, int *status ){
+HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
+                          hdsdim *subnd, void *ipd, double *ipv, double rms,
+                          AstKeyMap *config, int velax, double beamcorr[ 3 ],
+                          size_t *nrej, int *status ){
 /*
 *+
 *  Name:
@@ -38,10 +40,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     Starlink C
 
 *  Synopsis:
-*     HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd,
-*                               void *ipd, double *ipv, double rms,
-*                               AstKeyMap *config, int velax,
-*                               double beamcorr[ 3 ], size_t *nrej, int *status )
+*     HDSLoc *cupidGaussClumps( ThrWorkforce *wf, int type, int ndim, hdsdim *slbnd,
+*                          hdsdim *subnd, void *ipd, double *ipv, double rms,
+*                          AstKeyMap *config, int velax, double beamcorr[ 3 ],
+*                          size_t *nrej, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -69,6 +71,8 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
 *     terminates early.
 
 *  Parameters:
+*     wf
+*        Pointer to workforce.
 *     type
 *        An integer identifying the data type of the array values pointed to
 *        by "ipd". Must be either CUPID__DOUBLE or CUPID__FLOAT (defined in
@@ -235,6 +239,10 @@ HDSLoc *cupidGaussClumps( int type, int ndim, hdsdim *slbnd, hdsdim *subnd, void
    mean_peak = 0.0;
    sigma_peak = 0.0;
    new_peak = 0.0;
+
+/* Save the workforce pointer in the structure passed to the
+   iminimisation service functions. */
+   cupidGC.wf = wf;
 
 /* Say which method is being used. */
    msgBlankif( MSG__NORM, status );
