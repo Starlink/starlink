@@ -202,6 +202,7 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
    double sigma_peak;   /* The standard deviation of the values within "peaks" */
    double sum_peak2;    /* Sum of the squares of the values in "peaks" */
    double sum_peak;     /* Sum of the values in "peaks" */
+   double sumclump;     /* Sum of the values in a single clump */
    double sumclumps;    /* Sum of the values in all the used clumps so far */
    double sumdata;      /* Sum of the supplied data values */
    double x[ CUPID__GCNP3 ]; /* Parameters describing new Gaussian clump */
@@ -440,7 +441,8 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
                   cupidGCUpdateArrays( type, res, ipd, el, ndim, dims, x, rms,
                                        mlim, imax, peak_thresh, allowedge,
                                        slbnd, &ret, iclump, excols, mean_peak,
-                                       maxbad, &area, &sumclumps, status );
+                                       maxbad, &area, &sumclumps, &sumclump,
+                                       status );
 
 /* Dump the modified residuals if required. */
                   sprintf( buf, "residuals%lu", iclump );
@@ -449,7 +451,7 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
 
 /* Display the clump parameters on the screen if required. */
                   cupidGCListClump( iclump, ndim, x, chisq, slbnd,
-                                    rms, status );
+                                    rms, sumclump, status );
 
 /* If this clump has a peak value which is below the threshold, increment
    the count of consecutive clumps with peak value below the threshold.
@@ -474,7 +476,7 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
                      msgOutiff( MSG__VERB, "", "%zu clumps found (terminate at %zu)",
                                 status, iclump, maxclump );
                   }
-                  msgOutiff( MSG__VERB, "", "Data sum in clumps: %g (terminate at %g)",
+                  msgOutiff( MSG__VERB, "", "Data sum in clumps: %.10g (terminate at %.10g)",
                              status, sumclumps, sumdata );
                   if( peaks_below > 1 ) {
                      msgOutiff( MSG__VERB, "", "%d consecutive clumps below threshold peak (terminate at %d)",
@@ -504,8 +506,8 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
                      msgBlankif( MSG__DEBUG, status );
                      msgOutiff( MSG__DEBUG1,"",
                                 "The total data sum of the fitted "
-                                "Gaussians (%g) has reached the total "
-                                "data sum in the supplied data (%g).",
+                                "Gaussians (%.10g) has reached the total "
+                                "data sum in the supplied data (%.10g).",
                                 status, (float)sumclumps, (float)sumdata );
                      msgBlankif( MSG__DEBUG1, status );
 

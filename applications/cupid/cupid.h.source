@@ -323,7 +323,7 @@ void cupidDumpF( float *, int, hdsdim *, hdsdim *, const char *, int * );
 void cupidDumpI( int *, int, hdsdim *, hdsdim *, const char *, int * );
 void cupidEdges( float *, size_t, hdsdim[3], size_t[3], float, float, int * );
 void cupidFindback0( void *, int * );
-void cupidGCListClump( size_t, int, double *, double, hdsdim *, double, int * );
+void cupidGCListClump( size_t, int, double *, double, hdsdim *, double, double, int * );
 void cupidGCNdfClump( HDSLoc **, double, double *, double, int, hdsdim *, hdsdim *, size_t, double *, hdsdim *, hdsdim *, size_t, int *, AstKeyMap *, int, int *);
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );

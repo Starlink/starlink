@@ -22,7 +22,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
                                          int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
                                          size_t iclump, int excols, double mean_peak,
                                          double maxbad, size_t *area, double *sumclumps,
-                                         int *status ){
+                                         double *sumclump, int *status ){
 /*
 *+
 *  Name:
@@ -41,7 +41,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *                                  int allowedge, hdsdim *lbnd, HDSLoc **ndfs,
 *                                  size_t iclump, int excols, double mean_peak,
 *                                  double maxbad, size_t *area, double *sumclumps,
-*                                  int *status )
+*                                  double *sumclump, int *status )
 
 *  Description:
 *     This function removes the supplied Gaussian from the residuals array
@@ -105,6 +105,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *     area
 *        Pointer to an int in which to store the number of pixels
 *        contributing to the clump.
+*     sumclump
+*        Returned holding the sum of the data values in the fitted Gaussian.
 *     sumclumps
 *        The supplied value is incremented by the sum of the data values
 *        in the fitted Gaussian.
@@ -164,6 +166,8 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 *        Add argument "thresh".
 *     9-APR-2020 (DSB):
 *        Add argument "allowedge".
+*     5-NOV-2021 (DSB):
+*        Add argument "sumclump".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -187,7 +191,6 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
    double minr;           /* Minimum remaining residual value */
    double shiftsq;        /* Square of displacement from initial peak position */
    double sigr;           /* Std dev of remaining residual values */
-   double sum;            /* Integrated clump intensity */
    double sumr2;          /* Sum of squares of remaining residual values */
    double sumr;           /* Sum of remaining residual values */
    double xx[ 3 ];        /* Internal coords of current pixel */
@@ -271,7 +274,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
    first = 1;
    peakok = 0;
    lowpeak = 1;
-   sum = 0.0;
+   *sumclump = 0.0;
    *area = 0;
    area_off = 0;
    while( more ){
@@ -346,7 +349,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 /* Scale the model using the RMS noise so that it has the same normalisation
    as the residuals and input data, and then add it to the total clump sum. */
                   m *= rms;
-                  sum += m;
+                  *sumclump += m;
 
 /* Count the total number of pixels contributing to the peak. */
                   (*area)++;
@@ -410,7 +413,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
 
 /* Update the supplied "sumclumps" value, which holds the total
    integrated intensity in the fitted clumps. */
-   *sumclumps += sum;
+   *sumclumps += *sumclump;
 
 /* Set the specified element of the residuals array bad if the fit was
    unusable.  This prevents the any subsequent attempt to fit a Gaussian
@@ -449,7 +452,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
    }
 
 /* Display info */
-   msgSetd( "V", sum );
+   msgSetd( "V", *sumclump );
    msgSetk( "N", *area );
    msgOutif( MSG__DEBUG1, "",
              "   Integrated clump intensity: ^V (in ^N pixels)", status );
@@ -552,7 +555,7 @@ void CGEN_FUNCTION(cupidGCUpdateArrays)( CGEN_TYPE *res, CGEN_TYPE *ipd, size_t 
       }
 
 /* Create the NDF. */
-      cupidGCNdfClump( ndfs, sum, excols ? par : NULL, rms, ndim, lbox, ubox,
+      cupidGCNdfClump( ndfs, *sumclump, excols ? par : NULL, rms, ndim, lbox, ubox,
                        list_size, mlist, plist, lbnd, iclump, cupidGC.dax,
                        extra, ( bad > maxbad*( *area ) ), status );
 

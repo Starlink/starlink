@@ -3,7 +3,7 @@
 #include "mers.h"
 
 void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
-                       hdsdim *lbnd, double rms, int *status ){
+                       hdsdim *lbnd, double rms, double sum, int *status ){
 /*
 *+
 *  Name:
@@ -17,8 +17,7 @@ void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
 
 *  Synopsis:
 *     void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
-*                            hdsdim *lbnd, double rms,
-*                            int *status )
+*                            hdsdim *lbnd, double rms, double sum, int *status )
 
 *  Description:
 *     This function adds a clump to the output list.
@@ -37,6 +36,8 @@ void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
 *        The chi-squared associated with the fit.
 *     rms
 *        The RMS noise level.
+*     sum
+*        The data sum in the clump.
 *     status
 *        Pointer to the inherited status value.
 
@@ -71,6 +72,8 @@ void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
 *        Original version.
 *     14-JAN-2008 (TIMJ):
 *        Use msgOutif instead of ilevel
+*     5-NOV-2021 (DSB):
+*        Added argument sum.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,8 @@ void cupidGCListClump( size_t iclump, int ndim, double *par, double chisq,
 
    msgSetd( "V", chisq );
    msgOutif( MSG__DEBUG, "", "   Chi-squared: ^V", status );
+   msgSetd( "S", sum );
+   msgOutif( MSG__DEBUG, "", "   Data sum: ^S", status );
 
    msgSetd( "V", par[ 0 ]*rms );
    msgOutif( MSG__DEBUG, "", "   Peak intensity: ^V", status );

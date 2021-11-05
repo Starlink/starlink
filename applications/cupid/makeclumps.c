@@ -387,8 +387,9 @@ void makeclumps( int *status ) {
    const char *envvar;           /* Pointer to environment variable text */
    const gsl_rng_type *type;     /* GSL random number generator type */
    double beamcorr[ 3 ];         /* Beam widths */
+   double csum;                  /* Clump integrated intensity */
    double par[ 11 ];             /* Clump parameters */
-   double sum;                   /* Integrated intensity */
+   double sum;                   /* Total integrated intensity */
    float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
    float angle[ 2 ];             /* Values for ANGLE parameter */
@@ -772,7 +773,8 @@ void makeclumps( int *status ) {
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms, trunc, 0,
-                            0.0, 0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
+                            0.0, 0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, &csum,
+                            status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -790,7 +792,8 @@ void makeclumps( int *status ) {
                msgOutf( " ", "Creating clump %d at (%g,%g,%g)", status,
                         nc, par[2], par[4], par[7] );
             } else if( curlev == MSG__DEBUG ) {
-               cupidGCListClump( nc, sdims, par, VAL__BADD, slbnd, rms, status );
+               cupidGCListClump( nc, sdims, par, VAL__BADD, slbnd, rms,
+                                 csum, status );
             }
          }
 
@@ -805,7 +808,7 @@ void makeclumps( int *status ) {
    in the HDS object located by "obj_precat". */
             cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms,
                                   trunc, 0, 0.0, 0, slbnd, &obj_precat, i, 0,
-                                  0.0, 0, &area, &sum, status );
+                                  0.0, 0, &area, &sum, &csum, status );
 
 /* Check we have the same number of NDFs as in the main HDS array. */
             datSize( obj_precat, &st, status );
