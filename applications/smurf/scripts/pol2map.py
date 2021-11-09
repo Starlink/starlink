@@ -522,7 +522,7 @@
 *        (approximately) 13 arc-seconds (the 850 um beam width), and
 *        also reduces the noise. The smoothing kernel is derived from the
 *        two-component beam models described in the paper "A Decade of
-*        SCUBA-2: A Comprehensive Guide to Calibrating 450 μm and 850 μm
+*        SCUBA-2: A Comprehensive Guide to Calibrating 450 um and 850 um
 *        Continuum Data at the JCMT" (Mairs et al, 2021). If parameter
 *        MAPVAR is TRUE, the individual observation maps will be smoothed
 *        prior to determining the variances, thus ensuring that the
