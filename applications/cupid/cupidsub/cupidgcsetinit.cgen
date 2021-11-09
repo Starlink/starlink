@@ -189,13 +189,6 @@ void CGEN_FUNCTION(cupidGCSetInit)( CGEN_TYPE *array, double *var, int ndim,
 /* Do some initialisation if required. */
    if( init ) {
 
-/* Parameters which control the modification of the weights done by
-   cupidGCChiSq (this modification is meant to give low weights to pixels
-   which do not influence the Gaussian model, status ). */
-      cupidGC.nwf = cupidConfigI( config, "NWF", 10, status );
-      cupidGC.minwf = cupidConfigD( config, "MINWF", 0.8, status );
-      cupidGC.maxwf = cupidConfigD( config, "MAXWF", 1.1, status );
-
 /* Maximum number of function evaluations to be used when fitting an
    individual clump. */
       cupidGC.maxnf = cupidConfigI( config, "MAXNF", 100, status );

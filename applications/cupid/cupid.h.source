@@ -133,8 +133,6 @@ typedef struct CupidGC  {
    double *weight;         /* Pointer to weights for section being fitted */
    double beam_sq;         /* Square of spatial beam FWHM in pixels */
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
-   double maxwf;           /* Maximum factor for modifying weights */
-   double minwf;           /* Minimum factor for modifying weights */
    double rfctol;          /* Relative function change for convergence */
    double s0p1;            /* Chi-square stiffness parameter s0, minus 1.0 */
    double sa;              /* Chi-square stiffness parameter sa */
@@ -152,8 +150,6 @@ typedef struct CupidGC  {
    int nel;                /* Number of pixels in section being fitted */
    int nf;                 /* The invocation count from calcf */
    int npar;               /* No of free params in fit (inc. background level) */
-   int nwf;                /* Number of times to modifiy the weight array */
-
    double initpars[ CUPID__GCNP3 ];
    double pars[ CUPID__GCNP3 ];
    double *initmodel;

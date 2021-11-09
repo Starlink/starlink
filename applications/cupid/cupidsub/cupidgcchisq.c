@@ -28,10 +28,8 @@ typedef struct cupid1GCChiSqData {
    double wsum;
    double ret;
    int ndim;
-   int nwm;
    int oper;
    int what;
-   int wmod;
    size_t *stride;
    CupidGCModelCache *cache;
 } cupid1GCChiSqData;
@@ -166,19 +164,16 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
    double gback_term;      /* Gradient term to stop large shifts in bg level */
    double ret;             /* Returned value */
    double t;               /* Temporary storage */
-   double wsum;            /* Sum of weights */
    double ypar[ 11 ];      /* "xpar" ordered as if bckgnd is being fitted */
    int i;                  /* Parameter index */
    int iel;                /* Index of pixel within section currently being fitted */
    int iworker;
    int nworker;
    int what;               /* "xwhat" value assuming bckgnd is being fitted */
-   int wmod;               /* Were the weights changed? */
    size_t step;
    size_t stride[ 3 ];     /* Strides between pixels within fitted area */
 
 
-   static int nwm;         /* Number of times the weights have been modified */
    static double bg;       /* Last times background value */
    static double chisq;    /* Total modified chi squared */
    static double f3;       /* Beam smoothing factor for p[3] */
@@ -201,7 +196,6 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
    if( cupidGC.nf == 1 ) {
       for( i = 0; i < 11; i++ ) cupidGC.initpars[ i ] = xpar[ i ];
       bg = xpar[ 1 ];
-      nwm = 0;
    } else {
       for( i = 0; i < 11; i++ ) cupidGC.pars[ i ] = xpar[ i ];
    }
@@ -310,12 +304,45 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
             nworker = 1;
          }
 
+/* If this is the first iteration, modify the Gaussian weights to weight
+   down pixels that are in neighbouring overlapping sources. This is
+   guessed by looking at how far the data is from the initial model. */
+         if( cupidGC.nf == 1 ) {
+
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+               pdata = job_data + iworker;
+
+               pdata->b1 = iworker*step;
+               if( iworker < nworker - 1 ) {
+                  pdata->b2 = pdata->b1 + step - 1;
+               } else {
+                  pdata->b2 = cupidGC.nel - 1;
+               }
+
+               pdata->par = par;
+               pdata->oper = 3;
+               pdata->ndim = ndim;
+               pdata->stride = stride;
+               pdata->cache = modelcaches + iworker;
+
+               thrAddJob( wfr, 0, pdata, cupid1GCChiSq, 0, NULL, status );
+            }
+
+            thrWait( wfr, status );
+
+            cupidGC.wsum = 0;
+            for( iworker = 0; iworker < nworker; iworker++ ) {
+               pdata = job_data + iworker;
+               cupidGC.wsum += pdata->wsum;
+            }
+         }
+
 /* Submit a job to each worker thread to get the sum of the chi squared
    over a corresponding set of pixels. */
          for( iworker = 0; iworker < nworker; iworker++ ) {
             pdata = job_data + iworker;
 
-/* The iundex of the first and last pixel to be processed by the worker. */
+/* The index of the first and last pixel to be processed by the worker. */
             pdata->b1 = iworker*step;
             if( iworker < nworker - 1 ) {
                pdata->b2 = pdata->b1 + step - 1;
@@ -328,7 +355,6 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
             pdata->oper = 1;
             pdata->bg = bg;
             pdata->ndim = ndim;
-            pdata->nwm = nwm;
             pdata->stride = stride;
             pdata->cache = modelcaches + iworker;
 
@@ -341,13 +367,9 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
 
 /* Sum the contributions from all threads. */
          chisq = 0.0;
-         wmod = 0;
-         wsum = 0;
          for( iworker = 0; iworker < nworker; iworker++ ) {
             pdata = job_data + iworker;
             chisq += pdata->chisq;
-            if( pdata->wmod ) wmod = 1;
-            wsum += pdata->wsum;
          }
 
 /* The offset from the model centre to the data peak */
@@ -358,13 +380,8 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
 /* Remember the background value for next time. */
          bg = par[ 1 ];
 
-/* Increment the number of iteration sthat have made modifications to the
-   weights (if any such change has in fact been made). */
-         if( wmod ) nwm++;
-
 /* Divide by the sum of the weights . */
-         cupidGC.wsum = wsum;
-         chisq /= wsum;
+         chisq /= cupidGC.wsum;
 
 /* Modify this basic chi-squared value as described in the Stutski &
    Gusten paper. */
@@ -476,7 +493,6 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
                pdata->par = par;
                pdata->bg = bg;
                pdata->ndim = ndim;
-               pdata->nwm = nwm;
                pdata->stride = stride;
                pdata->cache = modelcaches + iworker;
             }
@@ -591,7 +607,6 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
    int dbg;                /* Has background changed? */
    int iax;
    int ndim;
-   int nwm;
    int what;
    size_t *stride;
    size_t iel;             /* Index of pixel within section currently being fitted */
@@ -613,7 +628,6 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
    par = pdata->par;
    stride = pdata->stride;
    ndim = pdata->ndim;
-   nwm = pdata->nwm;
    bg = pdata->bg;
    cache = pdata->cache;
 
@@ -631,8 +645,6 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
       prs = cupidGC.resids + b1;
 
 /* Initialise running sums. */
-      pdata->wmod = 0;
-      pdata->wsum = 0.0;
       pdata->chisq = 0.0;
 
 /* Pixel indices, within the full NDF, of the first pixel to be processed by
@@ -657,41 +669,6 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
                            status );
          res = *py - m;
 
-/* If the changing of the model parameters make little difference to the
-   residuals at a given place in the data, then those residuals should be
-   given less weight since they could dominate the chi-squared value. If
-   the residual at the current pixel has not change by much since the
-   previous call, reduce the weight associated with the pixel. However,
-   if the parameter has not change by much then you would not expect the
-   residuals to change by much. Therefore, do not reduce the weight by so
-   much if the model value at this pixel has not changed by much since the
-   last call. In order to avoid instability, we only do this modification
-   for a few iterations near the start, and then allow the fitting
-   process to complete with fixed weights. */
-         if( !cupidGC.fixback && cupidGC.nf > 2 && nwm <= cupidGC.nwf ) {
-            if( res != 0.0 && m != 0.0 && m != *pm ) {
-
-/* Only modify the weights if the background has changed. Without this,
-   the outlying background regions would be given low weights if the
-   background has not changed, resulting in the background being poorly
-   determined. */
-               if( bg != 0.0 ) {
-                  dbg = ( fabs( ( par[ 1 ] - bg )/bg ) > 0.001 );
-               } else {
-                  dbg = ( par[ 1 ] != 0.0 );
-               }
-               if( dbg ) {
-                  wf = ( res - *pu )/ res;
-                  wf /= ( m - *pm )/ m;
-                  wf = fabs( wf );
-                  wf = ( wf < cupidGC.minwf ) ? cupidGC.minwf : ( wf > cupidGC.maxwf ) ? cupidGC.maxwf : wf ;
-                  *pw *= wf;
-                  if( *pw > 1.0 ) *pw = 1.0;
-                  pdata->wmod = 1;
-               }
-            }
-         }
-
 /* Save the residual and model value at this pixel */
          *pu = res;
          *pm = m;
@@ -709,7 +686,6 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
    in a work array (pr) so that we do not need to calculate them again if
    this function is called subsequently to find the gradient for the same
    set of parameer values. */
-         pdata->wsum += *pw;
          *pr = *pw*res*rr;
          pdata->chisq += *pr*res;
          *prs = *pr*res;
@@ -787,6 +763,66 @@ static void cupid1GCChiSq( void *job_data_ptr, int *status ) {
          }
       }
 
+/* Modify the Gaussian weight to weight down pixels that include
+   contributions form neighbouring clumps. */
+   } else if( pdata->oper == 3 ) {
+
+/* Initialise pointers to the next element to be used in the arrays
+   defining the data to be fitted. Note, the elements in these arays have
+   fortran ordering (i.e. axis 0 varies most rapidly). */
+      py = cupidGC.data + b1;
+      pw = cupidGC.weight + b1;
+
+/* Initialise running sums. */
+      pdata->wsum = 0.0;
+
+/* Pixel indices, within the full NDF, of the first pixel to be processed by
+   this worker thread. */
+      rem = b1;
+      for( iax = ndim - 1; iax >= 0; iax-- ) {
+         off = rem/stride[ iax ];
+         rem -= off*stride[ iax ];
+         x[ iax ] = cupidGC.lbnd[ iax ] + off;
+      }
+
+/* Loop round all elements assigned to this thread in the section of the
+   data array which is currently being fitted. */
+      for( iel = b1; iel <= b2; iel++ ){
+
+/* Get the Gaussian model value at the centre of the current pixel. */
+         cache->newx = 1;
+         cache->newp = ( iel == b1 );
+         m = cupidGCModel( ndim, x, par, cupidGC.x_max, -1, cache,
+                           status );
+
+/* Get the residual. If the residual is not zero, modify the Gaussian
+   weight in order to give lower weight to the points that are far from the
+   initial model. Never allow a weight to increase (only decrease). */
+         res = *py - m;
+         if( res != 0.0 ){
+            wf = fabs( m/res );
+            if( wf < 1.0 ) *pw *= fabs( m/res );
+         }
+
+/* Increment running sums. */
+         pdata->wsum += *pw;
+
+/* Move the pointers on to the next pixel in the section of the data
+   array being fitted. */
+         py++;
+         pw++;
+
+/* Get the grid coords (within the full size original data array) of the
+   next pixel in the section currently being fitted. This assumes fortran
+   ordering of the elements in the arrays.*/
+         iax = 0;
+         x[ iax ] += 1.0;
+         while( x[ iax ] > cupidGC.ubnd[ iax ] ) {
+            x[ iax ] = cupidGC.lbnd[ iax ];
+            if( ++iax == ndim ) break;
+            x[ iax ] += 1.0;
+         }
+      }
 
 /* Report an error if the worker was to do an unknown job.
    ====================================================== */
