@@ -1,3 +1,10 @@
+
+/* Need sigaction to be prototyped */
+#define _POSIX_C_SOURCE 200809L
+
+/* Some compilers need this to get SA_RESTART */
+#define _DEFAULT_SOURCE
+
 #include "sae_par.h"
 #include "mers.h"
 #include "prm_par.h"
@@ -9,11 +16,13 @@
 #include <math.h>
 #include <stdio.h>
 #include <signal.h>
-#include <setjmp.h>
+#include <unistd.h>
 
-void cupidGCHandler( int );
-jmp_buf CupidGCHere;
+/* A flag used to indicate that an interupt has occurred. */
+volatile sig_atomic_t cupid_interupt = 0;
 
+/* Prototype for interupt handler. */
+void cupidGCHandler( int sig );
 
 /* Global Variables: */
 /* ================= */
@@ -241,6 +250,16 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
    sigma_peak = 0.0;
    new_peak = 0.0;
 
+/* If this is an interactive session, establish an interupt handler that
+   sets the cupid_interupt flag non-zero when an interupt occurs. */
+   if( isatty( STDIN_FILENO ) ) {
+      struct sigaction action;
+      action.sa_handler = cupidGCHandler;
+      sigemptyset( &action.sa_mask );
+      action.sa_flags = SA_RESTART | SA_RESETHAND;
+      sigaction( SIGINT, &action, NULL );
+   }
+
 /* Save the workforce pointer in the structure passed to the
    iminimisation service functions. */
    cupidGC.wf = wf;
@@ -340,30 +359,11 @@ HDSLoc *cupidGaussClumps( ThrWorkForce *wf, int type, int ndim, hdsdim *slbnd,
       peaks = astMalloc( sizeof( *peaks )*npeak );
       if( peaks ) {
          for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
-
-
-/* Use the setjmp function to define here to be the place to which the
-   signal handling function will jump when a signal is detected. Zero is
-   returned on the first invocation of setjmp. If a signal is detected,
-   a jump is made into setjmp which then returns a positive signal
-   identifier. */
-         if( setjmp( CupidGCHere ) ) {
-            iter = 0;
-            msgBlankif( MSG__QUIET, status );
-            msgOutif( MSG__QUIET, "",
-                      "Interupt detected. Clumps found so far will be saved",
-                      status );
-            msgBlankif( MSG__QUIET, status );
-         }
       }
 
-/* Set up a signal handler for the SIGINT (interupt) signal. If this
-   signal occurs, the function "cupidGCHandler" will be called. */
-      signal( SIGINT, cupidGCHandler );
-
 /* Loop round fitting a gaussian to the largest remaining peak in the
-   residuals array. */
-      while( iter && *status == SAI__OK ) {
+   residuals array. Break out of the loop if Control-C is pressed. */
+      while( iter && *status == SAI__OK && !cupid_interupt ) {
 
 /* Report the iteration number to the user if required. */
          ++niter;
@@ -638,13 +638,15 @@ void cupidGCHandler( int sig ){
 *  Purpose:
 *     Called when an interupt occurs within GaussClumps.
 
+*  Arguments:
+*     sig = int (Given)
+*        The raised signal type (should always be SIGINT).
+
 *  Description:
-*     This function is called when an interupt signal is detected during
-*     execution of the GaussClumps algorithm. It just jumps back to the
-*     location defined by the global variable "CupidGCHere", returning the
-*     signal value.
+*     When an interupt is detected (e.g. control-C) this function is
+*     called. It sets the cupid_interupt flag non-zero and returns.
 */
-   longjmp( CupidGCHere, sig );
+   cupid_interupt = 1;
 }
 
 

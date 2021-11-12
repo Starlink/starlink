@@ -6,12 +6,20 @@
 #include "star/thr.h"
 #include <math.h>
 #include <string.h>
+#include <signal.h>
 
 /* Global Variables: */
 /* ================= */
 /* A structure holding the global parameters of the GaussClump algorithm
    needed by this function. These are set by function cupidGaussClumps. */
 extern CupidGC cupidGC;
+
+/* A flag declared in cupidGaussClumps used to indicate that an interupt has
+   occurred. */
+extern volatile sig_atomic_t cupid_interupt;
+
+/* A variable used to decide if an interupt should be reported. */
+static int report_interupt = 1;
 
 /* Prototypes for local static functions. */
 /* ====================================== */
@@ -191,6 +199,13 @@ double cupidGCChiSq( ThrWorkForce *wfr, int ndim, double *xpar, int xwhat,
 
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return ret;
+
+/* Warn if control-C has been pressed. */
+   if( cupid_interupt && report_interupt ){
+      msgOut( " ", "!!! Interup detected. Program will exit after current "
+              "clump has been fitted.", status );
+      report_interupt = 0;
+   }
 
 /* Store diagnostic info */
    if( cupidGC.nf == 1 ) {
