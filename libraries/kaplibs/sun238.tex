@@ -215,6 +215,8 @@ related items to be removed.
 \item New routine kpgPutOutline creates and stores an STC polygon
       describing the spatial extent of an NDF.  It has an option to
       define a convex hull enclosing specified pixels in an array.
+\item New generic KPG1\_FMEDx derives the median of an array using
+      Wirth's method.  It is much faster than KPG1\_MEDUx.
 \item KPG1\_WRCAT can store arbitrary headers in the output catalogue.
 \item KPG1\_CORRx has a new argument which returns the number of used
       points.
@@ -21718,9 +21720,77 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
    }
 }
 \sstroutine{
+   KPG1\_FMEDx
+}{
+   Derives the unweighted fast median of a vector
+}{
+   \sstdescription{
+      This routine derives the unweighte `fast'  median of an array.
+      The method used is based on Wirth' s algorithm for selecting the
+      $K$th value, which is very fast compared with a full sort.  If there
+      is an even number of elements, the median is computed from the
+      mean of the two elements that straddle the median.
+   }
+   \sstinvocation{
+      CALL KPG1\_FMEDx( BAD, EL, ARRAY, POINT, MEDIAN, NGOOD, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         BAD = LOGICAL (Given)
+      }{
+         If BAD is .TRUE. there may be bad pixels present in the vector
+         and so should be tested.  If BAD is .FALSE. there is no testing
+         for bad values.
+      }
+      \sstsubsection{
+         EL = INTEGER (Given)
+      }{
+         The number of elements within the array to sort.
+      }
+      \sstsubsection{
+         ARRAY( EL ) = ? (Given and Returned)
+      }{
+         The array whose median is to be found.  On exit the array is
+         partially sorted.
+      }
+      \sstsubsection{
+         POINT( EL ) = INTEGER (Returned)
+      }{
+         Workspace to hold pointers to the original positions of the
+         data before extraction and conversion into the ARRAY array.
+      }
+      \sstsubsection{
+         MEDIAN = ? (Returned)
+      }{
+         The fast median of the array.
+      }
+      \sstsubsection{
+         NGOOD = INTEGER (Returned)
+      }{
+         The number of elements actually used after bad values have been
+         excluded.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+          There is a routine for each numeric data type: replace \texttt{"}x\texttt{"}  in
+         the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         array and MEDIAN arguments supplied to the routine must have the
+         data type specified.
+      }
+   }
+}
+\sstroutine{
    KPG1\_FRACx
 }{
-   Finds values corresponding to specified fractions of an array\texttt{'} s
+   Finds values corresponding to specified fractions of an array' s
    ordered distribution
 }{
    \sstdescription{

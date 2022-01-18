@@ -93,7 +93,7 @@ KPG_NXDK_GEN = kpg1_cmul.gnxdk kpg1_cmul8.gnxdk
 KPG_N_GEN =  kpg1_bl1d.gn kpg1_bor2.gn kpg1_cadd.gn \
 kpg1_chva.gn kpg1_cmpk.gn kpg1_cpbd.gn kpg1_cpbd8.gn kpg1_cpnd.gn \
 kpg1_cpnd8.gn kpg1_csub.gn kpg1_elnm.gn kpg1_expo.gn kpg1_fill.gn \
-kpg1_flip.gn kpg1_frac.gn kpg1_frac8.gn kpg1_gauf.gn kpg1_ghst.gn \
+kpg1_flip.gn kpg1_fmed.gn kpg1_frac.gn kpg1_frac8.gn kpg1_gauf.gn kpg1_ghst.gn \
 kpg1_ghst8.gn kpg1_hsta.gn kpg1_hstq.gn kpg1_loct.gn kpg1_loga.gn \
 kpg1_mani.gn kpg1_mean.gn kpg1_medu.gn kpg1_mode.gn \
 kpg1_mmth.gn kpg1_mxme.gn kpg1_mxmn.gn kpg1_nois.gn \

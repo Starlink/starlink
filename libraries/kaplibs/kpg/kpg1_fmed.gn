@@ -1,0 +1,212 @@
+      SUBROUTINE KPG1_FMED<T>( BAD, EL, ARRAY, POINT, MEDIAN, NGOOD,
+     :                       STATUS )
+*+
+*  Name:
+*     KPG1_FMEDx
+ 
+*  Purpose:
+*     Derives the unweighted fast median of a vector.
+ 
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL KPG1_FMEDx( BAD, EL, ARRAY, POINT, MEDIAN, NGOOD, STATUS )
+ 
+*  Description:
+*     This routine derives the unweighted "fast" median of an array.
+*     The method used is based on Wirth's algorithm for selecting the
+*     Kth value, which is very fast compared with a full sort.  If there
+*     is an even number of elements, the median is computed from the
+*     mean of the two elements that straddle the median.
+ 
+*  Arguments:
+*     BAD = LOGICAL (Given)
+*        If BAD is .TRUE. there may be bad pixels present in the vector
+*        and so should be tested.  If BAD is .FALSE. there is no testing
+*        for bad values.
+*     EL = INTEGER (Given)
+*        The number of elements within the array to sort.
+*     ARRAY( EL ) = ? (Given and Returned)
+*        The array whose median is to be found.  On exit the array is
+*        partially sorted.
+*     POINT( EL ) = INTEGER (Returned)
+*        Workspace to hold pointers to the original positions of the
+*        data before extraction and conversion into the ARRAY array.
+*     MEDIAN = ? (Returned)
+*        The fast median of the array.
+*     NGOOD = INTEGER (Returned)
+*        The number of elements actually used after bad values have been
+*        excluded.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+ 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRAY and MEDIAN arguments supplied to the routine must have the 
+*     data type specified.
+
+*  Implementation Deficiencies:
+*     The routine could be made more efficient by using a partial
+*     Quicksort, stopping once the median is found.  The current version
+*     is an interim solution.  There may be a rounding error for an
+*     even number of integers, so it may be best to work in floating
+*     point. 
+
+*  Copyright:
+*     Copyright (C) 2022 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 51, Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+ 
+*  History:
+*     2022 January 18 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+ 
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+ 
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
+ 
+*  Arguments Given:
+      LOGICAL BAD
+ 
+*  Arguments Given and Returned:
+      INTEGER EL
+      <TYPE> ARRAY( EL )
+ 
+*  Arguments Returned:
+      INTEGER POINT( EL )
+      <TYPE> MEDIAN
+      INTEGER NGOOD              ! Actual number of values to find the
+ 
+*  Status:
+      INTEGER STATUS             ! Global status
+ 
+*  Local Variables:
+      INTEGER CURR               ! Index to current smallest value
+                                 ! during sorting
+      DOUBLE PRECISION FMED      ! Doulbe-precision median
+      INTEGER MEDPOS             ! The position of the median in the
+                                 ! sorted array
+      INTEGER INDEX              ! Index to sample elements
+      <TYPE> VAL                 ! Kth value
+ 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+ 
+*.
+ 
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+ 
+*  The number used is the input number elements unless the vector may
+*  may contain bad values.
+      NGOOD = EL
+
+      DO INDEX = 1, EL
+         POINT( INDEX ) = INDEX
+      END DO
+
+*  Given one value, there median is just that value.
+      IF ( EL .EQ. 1 ) THEN
+         MEDIAN = ARRAY( 1 )
+      ELSE
+ 
+*  Perform bad-pixel testing.
+         IF ( BAD ) THEN
+ 
+*  Initialise running total for the sum of values of valid pixels.
+            NGOOD = 0
+ 
+*  Loop through all points in the input vector.
+            DO INDEX = 1, EL
+ 
+*  If the pixel is valid then increment the number-of-values counter.
+               IF ( ARRAY( INDEX ) .NE. VAL__BAD<T> ) THEN
+                  NGOOD = NGOOD + 1
+ 
+*  Update the pointers to the positions of the unextracted data.
+                  POINT( NGOOD ) = INDEX
+
+*  Shift the value for sorting.
+                  ARRAY( NGOOD ) = ARRAY( INDEX )
+               END IF
+            END DO
+ 
+*  To avoid trashing the input array completely, replace the lost values
+*  with the magic value.
+            IF ( NGOOD .LT. EL ) THEN
+               DO INDEX = NGOOD + 1, EL
+                  ARRAY( INDEX ) = VAL__BAD<T>
+               END DO
+            END IF
+         END IF
+ 
+*  Compute the median position, or the next element above for an even
+*  number of elements.
+         MEDPOS = NGOOD / 2 + 1
+
+*  Find the median using Wirth's algorithm.
+*  ========================================
+
+*  If no usable values were found, return a bad median value.
+         IF ( NGOOD .EQ. 0 ) THEN
+            MEDIAN = VAL__BAD<T>
+
+*  Otherwise, find the median value.
+         ELSE
+            CALL CCG_KTH<T>( NGOOD, MEDPOS, ARRAY, POINT, VAL, STATUS )
+            FMED = NUM_<T>TOD( VAL )
+
+*  If number of elements is even, we need the central two values.
+            IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+
+*  Select the second values needed for median, update the used counters.
+               MEDPOS = MEDPOS - 1
+               CALL CCG_KTH<T>( NGOOD, MEDPOS, ARRAY, POINT, VAL,
+     :                        STATUS )
+
+*  Median is mean of these two values.  To avoid bias and overflows for
+*  integers, convert to double precision to evaluate the average.
+               FMED = ( FMED + NUM_<T>TOD( VAL ) ) * 0.5D0
+
+            END IF
+
+*  Set up the median value. 
+            MEDIAN = NUM_DTO<T>( FMED )
+    
+*  End of condition for number in sample and median position
+         END IF
+
+      END IF
+ 
+      END
