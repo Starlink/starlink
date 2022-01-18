@@ -8,7 +8,7 @@
 \stardocsource      {sun\stardocnumber}
 \stardocnumber      {238.9}
 \stardocauthors     {D.S. Berry \\Malcolm J. Currie}
-\stardocdate        {2014 June 9}
+\stardocdate        {2022 January 18}
 \stardoctitle     {KAPLIBS -- Internal subroutines used within
                                 the KAPPA package.}
 \stardocversion     {Version 3.5}
@@ -2301,8 +2301,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       returns the estimated variances based on order stats for the
       population sizes used at each output pixel.
 
-      The method used is based on Wirth\texttt{'} s algorithm for selecting the
-      Kth value, which is very fast compared to a full sort.
+      The method used is based on Wirth's algorithm for selecting the
+      $K$th value, which is very fast compared with a full sort.
 
       The output medians are returned in the array RESULT.
    }
@@ -2418,8 +2418,8 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       form a (fast) median line.  This method uses no weights and
       returns no variances.
 
-      The method used is based on Wirth\texttt{'} s algorithm for selecting the
-      Kth value, which is very fast compared to a full sort.
+      The method used is based on Wirth's s algorithm for selecting the
+      $K$th value, which is very fast compared with a full sort.
 
       The output medians are returned in the array RESULT.
    }
@@ -3236,6 +3236,16 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
          STATUS = INTEGER (Given)
       }{
          The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         There is a routine for each numeric data type: replace \texttt{"}x\texttt{"}
+         in the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+         ARRAY and VALUE arguments supplied to the routine must have the
+         data type specified.
       }
    }
 }
@@ -21795,7 +21805,7 @@ ZERO2D  & \multicolumn{2}{l}{KPG1\_FILLx setting the fill value to 0.0. } \\
       \sstitemlist{
 
          \sstitem
-          There is a routine for each numerical data type: replace \texttt{"} x\texttt{"}  in
+          There is a routine for each numerical data type: replace \texttt{"}x\texttt{"}  in
          the routine name by B, D, I, R, W, UB or UW as appropriate.  The
          array supplied to the routine must have the data type specified.
 

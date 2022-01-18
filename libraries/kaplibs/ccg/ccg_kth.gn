@@ -35,6 +35,12 @@
 *     STATUS = INTEGER (Given)
 *        The global status.
 
+*  Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate.  The
+*     ARRAY and VALUE arguments supplied to the routine must have the
+*     data type specified.
+
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     Copyright (C) 2009 Science & Technology Facilities Council. All
