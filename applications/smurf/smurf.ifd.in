@@ -4023,6 +4023,14 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter nomfcf {
+                type _DOUBLE
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
             parameter ntile {
                 type _INTEGER
                 access WRITE

@@ -165,6 +165,7 @@ smf_expmodel_init.c \
 smf_export_noi.c \
 smf_ext2km.c \
 smf_extracols.c \
+smf_fcf.c \
 smf_ffclean.c \
 smf_ffmask.c \
 smf_fft_2dazav.c \

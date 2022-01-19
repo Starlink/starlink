@@ -707,6 +707,10 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   double exptime;               /* Exposure time for current chunk */
+  double tot_exptime;           /* Exposure time for all pixels */
+  double fcf_s1;                /* Sum of weighted FCF values */
+  double fcf_s2;                /* Sum of FCF weight values */
+  double fcf;                   /* Nominal FCF for output map */
   int firstiter;                /* First iteration in this invocation of makemap? */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
@@ -1158,7 +1162,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
          less than 0, the scale is a multiple of PIXSIZE. */
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
       if( (*status == SAI__OK) && (downsampscale < 0) ) {
-         downsampscale = abs(downsampscale) * pixsize;
+         downsampscale = fabs(downsampscale) * pixsize;
          astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
       }
 
@@ -1695,6 +1699,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   *totexp = 0.0;
   sumwchisq1 = 0.0;
   sumwchisq2 = 0.0;
+  fcf_s1 = 0.0;
+  fcf_s2 = 0.0;
 
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt && *status == SAI__OK;
        contchunk++ ) {
@@ -3720,15 +3726,31 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         }
 
         /* Add this chunk of exposure time to the total. We assume the array was
-           initialised to zero and will not contain bad values. */
+           initialised to zero and will not contain bad values. ALso find
+           the total exposure time in this continuous chunk. */
         if( *status == SAI__OK ) {
+          tot_exptime = 0.0;
           steptime = res[0]->sdata[0]->hdr->steptime;
           for (ipix = 0; ipix < msize; ipix++ ) {
             if ( thishits[ipix] != VAL__BADI) {
-              exp_time[ipix] += chunkweight*steptime * (double)thishits[ipix];
+              exptime = chunkweight * steptime * (double)thishits[ipix];
+              exp_time[ipix] += exptime;
+              tot_exptime += exptime;
             }
           }
+
+          /* Calculate the running sums needed to get the weighted nominal
+             FCF for the resulting map, allowing for different continuous
+             chunks to  be from different FCF periods. */
+          if( tot_exptime > 0.0 ) {
+             fcf = smf_fcf( res[0]->sdata[0]->hdr, status );
+             if( fcf != VAL__BADD ) {
+                fcf_s1 += tot_exptime * fcf;
+                fcf_s2 += tot_exptime;
+             }
+          }
         }
+
         /* Update the sum of all chunk weights. */
         sumchunkweights += chunkweight;
       }
@@ -3813,6 +3835,18 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
     }
 
   }
+
+  /* Find and report the nominal FCF. */
+  if( fcf_s2 > 0.0 ) {
+     fcf = fcf_s1/fcf_s2;
+     msgOutiff( MSG__VERB, "", "Nominal FCF for output map is %g", status,
+                fcf );
+  } else {
+     fcf = 0.0;
+     msgOutif( MSG__VERB, "", "WARNING: Cannot calculate nominal FCF for "
+               "output map", status );
+  }
+  parPut0d( "NOMFCF", fcf, status );
 
   /* Normalise the weighted chi-squared, display it and write it out to a
      parameter. */

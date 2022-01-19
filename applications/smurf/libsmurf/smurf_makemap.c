@@ -264,6 +264,13 @@
 *     NMINSMP = _INTEGER (Write)
 *          Total number of continuous data chunks processed by makemap
 *          when METHOD=iterate that failed due to insufficient samples. [!]
+*     NOMFCF = _DOUBLE (Write)
+*          The nominal beam FCF for the output map (Jy/beam/pW). This will
+*          depend on the observation dates of the input time-seroes files
+*          and the filter (450 or 850). If the input data spans a critical
+*          date at which the FCF changed, the stored value will be weighted
+*          by the amount of data included in the map that was taken before
+*          and after the critical date.
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameters JSATILES and TILEDIMS). If no input data
@@ -807,6 +814,8 @@
 *        contiguous chunks that failed to converge.
 *     2019-07-9 (DSB):
 *        Ensure no output NDF is created if an error occurs.
+*     2022-1-19 (DSB):
+*        Added output parameter NOMFCF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -2028,7 +2037,7 @@ void smurf_makemap( int *status ) {
     smf_add_spectral_axis( tndf, fchan, status );
 
     /* If required, split the output map up into JSA tiles. Delete the
-       original output NDF afterwards. Always delete the output NDF if 
+       original output NDF afterwards. Always delete the output NDF if
        an error has occurred. */
     if( jsatiles ) {
        parGet0l( "TRIMTILES", &trimtiles, status );
