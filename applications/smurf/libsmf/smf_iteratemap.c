@@ -25,7 +25,7 @@
 *                    char data_units[], char data_label[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *ncontig, int *memlow,
 *                    size_t *numinsmp, size_t *numcnvg, int *iters,
-*                    int *masked, double *totexp, int *status );
+*                    int *masked, double *totexp, double *nomfcf, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -134,6 +134,8 @@
 *     totexp = double * (Returned)
 *        Total exposure time (i.e. clock time on the sky) for all chunks,
 *        in seconds.
+*     nomfcf = double * (Returned)
+*        The nominal beam FCF (Jy/beam/pW) in the returned map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -551,6 +553,8 @@
 *     2020-12-04 (DSB):
 *        Calculate and report the weighted chi-squared, summed over all chunks.
 *        This primarily gives the chi-squared in the source regions.
+*     2022-JAN-19 (DSB):
+*        Added argument nomfcf.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -668,7 +672,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     double *totexp, int *status ) {
+                     double *totexp, double *nomfcf, int *status ) {
 
   /* Local Variables */
   float ast_filt_diff;          /* Size of map-change filter */
@@ -3847,6 +3851,9 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                "output map", status );
   }
   parPut0d( "NOMFCF", fcf, status );
+
+  /* Return the nominal FCF value */
+  if( nomfcf ) *nomfcf = fcf;
 
   /* Normalise the weighted chi-squared, display it and write it out to a
      parameter. */

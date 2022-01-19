@@ -1557,7 +1557,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     double *totexp, int *status );
+                     double *totexp, double *nomfcf, int *status );
 
 const char *smf_keyname( AstKeyMap *keymap, const char *basename,
                          const char *qualifier, char *buf, size_t lbuf,

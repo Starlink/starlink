@@ -815,7 +815,7 @@
 *     2019-07-9 (DSB):
 *        Ensure no output NDF is created if an error occurs.
 *     2022-1-19 (DSB):
-*        Added output parameter NOMFCF.
+*        Added output parameter NOMFCF and FITS header NOMFCF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1682,6 +1682,7 @@ void smurf_makemap( int *status ) {
     int memlow=0;
     NdgProvenance * oprov = NULL;
     double totexp;
+    double nomfcf;
 
     /************************* I T E R A T E *************************************/
 
@@ -1825,7 +1826,7 @@ void smurf_makemap( int *status ) {
                       fts_port, maxmem-mapmem, abortsoon, &abortedat,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                       data_label, &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
-                      &ncnvg, &iters, &totexp, status );
+                      &ncnvg, &iters, &totexp, &nomfcf, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
          snr mask allocated after the first run. */
@@ -2007,6 +2008,10 @@ void smurf_makemap( int *status ) {
     /* Store the total exposure time. */
     atlPtftd( fchan, "ELAPTIME", totexp,
               "[s] Total duration of all observations in map", status );
+
+    /* Store the nominal beam FCF. */
+    atlPtftd( fchan, "NOMFCF", nomfcf,
+              "[Jy/beam/pW] Nominal beam FCF for map", status );
 
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to
