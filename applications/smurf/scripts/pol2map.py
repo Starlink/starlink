@@ -175,7 +175,7 @@
 *     FCF = _REAL (Read)
 *        The FCF value that is used to convert I, Q and U values from pW
 *        to Jy/Beam. If a null (!) value is supplied a default value is
-*        used that depends on the waveband in use and the date of the
+*        used that depends on the waveband in use and the dates of the
 *        observations being processed. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
@@ -779,6 +779,10 @@
 *    27-OCT-2021 (DSB):
 *       Change JCMT beam shape parameters to those given in Mairs et al
 *       2021 (only affects the SMOOTH450 parameter).
+*    19-JAN-2022 (DSB):
+*       If observations span a date at which the nominal FCF changed, the
+*       default FCF value is now a weighted mean of the FCFs before and
+*       after the change.
 
 '''
 
@@ -1702,38 +1706,16 @@ try:
 #  calatlogue.
    jy = parsys["JY"].value
 
-#  If we are converting to mJy/beam, get the FCF (Jy/pw).
+#  If we are converting to mJy/beam, get the FCF to use (Jy/pw).
    if jy:
       fcf = parsys["FCF"].value
+   else:
+      fcf = None
 
-#  If no FCF supplied, get the default FCF for the waveband, which
-#  depends on UT date (assume all data files are in the same FCF bin as
-#  the first data file).
-      if fcf is None:
-         utdate = get_fits_header( indata[0], "UTDATE" )
-         if utdate is None:
-            dateobs = get_fits_header( indata[0], "DATE-OBS" )
-            if dateobs is not None:
-               (date,time) = dateobs.split("T")
-               utdate = float( date.replace("-","") )
-            else:
-               raise starutil.InvalidParameterError("Neither 'UTDATE' nor "
-                      "'DATE-OBS' FITS header found in {0}".format(indata[0]))
-         utdate = float( utdate )
-
-         if filter == 450:
-            if utdate < 20180630:
-               fcf_sc2 = 531.0
-            else:
-               fcf_sc2 = 472.0
-         else:
-            if utdate < 20161101:
-               fcf_sc2 = 525.0
-            elif utdate < 20180630:
-               fcf_sc2 = 516.0
-            else:
-               fcf_sc2 = 495.0
-         fcf = degrade*fcf_sc2
+#  We do not yet have a nominal FCF value from makemap. This may be
+#  different to the FCF supplied by the user and does not include the
+#  POL2 degradation factor.
+   nomfcf = None
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
@@ -2510,10 +2492,12 @@ try:
 #  little like the mean of all maps).
       badkeys = []
 
-#  See if the coadd already exists.
+#  See if the coadd already exists. If so get the nominal beam FCF from it.
       try:
          junk = NDG( coadd, "*" )
          coadd_exists = True
+         nomfcf = float( get_fits_header( coadd, "NOMFCF" ) )
+
       except starutil.NoNdfError:
          coadd_exists = False
 
@@ -2917,6 +2901,9 @@ try:
             if smooth450:
                Smooth450( unsmoothed, coadd )
 
+#  Get the nominal beam FCF from the coadd header.
+            nomfcf = float( get_fits_header( coadd, "NOMFCF" ) )
+
 #  Modify the names of the observation maps so that they use the same scheme
 #  as those created by makemap below, and move them into the main maps
 #  directory. If required, smooth them to the 850 um resolution at the
@@ -2978,6 +2965,10 @@ try:
 #  create the catalogue.
 #  -----------------------------------------------------------
       elif ( not coadd_exists ) or cat_needs_obsmaps:
+
+#  Initialise the sumes needed to find the weighted mean FCF.
+         fcf_s1 = 0.0
+         fcf_s2 = 0.0
 
 #  Loop over all the time series files for the current Stokes parameter. Each
 #  separate observation will usually have one time series file (although
@@ -3161,6 +3152,14 @@ try:
                   if smooth450:
                      Smooth450( unsmoothed, qui_maps[key] )
 
+#  Get the nominal beam FCF and median exposure time from the map.
+                  nomfcf = float( get_fits_header( qui_maps[key], "NOMFCF" ) )
+                  exptime = float( get_fits_header( qui_maps[key], "EXP_TIME" ) )
+
+#  Increment the sumes needed to find the weighted mean FCF.
+                  fcf_s1 = exptime*nomfcf
+                  fcf_s2 = exptime
+
 #  Store FITS headers holding the pointing corrections that were actually used.
                   if dx is not None:
                      sym = invoke("$KAPPA_DIR/wcsattrib ndf={0} mode=get name='Symbol(1)'".
@@ -3200,10 +3199,9 @@ try:
 #  A map was obtained successfully. Add it to the list of maps in mapdir.
             new_maps.append( qui_maps[key] )
 
-
-
-
-
+#  Calculate the weighted mean FCF.
+         if fcf_s2 > 0.0:
+            nomfcf = fcf_s1/fcf_s2
 
 
 
@@ -3297,6 +3295,12 @@ try:
                      "because their auto-masked maps look peculiar:")
             for key in badkeys:
                msg_out( key )
+
+#  Store the nominal FCF, if available.
+         if nomfcf is not None:
+            invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=NOMFCF edit=a value={1} "
+                            "comment=\"'[Jy/beam/pW] Nominal beam FCF for map'\""
+                            " position=! mode=interface".format(coadd,nomfcf))
 
 
 
@@ -3452,6 +3456,14 @@ try:
 
 #  If required, scale the I, Q and U values from pW to mJy/beam.
          if jy:
+
+#  If no FCF was supplied on the command line, use the nominal beam
+#  FCF from the map reduced by the POL2 degradation factor.
+            if fcf is None:
+               msg_out( "Converting catalogue values to Jy using FCF {0}*{1}".format(degrade,nomfcf) )
+               fcf = degrade*nomfcf
+
+#  Scale the I, Q and U values from pW to mJy/beam.
             tcube = NDG( 1 )
             invoke( "$KAPPA_DIR/cmult in={0} out={1} scalar={2}".
                     format(cube,tcube,1000*fcf) )
