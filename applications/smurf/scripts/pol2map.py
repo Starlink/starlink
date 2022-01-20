@@ -783,6 +783,15 @@
 *       If observations span a date at which the nominal FCF changed, the
 *       default FCF value is now a weighted mean of the FCFs before and
 *       after the change.
+*    20-JAN-2022 (DSB):
+*       If an existing NDF was supplied for parameter IPREF on the command 
+*       line but an error occurred before the IPREF parameter was accessed, the 
+*       ParSys cleanup function would previously add a history record to the existing 
+*       NDF suggesting it had been created by pol2map. Fix this bug by changing 
+*       the definition of the IPREF parameter so that it always expects an existing 
+*       NDF. Then temporarily change its "exists" preoperty just before the parameter 
+*       value is accessed to cater for cases where the IPREF map is also the output 
+*       total intensity map and should therefore have a history record added.  
 
 '''
 
@@ -1441,7 +1450,7 @@ try:
                                  noprompt=True))
 
    params.append(starutil.ParNDG("IPREF", "The total intensity map to use "
-                                 "for IP correction", default=None, exists=False,
+                                 "for IP correction", default=None, exists=True,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0L("REUSE", "Re-use existing time-streams and maps?", True,
@@ -1722,7 +1731,23 @@ try:
    ipref = None
    parsys["IPCOR"].default = ( qmap is not None or umap is not None )
    if parsys["IPCOR"].value:
+
+#  If the output total intensity map is also to be used as the IPREF map,
+#  it will not currently exist. Modify the IPREF parameter "exists"
+#  property to allow for this possibility. The IPREF parameter was defined
+#  initially with "exists=True" because this prevents a new history record
+#  being added erroneously to the existing NDF in the case of an error
+#  occuring before this point in the code (the parsys class adds history
+#  records to all NDFs that have a False value for the 'exists' property).
+      parsys["IPREF"].exists = False
       ipref = parsys["IPREF"].value
+
+#  Ensure no history record is added to the ip reference map suggesting it
+#  was created by pol2map. This would otherwise happen at cleanup. If it *is*
+#  created by pol2map (due to being the IOUT image), then a suitable history
+#  record will be created as a result of it being assigned to parameter IOUT.
+      parsys["IPREF"].exists = True
+
       if not ipref:
          ipref = ref
       if not ipref or ipref == "!":
@@ -1732,11 +1757,6 @@ try:
          CheckNDF( "IPREF", ipref, pixsize, "pW" )
       ip = "ipref={0}".format(ipref)
 
-#  Ensure no history record is added to the ip reference map suggesting it
-#  was created by pol2map. This would otherwise happen at cleanup. If it *is*
-#  created by pol2map (due to being the IOUT image), then a suitable history
-#  record will be created as a result of it being assigned to parameter IOUT.
-      parsys["IPREF"].exists = True
    else:
       ip = "ipref=!"
 
