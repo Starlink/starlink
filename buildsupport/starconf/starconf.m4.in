@@ -634,7 +634,7 @@ float fred_() {
 # Define the global symbol used to access the Fortran blank common block.
 # Usually under UNIX this is _BLNK__, but gfortran uses __BLNK__, so we
 # need to check for that. Gfortran is just detected by being a GNU compiler
-# and having "Fortran (GCC) 4.x[x].x[x]" (or 1x.x[x].x[x]) as part of
+# and having "GNU Fortran * 4.x[x].x[x]" (or 1x.x[x].x[x]) as part of
 # its --version output.
 #
 # The effect of this macro is to substitute BLANK_COMMON_SYMBOL with
@@ -743,7 +743,10 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 # Work out what type to use for the trailing lengths of character strings
 # passed from Fortran to C. See the "TRAIL" descriptions in SUN/209.
 #
-# For most compilers the maximum length of a string is limited to a 32bit
+# For gfortran, version 8.1 and onwards use size_t. Earlier versions use
+# int.
+#
+# For most other compilers the maximum length of a string is limited to a 32bit
 # unsigned int, but for others, this can be a 64bit unsigned long. Currently
 # the only compilers with 64bit strings are 64bit Intel fortran and
 # Solaris studio12 with -m64.
@@ -752,8 +755,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 # to use 32bit lengths. Various attempts to trap this issue permanently
 # using a test program have failed (especially for the Intel compiler), so the
 # actual test is to check for a known 64 bit compiler first and then try a
-# program that has had some success. Note no GNU compilers seem to have this
-# problem so they are never tested.
+# program that has had some success.
 #
 # The side-effect of this macro is to substitute TRAIL_TYPE with
 # the derived value and define TRAIL_TYPE. See "f77.h" in CNF.
@@ -763,7 +765,16 @@ AC_DEFUN([STAR_CNF_TRAIL_TYPE],
     AC_FC_HAVE_PERCENTLOC dnl
     AC_CACHE_CHECK([type used for Fortran string lengths],
        [star_cv_cnf_trail_type],
-       [if test "$ac_cv_sizeof_voidp" = 8 -a "$ac_cv_fc_compiler_gnu" = no; then
+       [if test "$ac_cv_fc_compiler_gnu" = yes; then
+           if "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[8-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+              star_cv_cnf_trail_type=size_t
+           elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*1[[0-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
+              star_cv_cnf_trail_type=size_t
+           else
+              star_cv_cnf_trail_type=int
+           fi
+
+        elif test "$ac_cv_sizeof_voidp" = 8; then
            if "$FC" -V 2>&1 < /dev/null | grep 'Intel.*64' > /dev/null; then
               star_cv_cnf_trail_type=long
            elif "$FC" -V 2>&1 < /dev/null | grep 'Sun.*Fortran' > /dev/null; then
@@ -830,7 +841,7 @@ C  checks passing 4 byte character string lengths on 64bit compiler.
               AC_LANG_POP([Fortran])
            fi
         else
-dnl  sizeof(void *) != 8 or GNU so no problems.
+dnl  sizeof(void *) != 8 and not GNU so assume no problems.
            star_cv_cnf_trail_type=int
         fi
 ])
