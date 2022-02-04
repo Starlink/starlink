@@ -1110,7 +1110,7 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
 size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
                    dim_t nbolo, dim_t ntime, size_t tstride,
                    size_t bstride, size_t t_first, size_t t_last,
-                   size_t box, double clip, int *status );
+                   size_t box, double cliphi, double cliplo, int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 

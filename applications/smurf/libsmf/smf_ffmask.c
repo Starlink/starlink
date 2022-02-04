@@ -16,7 +16,8 @@
 *     size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
 *                        dim_t nbolo, dim_t ntslice, size_t tstride,
 *                        size_t bstride, size_t t_first, size_t t_last,
-*                        size_t box, double clip, int *status )
+*                        size_t box, double cliphi, double cliplo,
+*                        int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -43,8 +44,11 @@
 *     box = size_t (Given)
 *        The number of time slices corresponding to the feature size to
 *        be masked.
-*     clip = double (Given)
-*        The number of standard deviations at which the residuals should
+*     cliphi = double (Given)
+*        The upper number of standard deviations at which the residuals should
+*        be clipped on each iteration.
+*     cliplo = double (Given)
+*        The lower number of standard deviations at which the residuals should
 *        be clipped on each iteration.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -60,7 +64,13 @@
 *     - The residuals between the original and smoothed data are found,
 *     and the RMS of these residuals is found.
 *     - The supplied data array values are set bad for any residuals
-*     greater than "clip" times the RMS.
+*     greater than "cliphi" times the RMS.
+*     - The supplied data array values are also set bad for any residuals
+*     greater than "cliplo" times the RMS, so long as 3 out of the 5
+*     nearest neighbouring residuals are also greater than "cliplo".
+*     - If any data value is set bad, then a block of neighbouring data
+*     values are also set bad. Each such block is centred on the original
+*     data value and is of lenght "0.5*box".
 *     - If this results in any points being set bad, the whole process is
 *     repeated again.
 
@@ -71,6 +81,10 @@
 *  History:
 *     8-SEP-2021 (DSB):
 *        Original version.
+*     1-FEB-2022 (DSB):
+*        - Renamed argument "clip" as "cliphi".
+*        - Added argument "cliplo".
+*        - Blank out neighbouring data values when a data value is set bad.
 
 *  Copyright:
 *     Copyright (C) 2021 East Asian Observatory.
@@ -120,7 +134,8 @@ typedef struct smfFfmaskData {
    dim_t b2;
    dim_t ntslice;
    double *data;
-   double clip;
+   double cliplo;
+   double cliphi;
    size_t box;
    size_t bstride;
    size_t nbad;
@@ -133,7 +148,7 @@ typedef struct smfFfmaskData {
 size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
                    dim_t nbolo, dim_t ntslice, size_t tstride,
                    size_t bstride, size_t t_first, size_t t_last,
-                   size_t box, double clip, int *status ){
+                   size_t box, double cliphi, double cliplo, int *status ){
 
 /* Local Variables: */
    smfFfmaskData *job_data = NULL;
@@ -180,7 +195,8 @@ size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
          pdata->qua = qua;
          pdata->t_first = t_first;
          pdata->t_last = t_last;
-         pdata->clip = clip;
+         pdata->cliplo = cliplo;
+         pdata->cliphi = cliphi;
          pdata->box = box;
 
 /* Submit a job to mask the range of bolometers from b1 to b2. */
@@ -234,11 +250,18 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
    double *pd;
    double *pw;
    double *work;
-   double clip;
-   double lim;
+   double cliplo;
+   double cliphi;
+   double limhi;
+   double limlo;
    double rms;
    double s1;
+   int count;
    int done;
+   int j;
+   int jlo;
+   int jhi;
+   int qbox;
    size_t box;
    size_t bstride;
    size_t itime;
@@ -267,8 +290,10 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
    t_first = pdata->t_first;
    t_last = pdata->t_last;
    ntslice = pdata->ntslice;
-   clip = pdata->clip;
+   cliplo = pdata->cliplo;
+   cliphi = pdata->cliphi;
    box = pdata->box;
+   qbox = box/4;
    nt = t_last - t_first + 1;
 
 /* Initialise the number of values set bad by this function. */
@@ -290,7 +315,8 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
             done = 0;
             while( !done ){
 
-/* Copy the data to a new array. */
+/* Copy the data to a new array, setting values bad if they have a
+   non-good quality value. */
                pd = pd0;
                pq = pq0;
                pw = work;
@@ -343,17 +369,53 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
                   break;
                }
 
-/* For all residuals greater than "clip" RMS, set the corresponding data
+/* For all residuals greater than "cliphi" RMS, set the corresponding data
    value bad. */
                done = 1;
-               lim = rms*clip;
+               limhi = rms*cliphi;
+               limlo = rms*cliplo;
                pd = pd0;
                pw = work;
                for( itime = t_first; itime <= t_last; itime++,pw++){
-                  if( *pw != VAL__BADD && fabs( *pw ) > lim ){
-                     nbad++;
-                     *pd = VAL__BADD;
-                     done = 0;
+                  if( *pw != VAL__BADD ){
+                     if( fabs( *pw ) > limhi ){
+                        jlo = t_first - itime;
+                        if( jlo < -qbox ) jlo = -qbox;
+                        jhi = t_last - itime;
+                        if( jhi > qbox ) jhi = qbox;
+
+                        for( j = jlo; j <= jhi; j++ ){
+                           pd[ j*tstride ] = VAL__BADD;
+                        }
+
+                        nbad += jhi - jlo + 1;
+                        done = 0;
+
+/* For all residuals greater than "cliplo" RMS, set the corresponding data
+   value bad so long as 3 out of 5 of the neigbouring residuals also greater
+   than "cliplo" RMS. */
+                     } else if( fabs( *pw ) > limlo ){
+
+                        if( itime >= t_first + 2 && itime <= t_last - 2 ){
+                           count = 0;
+                           for( j = -2; j <= 2; j++ ){
+                              if( fabs( pw[j] ) > limlo ) count++;
+                           }
+                           if( count >= 3 ) {
+                              jlo = t_first - itime;
+                              if( jlo < -qbox ) jlo = -qbox;
+                              jhi = t_last - itime;
+                              if( jhi > qbox ) jhi = qbox;
+
+                              for( j = jlo; j <= jhi; j++ ){
+                                 pd[ j*tstride ] = VAL__BADD;
+                              }
+
+                              nbad += jhi - jlo + 1;
+                              done = 0;
+                           }
+                        }
+                     }
                   }
                   pd += tstride;
                }

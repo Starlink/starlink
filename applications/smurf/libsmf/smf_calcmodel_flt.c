@@ -92,9 +92,11 @@
 *        ringing  after the FLT model has been removed.
 *     2013-08-22 (DSB):
 *        Include extra checks for bad values stored for BADDA samples.
-*     20201-9-9 (DSB):
-*        Added time-based masking based on an FFCLEAN-like algorithm 
+*     2021-9-9 (DSB):
+*        Added time-based masking based on an FFCLEAN-like algorithm
 *        prior to applying the filter. See parameter "flt.clip".
+*     2022-2-1 (DSB):
+*        Modified time-based masking to use two clipping levels.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -181,7 +183,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t bolostep;               /* Number of bolos per thread */
   int box;                      /* No. of samples across largest feature */
   size_t bstride;               /* bolo stride */
-  double clip;                  /* No of sigmas at which to clip within smf_ffmask */
+  double clip[2];               /* No of sigmas at which to clip within smf_ffmask */
   double dchisq=0;              /* this - last model residual chi^2 */
   int dofft;                    /* flag if we will actually do any filtering */
   int domask;                   /* Mask residuals prior to finding FLT? */
@@ -210,6 +212,7 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   int notfirst=0;               /* flag for delaying until after 1st iter */
   size_t nsharp;                /* No. of samples within sharp features */
   dim_t ntslice=0;              /* Number of time slices */
+  int nval;                     /* Number of values obtained */
   int nw;                       /* Number of worker threads */
   int order_list;               /* List of models to re-order */
   SmfCalcModelFltData *pdata = NULL; /* Data describing worker jobs */
@@ -499,20 +502,24 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
         /* If required, identifiy sharp features in the time-streams and
            replace them with bad values. */
-        astMapGet0D( kmap, "CLIP", &clip );
-        if( clip > 0.0 && domask ){
-           smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
-                              &t_first, &t_last, status );
-           if( (int) t_first > box/2 ){
-              t_first -= box/2;
-           } else {
-              t_first = 0;
+        if( domask ){
+           astMapGet1D( kmap, "CLIP", 2, &nval, clip );
+           if( clip[ 0 ] > 0.0 ){
+              if( nval == 1 ) clip[ 1 ] = clip[ 0 ];
+
+              smf_get_goodrange( qua_data, ntslice, tstride, SMF__Q_BOUND,
+                                 &t_first, &t_last, status );
+              if( (int) t_first > box/2 ){
+                 t_first -= box/2;
+              } else {
+                 t_first = 0;
+              }
+              t_last += box/2;
+              if( t_last >= ntslice ) t_last = ntslice - 1;
+              nsharp += smf_ffmask( wf, model_data, qua_data, nbolo, ntslice,
+                                    tstride, bstride, t_first, t_last, box,
+                                    clip[0], clip[1], status );
            }
-           t_last += box/2;
-           if( t_last >= ntslice ) t_last = ntslice - 1;
-           nsharp += smf_ffmask( wf, model_data, qua_data, nbolo, ntslice,
-                                 tstride, bstride, t_first, t_last, box, clip,
-                                 status );
         }
 
         /* Apply the complementary filter to the copy of the
