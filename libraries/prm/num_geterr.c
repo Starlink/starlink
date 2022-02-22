@@ -1,4 +1,11 @@
-      SUBROUTINE NUM_GETERR( STATUS )
+#include "f77.h"
+#include <fenv.h>
+#include "sae_par.h"
+#include "prm_err.h"
+#include "prm.h"
+
+F77_SUBROUTINE(num_geterr)( INTEGER(STATUS) ) {
+/*
 *+
 *  Name:
 *     NUM_GETERR
@@ -7,7 +14,7 @@
 *     Obtain the current numeric error status
 
 *  Language:
-*     Starlink Fortran
+*     C99 (for calling from F77)
 
 *  Invocation:
 *     CALL NUM_GETERR( STATUS )
@@ -47,33 +54,29 @@
 *  History:
 *     1-OCT-2004 (TIMJ):
 *        Original version
-
-*  Notes:
-*     If you are only interested in checking whether a numeric operation
-*     succeeded, you should use NUM_ISOK().
+*     22-FEB-2022 (DSB):
+*        Re-written in C.
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+   GENPTR_INTEGER(STATUS)
 
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! For good status
+   if( *STATUS != SAI__OK ) return;
 
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define the NUM_ERROR flag
+   int flags = fetestexcept( PRM__FPEXCEPTS );
 
-*  Inherited Status:
-      INTEGER STATUS
+   if( flags & FE_DIVBYZERO ) {
+      *STATUS = PRM__FLTDZ;
+   } else if( flags & FE_OVERFLOW ) {
+      *STATUS = PRM__FLTOF;
+   } else if( flags ){
+      *STATUS = PRM__ARGIN;
+   }
 
-*.
 
-*     Do nothing if already bad status
-      IF (STATUS .NE. SAI__OK) RETURN
+}
 
-      STATUS = NUM_ERROR
-
-      END

@@ -84,6 +84,8 @@
 *        Changed to use NUM_TRAP.
 *     27-SEP-1995 (BKM):
 *        Changed LIB$ESTABLISH and LIB$REVERT calls to NUM_HANDL and NUM_REVRT
+*     22-FEB-2022 (DSB):
+*        Changed error handling to use NUM_TEST
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,13 +98,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
       INCLUDE 'PRM_PAR'          ! PRM_ public constants
-
       INCLUDE 'PRM_CONST'        ! PRM_ private constants
-
-      INCLUDE 'PRM_ERR'          ! PRM_ error codes
-
+      INCLUDE 'PRM_ERR'          ! PRM_ public constants
 
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
@@ -119,11 +117,7 @@
       INTEGER STATUS             ! Error status
 
 *  External References:
-      EXTERNAL NUM_TRAP          ! Error handling routine
-
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR flag
-
+      LOGICAL NUM_TEST           ! Error testing routine
 
 *  Local Variables:
       INTEGER I                  ! Loop counter
@@ -139,18 +133,10 @@
 
       INCLUDE 'NUM_DEF_UW'      ! Define NUM_ arithmetic functions
 
-
 *.
 
 *  Check status.
       IF( STATUS .NE. SAI__OK ) RETURN
-
-*  If required, establish the numerical error handler and initialise
-*  the common block error flag.
-      IF( .FALSE. ) THEN
-         CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
-      ENDIF
 
 *  Initialise the numerical error pointer and the error count.
       IERR = 0
@@ -195,19 +181,17 @@
 *  flag is set.  If so, put a value of VAL__BADUW in the corresponding
 *  element of the result array and increment the error count.
                IF( .FALSE. ) THEN
-                  IF( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF( NUM_TEST() ) THEN
                      RESV( I ) = VAL__BADUW
                      NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                      IF( STATUS .EQ. SAI__OK ) THEN
-                        STATUS = NUM_ERROR
+                        STATUS = PRM__FPERR
                         IERR = I
                      ENDIF
 
-*  Clear the error flag.
-                     NUM_ERROR = SAI__OK
                   ENDIF
                ENDIF
             ENDIF
@@ -245,28 +229,21 @@
 *  flag is set.  If so, put a value of VAL__BADUW in the corresponding
 *  element of the result array and increment the error count.
                IF( .FALSE. ) THEN
-                  IF( NUM_ERROR .NE. SAI__OK ) THEN
+                  IF( NUM_TEST() ) THEN
                      RESV( I ) = VAL__BADUW
                      NERR = NERR + 1
 
 *  Set a STATUS value (if not already set) and update the error
 *  pointer.
                      IF( STATUS .EQ. SAI__OK ) THEN
-                        STATUS = NUM_ERROR
+                        STATUS = PRM__FPERR
                         IERR = I
                      ENDIF
 
-*  Clear the error flag.
-                     NUM_ERROR = SAI__OK
                   ENDIF
                ENDIF
             ENDIF
  2       CONTINUE
-      ENDIF
-
-*  If required, remove the error handler.
-      IF( .FALSE. ) THEN
-         CALL NUM_REVRT
       ENDIF
 
 *  Exit routine.

@@ -30,6 +30,10 @@
  *    15-MAR-2004 (NG)
  *       Original version, based rather loosely on the num_han.c_*
  *       platform-dependent originals.
+ *    22-FEB-2022 (DSB):
+ *       This file has been superceded and is retained only to provide
+ *       no-op stubs for functions it defines. Testing for numerical
+ *       errors is now done by file num_test.c
  */
 
 /* Configured flags */
@@ -86,12 +90,12 @@ void num_handl_ ( void(*routin)() )
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street,Fifth Floor, Boston, MA

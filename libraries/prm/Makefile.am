@@ -79,8 +79,7 @@ val_negw.f val_signb.f val_signd.f \
 val_signi.f val_signr.f val_signub.f val_signuw.f val_signw.f \
 val_sind.f val_sindd.f val_sindr.f val_sinhd.f val_sinhr.f val_sinr.f \
 val_tand.f val_tandd.f val_tandr.f \
-val_tanhd.f val_tanhr.f val_tanr.f \
-num_clearerr.f num_wasok.f num_geterr.f
+val_tanhd.f val_tanhr.f val_tanr.f num_wasok.f
 
 GEN_F_ROUTINES = $(PRM_N_GEN:.gn=.f) $(PRM_CVT_ITO_GEN:.gbBdkrwW=.f) \
 $(PRM_CVT_KTO_GEN:.gbBdirwW=.f) $(PRM_CVT_DTO_GEN:.gbBikrwW=.f) \
@@ -139,7 +138,7 @@ val_uwtox.gbBdikrw vec_uwtox.gbBdikrw vec8_uwtox.gbBdikrw
 # LIBOBJS, but there's no real need, since num1_cvt.c is inside a big
 # #if which makes it define nothing if the intrinsic is defined.  Thus
 # we can compile it unconditionally.
-PLATFORM_C = num_han.c num1_cvt.c
+PLATFORM_C = num_han.c num1_cvt.c num_test.c num_geterr.c num_clearerr.c 
 
 #  Generic C functions.
 CGENERIC_ROUTINES = vecBtox.cgen vecDtox.cgen vecItox.cgen \
@@ -171,15 +170,13 @@ NORMAL_INCLUDES = \
 # corresponding .F file, which is configured by being run through the
 # Fortran preprocessor
 #
-# NUM_CMN         uses the non-standard VOLATILE keyword.
 # NUM_DEF_{R,D}   uses non-standard SIND (etc) intrinsics.
 # NUM_DEF_CVT     uses non-standard intrinsics when available,
 #                 and functions from num1_cvt.c otherwise.
 PLATFORM_INCLUDES = NUM_DEF_D NUM_DEF_R NUM_DEF_CVT
-PLATFORM_PRIVATE_INCLUDES = NUM_CMN
+PLATFORM_PRIVATE_INCLUDES =
 
 # Here are the dependencies for these files
-#NUM_CMN: NUM_CMN.F
 #NUM_DEF_D: NUM_DEF_D.F
 #NUM_DEF_R: NUM_DEF_R.F
 #NUM_DEF_CVT: NUM_DEF_CVT.F

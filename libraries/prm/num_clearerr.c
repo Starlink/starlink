@@ -1,4 +1,9 @@
-      SUBROUTINE NUM_CLEARERR()
+#include "f77.h"
+#include "prm.h"
+#include <fenv.h>
+
+F77_SUBROUTINE(num_clearerr)( void ) {
+/*
 *+
 *  Name:
 *     NUM_CLEARERR
@@ -7,7 +12,7 @@
 *     Clear the global numeric error flag
 
 *  Language:
-*     Starlink Fortran
+*     C99 (for claling from F77)
 
 *  Invocation:
 *     CALL NUM_CLEARERR()
@@ -44,29 +49,18 @@
 *  History:
 *     1-OCT-2004 (TIMJ):
 *        Original version
+*     1-OCT-2004 (TIMJ):
+*        USe NUM_CLEAR.
+*     22-FEB-2022 (DSB):
+*        Re-write in C.
 
 *  Notes:
 *     This routine should always be called prior to using NUM_ routines
 *     if the result of the routine is to be checked using NUM_WASOK or
 *     NUM_GETERR
-
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
-
-*  Global Constants:
-      INCLUDE 'SAE_PAR'          ! For good status
-
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define the NUM_ERROR flag
-*.
-
-*     Clear the error flag unconditionally
-      NUM_ERROR = SAI__OK
-
-      END
+   feclearexcept(  PRM__FPEXCEPTS );
+}
 

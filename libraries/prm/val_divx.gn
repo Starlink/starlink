@@ -70,6 +70,8 @@
 *        Changed to use NUM_TRAP.
 *     27-SEP-1995 (BKM):
 *        Changed LIB$ESTABLISH and LIB$REVERT calls to NUM_HANDL and NUM_REVRT
+*     22-FEB-2022 (DSB):
+*        Changed error handling to use NUM_TEST
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,9 +84,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
       INCLUDE 'PRM_PAR'          ! PRM_ public constants
-
+      INCLUDE 'PRM_ERR'          ! PRM_ public constants
 
 *  Arguments Given:
       LOGICAL BAD                ! The bad data flag
@@ -95,11 +96,7 @@
       INTEGER STATUS             ! Error status
 
 *  External References:
-      EXTERNAL NUM_TRAP          ! Error handling routine
-
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR flag
-
+      LOGICAL NUM_TEST           ! Error testing routine
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
@@ -109,7 +106,6 @@
       INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
 
       INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
-
 
 *.
 
@@ -123,24 +119,16 @@
      :                    ( ARG2 .EQ. VAL__BAD<T> ) ) ) THEN
          VAL_DIV<T> = VAL__BAD<T>
 
-*  Establish the error handler and initialise the common block error
-*  flag.
-      ELSE
-         CALL NUM_HANDL( NUM_TRAP )
-         NUM_ERROR = SAI__OK
-
 *  Perform the floating divide operation.
          VAL_DIV<T> = NUM_DIV<T>( ARG1, ARG2 )
 
 *  Check if the numerical error flag is set.  If so, return the result
-*  VAL__BAD<T> and set STATUS to NUM_ERROR.
-         IF( NUM_ERROR .NE. SAI__OK ) THEN
+*  VAL__BAD<T> and set STATUS to NUM__FPERR.
+         IF( NUM_TEST() ) THEN
             VAL_DIV<T> = VAL__BAD<T>
-            STATUS = NUM_ERROR
+            STATUS = PRM__FPERR
          ENDIF
 
-*  Remove the error handler.
-         CALL NUM_REVRT
       ENDIF
 
 *  Exit routine.

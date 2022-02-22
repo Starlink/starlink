@@ -50,6 +50,8 @@
 *  History:
 *     1-OCT-2004 (TIMJ):
 *        Original version
+*     22-FEB-2022 (DSB):
+*        Use NUM_TEST function instead of common block
 
 *  Notes:
 *     You should clear error status using NUM_CLEARERR before using
@@ -64,17 +66,14 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! For good status
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define the NUM_ERROR flag
+*  Local Variables:
+      INTEGER STATUS
 
 *.
-
-      IF (NUM_ERROR .EQ. SAI__OK) THEN
-         NUM_WASOK = .TRUE.
-      ELSE
-         NUM_WASOK = .FALSE.
-      END IF
+      STATUS = SAI__OK
+      CALL NUM_GETERR( STATUS )
+      NUM_WASOK = ( STATUS .EQ. SAI__OK )
 
       END

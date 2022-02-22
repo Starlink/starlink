@@ -72,6 +72,8 @@
 *        Changed LIB$ESTABLISH and LIB$REVERT calls to NUM_HANDL and NUM_REVRT
 *     2012 May 10 (MJC):
 *        Adapted from VAL_ABSI.
+*     22-FEB-2022 (DSB):
+*        Changed error handling to use NUM_TEST
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,13 +86,9 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
       INCLUDE 'PRM_PAR'          ! PRM_ public constants
-
       INCLUDE 'PRM_CONST'        ! PRM_ private constants
-
-      INCLUDE 'PRM_ERR'          ! PRM_ error codes
-
+      INCLUDE 'PRM_ERR'          ! PRM_ public constants
 
 *  Arguments Given:
       LOGICAL BAD                ! Bad data flag
@@ -100,11 +98,7 @@
       INTEGER STATUS             ! Error status
 
 *  External References:
-      EXTERNAL NUM_TRAP          ! Error handling routine
-
-*  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR flag
-
+      LOGICAL NUM_TEST           ! Error testing routine
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
@@ -114,7 +108,6 @@
       INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
 
       INCLUDE 'NUM_DEF_K'      ! Define NUM_ arithmetic functions
-
 
 *.
 
@@ -133,29 +126,21 @@
          VAL_ABSK = VAL__BADK
          STATUS = PRM__INTOF
 
-*  If the argument value is acceptable then, if required, establish the
-*  numerical error handler and initialise the common block error
-*  status.
+*  If the argument value is acceptable...
       ELSE
-         IF( .FALSE. ) THEN
-            CALL NUM_HANDL( NUM_TRAP )
-            NUM_ERROR = SAI__OK
-         ENDIF
 
 *  Evaluate the function.
          VAL_ABSK = NUM_ABSK( ARG )
 
 *  If an error handler is established, check if the numerical error
 *  flag is set.  If so, return the result VAL__BADK and set STATUS to
-*  NUM_ERROR.
+*  NUM__FPERR.
          IF( .FALSE. ) THEN
-            IF( NUM_ERROR .NE. SAI__OK ) THEN
+            IF( NUM_TEST() ) THEN
                VAL_ABSK = VAL__BADK
-               STATUS = NUM_ERROR
+               STATUS = PRM__FPERR
             ENDIF
 
-*  Remove the error handler.
-            CALL NUM_REVRT
          ENDIF
       ENDIF
 
