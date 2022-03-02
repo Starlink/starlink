@@ -796,6 +796,9 @@
 *       Streamline the handling of nominal FCF values in order to simplify
 *       it and fix a bug that left "nomfcf" set to None when the IN
 *       parameter contain only previously created maps.
+*    2-MAR-2022 (DSB):
+*       Correct syntax error when applying POL-2 degradation factor to
+*       the I map.
 *-
 
 '''
@@ -3496,8 +3499,8 @@ try:
          inbeam = get_fits_header( imap_cat, "INBEAM" )
          if not inbeam or ("pol" not in inbeam):
             tmp = NDG( 1 )
-            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=degrade".
-                 format(imap_cat,tmp ))
+            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar={2}".
+                 format(imap_cat,tmp,degrade))
             imap_cat = tmp
 
 #  Ensure the Q, U and I images all have the same bounds, equal to the
