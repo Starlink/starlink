@@ -553,6 +553,7 @@ Debian 10:
    libxdmcp-dev
    libxt-dev
    make
+   python-is-python3
    texinfo
    texlive-full
    uuid-dev
