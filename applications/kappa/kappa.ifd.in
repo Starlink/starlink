@@ -13006,6 +13006,15 @@ iraf! {
             helpkey *
         }
 
+         parameter estimator {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default Mean
+            prompt {Statistic for estimating pixel values from collapsed axes}
+            helpkey *
+         }
+
          parameter in {
             position 1
             type NDF

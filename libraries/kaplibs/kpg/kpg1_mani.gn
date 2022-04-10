@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_MANI<T>( NDIMI, DIMI, IN, NDIMO, DIMO, AXES, 
-     :                         COLOFF, EXPOFF, OUT, STATUS )
+     :                         ESTIM, COLOFF, EXPOFF, COLPIX, OUT,
+     :                         STATUS )
 *+
 *  Name:
 *     KPG1_MANIx
@@ -11,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_MANIx( NDIMI, DIMI, IN, NDIMO, DIMO, AXES, COLOFF,
-*                      EXPOFF, OUT, STATUS )
+*     CALL KPG1_MANIx( NDIMI, DIMI, IN, NDIMO, DIMO, AXES, ESTIM, 
+*                      COLOFF, EXPOFF, COLPIX, OUT, STATUS )
 
 *  Description:
 *     An input array is copied to an output array under control of a
@@ -43,6 +44,10 @@
 *        I'th dimension of the output array.  If it is zero, a new
 *        dimension will grow there.  Otherwise, it gives the index of
 *        a dimension of the input array to copy.
+*     ESTIM = CHARACTER * ( * ) (Given)
+*        The statistic to use when collapsing dimensions.  This is
+*        currently 'MEAN' or 'MEDIAN'.  The mean will be used if a value
+*        other than the permitted optiions is supplied.
 *     COLOFF( * ) = INTEGER (Returned)
 *        Workspace.  This array must have at least as many elements
 *        as the product of all the dimensions of the input array along
@@ -53,6 +58,12 @@
 *        as the product of all the newly expanded dimensions in the
 *        output array; that is the product of each element of DIMO
 *        for which the corresponding element of AXES is zero.
+*     COLPIX( * ) = ? (Returned)
+*        Workspace.  IF ESTIM is MEDIAN, this array must have at least
+*        as many elements as the product of all the dimensions of the
+*        input array along which it is to be collapsed; that is the
+*        product of each  element of DIMI whose index does not appear
+*        in AXES.
 *     OUT( * ) = ? (Returned)
 *        The output array, vectorised.  The number of elements written 
 *        is given by the product of the elements of NDIMO.
@@ -62,7 +73,7 @@
 *  Notes:
 *     -  There is a routine for all numeric data types: replace "x" in
 *     the routine name by B, D, I, R, UB, UW, or W as appropriate.  The
-*     IN and OUT arguments must have the data type specified.
+*     IN, COLPIX, and OUT arguments must have the data type specified.
 *     - The assumption that NDF__MXDIM = 7 is hard coded into this 
 *     routine.
 *     - A few arithmetic operations could be saved, at the expense of
@@ -99,6 +110,9 @@
 *  History:
 *     13-NOV-2001 (MBT):
 *        Original version.
+*     2022 April 10;(MJC):
+*        Added ESTIM and COLPIX arguments to support median collapse
+*        of axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +127,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'NDF_PAR'          ! NDF system constants
       INCLUDE 'PRM_PAR'          ! VAL__BADx constants
+      INCLUDE 'CNF_PAR'          ! CNF (C and F) constants
 
 *  Arguments Given:
       INTEGER NDIMI
@@ -121,16 +136,19 @@
       INTEGER NDIMO
       INTEGER DIMO( NDIMO )
       INTEGER AXES( NDIMO )
+      CHARACTER * ( * ) ESTIM
 
 *  Arguments Returned:
       INTEGER COLOFF( * )
       INTEGER EXPOFF( * )
+      <TYPE> COLPIX( * )
       <TYPE> OUT( * )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER * 6 UESTIM       ! Uppercase version of estimator
       INTEGER I                  ! Loop index
       INTEGER J                  ! Loop index
       INTEGER IB                 ! Loop index over base pixels
@@ -142,6 +160,7 @@
       INTEGER NCOLL              ! Num input pixels collapsed per base pixel
       INTEGER NEXP               ! Num output pixels expanded per base pixel
       INTEGER NVAL               ! Number of non-bad pixels used for sum
+      INTEGER POINT              ! Pointer to workspace index
       INTEGER POSI( NDF__MXDIM ) ! co-ordinates of current position in input
       INTEGER POSO( NDF__MXDIM ) ! co-ordinates of current position in output
       INTEGER STRIDI( NDF__MXDIM ) ! Strides through input array dimensions
@@ -276,6 +295,19 @@
 *  Loop over each base pixel in the output array, filling it and its
 *  copies as appropriate from the input array.
       CALL KPG1_FILLI( 1, NDF__MXDIM, POSO, STATUS )
+
+*  Obtain the combination statistic.
+      UESTIM = ESTIM
+      CALL CHR_UCASE( UESTIM )
+      IF ( UESTIM .NE. 'MEAN' .AND. UESTIM .NE. 'MEDIAN' ) THEN
+         UESTIM = 'MEAN'
+      END IF
+
+* Get workspace for the pointers.
+      IF ( UESTIM .EQ. 'MEDIAN' ) THEN
+         CALL PSX_CALLOC( NCOLL, '_INTEGER', POINT, STATUS )
+      END IF
+
       DO IB = 1, NBASO
 
 *  Get the offset into the array of the base output pixel from its
@@ -311,22 +343,34 @@
          IF ( NCOLL .EQ. 1 ) THEN
             PIXO = IN( IXI )
 
-*  If we are collapsing, then average over the input pixels in the 
-*  collapsed dimensions to form the output pixel.
+*  If we are collapsing, then average or take the median over the 
+*  input pixels in the collapsed dimensions to form the output pixel.
          ELSE
-            SUM = 0D0
-            NVAL = 0
-            DO IC = 1, NCOLL
-               PIXI = IN( IXI + COLOFF( IC ) )
-               IF ( PIXI .NE. VAL__BAD<T> ) THEN
-                  SUM = SUM + NUM_<T>TOD( PIXI )
-                  NVAL = NVAL + 1
+
+            IF ( UESTIM .EQ. 'MEAN' ) THEN
+               SUM = 0D0
+               NVAL = 0
+               DO IC = 1, NCOLL
+                  PIXI = IN( IXI + COLOFF( IC ) )
+                  IF ( PIXI .NE. VAL__BAD<T> ) THEN
+                     SUM = SUM + NUM_<T>TOD( PIXI )
+                     NVAL = NVAL + 1
+                  END IF
+               END DO
+               IF ( NVAL .GT. 0 ) THEN
+                  PIXO = NUM_DTO<T>( SUM / DBLE( NVAL ) )
+               ELSE
+                  PIXO = VAL__BAD<T>
                END IF
-            END DO
-            IF ( NVAL .GT. 0 ) THEN
-               PIXO = NUM_DTO<T>( SUM / DBLE( NVAL ) )
+
             ELSE
-               PIXO = VAL__BAD<T>
+               DO IC = 1, NCOLL
+                  COLPIX( IC ) = IN( IXI + COLOFF( IC ) )
+               END DO
+
+               CALL KPG1_FMED<T>( .TRUE., NCOLL, COLPIX, 
+     :                          %VAL( CNF_PVAL( POINT ) ), PIXO,
+     :                          NVAL, STATUS )               
             END IF
          END IF
 
@@ -355,5 +399,7 @@
          END IF
 
       END DO
+
+      IF ( UESTIM .EQ. 'MEDIAN' ) CALL PSX_FREE( POINT, STATUS )
 
       END

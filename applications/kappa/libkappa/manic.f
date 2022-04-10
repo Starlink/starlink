@@ -21,12 +21,12 @@
 
 *  Description:
 *     This application manipulates the dimensionality of an NDF.  The
-*     input NDF can be projected on to any N-dimensional surface (line,
-*     plane, etc.) by averaging the pixels in perpendicular directions,
-*     or grown into new dimensions by duplicating an existing
-*     N-dimensional surface.  The order of the axes can also be changed
-*     at the same time.  Any combination of these operations is also
-*     possible.
+*     input NDF can be projected on to any n-dimensional surface (line,
+*     plane, etc.) by averaging or taking the median the pixels in
+*     perpendicular directions, or grown into new dimensions by
+*     duplicating an existing n-dimensional surface.  The order of the
+*     axes can also be changed at the same time.  Any combination of
+*     these operations is also possible.
 *
 *     The shape of the output NDF is specified using parameter AXES.
 *     This is a list of integers, each element of which identifies the
@@ -52,6 +52,10 @@
 *        entire output NDF a specified number of times (see parameters
 *        LBOUND and UBOUND).  At least one non-zero value must appear
 *        in the list, and no input axis may be used more than once.
+*     ESTIMATOR = LITERAL (Read)
+*        The method by which data values in collapsed axes are combined.
+*        The permittted options are "Mean" to form the average, or
+*         "Median" to use the median.  ["Mean"]
 *     IN = NDF (Read)
 *        The input NDF.
 *     LBOUND( ) = _INTEGER (Read)
@@ -91,6 +95,10 @@
 *        input NDF called (cube).  Each element in the output is equal
 *        to the average data value in the corresponding XY plane of the
 *        input.
+*     manic in=cube out=summ axis=3 estimator=median
+*        The same as the previous example, except each output value is 
+*        equal to the median data value in the corresponding XY plane of
+*        the input cube.
 *     manic line plane [0,1] lbound=1 ubound=25
 *        This takes a one-dimensional NDF called line and expands it
 *        into a two-dimensional NDF called plane.  The second pixel axis
@@ -132,7 +140,7 @@
 *  Copyright:
 *     Copyright (C) 2001-2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2012 Science & Technology Facilities Council.
+*     Copyright (C) 2012, 2022 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -176,6 +184,8 @@
 *        Use CNF_PVAL.
 *     2012 May 8 (MJC):
 *        Add _INT64 support.
+*     2022 April 10 (MJC):
+*        Add ESTIMATOR parameter to permit collapsing using the median.
 *     {enter_further_changes_here}
 
 *-
@@ -195,6 +205,7 @@
       INTEGER STATUS
 
 *  Local Variables:
+      CHARACTER  ESTIM*( 6 )     ! Combination method, collapsed axes 
       CHARACTER ITYPE*( NDF__SZTYP )! Numeric type of NDF data component
       CHARACTER LOC1*( DAT__SZLOC ) ! Locator to the whole NDF
       CHARACTER LOC2*( DAT__SZLOC ) ! Locator to NDF AXIS array
@@ -213,6 +224,7 @@
       INTEGER DFLS( NDF__MXDIM ) ! Default lower bounds
       INTEGER DIMI( NDF__MXDIM ) ! Dimensions of input NDF
       INTEGER DIMO( NDF__MXDIM ) ! Dimensions of output NDF
+      INTEGER DUMMY              ! Pointer to dummy work array
       INTEGER I                  ! Loop variable
       INTEGER IBASE              ! Index of Base Frame in WCS FrameSet
       INTEGER ICURR              ! Index of Current Frame in WCS
@@ -232,6 +244,7 @@
                                  ! array
       INTEGER IPWKC              ! Pointer to workspace
       INTEGER IPWKE              ! Pointer to workspace
+      INTEGER IPWKP              ! Pointer to workspace
       INTEGER IWCS               ! AST pointer to WCS FrameSet of NDF
       INTEGER J                  ! Loop variable
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
@@ -289,6 +302,11 @@
       CALL KPG1_FILLI( NDIMI, NDF__MXDIM, MAXS, STATUS )
       CALL PAR_GRMVI( 'AXES', NDF__MXDIM, MINS, MAXS, AXES, NDIMO,
      :                STATUS )
+
+*  Obtain the method to use for estimating the pixel values from
+*  collapsed axes.
+      CALL PAR_CHOIC( 'ESTIMATOR', 'Mean', 'Mean,Median',  .TRUE.,
+     :                ESTIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  See which dimensions of the input array are used in the output array
@@ -595,10 +613,6 @@
          END IF
       END DO
 
-*  Allocate workspace.
-      CALL PSX_CALLOC( NWKC, '_INTEGER', IPWKC, STATUS )
-      CALL PSX_CALLOC( NWKE, '_INTEGER', IPWKE, STATUS )
-
 *  Get the data type of the NDF's DATA component.
       CALL NDF_TYPE( INDF1, 'DATA', ITYPE, STATUS )
 
@@ -606,61 +620,74 @@
       CALL NDF_MAP( INDF1, 'DATA', ITYPE, 'READ', IPDI, NEL, STATUS )
       CALL NDF_MAP( INDF2, 'DATA', ITYPE, 'WRITE', IPDO, NEL, STATUS )
 
+*  Allocate workspace.
+      CALL PSX_CALLOC( NWKC, '_INTEGER', IPWKC, STATUS )
+      CALL PSX_CALLOC( NWKE, '_INTEGER', IPWKE, STATUS )
+      CALL PSX_CALLOC( NWKC, ITYPE, IPWKP, STATUS )
+
 *  Do the data pixel copying.
       IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                     AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     %VAL( CNF_PVAL( IPWKP ) ),
      :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                     AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     %VAL( CNF_PVAL( IPWKP ) ),
      :                     %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
          CALL KPG1_MANIK( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPDI ) ),
      :                    NDIMO, DIMO,
-     :                    AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                    AXES, ESTIM, %VAL( CNF_PVAL( IPWKC ) ),
      :                    %VAL( CNF_PVAL( IPWKE ) ),
+     :                    %VAL( CNF_PVAL( IPWKP ) ),
      :                    %VAL( CNF_PVAL( IPDO ) ), STATUS )
       END IF
 
@@ -685,57 +712,65 @@
          IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPG1_MANIB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                        NDIMO, DIMO,
-     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                        AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                        %VAL( CNF_PVAL( IPWKE ) ),
+     :                        %VAL( CNF_PVAL( IPWKP ) ),
      :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_MANIW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPG1_MANIUW( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                        NDIMO, DIMO,
-     :                        AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                        AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                        %VAL( CNF_PVAL( IPWKE ) ),
+     :                        %VAL( CNF_PVAL( IPWKP ) ),
      :                        %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_MANII( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INT64' ) THEN
             CALL KPG1_MANIK( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_MANIR( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_MANID( NDIMI, DIMI, %VAL( CNF_PVAL( IPVI ) ),
      :                       NDIMO, DIMO,
-     :                       AXES, %VAL( CNF_PVAL( IPWKC ) ),
+     :                       AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
      :                       %VAL( CNF_PVAL( IPWKE ) ),
+     :                       %VAL( CNF_PVAL( IPWKP ) ),
      :                       %VAL( CNF_PVAL( IPVO ) ), STATUS )
          END IF
 
@@ -756,11 +791,12 @@
          CALL NDF_MAP( INDF2, 'QUALITY', '_UBYTE', 'WRITE', IPQO, NEL,
      :                 STATUS )
 
-*  Do the quality pixel copying.
+*  Do the quality pixel copying.  Use a dummy argument for the unused
+*  pixel work array.
          CALL KPG1_MANIUB( NDIMI, DIMI, %VAL( CNF_PVAL( IPQI ) ),
      :                     NDIMO, DIMO,
-     :                     AXES, %VAL( CNF_PVAL( IPWKC ) ),
-     :                     %VAL( CNF_PVAL( IPWKE ) ),
+     :                     AXES, 'MEAN', %VAL( CNF_PVAL( IPWKC ) ),
+     :                     %VAL( CNF_PVAL( IPWKE ) ), DUMMY,
      :                     %VAL( CNF_PVAL( IPQO ) ), STATUS )
 
 *  Unmap the quality arrays.
@@ -771,6 +807,7 @@
 *  Release the workspace.
       CALL PSX_FREE( IPWKC, STATUS )
       CALL PSX_FREE( IPWKE, STATUS )
+      CALL PSX_FREE( IPWKP, STATUS )
 
 *  Come here if something has gone wrong.
   999 CONTINUE

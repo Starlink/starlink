@@ -64,6 +64,12 @@
       values are also written to a new output parameter called
       PIXVALS.
 
+   o  MANIC
+
+      - It is now possible to collapse axes using a median instead
+      of the default mean, controlled by a new parameter called
+      ESTIMATOR.
+
    o  NDFCOMPRESS
 
       - Parameter METHOD has a new option "BOTH" that compresses

@@ -19601,7 +19601,6 @@ KAPPA: \htmlref{HISTOGRAM}{HISTOGRAM},
          ellipse, in degrees.  Rotation from the \textit{x}-axis to the \textit{y}-axis is
          positive.  \texttt{[0.0]}
       }
-
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
       }{
@@ -30486,12 +30485,13 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
    Change the dimensionality of all or part of an NDF
 }{
    \sstdescription{
-      This application manipulates the dimensionality of an \NDFref{NDF}.  The input
-      NDF can be projected on to any \textit{n}-dimensional surface (line, plane,
-      \emph{etc.}) by averaging the pixels in perpendicular directions, or grown
-      into new dimensions by duplicating an existing \textit{n}-dimensional
-      surface.  The order of the axes can also be changed at the same time.
-      Any combination of these operations is also possible.
+      This application manipulates the dimensionality of an \NDFref{NDF}.
+      The input NDF can be projected on to any \textit{n}-dimensional surface 
+      (line, plane, \emph{etc.}) by averaging or taking the median the pixels in
+      perpendicular directions, or grown into new dimensions by duplicating an
+      existing \textit{n}-dimensional surface.  The order of the axes can also
+      be changed at the same time.  Any combination of these operations is also
+      possible.
 
       The shape of the output NDF is specified using Parameter AXES.  This
       is a list of integers, each element of which identifies the source
@@ -30519,6 +30519,13 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
          output NDF a specified number of times (see Parameters LBOUND and
          UBOUND).  At least one non-zero value must appear in the list, and
          no input axis may be used more than once.
+      }
+      \sstsubsection{
+         ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         The method by which data values in collapsed axes are combined.
+         The permittted options are \texttt{"Mean"} to form the average, or
+         \texttt{"Median"} to use the median.  \texttt{["Mean"]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -30579,6 +30586,13 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
          the single pixel axis corresponds to the \textit{z} (third) axis in an input
          NDF called (cube).  Each element in the output is equal to the
          average data value in the corresponding \textit{xy} plane of the input.
+      }
+      \sstexamplesubsection{
+         manic in=cube out=summ axis=3 estimator=median
+      }{
+         The same as the previous example, except each output value is 
+         equal to the median data value in the corresponding \textit{xy} plane of
+         the input cube.
       }
       \sstexamplesubsection{
          manic line plane [0,1] lbound=1 ubound=25
@@ -54553,10 +54567,19 @@ The following applications have been modified:
         written to a new output parameter called PIXVALS.
       \end{itemize}
 
-   \item [\htmlref{NDFCOMPRESS}{NDFCOMPRESS}]\mbox{}
+   \item [\htmlref{LISTSHOW}{LISTSHOW}]\mbox{}
       \begin{itemize}
-        \item Parameter METHOD has a new option \texttt{"BOTH"} that compresses
-        first with the SCALED scheme then applies the DELTA scheme.
+        \item New parameters called NDF and COMP allow the data, error,
+        or variance values at the catalogued positions within a chosen
+        NDF to be displayed.  These use the interpolation method specified
+        by the new Parameters METHOD and PARAMS.  The pixel values are also
+        written to a new output parameter called PIXVALS.
+      \end{itemize}
+
+   \item [\htmlref{MANIC}{MANIC}]\mbox{}
+      \begin{itemize}
+        \item It is now possible to collapse axes using a median instead
+        of the default mean, controlled by a new parameter called ESTIMATOR.
       \end{itemize}
 
    \item [\htmlref{REMQUAL}{REMQUAL}]\mbox{}
