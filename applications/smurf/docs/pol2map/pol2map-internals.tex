@@ -1,0 +1,660 @@
+\PassOptionsToPackage{font=footnotesize}{caption}
+\documentclass[twoside,11pt]{starlink}
+\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{float}
+\usepackage[labelformat=empty]{subfig}
+
+\stardocauthors     {D.S. Berry }
+\stardocdate        {14th April 2022}
+\stardoctitle       {POL2MAP internal structure}
+\stardocversion     {V1.1}
+\stardocabstract    {A description of the internal structure of the
+SMURF:POL2MAP script intended for maintainers.}
+
+\begin{document}
+\scfrontmatter
+
+\newcommand{\ptmap}{\texttt{pol2map}\ }
+\newcommand{\mmap}{\texttt{makemap}\ }
+\newcommand{\sloop}{\texttt{skyloop}\ }
+\newcommand{\cqu}{\texttt{calcqu}\ }
+\newcommand{\cp}[1]{configuration parameter \texttt{#1}\ }
+\newcommand{\pp}[1]{the \texttt{pol2map} parameter \texttt{#1}\ }
+\newcommand{\Pp}[1]{The \texttt{pol2map} parameter \texttt{#1}\ }
+
+\section{Introduction}
+The \ptmap command within the Starlink SMURF package creates a
+vector catalogue from one or more POL2 observations.  In addition, it can
+also create maps of Q, U and I --- both for individual observations and for
+the co-add of all supplied observations. It accepts either raw data or
+partially processed data (\emph{i.e.} Q/U/I time-streams or maps for
+individual observations) as input, and will apply the required processing
+to each input file to create the final catalogue.
+
+\subsection{Other Reading}
+Information about \ptmap is available in the
+following documents:
+\begin{itemize}
+\item The reference documentation describing the operation and parameters of
+\ptmap is contained within SUN/258 ``SMURF - the Sub-Millimetre User Reduction Facility''.
+\item A more extensive description of how to use \ptmap is available
+in SC/22 ``The POL-2 Data Reduction Cookbook''.
+\item An initial analysis made during POL-2 commissioning of the methods used within
+\ptmap is available in file \texttt{smurf/docs/pol2map/pol2map.tex}.
+\item A report on POL-2 data reduction methods created towards the end of
+commissioning is is available in file \texttt{smurf/docs/pol2-dr/pol2-dr.tex}.
+\item The JCMT Software Blog contains entries describing new \ptmap
+features and related POL-2 analysis added subsequent to commissioning.
+\item More information about POL2 in general and the IP model in
+particular is available on the
+\htmladdnormallink{{\em POL2 commissioning wiki}}
+{https://www.eao.hawaii.edu/pol2/Data\%20Reduction\%20And\%20Analysis}
+\latex{ (URL \texttt{https://www.eao.hawaii.edu/pol2/Data\%20Reduction\%20And\%20Analysis})}.
+\item The code comments in the script file \texttt{\$SMURF\_DIR/pol2map.py}.
+\end{itemize}
+
+\section{The \ptmap Operating Environment}
+The \ptmap command is an alias set up by the SMURF
+initialisation script, which points to the \texttt{\$SMURF\_DIR/pol2map.py}
+script. This is a stand-alone Python script that uses the facilities in
+the file \texttt{\$SMURF\_DIR/starutil.py} to provide a Starlink-like
+interface for the the \ptmap command. These facilities are used
+by various other Python scripts in SMURF - e.g. \sloop, and include
+\begin{itemize}
+\item Defining and accessing script parameters. These may be provided on the
+script's command line or via user prompts. Default values and acceptable
+data ranges may be defined. By design these parameters attempt to mimic the
+behaviour of ADAM parameters. Note though that many aspects of the ADAM parameter
+system have not been replicated, such as the help system, the PROMPT and RESET
+keywords and the facility for saving the value of each parameter in an external
+file.
+\item Running Starlink commands and accessing screen output or ADAM
+parameter values written by such commands.
+\item Managing groups of NDFs or single NDFs by providing an ``NDG'' class
+that wraps the facilities of the Starlink NDG library (see SUN/2). Within the
+\ptmap script, each group of one or more NDFs is represented by an
+instance of the NDG class.
+\item Display and logging of output information.
+\item Various other utilities, such as getting the value of a FITS
+header from an NDF.
+\end{itemize}
+The actual data processing required to produce the vector catalogue and
+other outputs is performed within various other Starlink tasks - the
+python code within the \ptmap script is used purely to glue these
+other tasks together. Tasks from the SMURF, KAPPA and POLPACK packages
+are used.
+
+\section{Use of pol2map}
+The usual way to use the \ptmap script is in a sequence of
+three invocations, or ``steps''. This is described in section 3.1, ``The
+Data Flow'', in SC/22. The first invocation creates an auto-masked total
+intensity map. This total intensity map is passed to the second
+invocation using \pp{MASK}, which uses it to create a mask
+that outlines the areas containing significant total intensity. The
+second invocation proceeds to create a new total intensity map using this
+mask to define the AST mask on every invocation (i.e. external masking is
+used rather than auto-masking). The third invocation creates Q and U
+masks using the same external mask as the second invocation. It also uses
+the externally masked total intensity map created by the second
+invocation to define the expected level of Instrumental Polarisation (IP)
+added into the Q and U data. This IP is removed (within \mmap)
+before the Q and U maps are created. Having created the externally-masked
+Q and U maps, the third invocation finished by using all three externally
+masked maps to create the final vector catalogue.
+
+The second and third invocations can be combined into a single invocation
+by assigning values to all three map output parameters (IOUT, QOUT and
+UOUT) and using the new total intensity map (i.e. the value assigned to
+IOUT) as the IP reference map assigned to \pp{IPREF}.
+
+
+\section{High Level Structure}
+
+The \ptmap script has the following sections:
+
+\begin{verbatim}
+- prologue
+- imports and function definitions
+- Get values for all script parameter
+- Classify the input data files
+- Create Stokes time series from raw input data
+- For Stokes = ( I, Q, U ):
+   - Create maps from all time series for the current Stokes parameter
+   - Coadd all maps for the current Stokes parameter
+   - Bin the coadd if the vector catalogue is to use a different bin size
+- Create the vector catalogue from the binned coadds
+- Clean up
+\end{verbatim}
+
+
+The \ptmap script starts with a Starlink-style prologue
+containing a description of the command and its parameters. This prologue
+is the primary source for the reference documentation included in SUN/258
+and should be updated each time any functionality is changed. It is
+processed using the Starlink SST package when SMURF is built, to generate
+the latex documentation included in SUN/258.
+
+Then follows a bunch of imports and the definition of some global
+variables. Several functions are then defined for later use before the
+main entry point is reached. The rest of the code is then divided into the
+following top-level functional blocks:
+
+\subsection{Get Values for all Script Parameters}
+Define the names, types, allowed values, etc, for all script
+parameters, and then get the value to use for each parameter - either
+from the command line or from a user prompt. Perform additional checks
+on the values and derive useful related values from them. The functions
+for defining and accessing script parameters are in
+\texttt{\$SMURF\_DIR/starutil.py}.
+
+
+\subsection{Classify the Input Data Files} \Pp{IN} is used to
+access a group of input NDFs. Each one is checked to see what sort of
+data it holds. Allowed forms are:
+\begin{itemize}
+\item SCUBA-2 data files containing raw POL-2 analysed intensity time
+series.
+\item SCUBA-2 data files containing down-sampled Q, U or I time series
+(these are derived from the corresponding raw analysed intensity time
+series).
+\item Two-dimensional maps holding previously generated Q, U or I images
+(these are derived from the corresponding down-sampled Q, U or I time
+series).
+\end{itemize}
+The \texttt{smurf:pol2check} command is used to do this.
+
+\subsection{Create Stokes Time Series from Raw Data}
+If the list of input data files contained any raw POL-2 analysed intensity
+time series, then these are processed using \cqu to create
+down-sampled Q, U and I time series files. All raw data files relating to
+an observation are processed by \cqu together. Each
+observation is processed separately. The resulting down-sampled Q, U and
+I time-stream files are placed in the directory specified by the script's
+QUDIR parameter. If this directory already contains pre-existing files
+with the same names, then they are retained in preference to creating new
+files by running \cqu (so long as \pp{REUSE} script
+parameter has not been set to FALSE).
+
+\subsection{Create Maps from Stokes Time Series\label{se:maps}}
+The next section creates maps from any input I, Q, U time streams - both
+those supplied directly via the ``IN'' parameter and those created from
+any raw  data files specified via ``IN''. There are two very different
+ways in which this can be done:
+\begin{itemize}
+\item If script parameter ``SKYLOOP'' is FALSE (the default), then
+\texttt{smurf:makemap} is used to process the I, Q or U time-series files
+for each observation separately. Thus \mmap is run three times
+for each observation creating an I map, a Q map and a U map for each
+individual observation. Once all observations have been processed, all the
+I maps (one for each observation) are combined to form an I co-added.
+Likewise all the Q maps are combined to form a Q co-add and all the U
+maps are combined to form a U coadd.
+\item If script parameter ``SKYLOOP'' is TRUE, then \texttt{smurf:skyloop}
+is used three times to create I, Q and U coadds. Each invocation of
+\sloop processes all available I, Q or U time-stream files from
+all observations. By default, \sloop does not create individual
+maps for individual observations - it just creates the coadd of all
+observations. However, supplying a value for the skyloop OBSDIR parameter when
+running \sloop causes maps for individual observations to be
+placed into the directory specified by OBSDIR. These are only usually
+needed if the \ptmap MAPVAR parameter is set TRUE, indicating
+that the variances in the final I, Q, U coadds and catalogue should be
+based on the spread of values seen between the individual observation maps.
+\end{itemize}
+If MAPVAR=YES, using SKYLOOP=YES produces lower variances than
+SKYLOOP=NO. See section 3.7 of the POL-2 cookbook (SC/22). If MAPVAR=NO,
+there seems to be little benefit in using \sloop.
+\subsection{Create the Coadded Maps}
+If SKYLOOP=NO, then all the individual I maps (one for each observation)
+are coadded to create an I coadd. Likewise Q and U coadds are formed from
+the individual Q or U maps. If MAPVAR=YES then the Variance values at each
+pixel in the
+three coadds are formed from the spread of values between the individual
+observation maps at the same pixel position\footnote{These variances will
+only be meaningful is a reasonable number of observations are being
+coadded.}. If MAPVAR=NO, the coadd Variances are calculated on the basis
+of the Variance values stored in the input maps, as created by
+\mmap. The MAPVAR=NO Variances are usually a lot smaller
+(unrealistically small, it may be thought), compared to the MAPVAR=YES
+variances.
+
+If SKYLOOP=YES, then the I, Q and U coadds already exist, having been created
+directly by \sloop. However, if MAPVAR=YES, then the Variances
+in these coadds need to be replaced by Variances formed from the differences
+between the individual observation maps. To do this, the individual
+observation maps formed by \sloop are coadded using
+\texttt{kappa:wcsmosaic} with GENVAR=YES. This causes the required Variances
+to be stored in the output NDF created by \texttt{wcsmosaic}. Note, the
+relationship between the individual observations maps and the coadd
+created by \sloop is not straightforward - the coadd is not
+literally the co-addition of the individual observation maps. To create
+an individual observation map, \sloop adds together the AST
+model from the final iteration with the RES (residuals) model for an
+individual observation, and then forms a map from the sum. For this
+reason, the literally co-addition of the individual observation maps is
+less reliable than the actual coadd formed directly by \sloop.
+Therefore, the Variances created by \texttt{wcsmosaic} are copied into
+the coadd created directly by \sloop, rather than just adopting
+the \texttt{wcsmosaic} output NDF as the whole coadd.
+
+\subsection{Create the Maps to Use When Creating the Catalogue}
+If an output vector catalogue is being created, we need to ensure that we
+have coadded maps, with Variances, that have the required pixel size specified
+by script parameter BINSIZE. In the face of some pressure from a few users
+to do otherwise, my advice has always been to create the
+initial maps using 4 arc-sec pixels - for both 850 and 450 um data - and
+then bin these maps up to a larger size prior to forming the catalogue
+(as if often desired by users to decrease the noise in the vector
+maps)\footnote{The alternative would be to run \mmap or
+\sloop with pixel size set to BINSIZE.}.
+This is because the behaviour of the map-making algorithm
+has been more thoroughly investigated at 4 arc-seconds than at larger
+pixel sizes. Also, the effects of pixel size on pixel SNR values, and thus
+on mask sizes (which are usually defined by SNR cuts), is not always
+understood by users. Increasing the map-maker pixel size causes the SNR
+in each pixel to increase, thus causing SNR-based masks to increase in
+area, thus muddying the waters when trying to assess the noise-reducing
+effects of increasing the pixel size\footnote{Any perceived improvement
+may simply be a consequence of increasing the mask size, rather than
+increasing the pixel size.}.
+
+However there is a complication associated with binning up the coadded
+maps. If you simply use \texttt{kappa:sqorst} (for instance) to bin up
+the maps, the variances in the binned up map will be determined assuming
+there are no pixel-to-pixel correlations in the noise in the input map -
+in other words, it is assumed that the noise will drop as the square root
+of the number of input values included in each output pixel. But SCUBA-2
+maps \emph{do} have pixel-to-pixel noise correlations, caused by the artificial
+large-scale structures introduced by the map-making algorithm. For this
+reason, the output Variances created by \texttt{sqorst} would be
+artificially low, since \texttt{sqorst} assumes that neighbouring noise
+values will tend to cancel out when coadded more than they actually do in
+the case of SCUBA-2 maps.
+
+To generate realistic variances in the binned up maps, it is necessary to
+bin up the individual observation maps and then create a new coadd with the
+larger bin size, generating new variances (in the case of MAPVAR=YES) in
+the process by looking at the variance between the binned up values at
+each point on the sky. This is done using ``\texttt{wcsmosaic
+genvar=yes}''.
+
+\subsection{Create the Vector Catalogue}
+The I, Q and U coadds at the required pixel size specified by script
+parameter BINSIZE are first trimmed so that they have the same pixel
+index bounds. They are then stacked into a cube as required by the
+\texttt{polpack:polvec} command, which is used to create the vector
+catalogue. Meta-data required by \texttt{polvec} is added to the cube,
+including suitable WCS. If required, the cube data is then converted from
+units of pW to units of mJy/beam (see script parameter JY). The FCF used
+to do this conversion is calculated by \mmap or
+\sloop and stored as a FITS header in the resulting maps. These
+values are the standard Mairs et al (2021) values, but use a weighted
+average if the data in the coadds straddle a date at which the FCF changed.
+The catalogue is then created using \texttt{polvec}. An extra column is
+then added to the catalogue that defines whether each vector is inside or
+outside the AST mask. A similar column is also added for the PCA/FLT/COM
+mask.
+
+\subsection{Clean up - and debugging}
+The names of any new maps created are recorded in the file specified by
+script parameter NEWMAPS, then all temporary NDFs created during the
+execution of the script are deleted. These NDFs can be retained for
+debugging purposes by setting script parameter RETAIN=YES when running
+\ptmap. These NDFs are stored in a subdirectory inside the
+directory specified by environment variable STAR\_TEMP, which defaults to
+\texttt{/tmp} is not specified. The path to this subdirectory is displayed when
+the script terminates. The log file created by \ptmap (see
+parameter LOGFILE) contains a record of each starlink command executed by
+\ptmap. This, together with the RETAIN parameter, allows for
+easy (ish) debugging.
+
+\section{Specific Issues}
+\subsection{Masking}
+
+When creating maps from I, Q or U time-series data - using either
+\mmap directly or via \sloop - spatial masks are used for
+various purposes. One mask is used to mask the AST model within
+\mmap / \sloop and another mask is used to mask the COM, FLT and PCA
+models (all three of these models are masked using the same mask).
+
+How to control the extent of these masks is described in
+\htmladdnormallink{{\em this blog post}}
+{https://www.eaobservatory.org/jcmt/2019/07/controlling-the-masks-used-by-pol2map/}
+\latex{ (URL \texttt{https://www.eaobservatory.org/jcmt/2019/07/controlling-the-masks-used-by-pol2map/})}.
+
+
+\subsubsection{Masking the AST model}
+The AST mask is used to suppress the growth of large scale gradients across
+the map by resetting the areas outside the mask to zero at the end of
+each \mmap or \sloop iteration. It should be large enough to enclose all
+areas where significant emission is expected, but no larger.
+
+\paragraph{Auto-masking:}
+When \pp{MASK} is set to the default value of ``AUTO'' (typically only done
+on the ``step 1'' invocation of \ptmap), a new AST mask is determined
+automatically at the end of each \mmap or \sloop iteration. The new mask
+is created by converting the current estimate of the final map into an SNR
+map and performing a cut at the SNR value given by \cp{ast.zero\_snr} (which
+defaults to 3) and then extending each ``island'' in the mask down to the
+SNR value given by \cp{ast.zero\_snrlo} (which defaults to 2). This continual
+changing of the mask after each iteration can sometimes upset the convergence
+of the algorithm, for which reason \ptmap uses \cp{ast.zero\_freeze} to freeze
+the mask when the relative map-change between iterations drops to 0.2.
+
+\paragraph{External-masking:}
+If \pp{MASK} is set to the name of an existing NDF, then the NDF is used in a
+manner determined by \pp{MASKTYPE}. By default, it is assumed that the NDF
+holds an intensity map of the sky. This map is converted to an SNR map and is
+thresholded at a  value of 3.0. Each island of emission is then extended down
+to an SNR of 2.0 to create the final mask. This is done using
+\texttt{cupid:findclumps} and occurs just before maps are created from the
+Stokes time-series data (see section \ref{se:maps}). Note, very bright
+sources are problematic because they can produce masks that cover nearly
+the whole map. To avoid this, if the source regions in the mask occupy
+more than 20\% of the good map pixels, then a new mask is created with a
+higher SNR threshold. This process is repeated until the source regions
+occupy less than 20\% of the good pixels (the SNR threshold is raised by
+a factor of 1.2 on each loop).
+
+The same mask is used on all iterations of \mmap or \sloop.
+
+External masking is usually used on the ``step 2'' and ``step 3''
+invocations  of \ptmap) to create the final I, Q and U co-adds. Note, the
+image supplied for \pp{MASK} is normally the total-intensity map created
+by the ``step 1'' invocation of \ptmap. The same mask is used to create
+the externally masked Q and U as well as the externally masked I map.
+Often, there is not much evidence for real emission in the Q and U maps,
+as the polarised intensity measured by Q and U is typically only a few
+percent of the total intensity. The external mask derived from the ``step
+1'' total intensity map will thus often enclose areas where there is no
+significant Q or U emission. This could potentially allow large scale
+artificial structures to grow in these areas (the bane of all SCUBA-2 data
+reduction). However, we continue to advise the use of the same mask for Q
+and U as for I, because processing all three Stokes parameters in the
+same way seems the most likely way to produce comparable results.
+
+
+\subsubsection{Masking the COM, FLT and PCA models}
+The other mask is used to exclude time-series data from the calculation
+of the COM, FLT and PCA models. Bright sources particularly can upset the
+calculation of these models, for instance producing ringing in the FLT
+model or negative bowling in the COM model. Time-series samples that fall
+within this mask are excluded from the calculation of each of these
+models. This mask should enclose just the brightest areas of the expected
+emission. The action of this masking results in these three models being
+largely unconstrained within the source areas of the mask. In other words, any
+spurious features that develop in the map within the masked regions will be
+blanked out by the masking and thus have no effect on the models, thus
+allowing the spurious features to remain in the map and possibly grow in
+strength. This gives rise to two considerations regarding this mask:
+
+\begin{enumerate}
+\item The masking should only be applied for a few iterations at the
+start of the map-making algorithm. By default, the masking is applied
+only until the relative map-change between iterations drops to 0.5
+(specified by \cp{xxx.zero\_niter}, where \texttt{xxx} is \texttt{flt},
+\texttt{com} or \texttt{pca}). By that time, most of the astronomical
+signal should have been moved out of the time-stream residuals and into
+the map, resulting in little need for further masking of the time-streams
+when calculating the COM, FLT and PCA models.
+
+\item The mask should be no larger than necessary, thus minimising the
+unconstrained areas of the map. How large is ``necessary'' is unclear.
+The default size (which, when using external masking, is determined by an
+SNR cut-off of 3 extended down to 2) has recently been shown to be
+sufficiently large to allow arbitrary large scale structures to appear in
+the masked regions. These structures appear to be weak but are
+sufficient to produce a noticeable zero-point offset when Q values at 450
+um are plotted against Q values at 850 um (restricted to the interior of
+the mask). The arbitrary structures that appear at the two wavelengths are
+independent of each other, and so will in general cause the values at the
+two wavelengths to be offset in different ways from the ``truth'',
+resulting in a systematic difference between the two wavelengths in the
+masked regions. Exploring the possibility for reducing the size of this
+second mask in order to minimise the offset between 450 um and 850 um is
+something which could be useful. Ray Furuya has done some work in this
+area, having been the first person to spot the 450/850 offset.
+\end{enumerate}
+
+\subsection{Use of PCA}
+The Common-mode (COM) model describes a single time-stream signal present
+in all bolometers. The Principal Component Analysis (PCA) model extends
+this concept in order to represent multiple independent time-stream
+signals (``principal components'') where each one is present in only a
+subset of bolometers. The common-mode signal can be thought of as being
+equivalent to the strongest principal component.
+
+Effectively, the PCA model caters for cases where the ``common-mode''
+signal varies across the focal plane. Varying common-mode is not a big
+problem for normal SCUBA-2 observations, where the bulk of the
+common-mode comes from sky emission that varies with time but is more or
+less constant across the focal plane at any one moment. However, it can be
+a significant feature of POL2 data because there is evidence that the
+Instrumental Polarisation varies significantly across the focal plane.
+This varying IP, acting on the flat sky emission incident on the telescope,
+will produce instrumental Q and U signals that vary across the focal
+plane. These form the common-mode signal when producing maps of Q and U.
+
+Of course there are other significant sources of non-common ``common-mode''
+present in all SCUBA-2 data. Non-POL2 data can sometimes benefit from the
+use of a PCA model, but in most cases the much higher scan speed and
+sample rate (compared to POL2 Q and U time-streams) make it untenable
+since the PCA model takes a long time to calculate and remove.
+
+In \ptmap, both COM and PCA models are used by default, with COM being
+calculated and removed before PCA on each iteration. In principle, it
+should not be necessary to use COM in addition to PCA since PCA should
+remove the common-mode signal anyway. But COM and PCA calculate the
+strongest correlated component in very different ways and so do not
+produce the same result. In practice, it seems that flatter maps are
+obtained if COM is removed independently before removing PCA.
+
+The most important parameter of the PCA model is the number of correlated
+signals (principal components) to remove. This is specified by \cp{pca.pcathresh}.
+If it was set to one, the PCA and COM models would be roughly equivalent,
+both removing the single strongest correlated signal. In practice, it
+defaults to 150 when using external masking and 50 when using
+auto-masking\footnote{Note, to specify an absolute number of components
+to remove, the supplied value for \cp{pca.pcathresh} must be negative.}.
+
+Increasing the value of \cp{pca.pcathresh} has the following effects:
+
+\begin{enumerate}
+\item On each iteration, the PCA model takes longer to calculate and remove
+as the number of components removed increases.
+\item The final map becomes flatter as the number of components removed
+increases. This diminishes artificial large scale structures but can also
+remove real astronomical structure if the value is too high.
+\item The number of map-maker iterations needed to reach convergence
+increases as the number of components removed increases. This slow-down
+in convergence is a function of the brightness of the sources within the
+data. Since sources within I maps are much stronger than within Q or U
+maps, the slow-down is much more noticeable when creating I maps.
+\end{enumerate}
+
+This final point can make it impossible to create converged I maps within
+a reasonable time in some cases, using the default values for
+\cp{pca.pcathresh}. The \ptmap script contains a trap for such cases when
+\pp{SKYLOOP} is set to FALSE (i.e. typically on step 1 - the auto-masked
+invocation). In such cases, \mmap is run with the ABORTSOON command line
+parameter set TRUE. This causes \mmap to abort as soon as it becomes
+clear that the convergence criterion (specified by configuration parameter
+MAPTOL) will not be reached within the number of iterations allowed by
+\cp{NUMITER}\footnote{This is determined at the end of each iteration from
+a scatter plot of log(relative map change) against log(iteration number)
+for all completed iterations. Such a plot is usually close to a straight
+line and so can be extrapolated to determine the likely number of
+iterations needed to reach the required relative map change, specified by
+\cp{MAPTOL}.}. If \mmap is aborted in this way, \ptmap will re-run \mmap
+again using a lower value for \cp{pca.pcathresh}. This continues until a
+value for \cp{pca.pcathresh} is found for which a map can be created
+within the maximum number of iterations.
+
+Consistency of processing is a key theme in \ptmap. By itself, the above
+scheme for modifying the value of \cp{pca.pcathresh} could lead to
+different observations being processed with different values. To avoid
+this, the above scheme is only used if:
+
+\begin{itemize}
+\item No value for \cp{pca.pcathresh} has been supplied by the user. If
+the user supplied a value, it is always used, even if doing so means that
+convergence is not reached within the allowed number of iterations.
+\item No previous maps have been made for the current field. Thus, the
+above scheme is only used when producing maps from the first observation.
+Subsequent observations use the same value even if that means that
+convergence is not reached within the allowed number of iterations. The
+value of \cp{pca.pcathresh} that was used to produce a map is stored with
+in its NDF History component and is accessed from there on subsequent
+invocations of \ptmap. Note, this means that when \ptmap is run with
+\pp{SKYLOOP} set to TRUE (typically step 2 or 3), the value to use for
+\cp{pca.pcathresh} will be read from the first auto-masked I map created
+by the earlier step 1 invocation of \ptmap.
+\end{itemize}
+
+Note, the value for \cp{pca.pcathresh} that is used to produce I maps is
+also used to produce Q and U maps. In general, the signal is much weaker
+in Q and U maps than in I maps and so it would be possible to use a
+higher value for \cp{pca.pcathresh}. This is not done however, in order
+to retain consistency in the creation of I, Q and U maps.
+
+The calculation and subtraction of the PCA model is performed within \mmap.
+See file \texttt{libsmf/smf\_calcmodel\_pca.c} in the SMURF source code
+repository.
+
+\subsection{Instrumental Polarisation Correction}
+
+A huge amount of effort has been put into determining an effective IP
+model for POL2 - starting with the work of James Kennedy who tried to use
+POL2 skydip observations to determine an IP model that included spatial
+variation across the focal plane. When the original ``stare \& spin''
+observing mode was replaced by the current ``scan \& spin'' mode, a new
+simpler IP model that included no spatial variation was derived from
+observations of an unpolarised point-like source (Uranus - see SMURF script
+\texttt{pol2ip.py}). This model was tweaked at various times, but could
+not be made to do an effective correction at 450 um (i.e. variation of Q
+and U with elevation remained even after IP correction). This model was
+then replaced by a new model determined from a set of observations of
+bright extended (possibly polarised) sources - see blog post
+https://www.eaobservatory.org/jcmt/2019/08/new-ip-models-for-pol2-data/).
+
+Both the current IP model and the previous Uranus-based IP model
+make no attempt to include any model of the physical processes that
+create IP within the telescope and instrument. They both just fit
+arbitrary polynomials to the observed IP. This is different to the
+earlier model implement by James Kennedy, which was based on the expected
+behaviour of IP, given the physical processes which create it. Pierre
+remains convinced that the IP model could be improved by incorporating
+more knowledge of the physics and optics involved in its creation.  He
+has produced several attempts at such models but none have produced
+results any better than those of the simpler models based on arbitrary
+polynomial fits. The usual test for an IP model is to porocess a set of
+Uranus observations. Since Uranus is assumed to be intrisically
+unpolarised, and significant Q or U emission in the final maps indicate
+some failing in the IP model.
+
+The subtraction of the IP is performed within \mmap, as part of the
+initial data processing performed before the iterative map-making
+algorithm begins. See file \texttt{libsmf/smf\_subip.c} in the SMURF
+source code repository.
+
+\subsection{Pointing Corrections}
+The first invocation of \ptmap, ``step 1'' - used to create the
+auto-masked I map, produces an I map from each observation independently
+using \mmap. These are then coadded. Any pointing error within an
+individual observation will result in the sources in the I map made from
+that observation being slightly displaced from those in the coadd. After
+the coadd has been created, each individual observation map is compared
+to the coadd using \texttt{kappa:align2d}. This finds the sub-pixel shift
+needed to minimize the differences between the coadd and the individual
+observation map. These offsets are stored in the FITS extension of the
+individual observation I map as headers PNTRQ\_DX and PNTRQ\_DY (arc-sec
+parallel to the celestial longitude and latitude axes).
+
+When ``step 2'' is performed, these offsets are read back from the step 1
+I maps (stored in the directory specified by \pp{MAPDIR}) and are used to
+create a text file which is then passed to \sloop and thus to \mmap
+ADAM parameter \texttt{POINTING}. This file contains details of the
+pointing corrections to be applied to the tracking information stored in
+each time-series data file. It is given as tables of longitude and
+latitude shift as function of observation time. Thus the pointing errors
+that are determined at the end of step 1 are corrected for and
+removed when maps are made in steps 2 and 3.
+
+The pointing corections that were applied by \mmap during the creation of
+an observation map are stored in the map's FITS extension in headers
+POINT\_DX and POINT\_DY. These differ from headers PNTRQ\_DX and
+PNTRQ\_DY, which hold the remaining pointing error still present in the
+map, determind by comparing the observation map to the coadd.
+
+\subsection{Units and FCFs}
+All maps produced by \ptmap are always in units of pW. This includes I, Q
+and U co-adds and all the maps stored in the MAPDIR
+directory\footnote{There have been one or two requests for a switch to
+allow the maps to be produced in mJy/beam.}. On the
+other hand, the I, Q, U and PI (polarised intensity) columns within the
+output vector catalogue are in mJy/beam by default\footnote{This can be changed
+by running \ptmap with \texttt{jy=no}, in which case the catalogue holds
+intensity values in pW.}.
+
+The FCF used to convert pW to mJy/beam can be supplied by the user using
+\pp{FCF}. If not supplied, a default is used which depends on the
+waveband (450 or 850 um) and the observation dates. These default FCFs
+are taken from Mairs et al (2021).
+
+BISTRO fields typically have 20 observations, which are usually all processed
+together by \ptmap. So there is a significant possibility that \ptmap
+will be supplied with observations that span both sides of a date when
+the FCF changed. In such cases the default FCF used to convert pW to
+mJy/beam is a weighted mean of the FCFs before and after the change. The
+weights are proportional to the amount of usable data on either side of the
+change date. How these are calculated depnds on whether \mmap or \sloop
+is being used to produce the maps:
+
+\begin{description}
+\item[\mmap]:
+The nominal FCF for each observation is determined from the observation
+start time. The weight for each observation map is equal to the median
+exposure time in the map, as stored in the EXP\_TIME keyword in the map's
+FITS extension. The FCF for the coadd is then just the weighted mean of
+th nominal FCFs for all observation maps.
+
+\item[\sloop]: The simple procedure described above cannot be used with
+\sloop since \sloop does not calculate the median exposure time for each
+individual observation map. In this case the FCF is calculated within
+\mmap, which is invoked on each iteration of \sloop. The FCF is
+calculated as a similar weighted mean within \mmap, averaged over all the
+supplied chunks of data (i.e. observations). The nominal FCF for each
+chunk is determined on the basis of the observation date for the chunk.
+The associated wirght is the total exposure time summed over all pixels
+in the map. The resulting FCF value is stored in the NOMFCF header in the
+output map's FITS extension, from where it is retrieved within \ptmap.
+\end{description}
+
+\subsection{The Default \ptmap Configuration}
+\Pp{CONFIG} allows the user to specify values for configuration
+parameters that control the map-making process. Any user-supplied
+configuration is augmented by various values determined within \ptmap and
+then passed on to \mmap or \sloop. See the user docs for \pp{CONFIG} for
+details. It is usually not necessary for the user to supply a value for
+\texttt{CONFIG} since the default configuration provided by \ptmap
+is usually sufficient. Most of this default configuration was determined over
+an extensive period during POL2 commissioning. The analyses that lead to
+some of the settings are described in articles on the POL2 commissioning
+wiki, although many are not. In addition, several years of experience
+with POL2 data has potentially made some of these earlier settings ready
+for review, although doing a complete re-assessment of the optimal
+configuration would be a very big job.
+
+The exact content of the default configuration depends on the type of
+masking being done - auto-masking or external masking - as determined by
+\pp{MASK}.
+
+\subsection{Configuring SMURF tasks}
+\subsection{Experimental Features}
+\subsubsection{A Priori Sky Maps}
+\subsubsection{Observation Weights}
+
+
+
+\end{document}
