@@ -1,0 +1,224 @@
+Most SMURF tasks are written in a way that differs substantially from
+other Starlink tasks. Firstly they are written in C rather than Fortran
+and secondly they use their own data access layer built on top of the NDF
+library, rather than using the NDF library directly.  The API for this
+data access layer does not make use of NDF identifiers, but instead uses
+a collection of C structure types to encapsulate information about a
+variety of object classes relevant to SMURF data processing.
+
+
+
+DATA STRUCTURES
+---------------
+
+Most of these structure types are defined within file libsmf/smf_typ.h
+(the ones related to the JSA tiling system are defined in file
+libsmf/jsatiles.h). The most important are described below - all are
+designed to be instrument-independent (i.e. the same structures are used
+to describe heterodyne raw data, SCUBA2 raw data, maps, cubes, etc):
+
+
+smfFile: Holds global info about a file. Main components are an NDF
+identifier and a file path. The file is now always an NDF but in the
+early days of SCUBA2 software development allowance was made for the use
+of a simple binary format that could be accessed using multi-threaded
+code (unlike NDF). In practice, code that accesses the "fd" component of
+this structure (a C file descriptor) is never actually used now. This
+provision was made in the days when typical desktop DR machines had
+insufficient memory to hold all the internal arrays required by makemap
+permanently in memory. Instead, the plan was to store them in disk files
+and then load or unload them as required during the course of a makemap
+run. With the larger memory of modern DR machines, these internal arrays
+are now just kept permanently in memory.
+
+
+smfHead: General metadata describing a single data file. The contents of
+this structure is mainly static and is stored at the time the associated
+data file is opened or created. It contains a copy of the NDF's FITS
+extension in the form of an AST FitsChan, a copy of the NDF's JCMTSTATE
+extension (as a dynamically allocated array of JCMTstate structures),
+plus various other specific headers read from the FITS extension or NDF
+structure. The main dynamic aspect of this structure is that it defines
+the "current timeslice" for time-series data (component "curframe") and
+provides access to the JCMTState (component "state") and WCS (component
+"wcs") information for that timeslice.
+
+
+smfData: Represents an entire data array. A smfData may contain a smfFile
+to identify any associated disk file (if the smfData is a temporary
+object held in memory then the smfFile will be NULL), and a smfHead to
+hold the metadata. It may also contains "void *" pointers to the mapped
+NDF array components - Data ("->pntr[0]"), Variance ("->pntr[1]") and
+Quality ("->qual") (the data type is stored in "->dtype"). It also
+contains the dimensions of the array and an indication of which pixel
+axis is the time axis (for 3-dimensional time-series arrays).
+
+
+smfArray: Represents a set of related data arrays (smfData structures).
+The most common usage is to relate up to four arrays of SCUBA-2 data
+(e.g. s8a, s8b, s8c and s8d).
+
+
+
+DATA ORDERING & ARRAY WALKING
+------------------------------
+
+A 3D data array will usually have two spatial axes and a time or spectral
+axis. The order of these axes is indicated by the "isTordered" component
+in each smfData structure. If "isTordered" is non-zero, then (for SCUBA-2
+raw data) each contigious block of 32x40 values represents a single time
+slice with subsequent time-slices stored in adjacent 32x40 blocks
+("time-ordered" data). If "isTordered" is zero then each contiguous block
+of "ntime" values represents the time series from a single bolometer
+("bolo-ordered" data). Some algorithms operate much faster with
+time-ordered data than with bolo-ordered data, and some are the other way
+round. For this reason, it is possible to change the ordering of the data
+in a smfData in-situ using function smf_dataOrder. This means however
+that each function that processes a smfData needs to take account of the
+possibility that the supplied smfData may have either of the two
+orderings. One option is to check the ordering of the supplied smfData
+and, if necessary, change it to that assumed by the function. Another
+option is to write the data processing code within the function in a way
+that will handle either ordering. This is typically done by calling
+functions smf_get_dims to get the stride (in data values) between
+adjacent bolometer values in a single time slice ("bstride") and the stride
+between adjacent time-slice values in a single bolometer ("tstride"). One
+of these two steps will have value 1, depending on the ordering of the
+smfData. The processing code can then be written in a generic way as
+follows (as is often the case, the 2D array of bolometers is accessed as
+a 1D rasterised list of "nbolo" bolometers here):
+
+
+
+/* Get the strides and lengths of the axes in the smfData. */
+   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
+                 &tstride, status );
+
+/* Initialise a pointer to the first element in the data, variance and
+   quality arrays. */
+   pd = (double *) data->pntr[0];
+   pv = (double *) data->pntr[1];
+   pq = smf_select_qualpntr( data, NULL, status );
+
+/* Loop round all bolometers. */
+   for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+
+/* If the entire bolometer is bad or unusable, it will have a bad value
+   for the quality  associated with the first sample. If this is the case
+   we can skip it. */
+      if( !( *pq & SMF__Q_BADB ) ) {
+
+/* Initialise pointers to the current time slice values and then loop
+   round all time slices. */
+         pd0 = pd;
+         pv0 = pv;
+         pq0 = pq;
+         for( itime = 0; itime < ntslice; itime++ ) {
+
+
+            (do something using *pd0, *pv0 and *pq0 to access the values)
+
+
+/* Move pointers on to the next time slice value for the current bolometer.
+            pd0 += tstride;
+            pv0 += tstride;
+            pq0 += tstride;
+         }
+      }
+
+/* Move pointers on to the first time slice value for the next bolometer.
+      pd += bstride;
+      pv += bstride;
+      pq += bstride;
+   }
+
+
+
+
+
+Alternatively, Ed Chapin favoured the following less verbose but
+potentially slower approach:
+
+/* Get the strides and lengths of the axes in the smfData. */
+   smf_get_dims( data, NULL, NULL, &nbolo, &ntslice, &ndata, &bstride,
+                 &tstride, status );
+
+/* Initialise a pointer to the first element in the data, variance and
+   quality arrays. */
+   pd = (double *) data->pntr[0];
+   pv = (double *) data->pntr[1];
+   pq = smf_select_qualpntr( data, NULL, status );
+
+/* Loop round all bolometers. */
+   for( ibolo = 0; ibolo < nbolo; ibolo++ ) {
+
+/* If the entire bolometer is bad or unusable, it will have a bad value
+   for the quality  associated with the first sample. If this is the case
+   we can skip it. */
+      if( !( pq[ ibolo*bstride ] & SMF__Q_BADB ) ) {
+
+/* Loop round all time slices. */
+         for( itime = 0; itime < ntslice; itime++ ) {
+
+            (do something using
+             pd[ ibolo*bstride + itime*tstride ]
+             pv[ ibolo*bstride + itime*tstride ]
+             pq[ ibolo*bstride + itime*tstride ]
+             to access the values)
+         }
+      }
+   }
+
+
+
+
+QUALITY HANDLING
+----------------
+The smfData structure stores a pointer to the primary Quality array in
+component "->qual". However, it also provides an option that allows this
+primary Quality array to be ignored and instead uses the primary Quality
+array defined in a second smfData (called a "side-car" quality). This
+allows multiple smfData structures to use the same quality array. The
+function smf_select_qualpntr should be used to get a pointer to the
+Quality array for a specific smfData, as this will take account of the
+presence of any side-car quality. In fact, many functions just access
+"data->qual" directly, which is a bit naughty.
+
+In an NDF, each Quality value is an unsigned byte and thus provides up to
+8 quality flags. Within SMURF, there is a need for more than 8 quality
+flags and so Quality arrays are represented internally using the
+smf_qual_t data type, which is currently "unsigned short" and so provides
+up to 16 quality flags. To do this, smurf allocates and uses its own
+quality arrays rather than using the Quality array provided by the NDF
+library. Functions are provided to transfer Quality information between
+an NDF and an internal SMURF Quality array, but this is complicated by
+the fact that an NDF Quality array has insufficient bits to hold a SMURF
+Quality array. This is addressed by a form of lossy compression when
+writing SMURF quality arrays out to an NDF. This involves combining
+certain SMURF quality bits that have similar meanings into a single NDF
+quality bit. This combination is done simply by taking the logical union
+of the SMURF quality bits. The compression is performed by function
+smf_qual_unmap and the corresponding uncompression (i.e. creating a SMURF
+quality array from an NDF quality array) is performed by smf_qual_map.
+Whan a bit in an NDF quality array is set, the uncompression causes the
+bits for all associated SMURF qualities to be set. The obvious down-side
+is that a round trip from SMURF to NDF and back to SMURF can change the
+quality array substantially. This is a particular problem in the skyloop
+scipr because skyloop makes a separate invocation of makemap for each
+iteration and so needs to transfer quality backwards and forwards between
+SMURF and NDF many times. To get round this, skyloop uses makemap's
+"exportqbits" configuration parameter to force up to 8 specific SMURF
+qualities to be exported explicitly without compression (the other SMURF
+qualities are not exported in any way).
+
+The bit number and meaning associated with each SMURF Quality bit is
+defined in smf_typ.h.
+
+SMURF uses the IRQ library (see SUN/261) to associate human-readable
+names with each bit in the NDF quality array. These names can be
+displayed using the showqual command in kappa.
+
+
+
+MULTI-THREADING
+---------------
