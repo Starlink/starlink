@@ -66,7 +66,7 @@ DATA ORDERING & ARRAY WALKING
 A 3D data array will usually have two spatial axes and a time or spectral
 axis. The order of these axes is indicated by the "isTordered" component
 in each smfData structure. If "isTordered" is non-zero, then (for SCUBA-2
-raw data) each contigious block of 32x40 values represents a single time
+raw data) each contiguous block of 32x40 values represents a single time
 slice with subsequent time-slices stored in adjacent 32x40 blocks
 ("time-ordered" data). If "isTordered" is zero then each contiguous block
 of "ntime" values represents the time series from a single bolometer
@@ -200,11 +200,11 @@ quality bit. This combination is done simply by taking the logical union
 of the SMURF quality bits. The compression is performed by function
 smf_qual_unmap and the corresponding uncompression (i.e. creating a SMURF
 quality array from an NDF quality array) is performed by smf_qual_map.
-Whan a bit in an NDF quality array is set, the uncompression causes the
+When a bit in an NDF quality array is set, the uncompression causes the
 bits for all associated SMURF qualities to be set. The obvious down-side
 is that a round trip from SMURF to NDF and back to SMURF can change the
 quality array substantially. This is a particular problem in the skyloop
-scipr because skyloop makes a separate invocation of makemap for each
+script because skyloop makes a separate invocation of makemap for each
 iteration and so needs to transfer quality backwards and forwards between
 SMURF and NDF many times. To get round this, skyloop uses makemap's
 "exportqbits" configuration parameter to force up to 8 specific SMURF
@@ -222,3 +222,48 @@ displayed using the showqual command in kappa.
 
 MULTI-THREADING
 ---------------
+
+Most of the CPU-intensive operation within smurf run in multi-threaded
+code, using the facilities of the Starlink "thr" library (SUN/266) to
+create and manage a pool of persistent worker threads. This pool is
+created by the thr library when function thrGetWorkforce is called for
+the first time. The top level atask function for each smurf command (e.g.
+libsmurf/smurf_makemap.c) makes a call to thrGetWorkforce to get a
+pointer to the workforce. Thus when running the monolith from ORAC-DR,
+the workforce will be created only once. But when running from the shell
+a new workforce will be created when each SMURF command starts and
+destroyed when it ends. The number of worker threads in the workforce
+defaults to the number of cores on the local machine, although this can
+be changed by assigning a different number to the environment variable
+SMURF_THREADS before running the first SMURF command.
+
+A pointer to the workforce is passed around as an argument to each
+function that needs to perform any multi-threaded operations. Each such
+function typically has the following structure:
+
+
+- Get the number of worker threads in the workforce
+- Decide how to divide up the task between the available worker threads
+  (e.g. how many bolometers to process in each thread etc).
+- Allocate a set of structures, one for each worker thread, which are used
+  to pass information from the main function to the functions that run in
+  each worker thread. These structures are defined locally within the function
+  preamble.
+- For each worker thread:
+  - Get a pointer to the structure for the current worker thread
+  - Store all information needed by the worker thread within this
+  structure. This will include the range of bolometers, time-slices, etc,
+  to be processed by the thread.
+  - Submit a job to the workforce using theAddJob. The structure pointer
+  is supplied as an argument together with a locally defined function that
+  is to be run by the worker thread. This function is called, with the
+  structure pointer as the first argument, as soon as a worker thread
+  becomes available. If the function run in the worker thread needs to
+  return any values to the main function, they should be stored in the
+  structure, from where the main function can access them.
+- Once all the required jobs have been submitted to the workforce, call
+  thrWait, which blocks until all the jobs previously assigned to the
+  workforce have completed.
+
+
+
