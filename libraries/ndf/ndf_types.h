@@ -42,6 +42,16 @@
 
 */
 
+/*  Function macros                                                         */
+/*  ===============                                                         */
+/* Return max or min of two values (beware of side effects!). */
+#define NDF_MIN(a,b) (((a)<(b))?(a):(b))
+#define NDF_MAX(a,b) (((a)>(b))?(a):(b))
+
+/* Return nearest integer, as an int. */
+#define NDF_NINT(a) ((int)round(a))
+
+
 /*  Constants.                                                              */
 /*  ==========                                                              */
 /*  General.                                                                */

@@ -55,14 +55,6 @@
 
 /* --- Function macros --------------------------------------- */
 
-/* Return max or min of two values (beware of side effects!). */
-#define NDF_MIN(a,b) (((a)<(b))?(a):(b))
-#define NDF_MAX(a,b) (((a)>(b))?(a):(b))
-
-/* Return nearest integer, as an int. */
-#define NDF_NINT(a) ((int)round(a))
-
-
 /* Get a pointer to the thread specific data. */
 #define NDF_GETTSD \
    NdfTSD *tsd = pthread_getspecific( starlink_ndf_globals_key ); \
