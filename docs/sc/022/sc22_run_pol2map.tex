@@ -170,7 +170,7 @@ This uses all available data from all four \SI{850}{\micro\metre} sub-arrays, fo
     \hat{} $ myfiles.lis}).
 
   Note that the \poltwomap\ script also invokes the \ \smurf\
-  \xref{pol2check}{sun258}{POL2CHECK} command, in order to 
+  \xref{pol2check}{sun258}{POL2CHECK} command, in order to
   first ensure that the input files are actually POL-2 files.
 \end{tip}
 
@@ -477,7 +477,9 @@ the non-polarimetric SCUBA-2 FCFs.
 POL-2 FCFs are now applied automatically within \poltwomap\ when catalogue columns
 in mJy/beam are required by the user, i.e. if the \task{pol2map} parameter \texttt{JY} is set
 to \texttt{TRUE} (the default option). The current version of \task{pol2map} uses the new,
-revised POL-2 FCFs for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}.
+revised POL-2 FCFs for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}
+and takes account of cases where the supplied raw data span one of the
+dates at which the FCF changed (20180630 and 20161101).
 
 \section{\xlabel{tweaking}Changing pixel size in pol2map}
 \label{sec:pol2map-pixelsize}
