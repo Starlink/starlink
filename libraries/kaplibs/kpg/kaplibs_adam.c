@@ -843,3 +843,41 @@ void kpg1Gtpos( const char *param, AstFrameSet *iwcs, int null,
    return;
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_ccpro)( CHARACTER(PNCOMP),
+                            CHARACTER(COMP),
+                            INTEGER(NDFI),
+                            INTEGER(NDFO),
+                            INTEGER(STATUS)
+                            TRAIL(PNCOMP)
+                            TRAIL(COMP) );
+
+void kpg1Ccpro( const char *pncomp, const char *comp,
+                int ndfi, int ndfo, int *status ){
+   DECLARE_CHARACTER_DYN(PNCOMP);
+   DECLARE_CHARACTER_DYN(COMP);
+   DECLARE_INTEGER(NDFI);
+   DECLARE_INTEGER(NDFO);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_EXPORT_CHARACTER( pncomp, PNCOMP );
+   F77_CREATE_EXPORT_CHARACTER( comp, COMP );
+   F77_EXPORT_INTEGER( ndfi, NDFI );
+   F77_EXPORT_INTEGER( ndfo, NDFO );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(kpg1_ccpro)( CHARACTER_ARG(PNCOMP),
+                                   CHARACTER_ARG(COMP),
+                                   INTEGER_ARG(&NDFI),
+                                   INTEGER_ARG(&NDFO),
+                                   INTEGER_ARG(&STATUS)
+                                   TRAIL_ARG(PNCOMP)
+                                   TRAIL_ARG(COMP) ); )
+
+   F77_FREE_CHARACTER( PNCOMP );
+   F77_FREE_CHARACTER( COMP );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+
