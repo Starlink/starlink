@@ -11,3 +11,5 @@ void CGEN_FUNCTION(kpgCsub)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TY
 void CGEN_FUNCTION(kpgCmult)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpgCdiv)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpg1Qntl)( int usewt, int interp, CGEN_TYPE fract, int el, const CGEN_TYPE x[], const CGEN_TYPE w[], int ip[], CGEN_TYPE *q, int *status );
+void CGEN_FUNCTION(kpgBlon)( int bad, int sambad, int var, int ndim, const int dims[], const CGEN_TYPE a[], const int ibox[], int nlim, int wdim, CGEN_TYPE b[], int *badout, CGEN_TYPE asum[], int nsum[], int *status );
+void CGEN_FUNCTION(kpgBmdn)( int bad, int sambad, int var, int ndim, const int dims[], const CGEN_TYPE in[], const int hb[], int nlim, CGEN_TYPE out[], int *badout, CGEN_TYPE work1[], int work2[], int *status );
