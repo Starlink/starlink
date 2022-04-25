@@ -125,3 +125,28 @@ void lpgProp( int indf1, const char *clist, const char *param, int *indf2, int *
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(lpg_state)( CHARACTER(PARAM),
+                           INTEGER(STATE),
+                           INTEGER(STATUS)
+                           TRAIL(PARAM) );
+
+void lpgState( const char *param, int *state, int *status ){
+   DECLARE_CHARACTER_DYN(PARAM);
+   DECLARE_INTEGER(STATE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_CREATE_EXPORT_CHARACTER( param, PARAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_LOCK( F77_CALL(lpg_state)( CHARACTER_ARG(PARAM),
+                                  INTEGER_ARG(&STATE),
+                                  INTEGER_ARG(&STATUS)
+                                  TRAIL_ARG(PARAM)); )
+
+   F77_FREE_CHARACTER( PARAM );
+   F77_IMPORT_INTEGER( STATE, *state );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
