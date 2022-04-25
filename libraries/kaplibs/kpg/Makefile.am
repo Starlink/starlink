@@ -46,7 +46,7 @@ kpg1CrMapD.c kpg1_crmapd.c kpg1_osta8.c kpg1_cputm.c kpg1Badbits.c \
 kpg1_elptm.c
 
 CGEN_ROUTINES = kpgOsta8.cgen kpg1SymFit.cgen kpgMul.cgen kpgDiv.cgen \
-kpgCadd.cgen kpgCsub.cgen kpgCmult.cgen kpgCdiv.cgen
+kpgCadd.cgen kpgCsub.cgen kpgCmult.cgen kpgCdiv.cgen kpg1Qntl.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGEN_ROUTINES:.cgen=.c) $(KPG_N_CGEN:.cn=.c)

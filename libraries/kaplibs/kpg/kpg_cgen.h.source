@@ -10,3 +10,4 @@ void CGEN_FUNCTION(kpgCadd)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TY
 void CGEN_FUNCTION(kpgCsub)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpgCmult)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpgCdiv)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
+void CGEN_FUNCTION(kpg1Qntl)( int usewt, int interp, CGEN_TYPE fract, int el, const CGEN_TYPE x[], const CGEN_TYPE w[], int ip[], CGEN_TYPE *q, int *status );
