@@ -276,12 +276,9 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    int state;            /* State of BOX parameter */
    int ubnd[ NDF__MXDIM + 1 ];     /* Upper bounds of NDF pixel axes */
    int var;              /* Variance array present? */
-   int wdim;             /* Dimension of accumulation workspaces */
    size_t cpos;          /* Character position */
    void *pntr1[ 2 ];     /* Pointers for mapped input arrays */
    void *pntr2[ 2 ];     /* Pointers for mapped output arrays */
-   void *wpntr1;         /* Mapped workspace pointer */
-   void *wpntr2;         /* Mapped workspace pointer */
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
@@ -395,18 +392,6 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
 /* See if it is necessary to check for bad pixels in the input arrays. */
    ndfMbad( 1, ndf1, ndf1, comp, 0, &bad, status );
 
-/* Obtain workspace arrays for the smoothing algorithm and map them.
-   First compute the dimensions of the accumulation arrays.  These
-   provide storage for the sums at each dimensionality concatenated
-   into single sum and pixel counter arrays. */
-   if( !strcmp( estim, "MEAN" ) ) {
-      wpntr1 = NULL;
-      wpntr2 = NULL;
-   } else {
-      wpntr1 = astCalloc( boxsiz, kpg1Typsz(itype,status) );
-      wpntr2 = astCalloc( boxsiz, VAL__NBI );
-   }
-
 /* Only proceed around the loop if everything is satisfactory. */
    if( *status != SAI__OK ) goto L990;
 
@@ -430,7 +415,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
                    pntr2[ 0 ], &badout, status );
       } else {
          kpgBmdnF( wf, bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
-                   pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
+                   pntr2[ 0 ], &badout, status );
       }
 
 /* Double precision */
@@ -441,7 +426,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
                    pntr2[ 0 ], &badout, status );
       } else {
          kpgBmdnD( wf, bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
-                   pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
+                   pntr2[ 0 ], &badout, status );
       }
 
    }
@@ -476,10 +461,6 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    kpg1Ccpro( "TITLE", "Title", ndf1, ndf2, status );
 
 L990:
-
-/* Release the temporary workspace arrays. */
-   wpntr1 = astFree( wpntr1 );
-   wpntr2 = astFree( wpntr2 );
 
 /* End the NDF context. */
 L999:
