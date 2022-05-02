@@ -1,12 +1,38 @@
 #include "sae_par.h"
 #include "prm_par.h"
 #include "ndf.h"
+#include "kaplibs.h"
+#include "star/thr.h"
+#include "mers.h"
+#include <string.h>
 
-void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
-                             const int dims[], const CGEN_TYPE a[],
-                             const int ibox[], int nlim, int wdim,
-                             CGEN_TYPE b[], int *badout, CGEN_TYPE
-                             asum[], int nsum[], int *status ){
+/* Structure used to pass information to each worker thread. */
+typedef struct CGEN_FUNCTION(KpgBlonData) {
+   CGEN_TYPE *b;
+   const CGEN_TYPE *a;
+   const int *dims;
+   const int *ibox;
+   int badout;
+   int bad;
+   int ndim;
+   int nlim;
+   int sambad;
+   int var;
+   int lo;
+   int hi;
+   size_t wdim;
+} CGEN_FUNCTION(KpgBlonData);
+
+/* Prototype for function that will do the work in each worker thread. */
+static void CGEN_FUNCTION(kpgBlonWork)( void *job_data_ptr, int *status );
+
+
+
+
+void CGEN_FUNCTION( kpgBlon )( ThrWorkForce *wf, int bad, int sambad, int var,
+                               int ndim, const int dims[], const CGEN_TYPE a[],
+                               const int ibox[], int nlim, CGEN_TYPE b[],
+                               int *badout, int *status ){
 /*
 *+
 *  Name:
@@ -16,10 +42,10 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 *     Smooths an n-dimensional image using box filter.
 
 *  Synopsis:
-*     void kpgBlon<T>( int bad, int sambad, int var, int ndim,
-*                      const int dims[], const CGEN_TYPE a[],
-*                      const int ibox[], int nlim, int wdim, CGEN_TYPE b[],
-*                      int *badout, CGEN_TYPE asum[], int nsum[], int *status )
+*     void kpgBlon<T>( ThrWorkForce *wf, int bad, int sambad, int var,
+*                      int ndim, const int dims[], const CGEN_TYPE a[],
+*                      const int ibox[], int nlim, CGEN_TYPE b[],
+*                      int *badout, int *status )
 
 *  Description:
 *     This function smooths an n-dimensional array using an n-dimensional
@@ -27,6 +53,9 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 *     neighbours which lie within a box of specified size.
 
 *  Parameters:
+*     wf
+*        Pointer to a pool of worker threads created by the thr library,
+*        or NULL (in which case the code will run in a single thread).
 *     bad
 *        Whether it is necessary to check for bad pixels in the input
 *        image.
@@ -54,7 +83,7 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 *        "dims".
 *     ibox
 *        Half-size of the smoothing box in pixels along eeach axis (the
-*        actual size of the ith axis's box used will be 2*"ibox"(i)+1
+*        actual size of the ith axis's box used will be 2*ibox[i]+1
 *        pixels). The supplied "ibox" array should have at least "ndim"
 *        elements.
 *     nlim
@@ -63,24 +92,12 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 *        this minimum number is not satisfied, then a bad output pixel will
 *        result. "a" value between 1 and the total number of pixels in the
 *        smoothing box should be supplied.
-*     wdim
-*        The dimension of the "asum" and "nsum" workspaces.  It must be at
-*        least 1 + "dims"( 1 ) for a two-dimensional array , and at least 1
-*        + ( "dims"(1) * ... ( 1 + "dims"("ndim"-1) ) ... ) for an
-*        "ndim"-dimensional array.  For example a 20x16x27-element array
-*        would need WLIM not fewer than 1+(20*(1+16)=341 elements.
 *     b
 *        Returned holding the smoothed output array.  It has the same
 *        dimensions as "a".
 *     *badout
-*        Returned holding the whether bad pixels are present in the output
-*        image.
-*     asum
-*        Returned holding the workspace for the pixel sums. The supplied
-*        "asum" array should have at least "wdim" elements.
-*     nsum
-*        Returned holding the workspace for counting good pixels. The
-*        supplied "nsum" array should have at least "wdim" elements.
+*        Returned holding a flag indicating whether bad pixels are present
+*        in the output image.
 *     *status
 *        The global status.
 
@@ -89,6 +106,10 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 *     arrays; replace "x" in the function name by R or D as appropriate.
 *     The data type of the "a", "b" and "asum" arguments must match the
 *     function used.
+*     -  It would be straightforward to extract each box in turn and sum
+*     within it in.  However, this is inefficient and a rolling window
+*     is used so only the values leaving and entering the smoothing
+*     region need be processed.
 *     -  The function uses recursion of the standard filter algorithm for
 *     each dimension moving from the highest to lowest. Recursion ends when
 *     there is only the integrated value and the corresponding number of
@@ -121,37 +142,23 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
-*     DSB: David Berry (JAC, Hawaii)
 *     DSB: David S. Berry (EAO)
 
 *  History:
 *     25-APR-2022 (DSB):
-*        Original version, based on equivalent Fortran function by MJC et
-*        al.
+*        Original version, based on equivalent Fortran function by MJC.
 
 *-
 */
 
 /* Local Variables: */
-   CGEN_TYPE denom;      /* Denominator for smoothed output value */
-   CGEN_TYPE npix;       /* Number of pixels in smoothing box */
-   int bnew;             /* New box pixel offset */
-   int bof;              /* Box pixel offset */
-   int bold;             /* Old box pixel offset */
-   int cdim;             /* Current dimension in recursion */
-   int el;               /* Number of elements in output array */
-   int end;              /* New box has been found or there are  no more
-                           boxes to sum */
+   CGEN_FUNCTION(KpgBlonData) *job_data;/* Pointer to array of job data structures */
+   CGEN_FUNCTION(KpgBlonData) *pdata;   /* Pointer to a single job data structure */
    int i;                /* Loop counter */
-   int ib;               /* Box index */
-   int idim[ NDF__MXDIM ];         /* Indices of an array element */
-   int j;                /* Index within summation array */
-   int k;                /* Loop counter for box initialisation */
-   int m;                /* Loop counter for output elements */
-   int new;              /* Position of new pixel */
-   int old;              /* Position of old pixel */
-   int sof[ NDF__MXDIM ];/* Summation array offset */
-   int stride[ NDF__MXDIM ];       /* Strides through array dimensions */
+   int iw;               /* Index of a worker thread */
+   int nw;               /* Number of worker threads to use */
+   size_t step;          /* No. of elements to be processed by a worker */
+   size_t wdim;          /* Workspace size */
 
 /* Initialise the bad-output-pixel flag. */
    *badout = 0;
@@ -159,307 +166,138 @@ void CGEN_FUNCTION( kpgBlon )( int bad, int sambad, int var, int ndim,
 /* Check the inherited global status. */
    if( *status != SAI__OK ) return;
 
-/* Compute the strides and numbers of elements.
-   ============================================ */
-
-/* Initialise the stride of dimension number 1 for the data and output
-   array objects. (The stride for a dimension is the amount by which
-   the vectorised array index increases when the n-dimensional array
-   index for that dimension increases by 1.) */
-   stride[ 0 ] = 1;
-
-/* Calculate the stride for each remaining dimension.  The final stride
-   is also the number of elements in the initial summation arrays. */
-   for( i = 1; i < ndim; i++ ){
-      stride[ i ] = stride[ i - 1 ]*dims[ i - 1 ];
+/* How many worker threads should we use? The final pixel axis is divided
+   into disjoint sections and each worker thread processes one section.
+   Therefore check for cases where the length of the final axis is less than
+   the number of worker threads, in which case some worker threads remain
+   idle. */
+   if( wf ) {
+      nw = wf->nworker;
+      if( dims[ ndim - 1 ] < nw ) nw = dims[ ndim - 1 ];
+   } else {
+      nw = 1;
    }
 
-/* Calculate the number of pixels in the averaging box and in the full
-   array to be smoothed. */
-   npix = 1;
-   el = 1;
-   for( i = 0; i < ndim; i++ ){
-      el *= dims[ i ];
-      npix = npix*( 2*ibox[ i ] + 1 );
-   }
+/* Allocate a job data structure for each used thread. */
+   job_data = astMalloc( nw*sizeof(*job_data) );
 
-/* Find the offsets in the summation arrays for each dimensionality. */
-   sof[ ndim - 1 ] = 0;
-   for( i = ndim - 2; i >= 0; i-- ){
-      sof[ i ] = sof[ i + 1 ] + stride[ i + 1 ];
-   }
+/* Check pointers can be dereferenced safely. */
+   if( *status == SAI__OK ){
 
-/* Form the initial summations for the highest dimension.
-   ====================================================== */
+/* Compute the dimension of the accumulation arrays.  These provide storage
+   for the sums at each dimensionality concatenated into single sum and pixel
+   counter arrays. workspaces.  They must have at least 1 + dims[0] for a two
+   dimensional array, and at least 1 + ( dims[0] * ... ( 1 + dims[ndim-2] ) ... )
+   for an "ndim"-dimensional array.  For example a 20x16x27-element array
+   would need WLIM not fewer than 1+(20*(1+16))=341 elements. */
+      wdim = dims[ 0 ];
+      if( ndim > 2 ) {
+         for( i = 1; i < ndim - 1; i++ ){
+            wdim = wdim*( dims[ i ] + 1 );
+         }
+      }
+      wdim++;
 
-/* It would be straightforward to extract each box in turn and sum
-   within it in.  However, this is inefficient and a rolling window
-   is used so only the values leaving and entering the smoothing
-   region need be processed. */
+/* Find the length of each section (on the final pixel axis) that is to
+   be processed by each worker thread. */
+      step = dims[ ndim - 1 ]/nw;
 
-/* Initialise the portion of the workspace arrays required for the
-   "ndim" dimension's summations. */
-   for( i = 0; i < stride[ ndim - 1 ]; i++ ){
-      asum[ i ] = 0.0;
-      nsum[ i ] = 0;
-   }
-
-/* Loop to initialise elements of the two workspace arrays so that they
-   contain sum for the good pixels in a box of size 1x(2*"ibox"("ndim")+1)
-   centred on pixel location (IX,0,...).  First loop over all the
-   possible contributing lines. */
-   for( k = -ibox[ ndim - 1 ] - 1; k < ibox[ ndim - 1 ]; k++ ){
-
-/* If the pixel lies outside the input array, then use the boundary
-   instead. */
-      ib = NDF_MAX( 1, NDF_MIN( k + 1, dims[ ndim - 1 ] ) );
-
-/* Find the offset of the line to be accumulated. */
-      bof = ( ib - 1 )*stride[ ndim - 1 ];
-
-/* Accumulate sums for each box in the workspace arrays. If bad pixels
-   are present, then test for them. */
-      if( bad ) {
-         for( i = 0; i < stride[ ndim - 1 ]; i++ ){
-            if( a[ i + bof ] != CGEN_BAD ) {
-               asum[ i ] += a[ i + bof ];
-               nsum[ i ]++;
-            }
+/* Store the range of hyper-planes indices (zero-based) to be processed by
+   each worker. Ensure that the last thread picks up any left-over
+   hyper-planes. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->lo = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->hi = pdata->lo + step - 1;
+         } else {
+            pdata->hi = dims[ ndim - 1 ] - 1;
          }
 
-/* If no bad pixels are present, then omit the test for them. */
-      } else {
-         for( i = 0; i < stride[ ndim - 1 ]; i++ ){
-            asum[ i ] += a[ i + bof ];
-         }
+/* Store info required by kpgBlonWork. */
+         pdata->a = a;
+         pdata->b = b;
+         pdata->dims = dims;
+         pdata->ibox = ibox;
+         pdata->bad = bad;
+         pdata->ndim = ndim;
+         pdata->nlim = nlim;
+         pdata->sambad = sambad;
+         pdata->var = var;
+         pdata->wdim = wdim;
+
+/* Submit the job to the workforce. This will cause the kpgBlonWork
+   function to be called, which will be passed the "pdata" pointer and a
+   status pointer. */
+         thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpgBlonWork), 0, NULL,
+                    status );
+      }
+
+/* Wait for all the jobs submitted above to complete. */
+      thrWait( wf, status );
+
+/* Accumulate the "badout" flags from all threads. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         if( pdata->badout ) *badout = 1;
       }
    }
 
-/* Prepare to form the sums.
-   ========================= */
+/* Free the job data structures. */
+   job_data = astFree( job_data );
+}
 
-/* Recursive scanning of the array dimensions begins with the highest
-   dimension. */
-   cdim = ndim;
-   for( i = 0; i < ndim; i++ ){
-      idim[ i ] = 0;
-   }
+static void CGEN_FUNCTION(kpgBlonWork)( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     kpgBlonWork<X>
 
-/* Loop for every array element.
-   ============================ */
-   m = 0;
-   while( m < el ){
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     kpgBlon
 
-/* This is effectively a "DO UNTIL" loop, which starts with the current
-   dimension summing values and numbers of pixels in the smoothing box,
-   and reduces dimensionality, summing the sums, until just a vector
-   remains. */
+*  Invocation:
+*     kpgBlonWork<X>( void *job_data_ptr, int *status )
 
-/* Determine what should be the current dimension for the summations.
-   ================================================================== */
-      end = 0;
-      while( !end ){
+*  Arguments:
+*     job_data_ptr = KpgBlonData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
 
-/* Shift the box along the current dimension. */
-         idim[ cdim - 1 ]++;
+*/
 
-/* Has it gone beyond the current dimension? */
-         if( idim[ cdim - 1 ] > dims[ cdim - 1 ] ) {
+/* Local Variables: */
+   CGEN_FUNCTION(KpgBlonData) *pdata;   /* Pointer to job data structure */
+   CGEN_TYPE *asum;                     /* Pointer to work array */
+   int *nsum;                           /* Pointer to work array */
 
-/* Reset index within current dimension. */
-            idim[ cdim - 1 ] = 0;
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
 
-/* As it has completed the dimension for the current next-higher
-   dimension's smoothing block, go to the next higher dimension.  There
-   must be one since there are still output elements to be computed. */
-            cdim++;
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(KpgBlonData) *) job_data_ptr;
 
-         } else {
+/* Obtain workspace arrays for the smoothing algorithm. */
+   asum = astCalloc( pdata->wdim, sizeof(CGEN_TYPE) );
+   nsum = astCalloc( pdata->wdim, sizeof(int) );
 
-/* The next box location has been located successfully within the
-   current dimenson, so exit the loop. */
-            end = 1;
+/* Call the function to smooth the section of the array specified by
+   pdata->lo and pdata->hi. */
+   CGEN_FUNCTION(kpgBlonSec)( pdata->bad, pdata->sambad, pdata->var,
+                              pdata->ndim, pdata->dims, pdata->lo + 1,
+                              pdata->hi + 1, pdata->a, pdata->ibox,
+                              pdata->nlim, pdata->wdim, pdata->b,
+                              &(pdata->badout), asum, nsum, status );
 
-         }
-      }
-
-/* Smooth down the array.
-   ====================== */
-
-/* Loop to form smoothed output values for each image line (or plane
-   or hyperplane depending on the dimensionality) by moving the
-   accumulated sums for each initial box down the input array. */
-
-/* Find the position of the old input line/plane/cube/hypercube that
-   is lost from the box as the box is moved down the array in the
-   current dimension.  Likewise find the position of the new
-   line/plane/cube/hypercube that enters the box.  Allow for the array
-   boundaries. */
-      old = NDF_MAX( 1, idim[ cdim - 1 ] - ibox[ cdim - 1 ] - 1 );
-      new = NDF_MIN( dims[ cdim - 1 ], idim[ cdim - 1 ] + ibox[ cdim - 1 ] );
-
-/* Find the offset of the slab to be removed and the slab to be
-   accumulated.  Note that the recursion is different for the highest
-   dimension as this is where values are extracted and summed from the
-   input array.  In subsequent recursions, values in the summation
-   array are summed to the next unused portion of the summation arrays. */
-      if( cdim == ndim ) {
-         bold = ( old - 1 )*stride[ cdim - 1 ];
-         bnew = ( new - 1 )*stride[ cdim - 1 ];
-
-/* Remove the pixels in the old line from the accumulated sums and add
-   the pixels in the new line.  If bad pixels are present, then test
-   for them. */
-         if( bad ) {
-            for( i = 0; i < stride[ ndim - 1 ]; i++ ){
-               if( a[ i + bold ] != CGEN_BAD ) {
-                  asum[ i ] += -a[ i + bold ];
-                  nsum[ i ]--;
-               }
-
-               if( a[ i + bnew ] != CGEN_BAD ) {
-                  asum[ i ] += a[ i + bnew ];
-                  nsum[ i ]++;
-               }
-            }
-
-/* If bad pixels are absent, then there is no need to test for them.
-   There is also no need to keep track of the number of good pixels in
-   the box, as this will always be equal to the total number of pixels
-   in the smoothing box. */
-         } else {
-            for( i = 0; i < stride[ cdim - 1 ]; i++ ){
-               asum[ i ] += a[ i + bnew ] - a[ i + bold ];
-            }
-         }
-
-/* Add the sums from a higher dimension to collapse a dimension.
-   ============================================================= */
-      } else {
-
-/* Loop to initialise elements of the two workspace arrays so that they
-   contain sum for the good pixels in a box of size 1x(2*"ibox"("cdim")+1). */
-         if( idim[ cdim - 1 ] == 1 ) {
-
-/* Initialise the portion of the workspace arrays required for the
-   "ndim" dimension's summations. */
-            for( i = 0; i < stride[ cdim - 1 ]; i++ ){
-               asum[ i + sof[ cdim - 1 ] ] = 0.0;
-               nsum[ i + sof[ cdim - 1 ] ] = 0;
-            }
-
-/* Loop to initialise elements of the two workspace arrays so that they
-   contain sum for the good pixels in a box of size 1x(2*"ibox"("cdim")+1)
-   centred on pixel location (IX,0,...). */
-            for( k = -ibox[ cdim - 1 ] - 1; k < ibox[ cdim - 1 ]; k++ ){
-
-/* If the pixel lies outside the input array, then use the boundary
-   instead. */
-               ib = NDF_MAX( 1, NDF_MIN( k + 1, dims[ cdim - 1 ] ) );
-
-/* Find the offset of the line to be accumulated.  This has two
-   components: the location of the next line/plane/cube in the
-   smoothing box, and the offset of the already summed data within
-   the summation array.  Note that the latter is for the next higher
-   dimension. */
-               bof = ( ib - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
-
-/* Accumulate sums for each box in the workspace arrays. */
-               for( i = 0; i < stride[ cdim - 1 ]; i++ ){
-                  j = i + sof[ cdim - 1 ] + 1;
-                  asum[ j - 1 ] += asum[ i + bof ];
-                  if( bad ) nsum[ j - 1 ] += nsum[ i + bof ];
-               }
-            }
-         }
-
-/* For the smmothing box centred on element "idim"( "cdim" ), find the
-   offset of the slab to be removed for the slab centred and the
-   slab to be accumulated.  As above combine the two components.
-   Note that the ofset for the input summation array is for the
-   next higher dimension. */
-         bold = ( old - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
-         bnew = ( new - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
-
-         for( i = 0; i < stride[ cdim - 1 ]; i++ ){
-            j = i + sof[ cdim - 1 ] + 1;
-            asum[ j - 1 ] += asum[ i + bnew ] - asum[ i + bold ];
-            if( bad ) nsum[ j - 1 ] += nsum[ i + bnew ] - nsum[ i + bold ];
-         }
-      }
-
-/* See if the recursion has ended such that we can evaluate output
-   values. */
-      if( cdim == 1 ) {
-
-/* Find the denominator along each array line.
-   ============================================ */
-
-/* Increment the output-pixel index. */
-         m++;
-
-/* If there are no bad pixels present, then this is equal to the number
-   of pixels in the smoothing box.  Otherwise, use the accumulated sum
-   of good pixels. */
-         if( !bad ) {
-            denom = npix;
-         } else {
-            denom = nsum[ sof[ 0 ] ];
-         }
-
-/* If smoothing a variance image, then use the square of the number of
-   good pixels (this takes account of the variance-reducing effect that
-   smoothing introduces). */
-         if( var ) denom *= denom;
-
-/* Calculate the smoothed output value.
-   ==================================== */
-
-/* This is valid if there are no bad pixels present. */
-         if( denom == 0 ) {
-            b[ m - 1 ] = CGEN_BAD;
-            *badout = 1;
-
-         } else if( !bad ) {
-            b[ m - 1 ] = asum[ sof[ 0 ] ]/denom;
-
-/* It is also valid if "sambad" is non-zero and the corresponding input
-   pixel is not bad. */
-         } else if( sambad ) {
-            if( a[ m - 1 ] != CGEN_BAD ) {
-               b[ m - 1 ] = asum[ sof[ 0 ] ]/denom;
-
-/* It is bad if "sambad" is non-zero and the corresponding input pixel is
-   bad.  Note that bad pixels are present in the output image. */
-            } else {
-               b[ m - 1 ] = CGEN_BAD;
-               *badout = 1;
-            }
-
-/* It is valid if "sambad" is zero and the "nlim" criterion is met. */
-         } else {
-            if( denom >= nlim ) {
-               b[ m - 1 ] = asum[ sof[ 0 ] ]/denom;
-
-/* It is bad if the "nlim" criterion is not met.  Note that bad pixels are
-   present in the output image. */
-            } else {
-               b[ m - 1 ] = CGEN_BAD;
-               *badout = 1;
-            }
-         }
-
-/* The algorithm calls itself recursively here.
-   ============================================ */
-
-/* The algorithm invokes itself recursively to process the next lower
-   dimension.  Decrement the current dimension count and branch back to
-   the start. */
-      } else {
-         cdim--;
-      }
-
-   }
+/* Free the work arrays. */
+   asum = astFree( asum );
+   nsum = astFree( nsum );
 
 }
+
+
+
 

@@ -3,6 +3,7 @@
 #include "prm_par.h"
 #include "star/lpg.h"
 #include "chr.h"
+#include "star/thr.h"
 #include "par.h"
 #include "ndf.h"
 #include "star/kaplibs.h"
@@ -247,6 +248,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
 */
 
 /* Local Variables: */
+   ThrWorkForce *wf;     /* Pointer to pool of worker threads */
    char buffer[ 31 ];    /* Text buffer for message */
    char comp[ 14 ];      /* List of components to process */
    char dtype[ NDF__SZFTP + 1 ];   /* Numeric type for output arrays */
@@ -283,6 +285,12 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
+
+/* Find the number of cores/processors available and create a pool of
+   threads of the same size. The size is obtained from the environment
+   variable if defined, or the number of CPUs/cores otherwise. */
+   wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", status ),
+                         status );
 
 /* Begin an NDF context. */
    ndfBegin();
@@ -392,16 +400,8 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    provide storage for the sums at each dimensionality concatenated
    into single sum and pixel counter arrays. */
    if( !strcmp( estim, "MEAN" ) ) {
-      wdim = dim[ 0 ];
-      if( ndim > 2 ) {
-         for( i = 1; i < ndim - 1; i++ ){
-            wdim = wdim*( dim[ i ] + 1 );
-         }
-      }
-      wdim++;
-
-      wpntr1 = astCalloc( wdim, kpg1Typsz(itype,status) );
-      wpntr2 = astCalloc( wdim, VAL__NBI );
+      wpntr1 = NULL;
+      wpntr2 = NULL;
    } else {
       wpntr1 = astCalloc( boxsiz, kpg1Typsz(itype,status) );
       wpntr2 = astCalloc( boxsiz, VAL__NBI );
@@ -426,10 +426,10 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    if( !strcmp( itype, "_REAL" ) ) {
 
       if( !strcmp( estim, "MEAN" ) ) {
-         kpgBlonF( bad, sambad, 0, ndim, dim, pntr1[ 0 ], ibox, nlim, wdim,
-                   pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
+         kpgBlonF( wf, bad, sambad, 0, ndim, dim, pntr1[ 0 ], ibox, nlim,
+                   pntr2[ 0 ], &badout, status );
       } else {
-         kpgBmdnF( bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
+         kpgBmdnF( wf, bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
                    pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
       }
 
@@ -437,10 +437,10 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    } else if( !strcmp( itype, "_DOUBLE" ) ) {
 
       if( !strcmp( estim, "MEAN" ) ) {
-         kpgBlonD( bad, sambad, 0, ndim, dim, pntr1[ 0 ], ibox, nlim, wdim,
-                   pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
+         kpgBlonD( wf, bad, sambad, 0, ndim, dim, pntr1[ 0 ], ibox, nlim,
+                   pntr2[ 0 ], &badout, status );
       } else {
-         kpgBmdnD( bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
+         kpgBmdnD( wf, bad, sambad, 1, ndim, dim, pntr1[ 0 ], ibox, nlim,
                    pntr2[ 0 ], &badout, wpntr1, wpntr2, status );
       }
 
@@ -454,12 +454,12 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    being used. */
    if( var && !strcmp( estim, "MEAN" ) ) {
       if( !strcmp( itype, "_REAL" ) ) {
-         kpgBlonF( bad, sambad, 1, ndim, dim, pntr1[ 1 ], ibox, nlim, wdim,
-                   pntr2[ 1 ], &badout, wpntr1, wpntr2, status );
+         kpgBlonF( wf, bad, sambad, 1, ndim, dim, pntr1[ 1 ], ibox, nlim,
+                   pntr2[ 1 ], &badout, status );
 
       } else if( !strcmp( itype, "_DOUBLE" ) ) {
-         kpgBlonD( bad, sambad, 1, ndim, dim, pntr1[ 1 ], ibox, nlim, wdim,
-                   pntr2[ 1 ], &badout, wpntr1, wpntr2, status );
+         kpgBlonD( wf, bad, sambad, 1, ndim, dim, pntr1[ 1 ], ibox, nlim,
+                   pntr2[ 1 ], &badout, status );
       }
 
 /* Update the bad data flag. */

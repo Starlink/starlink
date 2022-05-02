@@ -2,12 +2,13 @@
 #include "prm_par.h"
 #include "ndf.h"
 #include "kaplibs.h"
+#include "star/thr.h"
 
-void CGEN_FUNCTION( kpgBmdn )( int bad, int sambad, int var, int ndim,
-                             const int dims[], const CGEN_TYPE in[],
-                             const int hb[], int nlim, CGEN_TYPE out[],
-                             int *badout, CGEN_TYPE work1[], int work2[],
-                             int *status ){
+void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
+                               int ndim, const int dims[], const CGEN_TYPE in[],
+                               const int hb[], int nlim, CGEN_TYPE out[],
+                               int *badout, CGEN_TYPE work1[], int work2[],
+                               int *status ){
 /*
 *+
 *  Name:
@@ -17,8 +18,8 @@ void CGEN_FUNCTION( kpgBmdn )( int bad, int sambad, int var, int ndim,
 *     Smooths an n-dimensional array using a block median filter.
 
 *  Synopsis:
-*     void kpgBmdn<T>( int bad, int sambad, int var, int ndim,
-*                      const int dims[], const CGEN_TYPE in[],
+*     void kpgBmdn<T>( ThrWorkForce *wf, int bad, int sambad, int var,
+*                      int ndim, const int dims[], const CGEN_TYPE in[],
 *                      const int hb[], int nlim, CGEN_TYPE out[],
 *                      int *badout, CGEN_TYPE work1[], int work2[],
 *                      int *status )
@@ -32,6 +33,9 @@ void CGEN_FUNCTION( kpgBmdn )( int bad, int sambad, int var, int ndim,
 *     same and so can be copied rather than re-calculated.
 
 *  Parameters:
+*     wf
+*        Pointer to a pool of worker threads created by the thr library,
+*        or NULL (in which case the code will run in a single thread).
 *     bad
 *        Whether or not it is necessary to check for bad pixels in the
 *        input image.
