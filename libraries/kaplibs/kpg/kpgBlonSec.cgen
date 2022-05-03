@@ -3,9 +3,9 @@
 #include "ndf.h"
 
 void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
-                                  const int dims[], int lo, int hi,
+                                  const size_t dims[], size_t lo, size_t hi,
                                   const CGEN_TYPE a[], const int ibox[],
-                                  int nlim, int wdim, CGEN_TYPE b[],
+                                  int nlim, size_t wdim, CGEN_TYPE b[],
                                   int *badout, CGEN_TYPE asum[], int nsum[],
                                   int *status ){
 /*
@@ -18,9 +18,9 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
 
 *  Synopsis:
 *     void kpgBlonSec<T>( int bad, int sambad, int var, int ndim,
-*                         const int dims[], int lo, int hi,
+*                         const size_t dims[], size_t lo, size_t hi,
 *                         const CGEN_TYPE a[], const int ibox[],
-*                         int nlim, int wdim, CGEN_TYPE b[],
+*                         int nlim, size_t wdim, CGEN_TYPE b[],
 *                         int *badout, CGEN_TYPE asum[], int nsum[],
 *                         int *status )
 
@@ -58,10 +58,10 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
 *        The dimensions of the array to be smoothed. The supplied "dims"
 *        array should have at least "ndim" elements.
 *     lo
-*        The 1-based index on the final pixel axis of the first hyper-plane
+*        The 1-based grid index on the final pixel axis of the first hyper-plane
 *        in the section to be smoothed.
 *     hi
-*        The 1-based index on the final pixel axis of the last hyper-plane
+*        The 1-based grid index on the final pixel axis of the last hyper-plane
 *        in the section to be smoothed.
 *     a
 *        Input array to be smoothed.  Its dimensions are given by parameter
@@ -146,24 +146,23 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
 /* Local Variables: */
    CGEN_TYPE denom;      /* Denominator for smoothed output value */
    CGEN_TYPE npix;       /* Number of pixels in smoothing box */
-   int bnew;             /* New box pixel offset */
-   int bof;              /* Box pixel offset */
-   int bold;             /* Old box pixel offset */
+   hdsdim k;             /* Loop counter for box initialisation */
+   hdsdim m0;            /* 0-based index of o/p pixel prior to smoothed section */
+   hdsdim m;             /* Loop counter for output elements */
    int cdim;             /* Current dimension in recursion */
-   int el;               /* 0-based index of last o/p pixel to be calculated */
-   int end;              /* New box has been found or there are  no more
-                           boxes to sum */
-   int i;                /* Loop counter */
-   int ib;               /* Box index */
-   int idim[ NDF__MXDIM ];         /* Indices of an array element */
-   int j;                /* Index within summation array */
-   int k;                /* Loop counter for box initialisation */
-   int m;                /* Loop counter for output elements */
-   int m0;               /* 0-based index of o/p pixel prior to smoothed section */
-   int new;              /* Position of new pixel */
-   int old;              /* Position of old pixel */
-   int sof[ NDF__MXDIM ];/* Summation array offset */
-   int stride[ NDF__MXDIM ];       /* Strides through array dimensions */
+   int end;              /* New box has been found or there are  no more boxes to sum */
+   size_t bnew;          /* New box pixel offset */
+   size_t bof;           /* Box pixel offset */
+   size_t bold;          /* Old box pixel offset */
+   size_t el;            /* 0-based index of last o/p pixel to be calculated */
+   size_t i;             /* Loop counter */
+   size_t ib;            /* Box index */
+   size_t idim[ NDF__MXDIM ];         /* Indices of an array element */
+   size_t j;             /* Index within summation array */
+   size_t new;           /* Position of new pixel */
+   size_t old;           /* Position of old pixel */
+   size_t sof[ NDF__MXDIM ];/* Summation array offset */
+   size_t stride[ NDF__MXDIM ];       /* Strides through array dimensions */
 
 /* Initialise the bad-output-pixel flag. */
    *badout = 0;
@@ -207,11 +206,13 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
    m0--;
    el--;
 
-/* Find the offsets in the summation arrays for each dimensionality. */
+/* Find the offsets in the summation arrays for each dimensionality. Use
+   a signed int as the loop variable since it will decremented when zero. */
    sof[ ndim - 1 ] = 0;
-   for( i = ndim - 2; i >= 0; i-- ){
-      sof[ i ] = sof[ i + 1 ] + stride[ i + 1 ];
+   for( k = ndim - 2; k >= 0; k-- ){
+      sof[ k ] = sof[ k + 1 ] + stride[ k + 1 ];
    }
+
 
 /* Form the initial summations for the highest dimension.
    ====================================================== */
@@ -233,11 +234,11 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
    centred on pixel location [,,,lo-1].  First loop over all the
    possible contributing lines. Here, "k" is a one-based index on the
    final pixel axis. */
-   for( k = (lo - 1) - ibox[ ndim - 1 ]; k <= (lo - 1) + ibox[ ndim - 1 ]; k++ ){
+   for( k = (hdsdim)(lo - 1) - ibox[ ndim - 1 ]; k <= (hdsdim)(lo - 1) + ibox[ ndim - 1 ]; k++ ){
 
 /* If the pixel lies outside the input array, then use the boundary
    instead ("ib" is also one-based). */
-      ib = NDF_MAX( 1, NDF_MIN( k, dims[ ndim - 1 ] ) );
+      ib = NDF_MAX( 1, NDF_MIN( k, (hdsdim) dims[ ndim - 1 ] ) );
 
 /* Find the offset of the line to be accumulated. */
       bof = ( ib - 1 )*stride[ ndim - 1 ];
@@ -274,8 +275,13 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element in the section to be smoothed.
    ========================================================== */
+/* m is initialised to -1 so needs to be a signed integer value, but el is
+   unsigned. Simply comparing them using "m < el" would cause the inital
+   m value of -1 to be cast to a huge unsigned value thus causing the
+   expression value to be zero. So we check for negative m values
+   separately. */
    m = m0;
-   while( m < el ){
+   while( m < 0 || m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
    dimension summing values and numbers of pixels in the smoothing box,
@@ -322,7 +328,7 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
    current dimension.  Likewise find the position of the new
    line/plane/cube/hypercube that enters the box.  Allow for the array
    boundaries. */
-      old = NDF_MAX( 1, idim[ cdim - 1 ] - ibox[ cdim - 1 ] - 1 );
+      old = NDF_MAX( 1, (hdsdim) idim[ cdim - 1 ] - ibox[ cdim - 1 ] - 1 );
       new = NDF_MIN( dims[ cdim - 1 ], idim[ cdim - 1 ] + ibox[ cdim - 1 ] );
 
 /* Find the offset of the slab to be removed and the slab to be
@@ -382,7 +388,7 @@ void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
 
 /* If the pixel lies outside the input array, then use the boundary
    instead. */
-               ib = NDF_MAX( 1, NDF_MIN( k + 1, dims[ cdim - 1 ] ) );
+               ib = NDF_MAX( 1, NDF_MIN( k + 1, (hdsdim) dims[ cdim - 1 ] ) );
 
 /* Find the offset of the line to be accumulated.  This has two
    components: the location of the next line/plane/cube in the

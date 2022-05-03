@@ -4,7 +4,7 @@
 #include "kaplibs.h"
 
 void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
-                                  const int dims[], int seclo, int sechi,
+                                  const size_t dims[], size_t seclo, size_t sechi,
                                   const CGEN_TYPE in[], const int hb[], int nlim,
                                   CGEN_TYPE out[], int *badout, CGEN_TYPE work1[],
                                   int work2[], int *status ){
@@ -18,7 +18,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 *  Synopsis:
 *     void kpgBmdnSec<T>( int bad, int sambad, int var, int ndim,
-*                         const int dims[], int seclo, int sechi,
+*                         const size_t dims[], size_t seclo, size_t sechi,
 *                         const CGEN_TYPE in[], const int hb[], int nlim,
 *                         CGEN_TYPE out[], int *badout, CGEN_TYPE work1[],
 *                         int work2[], int *status )
@@ -58,10 +58,10 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 *        array. The supplied "dims" array should have at least "ndim"
 *        elements.
 *     seclo
-*        The 1-based index on the final pixel axis of the first hyper-plane
+*        The 1-based grid index on the final pixel axis of the first hyper-plane
 *        in the section to be smoothed.
 *     sechi
-*        The 1-based index on the final pixel axis of the last hyper-plane
+*        The 1-based grid index on the final pixel axis of the last hyper-plane
 *        in the section to be smoothed.
 *     in
 *        The input array, whose dimensions are given by parameter "dims".
@@ -133,26 +133,26 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Local Variables: */
    CGEN_TYPE midper;     /* Central percentile, i.e. median */
+   hdsdim m0;            /* Index of first output pixel to be done */
+   hdsdim m;             /* Counter of output values */
    int bdim;             /* Current dimension for box extraction */
    int cdim;             /* Current dimension in recursion */
-   int el;               /* Total number of elements in i/o arrays */
    int end;              /* End loop through axes */
-   int hi[ NDF__MXDIM ]; /* Filter box upper bounds */
-   int hil[ NDF__MXDIM ];/* Previous filter-box upper */
    int i;                /* Loop counter */
-   int idim[ NDF__MXDIM ];         /* Indices of an array element */
-   int ivo;              /* Index of input array value */
-   int lo[ NDF__MXDIM ]; /* Filter-box lower bounds */
-   int lol[ NDF__MXDIM ];/* Previous filter-box lower bounds */
-   int m0;               /* Index of first output pixel to be done */
-   int m;                /* Counter of output values */
    int more;             /* More pixels to copy? */
    int n;                /* Number of good pixels in box */
-   int new;              /* Position of new pixel */
-   int old;              /* Position of old pixel */
-   int ovo;              /* Zero-based index of output array value */
-   int pix[ NDF__MXDIM ];/* Pixel indices of next pixel to sort */
-   int stride[ NDF__MXDIM ];       /* Strides through array dimensions */
+   size_t el;            /* Total number of elements in i/o arrays */
+   size_t hi[ NDF__MXDIM ]; /* Filter box upper bounds */
+   size_t hil[ NDF__MXDIM ];/* Previous filter-box upper */
+   size_t idim[ NDF__MXDIM ];         /* Indices of an array element */
+   size_t ivo;           /* Index of input array value */
+   size_t lo[ NDF__MXDIM ]; /* Filter-box lower bounds */
+   size_t lol[ NDF__MXDIM ];/* Previous filter-box lower bounds */
+   size_t new;           /* Position of new pixel */
+   size_t old;           /* Position of old pixel */
+   size_t ovo;           /* Zero-based index of output array value */
+   size_t pix[ NDF__MXDIM ];/* Grid indices of next pixel to sort */
+   size_t stride[ NDF__MXDIM ];       /* Strides through array dimensions */
 
 /* Initialise the "badout" flag to indicate that no bad values have yet
    been put in the output image. */
@@ -167,8 +167,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 /* Initialise the y bounds of the filter box used to create the
    `previous" output line. */
    for( i = 0; i < ndim; i++ ){
-      lol[ i ] = VAL__BADI;
-      hil[ i ] = VAL__BADI;
+      lol[ i ] = VAL__BADK;
+      hil[ i ] = VAL__BADK;
    }
 
 /* Compute the strides and numbers of elements.
@@ -211,13 +211,13 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    for( i = 0; i < ndim - 1; i++ ){
       idim[ i ] = 1;
       lo[ i ] = 1;
-      hi[ i ] = NDF_MIN( dims[ i ], 1 + hb[ i ] );
+      hi[ i ] = NDF_MIN( (hdsdim) dims[ i ], 1 + hb[ i ] );
    }
    idim[ cdim - 1 ] = 0;
 
 /* The final dimension spans just the supplied section. */
    idim[ ndim - 1 ] = seclo;
-   lo[ ndim - 1 ] = NDF_MAX( 1, seclo - hb[ i ] );
+   lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ i ] );
    hi[ ndim - 1 ] = NDF_MIN( dims[ i ], seclo + hb[ i ] );
 
 /* Data containing bad values.
@@ -229,8 +229,13 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element in the section being smoothed.
    ========================================================== */
+/* m is initialised to -1 so needs to be a signed integer value, but el is
+   unsigned. Simply comparing them using "m < el" would cause the inital
+   m value of -1 to be cast to a huge unsigned value thus causing the
+   expression value to be zero. So we check for negative m values
+   separately. */
       m = m0;
-      while( m < el ){
+      while( m < 0 || m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
    dimension copying values within the box neighbourhood into the work
@@ -256,14 +261,14 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
                   hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], hb[ cdim - 1 ] + 1 );
                } else {
                   idim[ ndim - 1 ] = seclo;
-                  lo[ ndim - 1 ] = NDF_MAX( 1, seclo - hb[ ndim - 1 ] );
+                  lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ ndim - 1 ] );
                   hi[ ndim - 1 ] = NDF_MIN( dims[ ndim - 1 ], seclo + hb[ ndim - 1 ] );
                }
 
 /* Initialise the bounds of the filter box used to create the
    `previous" output column/row/plane/hyperplane. */
-               lol[ cdim - 1 ] = VAL__BADI;
-               hil[ cdim - 1 ] = VAL__BADI;
+               lol[ cdim - 1 ] = VAL__BADK;
+               hil[ cdim - 1 ] = VAL__BADK;
 
 /* As it has completed the dimension for the current next-higher
    dimension's smoothing block, go to the next higher dimension.  There
@@ -285,7 +290,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Form the upper and lower bounds of the input block.  Limit them to
    the edges of the input array. */
-         lo[ cdim - 1 ] = NDF_MAX( 1, idim[ cdim - 1 ] - hb[ cdim - 1 ] );
+         lo[ cdim - 1 ] = NDF_MAX( 1, (hdsdim) idim[ cdim - 1 ] - hb[ cdim - 1 ] );
          hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], idim[ cdim - 1 ] +
                                    hb[ cdim - 1 ] );
 
@@ -300,8 +305,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 /* If both bounds are the same as last time, then the current output
    column/row/plane/hyperplane  will be identical to the previous
    equivalent.  Save time by copying it rather than re-calculating it. */
-         if( lo[ cdim - 1 ] == lol[ cdim - 1 ] && hi[ cdim - 1 ] == hil[
-             cdim - 1 ] ) {
+         if( lo[ cdim - 1 ] == lol[ cdim - 1 ] &&
+             hi[ cdim - 1 ] == hil[ cdim - 1 ] ) {
             for( i = 0; i < stride[ cdim - 1 ]; i++ ){
                out[ i + new ] = out[ i + old ];
             }
@@ -316,7 +321,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 /* Find the index of the output element. */
             ovo = 0;
             for( i = 0; i < ndim; i++ ){
-               ovo += NDF_MAX( 0, idim[ i ] - 1 )*stride[ i ];
+               ovo += NDF_MAX( 0, (hdsdim) idim[ i ] - 1 )*stride[ i ];
             }
 
 /* If the input pixel is bad and "sambad" is non-zero, then the output
@@ -474,8 +479,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Initialise the bounds of the filter box used to create the
    `previous" output column. */
-               lol[ cdim - 1 ] = VAL__BADI;
-               hil[ cdim - 1 ] = VAL__BADI;
+               lol[ cdim - 1 ] = VAL__BADK;
+               hil[ cdim - 1 ] = VAL__BADK;
 
 /* As it has completed the dimension for the current next-higher
    dimension's smoothing block, go to the next higher dimension.  There
@@ -493,7 +498,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Form the upper and lower bounds of the input block.  Limit them to
    the edges of the input array */
-         lo[ cdim - 1 ] = NDF_MAX( 1, idim[ cdim - 1 ] - hb[ cdim - 1 ] );
+         lo[ cdim - 1 ] = NDF_MAX( 1, (hdsdim) idim[ cdim - 1 ] - hb[ cdim - 1 ] );
          hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], idim[ cdim - 1 ] +
                                    hb[ cdim - 1 ] );
 
@@ -509,8 +514,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    coloumn/row/plane/hyperplane row will be identical to the previous
    output equivalent.  Save time by copying it rather than
    re-calculating it. */
-         if( lo[ cdim - 1 ] == lol[ cdim - 1 ] && hi[ cdim - 1 ] == hil[
-             cdim - 1 ] ) {
+         if( lo[ cdim - 1 ] == lol[ cdim - 1 ] &&
+             hi[ cdim - 1 ] == hil[ cdim - 1 ] ) {
             for( i = 0; i < stride[ cdim - 1 ]; i++ ){
                out[ i + new ] = out[ i + old ];
             }
@@ -525,7 +530,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 /* Find the index of the output element. */
             ovo = 0;
             for( i = 0; i < ndim; i++ ){
-               ovo += NDF_MAX( 0, idim[ i ] - 1 )*stride[ i ];
+               ovo += NDF_MAX( 0, (hdsdim) idim[ i ] - 1 )*stride[ i ];
             }
 
 /* Find the index within the input vectorised array corresponding to

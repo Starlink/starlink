@@ -10,7 +10,7 @@
 typedef struct CGEN_FUNCTION(KpgBmdnData) {
    CGEN_TYPE *out;
    const CGEN_TYPE *in;
-   const int *dims;
+   const size_t *dims;
    const int *hb;
    int badout;
    int bad;
@@ -18,8 +18,8 @@ typedef struct CGEN_FUNCTION(KpgBmdnData) {
    int nlim;
    int sambad;
    int var;
-   int seclo;
-   int sechi;
+   size_t seclo;
+   size_t sechi;
    size_t wdim;
 } CGEN_FUNCTION(KpgBmdnData);
 
@@ -30,7 +30,7 @@ static void CGEN_FUNCTION(kpgBmdnWork)( void *job_data_ptr, int *status );
 
 
 void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
-                               int ndim, const int dims[], const CGEN_TYPE in[],
+                               int ndim, const size_t dims[], const CGEN_TYPE in[],
                                const int hb[], int nlim, CGEN_TYPE out[],
                                int *badout, int *status ){
 /*
@@ -43,7 +43,7 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
 
 *  Synopsis:
 *     void kpgBmdn<T>( ThrWorkForce *wf, int bad, int sambad, int var,
-*                      int ndim, const int dims[], const CGEN_TYPE in[],
+*                      int ndim, const size_t dims[], const CGEN_TYPE in[],
 *                      const int hb[], int nlim, CGEN_TYPE out[],
 *                      int *badout, int *status )
 
@@ -159,7 +159,7 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
    idle. */
    if( wf ) {
       nw = wf->nworker;
-      if( dims[ ndim - 1 ] < nw ) nw = dims[ ndim - 1 ];
+      if( dims[ ndim - 1 ] < nw ) nw = (int) dims[ ndim - 1 ];
    } else {
       nw = 1;
    }

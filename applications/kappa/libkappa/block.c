@@ -1,3 +1,6 @@
+/* Indicate that we want to use the 8-byte NDF interface */
+#define NDF_I8 1
+
 #include "sae_par.h"
 #include "par_par.h"
 #include "prm_par.h"
@@ -165,6 +168,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
 *     -  All non-complex numeric data types can be handled.  Arithmetic
 *     is performed using single-precision floating point, or double
 *     precision, if appropriate.
+*     -  Huge NDFs are supported.
 
 *  Timing:
 *     When using the mean estimator, the execution time is
@@ -255,28 +259,27 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    char estim[ 7 ];      /* Method to estimate smoothed values */
    char itype[ NDF__SZTYP + 1 ];   /* Numeric type for processing */
    float wlim;           /* Fraction of good pixels required */
+   hdsdim lbnd[ NDF__MXDIM + 1 ];  /* Lower bounds of NDF pixel axes */
+   hdsdim ubnd[ NDF__MXDIM + 1 ];  /* Upper bounds of NDF pixel axes */
    int bad;              /* Check for bad input pixels? */
    int baddat;           /* Bad values stored in o/p data array? */
    int badout;           /* Bad pixels in output array? */
    int badvar;           /* Bad values stored in o/p var. array? */
    int box[ NDF__MXDIM ];/* Smoothing box size */
    int boxsiz;           /* Number of pixels in smoothing box */
-   int dim[ NDF__MXDIM ];/* NDF dimensions */
-   int el;               /* Number of mapped array elements */
    int i;                /* Loop counter */
    int ibox[ NDF__MXDIM ];         /* Smoothing box half-size */
-   int lbnd[ NDF__MXDIM + 1 ];     /* Lower bounds of NDF pixel axes */
    int ndf1;             /* Identifier for input NDF */
    int ndf2;             /* Identifier for output NDF */
-   int ndf2b;            /* Section of output NDF to be filled */
    int ndim;             /* Number of dimensions in the NDF */
    int nlim;             /* Minimum good pixel limit */
    int nval;             /* Number of values obtained */
    int sambad;           /* Propagate bad pixels to same place? */
    int state;            /* State of BOX parameter */
-   int ubnd[ NDF__MXDIM + 1 ];     /* Upper bounds of NDF pixel axes */
    int var;              /* Variance array present? */
    size_t cpos;          /* Character position */
+   size_t dim[ NDF__MXDIM ];/* NDF dimensions */
+   size_t el;            /* Number of mapped array elements */
    void *pntr1[ 2 ];     /* Pointers for mapped input arrays */
    void *pntr2[ 2 ];     /* Pointers for mapped output arrays */
 
@@ -305,7 +308,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
 /* Determine its dimensions.  Unused dimensions need to be passed to 1
    for the n-dimensional looping inside the subfunctions that perform the
    smoothing. */
-   kpg1Filli( 1, NDF__MXDIM, dim, status );
+   for( i = 0; i < NDF__MXDIM; i++ ) dim[ i ] = 1;
    for( i = 0; i < ndim; i++ ){
       dim[ i ] = ubnd[ i ] - lbnd[ i ] + 1;
    }

@@ -10,16 +10,16 @@
 typedef struct CGEN_FUNCTION(KpgBlonData) {
    CGEN_TYPE *b;
    const CGEN_TYPE *a;
-   const int *dims;
    const int *ibox;
-   int badout;
+   const size_t *dims;
    int bad;
+   int badout;
    int ndim;
    int nlim;
    int sambad;
    int var;
-   int lo;
-   int hi;
+   size_t hi;
+   size_t lo;
    size_t wdim;
 } CGEN_FUNCTION(KpgBlonData);
 
@@ -30,7 +30,7 @@ static void CGEN_FUNCTION(kpgBlonWork)( void *job_data_ptr, int *status );
 
 
 void CGEN_FUNCTION( kpgBlon )( ThrWorkForce *wf, int bad, int sambad, int var,
-                               int ndim, const int dims[], const CGEN_TYPE a[],
+                               int ndim, const size_t dims[], const CGEN_TYPE a[],
                                const int ibox[], int nlim, CGEN_TYPE b[],
                                int *badout, int *status ){
 /*
@@ -43,7 +43,7 @@ void CGEN_FUNCTION( kpgBlon )( ThrWorkForce *wf, int bad, int sambad, int var,
 
 *  Synopsis:
 *     void kpgBlon<T>( ThrWorkForce *wf, int bad, int sambad, int var,
-*                      int ndim, const int dims[], const CGEN_TYPE a[],
+*                      int ndim, const size_t dims[], const CGEN_TYPE a[],
 *                      const int ibox[], int nlim, CGEN_TYPE b[],
 *                      int *badout, int *status )
 
@@ -173,7 +173,7 @@ void CGEN_FUNCTION( kpgBlon )( ThrWorkForce *wf, int bad, int sambad, int var,
    idle. */
    if( wf ) {
       nw = wf->nworker;
-      if( dims[ ndim - 1 ] < nw ) nw = dims[ ndim - 1 ];
+      if( dims[ ndim - 1 ] < nw ) nw = (int) dims[ ndim - 1 ];
    } else {
       nw = 1;
    }
