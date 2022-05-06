@@ -12,10 +12,10 @@
 	url = ../skycat.git
 [submodule "thirdparty/perlsys/perl/perl"]
 	path = thirdparty/perlsys/perl/perl
-	url = git://github.com/Perl/perl5.git
+	url = https://github.com/Perl/perl5.git
 [submodule "applications/smurf/libacsis/specwrite"]
 	path = applications/smurf/libacsis/specwrite
-	url = git://github.com/eaobservatory/acsis-libspecwrite.git
+	url = https://github.com/eaobservatory/acsis-libspecwrite.git
 [submodule "thirdparty/heasarc/cfitsio/cfitsio"]
 	path = thirdparty/heasarc/cfitsio/cfitsio
 	url = ../cfitsio.git
@@ -111,37 +111,37 @@
 	url = ../perl-Starlink-Extractor.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-Pointing"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-Pointing
-	url = git://github.com/eaobservatory/perl-JCMT-Pointing.git
+	url = https://github.com/eaobservatory/perl-JCMT-Pointing.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-Tau"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-Tau
-	url = git://github.com/eaobservatory/perl-JCMT-Tau.git
+	url = https://github.com/eaobservatory/perl-JCMT-Tau.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-MapArea"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-MapArea
-	url = git://github.com/eaobservatory/perl-JCMT-MapArea.git
+	url = https://github.com/eaobservatory/perl-JCMT-MapArea.git
 [submodule "thirdparty/perlsys/perlmods/perl-JSA"]
 	path = thirdparty/perlsys/perlmods/perl-JSA
-	url = git://github.com/eaobservatory/perl-JSA.git
+	url = https://github.com/eaobservatory/perl-JSA.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-Array
-	url = git://github.com/eaobservatory/perl-JCMT-ACSIS-Array.git
+	url = https://github.com/eaobservatory/perl-JCMT-ACSIS-Array.git
 [submodule "thirdparty/perlsys/perlmods/perl-JAC-Setup"]
 	path = thirdparty/perlsys/perlmods/perl-JAC-Setup
-	url = git://github.com/eaobservatory/perl-JAC-Setup.git
+	url = https://github.com/eaobservatory/perl-JAC-Setup.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-SCUBA"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-SCUBA
-	url = git://github.com/eaobservatory/perl-JCMT-SCUBA.git
+	url = https://github.com/eaobservatory/perl-JCMT-SCUBA.git
 [submodule "thirdparty/perlsys/perlmods/perl-JCMT-DAS"]
 	path = thirdparty/perlsys/perlmods/perl-JCMT-DAS
-	url = git://github.com/eaobservatory/perl-JCMT-DAS.git
+	url = https://github.com/eaobservatory/perl-JCMT-DAS.git
 [submodule "libext/pal"]
 	path = libext/pal
 	url = ../pal
 [submodule "thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2"]
 	path = thirdparty/perlsys/perlmods/perl-Astro-ITC-SCUBA2
-	url = git://github.com/eaobservatory/perl-Astro-ITC-SCUBA2.git
+	url = https://github.com/eaobservatory/perl-Astro-ITC-SCUBA2.git
 [submodule "thirdparty/perlsys/perlmods/perl-UKIRT-Archive"]
 	path = thirdparty/perlsys/perlmods/perl-UKIRT-Archive
-	url = git://github.com/eaobservatory/perl-UKIRT-Archive.git
+	url = https://github.com/eaobservatory/perl-UKIRT-Archive.git
 [submodule "thirdparty/fsf/autotools/autoconf/autoconf"]
 	path = thirdparty/fsf/autotools/autoconf/autoconf
 	url = ../autoconf.git
@@ -156,7 +156,7 @@
 	url = ../m4.git
 [submodule "thirdparty/erfa/erfa"]
 	path = thirdparty/erfa/erfa
-	url = git://github.com/liberfa/erfa.git
+	url = https://github.com/liberfa/erfa.git
 [submodule "thirdparty/perlsys/perlmods/perl-Pod-SST"]
 	path = thirdparty/perlsys/perlmods/perl-Pod-SST
 	url = ../perl-Pod-SST
@@ -174,4 +174,4 @@
 	url = ../hds-v4.git
 [submodule "applications/smurf/wvm"]
 	path = applications/smurf/wvm
-	url = git://github.com/eaobservatory/jcmt-wvm.git
+	url = https://github.com/eaobservatory/jcmt-wvm.git
