@@ -2876,23 +2876,25 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                           "using a box filter of %zu pixels.", status, ibox );
 
                usemap = smf_tophat2( wf, mapchange, mdims, ibox, 0, 0.0, 1, status );
+               if( usemap ){
 
-               /* Calculate the max of the smoothed map change values. */
-               mapchange_max = 0;
-               int maxat = -1;
-               for( ipix = 0; ipix < msize; ipix++ ) {
-                  if( usemap[ipix] != VAL__BADD ){
-                     if( usemap[ipix] > mapchange_max ) {
-                        mapchange_max = usemap[ipix];
-                        maxat = ipix;
+                  /* Calculate the max of the smoothed map change values. */
+                  mapchange_max = 0;
+                  int maxat = -1;
+                  for( ipix = 0; ipix < msize; ipix++ ) {
+                     if( usemap[ipix] != VAL__BADD ){
+                        if( usemap[ipix] > mapchange_max ) {
+                           mapchange_max = usemap[ipix];
+                           maxat = ipix;
+                        }
                      }
                   }
-               }
 
-               msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
-                          "at pixel (%d,%d).", status,
-                          ( maxat % (int)mdims[0] ) + lbnd_out[0],
-                          ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+                  msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
+                             "at pixel (%d,%d).", status,
+                             ( maxat % (int)mdims[0] ) + lbnd_out[0],
+                             ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+               }
 
             } else {
                usemap = mapchange;
