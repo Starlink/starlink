@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/sh
 #
 #  - - - - -
 #   H L I B
@@ -23,11 +23,13 @@
 #
 #  Copyright P.T.Wallace 1996.  All rights reserved.
 #
-foreach file ($*)
-   crehlp $file $file:r.shl
-   if ( $status != 0 ) then
+for file in "$@"; do
+   crehlp "$file" "${file%.*}.shl"
+   if [[ $? != 0 ]]; then
      echo Error running crehlp
-     if (-e $file:r.shl) rm $file:r.shl
+     if [[ -e "${file%.*}".shl ]]; then
+       rm "${file%.*}".shl
+     fi
      exit 1
-   endif
-end
+   fi
+done
