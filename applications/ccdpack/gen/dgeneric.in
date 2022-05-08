@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/sh
 #+
 #  Name:
 #     dgeneric
@@ -7,7 +7,7 @@
 #     Generates doubly generic code for CCDPACK
 
 #  Language:
-#     C-shell script
+#     Bourne Shell
 
 #  Invocation:
 #     dgeneric filename [generic_types]
@@ -45,32 +45,33 @@
 #        Modified for use with configure.
 #     10-OCT-2004 (AA):
 #        Updated to use FGENERIC token
+#     7-MAY-2022 (GSB):
+#        Convert to sh.
 #     {enter_changes_here}
 
 #-
 #
 #  Check for input file.
-     if ( $1 == "" ) then
+     if [[ -z "$1" ]]; then
         echo "Usage: dgeneric filename"
         exit
      else
-        if ( ! ( -e $1 ) ) then
-           set file = ${1}.gen
-           if ( ! ( -e $file ) ) then
+        if [[ ! -e "$1" ]]; then
+           file="${1}.gen"
+           if [[ ! -e "$file" ]]; then
               echo "$1 does not exist"
               exit
-           endif
+           fi
         else
-           set file = $1
-        endif
+           file="$1"
+        fi
         echo "Processing $file"
-     endif
+     fi
 
 #  Replace the T1's etc. with the normal flags.
-     onintr EXIT
-     if ( -e dgeneric.gen ) then
-        'rm' dgeneric.gen
-     endif
+     if [[ -e dgeneric.gen ]]; then
+        rm dgeneric.gen
+     fi
      sed <$file  >dgeneric.gen   \
         -e s/T1/T/g          \
         -e s/TYPE1/TYPE/g    \
@@ -80,16 +81,16 @@
         -e s/COMM1/COMM/g
 
 #  Generic this.
-     if ( $2 == "" ) then
+     if [[ -z "$2" ]]; then
         @FGENERIC@ -t n dgeneric.gen
      else
-        @FGENERIC@ -t $2 dgeneric.gen
-     endif
+        @FGENERIC@ -t "$2" dgeneric.gen
+     fi
 
 #  Second tokens.
-     if ( -e dgeneric2.gen ) then
-        'rm' dgeneric2.gen
-     endif
+     if [[ -e dgeneric2.gen ]]; then
+        rm dgeneric2.gen
+     fi
      sed <dgeneric.f  >dgeneric2.gen   \
        -e s/T2/T/g          \
        -e s/TYPE2/TYPE/g    \
@@ -100,43 +101,42 @@
 
 #  Final generic process. If split is set then give generic the
 #  -s flag
-     if ( $3 == "" ) then
-        if ( $2 == "" ) then
+     if [[ -z "$3" ]]; then
+        if [[ -z "$2" ]]; then
            @FGENERIC@ -t n dgeneric2.gen
         else
-           @FGENERIC@ -t $2 dgeneric2.gen
-        endif
+           @FGENERIC@ -t "$2" dgeneric2.gen
+        fi
 
 #  Set the output file name.
-        set fname = $file:r
-        'mv' dgeneric2.f ${fname}.f
+        fname="${file%.*}"
+        mv dgeneric2.f "${fname}.f"
      else
 
 #  Splitting output into separate files. Need to rename the resultant files
 #  to the correct names.
-        foreach part ( dgeneric2b.f dgeneric2B.f dgeneric2w.f dgeneric2W.f \
-                       dgeneric2i.f dgeneric2r.f dgeneric2d.f )
-           if ( -e $part ) then
-              'rm' $part
-           endif
-        end
-        if ( $2 == "" ) then
+        for part in dgeneric2b.f dgeneric2B.f dgeneric2w.f dgeneric2W.f \
+                    dgeneric2i.f dgeneric2r.f dgeneric2d.f; do
+           if [[ -e "$part" ]]; then
+              rm $part
+           fi
+        done
+        if [[ -z "$2" ]]; then
            @FGENERIC@ -t n  -s dgeneric2.gen
         else
-           @FGENERIC@ -t $2 -s dgeneric2.gen
-        endif
+           @FGENERIC@ -t "$2" -s dgeneric2.gen
+        fi
 
 #  Now look for all dgeneric2* files. Get the * value and rename.
-        set fname = $file:r
-        foreach part ( dgeneric2*.f )
-           set this_part = $part:r
-           set exten = `echo $this_part | sed "s:dgeneric2::" `
-           'mv' $part ${fname}${exten}.f
-        end
-     endif
+        fname="${file%.*}"
+        for part in dgeneric2*.f; do
+           this_part="${part%.*}"
+           exten="${this_part/dgeneric/}"
+           mv "$part" "${fname}${exten}.f"
+        done
+     fi
 
 # Finished. Get rid of intermediary files.
-EXIT:
-    'rm' dgeneric.gen dgeneric.f dgeneric2.gen
+     rm dgeneric.gen dgeneric.f dgeneric2.gen
      exit
 # $Id$
