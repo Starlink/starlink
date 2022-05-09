@@ -327,4 +327,9 @@
 /kpg/notes
 /kpg/kpgMul.c
 /kpg/kpgDiv.c
+/kpg/kpg1Qntl.c
+/kpg/kpgBlon.c
+/kpg/kpgBlonSec.c
+/kpg/kpgBmdn.c
+/kpg/kpgBmdnSec.c
 /sun238.pdf
