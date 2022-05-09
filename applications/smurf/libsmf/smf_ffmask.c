@@ -13,10 +13,10 @@
 *     Library routine
 
 *  Invocation:
-*     size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
-*                        dim_t nbolo, dim_t ntslice, size_t tstride,
-*                        size_t bstride, size_t t_first, size_t t_last,
-*                        size_t box, double cliphi, double cliplo,
+*     dim_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
+*                        dim_t nbolo, dim_t ntslice, dim_t tstride,
+*                        dim_t bstride, dim_t t_first, dim_t t_last,
+*                        dim_t box, double cliphi, double cliplo,
 *                        int *status )
 
 *  Arguments:
@@ -31,17 +31,17 @@
 *        The number of bolometers in the array.
 *     ntslice = dim_t (Given)
 *        The number of time slices in the array.
-*     tstride = size_t (Given)
+*     tstride = dim_t (Given)
 *        The number of array elements between adjacent time slices in a
 *        single bolometer.
-*     bstride = size_t (Given)
+*     bstride = dim_t (Given)
 *        The number of array elements between adjacent bolometers at a
 *        single time slice.
-*     t_first = size_t (Given)
+*     t_first = dim_t (Given)
 *        The index of the first time slice to use.
-*     t_last = size_t (Given)
+*     t_last = dim_t (Given)
 *        The index of the last time slice to use.
-*     box = size_t (Given)
+*     box = dim_t (Given)
 *        The number of time slices corresponding to the feature size to
 *        be masked.
 *     cliphi = double (Given)
@@ -136,27 +136,27 @@ typedef struct smfFfmaskData {
    double *data;
    double cliplo;
    double cliphi;
-   size_t box;
-   size_t bstride;
-   size_t nbad;
-   size_t t_first;
-   size_t t_last;
-   size_t tstride;
+   dim_t box;
+   dim_t bstride;
+   dim_t nbad;
+   dim_t t_first;
+   dim_t t_last;
+   dim_t tstride;
    smf_qual_t *qua;
 } smfFfmaskData;
 
-size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
-                   dim_t nbolo, dim_t ntslice, size_t tstride,
-                   size_t bstride, size_t t_first, size_t t_last,
-                   size_t box, double cliphi, double cliplo, int *status ){
+dim_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
+                   dim_t nbolo, dim_t ntslice, dim_t tstride,
+                   dim_t bstride, dim_t t_first, dim_t t_last,
+                   dim_t box, double cliphi, double cliplo, int *status ){
 
 /* Local Variables: */
    smfFfmaskData *job_data = NULL;
    smfFfmaskData *pdata;
    int iw;
    int nw;
-   size_t bstep;
-   size_t nbad = 0;
+   dim_t bstep;
+   dim_t nbad = 0;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return 0;
@@ -262,15 +262,15 @@ static void smf1_ffmask( void *job_data_ptr, int *status ) {
    int jlo;
    int jhi;
    int qbox;
-   size_t box;
-   size_t bstride;
-   size_t itime;
-   size_t nbad;
-   size_t nt;
-   size_t s2;
-   size_t t_first;
-   size_t t_last;
-   size_t tstride;
+   dim_t box;
+   dim_t bstride;
+   dim_t itime;
+   dim_t nbad;
+   dim_t nt;
+   dim_t s2;
+   dim_t t_first;
+   dim_t t_last;
+   dim_t tstride;
    smfFfmaskData *pdata;
    smf_qual_t *pq0;
    smf_qual_t *pq;

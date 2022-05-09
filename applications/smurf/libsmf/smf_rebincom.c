@@ -134,14 +134,14 @@ typedef struct SmfRebinComData {
    int nblock;
    int nw;
    int oper;
-   size_t bstride;
-   size_t gbstride;
-   size_t gcstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t gbstride;
+   dim_t gcstride;
+   dim_t tstride;
    smf_qual_t *qual;
    dim_t vntslice;
-   size_t vbstride;
-   size_t vtstride;
+   dim_t vbstride;
+   dim_t vtstride;
    double *var;
 } SmfRebinComData;
 
@@ -162,15 +162,15 @@ void smf_rebincom( ThrWorkForce *wf, smfData *comdata, smfData *gaidata,
    int iw;
    int nblock;
    int nw;
-   size_t bstride;
-   size_t gbstride;
-   size_t gcstride;
-   size_t pixstep;
-   size_t tstride;
-   size_t vbstride;
+   dim_t bstride;
+   dim_t gbstride;
+   dim_t gcstride;
+   dim_t pixstep;
+   dim_t tstride;
+   dim_t vbstride;
    dim_t vnbolo;
    dim_t vntslice;
-   size_t vtstride;
+   dim_t vtstride;
    double *var;
 
 /* Check inherited status */
@@ -373,8 +373,8 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
    int *pl;
    int iw;
    int nw;
-   size_t iv0;
-   size_t msize;
+   dim_t iv0;
+   dim_t msize;
    smf_qual_t *pq;
    smf_qual_t *pq0;
 
@@ -390,17 +390,17 @@ static void smf1_rebincom( void *job_data_ptr, int *status ) {
    if( pdata->oper == 1 ) {
       dim_t t1 = pdata->t1;
       dim_t t2 = pdata->t2;
-      size_t bstride = pdata->bstride;
-      size_t tstride = pdata->tstride;
-      size_t gbstride = pdata->gbstride;
-      size_t gcstride = pdata->gcstride;
+      dim_t bstride = pdata->bstride;
+      dim_t tstride = pdata->tstride;
+      dim_t gbstride = pdata->gbstride;
+      dim_t gcstride = pdata->gcstride;
       dim_t ntslice = pdata->ntslice;
       dim_t vntslice = pdata->vntslice;
       int nblock = pdata->nblock;
       dim_t nbolo = pdata->nbolo;
       dim_t gain_box = pdata->gain_box;
-      size_t vbstride = pdata->vbstride;
-      size_t vtstride = pdata->vtstride;
+      dim_t vbstride = pdata->vbstride;
+      dim_t vtstride = pdata->vtstride;
       double *var = pdata->var;
 
 /* Allocate work space */

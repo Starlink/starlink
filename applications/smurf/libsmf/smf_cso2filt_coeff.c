@@ -93,7 +93,7 @@
 #include "smf.h"
 
 static const double default_coeffs[] = {1.0, 0.0, 0.0};
-static const size_t n_default_coeffs = sizeof(default_coeffs) / sizeof(*default_coeffs);
+static const dim_t n_default_coeffs = sizeof(default_coeffs) / sizeof(*default_coeffs);
 
 void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
                          dim_t nvals, double coeffs[], dim_t *ncoeff, int *status) {

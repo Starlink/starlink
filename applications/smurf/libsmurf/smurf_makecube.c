@@ -1123,13 +1123,8 @@ void smurf_makecube( int *status ) {
    size_t el;                 /* Index of 3D array element */
    size_t idet;               /* Detector index */
    size_t id;                 /* Detector index */
-   size_t itile;              /* Output tile index */
    size_t nd;                 /* Number of detectors */
    size_t ndet;               /* Number of detectors */
-   size_t njsatile;           /* Number of output JSA tiles */
-   size_t ntile;              /* Number of output tiles */
-   size_t outsize;            /* Number of files in output group */
-   size_t size;               /* Number of files in input group */
    size_t nel;                /* Number of elements in 3D array */
    size_t nxy;                /* Number of elements in a 2D output tile */
    size_t temp;               /* Temp size_t value */

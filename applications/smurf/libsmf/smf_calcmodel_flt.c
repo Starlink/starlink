@@ -228,13 +228,13 @@ void smf_calcmodel_flt( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double ring_nsigma;           /* Clipping limit for ringing filter */
   double ring_wing;             /* Size of wings for ringing filter */
   int skip;                     /* Number of AST models being skipped */
-  dim_t tstride;               /* Time slice stride in data array */
+  dim_t t_first;                /* Index of first usable time slice */
+  dim_t t_last;                 /* Index of last usable time slice */
+  dim_t tstride;                /* Time slice stride in data array */
   int undofirst = 1;            /* Undo FLT model at start of iteration? */
   int whiten;                   /* Applying whitening filter? */
   double period;                /* Period of lowest passed frequency */
   int zeropad;                  /* Pad with zeros? */
-  size_t t_first;               /* Index of first usable time slice */
-  size_t t_last;                /* Index of last usable time slice */
 
   /* Main routine */
   if (*status != SAI__OK) return;

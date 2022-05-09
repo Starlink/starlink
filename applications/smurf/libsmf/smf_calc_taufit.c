@@ -184,7 +184,6 @@ void smf_calc_taufit( const smfData * data, smf_tausrc tausrc,
     } else {
       dim_t i;
       double curepoch;
-      csofit2_poly_t *polys;
       double coeffs[3];
       dim_t ncoeffs = 0;
 

@@ -1106,10 +1106,10 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
                      int resids, int neg, double *sigma, int *status );
 
-size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
-                   dim_t nbolo, dim_t ntime, size_t tstride,
-                   size_t bstride, size_t t_first, size_t t_last,
-                   size_t box, double cliphi, double cliplo, int *status );
+dim_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
+                   dim_t nbolo, dim_t ntime, dim_t tstride,
+                   dim_t bstride, dim_t t_first, dim_t t_last,
+                   dim_t box, double cliphi, double cliplo, int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 

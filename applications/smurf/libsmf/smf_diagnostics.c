@@ -565,9 +565,10 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                   sprintf( root, "mod_%d", (int) chunk );
 
                   if( btable ){
-                     sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, chunk,
+                     sprintf( broot, "%s_%d_%d_%s_mod.asc", btable, (int) chunk,
                               dat->iter, modname );
                   }
+
                   smf_diag( wf, mloc, &ibolo, irow, power, time, isub,
                             dat, type, allmodel ? allmodel[ 0 ] : NULL,
                             hits?-999:0, root, mask, mingood, cube, map, addqual,
@@ -578,7 +579,7 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
                      sprintf( root, "aft_%d", (int) chunk );
 
                      if( btable ){
-                        sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, chunk,
+                        sprintf( broot, "%s_%d_%d_%s_aft.asc", btable, (int) chunk,
                                  dat->iter, modname );
                      }
 
@@ -601,11 +602,13 @@ void smf_diagnostics( ThrWorkForce *wf, int where, smfDIMMData *dat,
 /* Report the chosen typical bolometer if required, and store it in the
    KeyMap in place of the original BOLO value, in order to ensure that the
    same bolometer is chosen in future. */
-            if( repbolo && ibolo >= 0 ) {
-               astMapPut0K( kmap, "BOLO", ibolo, NULL );
-               msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
-                        status, (int) ibolo );
-               repbolo = 0;
+                if( repbolo && ibolo >= 0 ) {
+                  astMapPut0K( kmap, "BOLO", ibolo, NULL );
+                  msgOutf( "", "Diagnostics: using \"typical\" bolometer %d.",
+                           status, (int) ibolo );
+                  repbolo = 0;
+               }
+
             }
          }
       }

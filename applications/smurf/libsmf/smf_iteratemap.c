@@ -2895,6 +2895,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                              "at pixel (%" DIM_T_FMT ",%" DIM_T_FMT ").", status,
                              ( maxat % (int)mdims[0] ) + lbnd_out[0],
                              ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+               }
 
             } else {
                usemap = mapchange;
