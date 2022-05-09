@@ -479,6 +479,9 @@ Ubuntu:
    cm-super
    texinfo
    texi2html
+   libglu1-mesa-dev
+   freeglut3-dev
+   mesa-common-dev
 
 Fedora:
    Mainly as for Ubuntu, but note that package names are usually changed
