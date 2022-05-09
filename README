@@ -367,6 +367,13 @@ Platform specific build notes
 
   http://wiki.debian.org/ToolChain/DSOLinking
 
+
+  Bootstrap in thirdparty/kitware/vtk may fail during bootstrap of cmake
+  if QT5 devel packges are installed on the local system. The answer
+  seems to be to remove such packages before building starlink,
+  reinstalling them again afterwards if necessary..
+
+
   - OS X
 
   The build situation under OS X follows much like that of GNU/Linux,
