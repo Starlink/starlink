@@ -444,8 +444,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *B*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/ubyte $fname \
@@ -470,8 +472,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *c*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/character $fname \
@@ -498,8 +502,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *d*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/double $fname \
@@ -524,8 +530,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *i*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/integer $fname \
@@ -550,8 +558,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *k*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/integer8 $fname \
@@ -576,8 +586,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *l*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/logical $fname \
@@ -602,8 +614,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *r*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/real $fname \
@@ -628,8 +642,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *w*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/word $fname \
@@ -654,8 +670,10 @@ for fname in $gfiles; do
          if [[ -f $tempfile ]]; then
             \rm $tempfile
          fi
-         ;;&
+         ;;
+      esac
 
+      case "$types" in
       *W*)
          if [[ $astflag == 1 ]]; then
             sed -f $GENERIC_DIR/uword $fname \
