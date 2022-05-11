@@ -179,13 +179,23 @@
       tmpdir="${HTX_TMP:-${HOME}/.htxtmp}"
       if test ! -d "${tmpdir}"; then mkdir "${tmpdir}"; fi
 
-#  Mac OS X
-#  --------
+#  Mac OS X or Linux with xdg-open available
+#  -----------------------------------------
 #  If this is an OSX system the "open" command will do all the heavy lifting
 #  for us and will let us use the system default browser (match OS X
 #  and OS X Server).
+#  On Linux xdg-open can be used, but without -a to specify a browser.
 
-      if test -f /usr/bin/sw_vers && expr "`/usr/bin/sw_vers -productName`" : 'Mac OS X' >/dev/null; then
+      opencmd=""
+      if test -z "$HTX_BROWSER" -a -f /usr/bin/xdg-open; then
+         opencmd="/usr/bin/xdg-open"
+      elif test -f /usr/bin/sw_vers && expr "`/usr/bin/sw_vers -productName`" : 'macOS' >/dev/null; then
+         opencmd="open"
+      elif test -f /usr/bin/sw_vers && expr "`/usr/bin/sw_vers -productName`" : 'Mac OS X' >/dev/null; then
+         opencmd="open"
+      fi
+
+      if test -n "$opencmd"; then
 
 #  Manage scratch file space.
 #  -------------------------
@@ -195,14 +205,14 @@
 
 #  Use "ls" to list all the temporary file names so far used in reverse order
 #  of their creation time.
-            tempfiles="`ls -t ${tmpdir}/htx-browse-osx-${LOGNAME}-*.html \
+            tempfiles="`ls -t ${tmpdir}/htx-browse-open-${LOGNAME}-*.html \
                         2>/dev/null`"
 
 #  Pass this list of file names through "sed" to extract the sequence number
 #  field, quitting once that corresponding to the most recently created file
 #  has been obtained.
             n="`echo "${tempfiles}" \
-            | sed -n 's%^.*/htx-browse-osx-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
+            | sed -n 's%^.*/htx-browse-open-'"${LOGNAME}"'-\([1-9][0-9]*\)\.html$%\1%p
                       t done
                       b
                       :done
@@ -214,7 +224,7 @@
 #  Generate the temporary file name and replace the URL value with it. This
 #  name must be unique to the current machine, software, browser, user and
 #  temporary document sequence number.
-            url="${tmpdir}/htx-browse-osx-${LOGNAME}-${n}.html"
+            url="${tmpdir}/htx-browse-open-${LOGNAME}-${n}.html"
 
 #  Select the names of all but the most recent few temporary files and remove
 #  these older ones if necessary.
@@ -236,14 +246,15 @@
 
 #  Start a new browser, supplying the URL generated above. Cannot suppress
 #  warning messages on OS X.
-         echo "Sending document to ${HTX_BROWSER} WWW browser..."
 	
          if test -z "$HTX_BROWSER"; then
-             echo open $url
-             open $url
+             echo "Sending document to default WWW browser..."
+             echo $opencmd $url
+             $opencmd $url
          else
-             echo open -a "${HTX_BROWSER}" $url
-             open -a "${HTX_BROWSER}" $url
+             echo "Sending document to ${HTX_BROWSER} WWW browser..."
+             echo $opencmd -a "${HTX_BROWSER}" $url
+             $opencmd -a "${HTX_BROWSER}" $url
          fi
 #  OS X stops here. The job is done.
 	 exit
@@ -674,7 +685,7 @@
 #  If the browser was not recognised, then abort with an error message.
       *)
          echo >&2 \
-         "${HTX_SCRIPT}: ${HTX_BROWSER} WWW browser is not recognised"
+         "${HTX_SCRIPT:-browse}: ${HTX_BROWSER} WWW browser is not recognised"
          exit 1
       esac
 
