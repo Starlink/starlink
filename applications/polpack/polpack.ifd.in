@@ -2685,17 +2685,25 @@ package polpack {
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-      if (-d $HOME/adam) then
+      if ($?ADAM_USER) then
+         set adamdir=$ADAM_USER
+      else
+         set adamdir=$HOME/adam
+      endif
+
+      if (-d $adamdir) then
          echo -n
       else
-         if (-f $HOME/adam) then
-            echo "You have a file called adam in your home directory.  Please rename "
-            echo "since adam must be a directory for ADAM files."
+         if (-f $adamdir) then
+            echo "You have a file called $adamdir"
+            echo "Please rename this, or define the environment variable ADAM_USER"
+            echo "to point to a directory for ADAM files."
             exit
          else
-            mkdir $HOME/adam
+            mkdir $adamdir
          endif
       endif
+      unset adamdir
 #
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
@@ -2727,17 +2735,25 @@ package polpack {
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-      if test -d "$HOME/adam"; then
+      if test ! -z "$ADAM_USER"; then
+         adamdir="$ADAM_USER"
+      else
+         adamdir="$HOME/adam"
+      fi
+
+      if test -d "$adamdir"; then
          echo -n
       else
-         if test -f "$HOME/adam"; then
-            echo "You have a file called adam in your home directory.  Please rename "
-            echo "since adam must be a directory for ADAM files."
+         if test -f "$adamdir"; then
+            echo "You have a file called $adamdir"
+            echo "Please rename this, or define the environment variable ADAM_USER"
+            echo "to point to a directory for ADAM files."
             exit
          else
-            mkdir $HOME/adam
+            mkdir "$adamdir"
          fi
       fi
+      unset adamdir
 #
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
