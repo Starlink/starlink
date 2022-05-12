@@ -138,12 +138,12 @@ fi
 
 #  Run up GAIA, trap nasty -help output and show something useful.
 if test "${1}" = "-help" -o "${1}" = "-h"; then
-   export TCL_LIBRARY=$BASE_DIR/lib/tcl8.5
+   export TCL_LIBRARY=$BASE_DIR/lib/tcl@TCL_VERSION@
    exec $GAIA_DIR/gaia_wish $BASE_DIR/lib/gaia@TCL_PACKAGE_VERSION@/gaiaMain.tcl --help
 else
    test -d $HOME/.skycat || mkdir $HOME/.skycat
    echo "`date`: Starting GAIA with: $0 ${1+"$@"}" > $HOME/.skycat/log
-   export TCL_LIBRARY=$BASE_DIR/lib/tcl8.5
+   export TCL_LIBRARY=$BASE_DIR/lib/tcl@TCL_VERSION@
    exec $GAIA_DIR/gaia_wish $BASE_DIR/lib/gaia@TCL_PACKAGE_VERSION@/gaiaMain.tcl ${1+"$@"} | tee -a $HOME/.skycat/log 2>&1
 fi
 exit
