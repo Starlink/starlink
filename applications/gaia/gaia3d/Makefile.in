@@ -406,7 +406,7 @@ install-lib-binaries: binaries
 #========================================================================
 
 install-bin-binaries: binaries
-	@test -d $(DESTDIR)$(bindir)/$(PACKAGE_NAME) || mkdir -p $(DESTDIR)$(bindir)/$(PACKAGE_NAME)
+	@test -d $(DESTDIR)$(bindir)/$(PACKAGE_NAME) -o -z "$(strip $(bin_BINARIES))" || mkdir -p $(DESTDIR)$(bindir)/$(PACKAGE_NAME)
 	@list='$(bin_BINARIES)'; for p in $$list; do \
 	  if test -f $$p; then \
 	    echo "MANIFEST:$(DESTDIR)$(bindir)/$(PACKAGE_NAME)/$$p"; \
