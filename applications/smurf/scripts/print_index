@@ -1,5 +1,4 @@
-#!/local/perl/bin/perl
-##/usr/bin/env starperl   # -*- cperl -*-
+#!/usr/bin/env starperl
 
 =head1 NAME
 
