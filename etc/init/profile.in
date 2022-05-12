@@ -497,7 +497,7 @@ fi
 
 if test -f ${bindir}/atools/atools.sh; then
   atools () { . $ATOOLS_DIR/atools.sh; }
-  atools () { . $ATOOLS_DIR/atools.sh; }
+  atoolssetup () { . $ATOOLS_DIR/atools.sh; }
 else
   atools () { ${STARLINK_DIR}/etc/notinst atools; }
   atoolssetup () { ${STARLINK_DIR}/etc/notinst atools; }
