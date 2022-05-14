@@ -18,7 +18,7 @@ cocomain_LDADD = `sla_link`
 
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
-	-e 's,@CSH\@,$(CSH),g' \
+	-e 's,@SH\@,$(SH),g' \
 	-e 's,@starbindir\@,$(bindir),g'
 
 coco: coco.in

@@ -26,7 +26,7 @@ LT_INIT
 AC_FC_OPEN_SPECIFIERS(readonly)
 AC_FC_OPEN_SPECIFIERS(action='read')
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_CHECK_PROGS(csh)
+STAR_CHECK_PROGS(sh)
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [sla])
