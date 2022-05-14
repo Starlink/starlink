@@ -20,7 +20,7 @@ AC_PROG_FC
 LT_INIT
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS(csh)
+STAR_CHECK_PROGS(sh)
 
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae;

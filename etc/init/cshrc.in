@@ -333,8 +333,8 @@ endif
 #
 
 if ( -e ${bindir}/fluxes/fluxes ) then
-   alias fluxes ${bindir}/fluxes/fluxes.csh
-   alias fluxnow ${bindir}/fluxes/fluxnow.csh
+   alias fluxes ${bindir}/fluxes/fluxes.sh
+   alias fluxnow ${bindir}/fluxes/fluxnow.sh
 else
    alias fluxes ${staretcdir}/notinst fluxes
    alias fluxnow ${staretcdir}/notinst fluxnow

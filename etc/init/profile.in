@@ -288,10 +288,10 @@ if test -f ${bindir}/figaro/figaro.sh; then
    export FIGARO_PROG_N=${bindir}/figaro
 fi
 
-#  Fluxes - note that we can run with fluxes.csh
-#           (assuming that csh exists on the system)
+#  Fluxes - note that we can run with fluxes.sh
+#           (assuming that sh exists on the system)
 
-if test -f ${bindir}/fluxes/fluxes.csh; then
+if test -f ${bindir}/fluxes/fluxes.sh; then
    export FLUXES_DIR=${bindir}/fluxes
 fi
 
@@ -657,8 +657,8 @@ fi
 # Fluxes
 
 if test -f ${bindir}/fluxes/fluxes; then
-  fluxes () { $FLUXES_DIR/fluxes.csh ${1+"$@"}; }
-  fluxnow () { $FLUXES_DIR/fluxnow.csh; }
+  fluxes () { $FLUXES_DIR/fluxes.sh ${1+"$@"}; }
+  fluxnow () { $FLUXES_DIR/fluxnow.sh; }
 else
   fluxes () { ${STARLINK_DIR}/etc/notinst fluxes; }
   fluxnow () { ${STARLINK_DIR}/etc/notinst fluxnow; }
