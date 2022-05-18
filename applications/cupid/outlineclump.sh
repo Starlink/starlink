@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/sh
 #+
 #  Name:
 #     OUTLINECLUMP
@@ -7,10 +7,10 @@
 #     Draw an outline around a 2-dimensional clump identified by CUPID.
 
 #  Language:
-#     C-shell
+#     Bourne shell
 
 #  Type of Module:
-#     C-shell script
+#     Bourne shell script
 
 #  Description:
 #     This procedure will outline a specified clump previously identified
@@ -111,16 +111,41 @@
 #        and use to constrain Parameter INDEX.
 #     2013 November 20 (MJC):
 #        Allow Parameter INDEX to be a list of indices.
+#     2022 May 17 (GSB):
+#        Convert to sh.
 #     {enter_further_changes_here}
 #
 #-
 
-#
-#   See whether or not an input NDF has been supplied.
-#
+if [[ $# -gt 0 ]]; then
+   ndfparam="$1"
+else
+   ndfparam=
+fi
 
-set style = ""
-set narg = $#argv
+if [[ $# -gt 1 ]]; then
+#
+#   Remove the parameter name from the start of the parameter value
+#   (if present).
+#
+   indexparam=`echo $2 | sed -e 's/^index=//'`
+else
+   indexparam=
+fi
+
+#
+#   Obtain the plotting style
+#   =========================
+#
+if [[ $# -gt 2 ]]; then
+#
+#   Remove the parameter name from the start of the parameter value
+#   (if present).
+#
+   style=`echo $3 | sed -e 's/^style=//'`
+else
+   style=
+fi
 
 #   Obtain the NDF name
 #   ===================
@@ -128,96 +153,91 @@ set narg = $#argv
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-set ok = 0
-set repeat = 0
-while ( $ok == 0 )
+ok=
+while [[ -z "$ok" ]]; do
 #
 #   Prompt if the NDF name was not supplied on the command line.
 #
-   if ( $narg == 0 || $repeat ) then
+   if [[ -z "$ndfparam" ]]; then
 #
 #
 #   Ensure that the following invocation of parget will return a non-zero
 #   status value if anything goes wrong.
 #
-      set adam_exit_set = $?ADAM_EXIT
-      setenv ADAM_EXIT 1
+      adam_exit_set=
+      if [[ -n "$ADAM_EXIT" ]]; then
+         adam_exit_set=1
+      fi
+      export ADAM_EXIT=1
 #
 #   Obtain the current DATA_ARRAY. Check that parget worked ok by testing
 #   status. Also remove angle brackets introduced by parget (eg. replace
 #   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ), and any NDF section specifier.
 #
-      set defndf = `$KAPPA_DIR/parget data_array GLOBAL`
-      if ( $status || "$defndf" == "" ) then
-         set prstring = "NDF - Name of the NDF > "
+      defndf=`$KAPPA_DIR/parget data_array GLOBAL`
+      if [[ $? -ne 0 || -z "$defndf" ]]; then
+         defndf=
+         prstring="NDF - Name of the NDF > "
       else
-         set defndf = `echo $defndf | sed -e 's/^\$<\(.*\)>\(.*\)/\$\1\2/' | sed -e 's/^\(.*\)(.*)/\1/'`
-         set prstring = "NDF - Name of the NDF /@"$defndf"/ > "
-         set ndf = $defndf
-      endif
+         defndf=`echo $defndf | sed -e 's/^\$<\(.*\)>\(.*\)/\$\1\2/' | sed -e 's/^\(.*\)(.*)/\1/'`
+         prstring="NDF - Name of the NDF /@"$defndf"/ > "
+      fi
 #
 #   Clear ADAM_EXIT unless it was already set.
 #
-      if ( ! $adam_exit_set ) then
-         unsetenv ADAM_EXIT
-      endif
+      if [[ -z "$adam_exit_set" ]]; then
+         unset ADAM_EXIT
+      fi
 #
 #   Assume that the value will be fine unless we discover otherwise
-#   later.  Prompt for the value.  We must prevent the ? from being
-#   treated as a single-character pattern match.  Various combinations
-#   of quotes and backslashes do not seem to work.  Hence we use noglob.
+#   later.  Prompt for the value.
 #
-      set ok = 1
-      set noglob
-      echo -n "$prstring"
-      set ndf = $<
+      ok=1
+      read -p "$prstring" ndf
 #
 #   Write some help information, but continue in the loop.
 #
-      if ( "$ndf" == '?' ) then
-         sh -c "echo '  ' 1>&2"
-         sh -c "echo '   NDF  = NDF (Read)' 1>&2"
-         sh -c "echo '      The name of the NDF conting the clump information.' 1>&2"
-         sh -c "echo ' ' 1>&2"
-         set ok = 0
+      if [[ "$ndf" == '?' ]]; then
+         echo '  ' 1>&2
+         echo '   NDF  = NDF (Read)' 1>&2
+         echo '      The name of the NDF conting the clump information.' 1>&2
+         echo ' ' 1>&2
+         ok=
+         continue
 #
 #   Abort when requested.
 #
-      else if ( "$ndf" == \!\! || "$ndf" == \! ) then
+      elif [[ "$ndf" == '!!' || "$ndf" == '!' ]]; then
          exit
 #
 #   Reprompt when no value is given.
 #
-      else if ( "$defndf" == "" && "$ndf" == "" ) then
-         sh -c "echo 'No NDF specified.  Enter "\!\!" to abort.' 1>&2"
-         set ok = 0
+      elif [[ -z "$ndf" ]]; then
+         if [[ -z "$defndf" ]]; then
+            echo 'No NDF specified.  Enter "!!" to abort.' 1>&2
+            ok=
+            continue
 
-      else
+         else
 #
 #   Accept the default.
-#
-         if ( "$ndf" == "" && "$defndf" != "" ) then
-            set ndf = $defndf
-         endif
-         unset noglob
-#
 #   Remove any shell meta-characters
 #
-         eval set ndf = "$ndf"
-      endif
+            eval ndf="$defndf"
+         fi
+      fi
 #
 #   If one or more arguments were supplied, assume the first is the
 #   NDF name.
 #
    else
-      set ndf = $1
-      set ok = 1
+      ok=1
 #
 #   Remove the parameter name from the start of the parameter value
 #   (if present).
 #
-      set ndf = `echo $ndf | sed -e 's/^ndf=//'`
-   endif
+      ndf=`echo $ndfparam | sed -e 's/^ndf=//'`
+   fi
 
 #   Validate the NDF name
 #   =====================
@@ -225,104 +245,99 @@ while ( $ok == 0 )
 #   NDFs with numerical or boolean names might be indicated by an @
 #   prefix.  This must be stripped first.
 #
-   set ndf = `echo $ndf | echo $ndf | sed 's/\(^@\)//'`
+   ndf=`echo $ndf | sed 's/\(^@\)//'`
 #
 #   Check that the supplied NDF exists.  If there is a specific
 #   extension, test that the file exists.
 #
-   if ( $ndf:e != "" ) then
-      if ( ! -e $ndf ) then
-         sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
-         set ok = 0
-      endif
-   else
+   case "$ndf" in
+   *.*)
+      if [[ ! -e "$ndf" ]]; then
+         echo "Data file \"$ndf\" does not exist." 1>&2
+         ok=
+      fi
+      ;;
+   *)
 #
 #   The filename does not have a file extension.  Thus it is either an
 #   NDF or a foreign format defined by the NDF_FORMATS_IN environment
 #   variable.  First test for an NDF.
 #
-      set file = $ndf".sdf"
-      if ( ! -e $file ) then
+      if [[ ! -e "${ndf}.sdf" ]]; then
 #
 #   The file might be in a foreign format.  Obtain the number and a list
 #   of the valid file extensions in search-order from NDF_FORMATS_IN.
 #   The first value gives the number of formats, so if this is 0,
 #   NDF_FORMATS_IN is undefined.
 #
-         set formats = `printenv | grep NDF_FORMATS_IN | awk -f $KAPPA_DIR/nfi.awk`
-         if ( "$formats" == "" ) then
-            sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
-            set ok = 0
-         else if ( "$formats" == "0" ) then
-            sh -c "echo 'NDF "$ndf" does not exist.' 1>&2"
-            set ok = 0
-         else
-            set noformats = $formats[1]
-            shift formats
+         formats=`echo "$NDF_FORMATS_IN" | awk -f $KAPPA_DIR/nfi.awk`
+         case "$formats" in
+         0)
+            echo "NDF \"$ndf\" does not exist." 1>&2
+            ok=
+            ;;
+         *)
 #
 #   Test for the existence of each format in the list, until a match
 #   is found.  Set the flag to indicate failure to find a file, until one
 #   is found.
 #
-            set ok = 0
-            set iform = 1
-            while ( $iform <= $noformats )
-               set file = $ndf$formats[$iform]
-               if ( ! -e $file ) then
-                  @ iform = $iform + 1
-
-               else
-                  set ok = 1
-                  @ iform = $noformats + 1
-               endif
-            end
+            ok=
+            set $formats
+            shift
+            for format in "$@"; do
+               if [[ -e "${ndf}${format}" ]]; then
+                  ok=1
+                  break
+               fi
+            done
 #
 #   Report the case where no foreign file could be found.
 #
-            if ( $ok == 0 ) then
-               sh -c "echo 'Data file "$ndf" does not exist.' 1>&2"
-               endif
-            endif
-         endif
-      endif
-   endif
-   unset noglob
+            if [[ -z "$ok" ]]; then
+               echo "Data file \"$ndf\" does not exist." 1>&2
+            fi
+         esac
+      fi
+   esac
 #
 #  Ensure that the filename will be treated as such.
 #
-   set ndf = "@$ndf"
+   ndf="@$ndf"
 #
 #   See if the NDF has a CUPID extension.
 #
-   if ( $ok ) then
-      $KAPPA_DIR/ndftrace $ndf quiet
-      set gotext = 0
-      if ( `$KAPPA_DIR/parget nextn ndftrace` > 0 ) then
-         foreach ext ( `$KAPPA_DIR/parget extname ndftrace` )
-            if ( $ext == "CUPID" ) set gotext = 1
-         end
-      endif
+   if [[ -n "$ok" ]]; then
+      $KAPPA_DIR/ndftrace "$ndf" quiet
+      ok=
+      if [[ `$KAPPA_DIR/parget nextn ndftrace` -gt 0 ]]; then
+         for ext in `$KAPPA_DIR/parget extname ndftrace`; do
+            if [[ "$ext" == "CUPID" ]]; then
+               ok=1
+               break
+            fi
+         done
+      fi
 #
 #   Report an error if the NDF has no CUPID extension.
 #
-      if ( $gotext != 1 ) then
+      if [[ -z "$ok" ]]; then
          echo "outlineclump: '$ndf' has no CUPID extension!"
          echo "Please supply an NDF that has been created by the CUPID:FINDCLUMPS command."
-      endif
-      set ok = $gotext
-   endif
+      fi
+   fi
 #
 #   Prompt the second time around if a bad name was supplied on the
 #   command line.
 #
-   set repeat = 1
-end
+   ndfparam=
+done
 #
 #   Find the number of clump indices.  Surely there is a better way of
 #   obtaining this number than parsing output.  HDIR probably should
 #   write output parameters.
 #
-set maxindex = `$HDSTOOLS_DIR/hdir ${ndf}.more.cupid.clumps | grep dimensions | awk '{print substr($7,2,length($7)-2)}'`
+maxindex=`$HDSTOOLS_DIR/hdir "${ndf}.more.cupid.clumps" | awk '/dimensions/ {print substr($7,2,length($7)-2)}'`
 #
 #   Get the clump index
 #   ===================
@@ -331,80 +346,66 @@ set maxindex = `$HDSTOOLS_DIR/hdir ${ndf}.more.cupid.clumps | grep dimensions | 
 #   supplied.  If there is only one index, there's no need to ask the
 #   user.
 #
-if ( $maxindex == 1 ) then
-   set ok = 1
-   set indexlist = 1
+if [[ "$maxindex" == "1" ]]; then
+   ok=1
+   indexlist=1
 else
-   set ok = 0
-   set repeat = 0
-endif
+   ok=
+fi
 
-while ( $ok == 0 )
+while [[ -z "$ok" ]]; do
 
-   if ( $narg < 2 || $repeat ) then
+   if [[ -z "$indexparam" ]]; then
 #
 #   Assume that the value will be fine unless we discover otherwise
 #   later.  Prompt for the index.
 #
-      set ok = 1
-      set noglob
-      sh -c "echo -n 'INDEX - The index of the clump to be outlined > ' 1>&2"
-      set index = $<
+      ok=1
+      read -p 'INDEX - The index of the clump to be outlined > ' index
 #
 #   Write some help information, but continue in the loop.
 #
-      if ( $index == '?' ) then
-         sh -c "echo ' ' 1>&2"
-         sh -c "echo '   INDEX = _INTEGER (Read)' 1>&2"
-         sh -c "echo '      The index of the clump to be plotted.  It should be a positive integer not more than $maxindex.' 1>&2"
-         sh -c "echo ' ' 1>&2"
-         set ok = 0
-#
-#   Set it to a numerical value for validity test.
-#
-         set index = 1
+      if [[ "$index" == '?' ]]; then
+         echo ' ' 1>&2
+         echo '   INDEX = _INTEGER (Read)' 1>&2
+         echo "      The index of the clump to be plotted.  It should be a positive integer not more than $maxindex." 1>&2
+         echo ' ' 1>&2
+         ok=
+         continue
 #
 #   Abort when requested.
 #
-      else if ( "$index" == \!\! ||  "$index" == \! ) then
+      elif [[ "$index" == '!!' || "$index" == '!' ]]; then
          exit
-      else
-         set ok = 1
-      endif
+      fi
 #
 #   Use the command-line value.
 #
-   else if ( $narg > 1 ) then
-      set index = $2
-      set ok = 1
-#
-#   Remove the parameter name from the start of the parameter value
-#   (if present).
-#
-      set index = `echo $index | sed -e 's/^index=//'`
-   endif
+   else
+      index=$indexparam
+      ok=1
+   fi
 
-#   Convert the list into an array of indices.  This is C-shell so
-#   a line continuation of the awk requires a backslash.
-   set indexlist = `echo $index | awk -F,\
-     '{\
-         for ( i=0; ++i <= NF; ) {\
-            if ( index( $i, "-" ) == 0 ){\
-               print $i\
-            } else {\
-               split( $i, b,"-" );\
-               if ( b[1] <= b[2] ) {\
-                  lower=b[1];\
-                  upper=b[2];\
-               } else {\
-                  lower=b[2];\
-                  upper=b[1];\
-               }\
-               for ( j=lower; j<=upper; j++){\
-                  print j;\
-               }\
-            }\
-         }\
+#   Convert the list into an array of indices.  This isn't C-shell so
+#   a line continuation of the awk doesn't require a backslash.
+   indexlist=`echo $index | awk -F, '{
+         for ( i=0; ++i <= NF; ) {
+            if ( index( $i, "-" ) == 0 ){
+               print $i
+            } else {
+               split( $i, b,"-" );
+               if ( b[1] <= b[2] ) {
+                  lower=b[1];
+                  upper=b[2];
+               } else {
+                  lower=b[2];
+                  upper=b[1];
+               }
+               for ( j=lower; j<=upper; j++){
+                  print j;
+               }
+            }
+         }
      }'`
 #
 #   Validate the index.
@@ -413,58 +414,40 @@ while ( $ok == 0 )
 #   Use a logical to expression to decide whether or not the value
 #   given is valid.
 #
-   if ( ${#indexlist} == 0 ) then
-      sh -c "echo 'No index supplied' 1>&2"
-      set ok = 0
-
-   else if ( ${#indexlist} == 1 ) then
-      set index = $indexlist[1];
-      if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
-         sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
-         set ok = 0
-      endif
+   if [[ -z "$indexlist" ]]; then
+      echo 'No index supplied' 1>&2
+      ok=
 
    else
-      foreach index ( $indexlist )
-         if ( ! ( $index =~ [0-9]* && $index > 0 && $index <= $maxindex ) && $ok ) then
-            sh -c "echo 'The clump index must be a positive integer between 1 and $maxindex.' 1>&2"
-            set ok = 0
+      for index in $indexlist; do
+         if [[ "$index" -lt 1 || "$index" -gt $maxindex ]]; then
+            echo "The clump index must be a positive integer between 1 and $maxindex." 1>&2
+            ok=
             break
-         endif
-      end
-   endif
+         fi
+      done
+   fi
 
-   unset noglob
-
-   set repeat = 1
-end
-#
-#   Obtain the plotting style
-#   =========================
-#
-if ( $narg == 3 ) then
-   set style = "$3"
-#
-#   Remove the parameter name from the start of the parameter value
-#   (if present).
-#
-   set style = `echo $style | sed -e 's/^style=//'`
-endif
+   indexparam=
+done
 
 #
 #   Plot the clump outline
 #   ======================
 #
-foreach index ( $indexlist )
-   if ( ${#indexlist} > 1 ) echo "Plotting clump index $index"
-   if ( "$style" == "" ) then
+set $indexlist
+for index in "$@"; do
+   if [[ $# -gt 1 ]]; then
+      echo "Plotting clump index $index"
+   fi
+   if [[ -z "$style" ]]; then
       $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
                          labpos=\! mode=good clear=no
    else
       $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
                          labpos=\! mode=good clear=no style="$style"
-   endif
-end
+   fi
+done
 #
 #  At this point the current NDF is not what was supplied.
 #  Reset the GLOBAL association by doing a dummy operation.

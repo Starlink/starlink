@@ -2,7 +2,7 @@
 
 SUBDIRS = cupidsub
 
-dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.csh $(DATA_FILES)
+dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.sh $(DATA_FILES)
 
 DATA_FILES = test_data.sdf test_data.FIT
 
@@ -49,8 +49,8 @@ history.help: cupid.news
 cupid.h: cupid.h.source make_h
 	./make_h
 
-outlineclump.help: outlineclump.csh
-	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
+outlineclump.help: outlineclump.sh
+	cat outlineclump.sh | sed -e 's@^#@*@' > outlineclump.f
 	-rm -f outlineclump.help
 	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ;\
@@ -69,7 +69,7 @@ sun255.tex: $(cupid_mon_TASKS:=.c) sun_master.tex
 	   $(prolat) in=$${f} atask nodocument nopage single out=$${f}.latex ;\
 	   ./make_quickdes $${f} ;\
 	done
-	cat outlineclump.csh | sed -e 's@^#@*@' > outlineclump.f
+	cat outlineclump.sh | sed -e 's@^#@*@' > outlineclump.f
 	PATH="$(PATH):$(STARLINK)/bin/sst"; \
 	export PATH ;\
 	$(prolat) in=outlineclump.f atask nodocument nopage single out=outlineclump.latex
