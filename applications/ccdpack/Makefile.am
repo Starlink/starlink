@@ -103,7 +103,7 @@ SHELL_SCR = ccdfork ccdexercise wcsexercise setexercise \
  ccdexecute ccdwww geometry ccdpack_ex1.csh ccdpack_ex2.csh \
  ccdpack_ex3.csh ccdpack_ex4.csh ccdpack_ex5.csh ccdpack_ex6.csh \
  ccdpack_ex7.csh ccdpack_ex8.csh glitch2ard filemonitor \
- ccdimp.csh ccdexp.csh
+ ccdimp.sh ccdexp.sh
 
 ICL_SCR = ccdexercise.icl ccdfork.icl
 
