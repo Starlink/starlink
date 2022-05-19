@@ -2672,7 +2672,7 @@ package polpack {
    }
 
    command makecube {
-      obey {$POLPACK_DIR/makecube.csh}
+      obey {$POLPACK_DIR/makecube.sh}
    }
 
    icl {defhelp kappa $KAPPA_HELP 0}
@@ -2719,8 +2719,8 @@ package polpack {
          setenv NDF_XTN POLPACK
       endif
 
-      setenv NDF_IMP_POLPACK '$POLPACK_DIR/polimp.csh ^ndf'
-      setenv NDF_EXP_POLPACK '$POLPACK_DIR/polexp.csh ^ndf'
+      setenv NDF_IMP_POLPACK '$POLPACK_DIR/polimp.sh ^ndf'
+      setenv NDF_EXP_POLPACK '$POLPACK_DIR/polexp.sh ^ndf'
       setenv NDF_IMP_POLPACK_COMPRESSED ' '
       setenv NDF_EXP_POLPACK_COMPRESSED ' '
       setenv NDF_IMP_POLPACK_GZIP ' '
@@ -2771,8 +2771,8 @@ package polpack {
           export NDF_XTN=POLPACK
       fi
 
-      export NDF_IMP_POLPACK='$POLPACK_DIR/polimp.csh ^ndf'
-      export NDF_EXP_POLPACK='$POLPACK_DIR/polexp.csh ^ndf'
+      export NDF_IMP_POLPACK='$POLPACK_DIR/polimp.sh ^ndf'
+      export NDF_EXP_POLPACK='$POLPACK_DIR/polexp.sh ^ndf'
       export NDF_IMP_POLPACK_COMPRESSED=' '
       export NDF_EXP_POLPACK_COMPRESSED=' '
       export NDF_IMP_POLPACK_GZIP=' '

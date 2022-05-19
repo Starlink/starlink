@@ -78,8 +78,8 @@ POLPACK_TASKS = $(POLPACK_F_ROUTINES:.f=)
 #  set.
 
 PUBLICSCRIPTS = Polka.tcl Polka_procs.tcl \
-CCDShowHelp.tcl dialog.tcl polimp.csh \
-polexp.csh makecube.csh
+CCDShowHelp.tcl dialog.tcl polimp.sh \
+polexp.sh makecube.sh
 
 #  Define the set of all interface files.
 

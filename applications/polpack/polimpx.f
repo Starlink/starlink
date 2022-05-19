@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application is not for general use. It is a version of POLIMP
-*     which is used within the polimp.csh script to import POLPACK
+*     which is used within the polimp.sh script to import POLPACK
 *     information during on-thr-fly data conversion. In this context, it
 *     is known that only a single input file will be specified, and that
 *     it will be a native NDF. We can therefore make big speed gains by

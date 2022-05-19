@@ -1,4 +1,4 @@
-#!/bin/tcsh
+#!/bin/sh
 
 #+
 #  Name:
@@ -9,7 +9,7 @@
 #     cube holding Stokes vectors.
 
 #  Language:
-#     Unix C-shell
+#     Bourne shell
 
 #  Invocation:
 #     makecube i q u cube angrot
@@ -37,7 +37,7 @@
 #  Prior Requirements:
 #     For ease of use, it's recommended that you set up an alias for
 #     this script, for example
-#        alias makecube 'source /home/bm/scripts/makecube.csh'
+#        alias makecube 'source /home/bm/scripts/makecube.sh'
 
 #  Authors:
 #     DSB: David S. Berry (Starlink)
@@ -50,6 +50,8 @@
 #        Added angrot parameter.
 #     8-JUN-1999 (DSB):
 #        Added -h option.
+#     19-MAY-2022 (GSB):
+#        Convert to sh, use paste shift parameter.
 #     {enter_further_changes_here}
 
 #-
@@ -58,28 +60,25 @@
 #  script to extract those lines comprising the prologue. Use sed to
 #  strip off comment characters and pipe the result through more. Then
 #  exit.
-      set args = ($argv[1-])
-      if ( $#args > 0 ) then
-         if( $argv[1] == "-h" ) then
+      if [[ $# -gt 0 ]]; then
+         if [[ "$1" == "-h" ]]; then
 
             awk '{if($1=="#-")p=0;if(p)print $0;if($0=="#+"){p=1;print""}}' ${0} \
             | sed -e 's/^#/ /' -e 's/^  //' \
             | more
             exit
 
-         endif
-      endif
+         fi
+      fi
 
 #  Check that there are 4 arguments present.
-      if ( $#args != 5 ) then
+      if [[ $# -ne 5 ]]; then
          echo "Usage: makecube [-h] i q u cube angrot"
          exit
-      endif
+      fi
 
 # Conceal the startup messages.
-      alias echo "echo > /dev/null"
-      source $KAPPA_DIR/kappa.csh
-      unalias echo
+      . $KAPPA_DIR/kappa.sh > /dev/null
 
 # Take copies of the I, Q and U NDFs, so that the original files
 # are left unchanged.
@@ -94,27 +93,8 @@
       erase qtemp.wcs ok
       erase utemp.wcs ok
 
-# Add a third dimension to these NDFs, with bounds 1:1.
-      setbound "itemp(,,)"
-      setbound "qtemp(,,)"
-      setbound "utemp(,,)"
-
-# Get the lower bounds of the Q NDF.
-      ndftrace qtemp quiet
-      set lb = `parget lbound ndftrace`
-
-# Shift the origin of the Q image so that it occupies the second plane.
-      setorigin qtemp origin=\[$lb[1]\,$lb[2]\,2\]
-
-# Get the lower bounds of the U NDF.
-      ndftrace utemp quiet
-      set lb = `parget lbound ndftrace`
-
-# Shift the origin of the U image so that it occupies the third plane.
-      setorigin utemp origin=\[$lb[1]\,$lb[2]\,3\]
-
 # Paste these three 3d NDFs into a single 3d NDF.
-      paste transp noconfine in=itemp p1=qtemp p2=utemp out=$4
+      paste transp noconfine in=itemp p1=qtemp p2=utemp out=$4 shift='[0,0,1]'
 
 # Set up the POLPACK extension in the cube.
       setext $4 xname=polpack xtype=polpack option=put noloop cname=STOKES \
