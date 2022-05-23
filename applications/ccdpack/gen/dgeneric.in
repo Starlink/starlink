@@ -52,13 +52,13 @@
 #-
 #
 #  Check for input file.
-     if [[ -z "$1" ]]; then
+     if [ -z "$1" ]; then
         echo "Usage: dgeneric filename"
         exit
      else
-        if [[ ! -e "$1" ]]; then
+        if [ ! -e "$1" ]; then
            file="${1}.gen"
-           if [[ ! -e "$file" ]]; then
+           if [ ! -e "$file" ]; then
               echo "$1 does not exist"
               exit
            fi
@@ -69,7 +69,7 @@
      fi
 
 #  Replace the T1's etc. with the normal flags.
-     if [[ -e dgeneric.gen ]]; then
+     if [ -e dgeneric.gen ]; then
         rm dgeneric.gen
      fi
      sed <$file  >dgeneric.gen   \
@@ -81,14 +81,14 @@
         -e s/COMM1/COMM/g
 
 #  Generic this.
-     if [[ -z "$2" ]]; then
+     if [ -z "$2" ]; then
         @FGENERIC@ -t n dgeneric.gen
      else
         @FGENERIC@ -t "$2" dgeneric.gen
      fi
 
 #  Second tokens.
-     if [[ -e dgeneric2.gen ]]; then
+     if [ -e dgeneric2.gen ]; then
         rm dgeneric2.gen
      fi
      sed <dgeneric.f  >dgeneric2.gen   \
@@ -101,8 +101,8 @@
 
 #  Final generic process. If split is set then give generic the
 #  -s flag
-     if [[ -z "$3" ]]; then
-        if [[ -z "$2" ]]; then
+     if [ -z "$3" ]; then
+        if [ -z "$2" ]; then
            @FGENERIC@ -t n dgeneric2.gen
         else
            @FGENERIC@ -t "$2" dgeneric2.gen
@@ -117,11 +117,11 @@
 #  to the correct names.
         for part in dgeneric2b.f dgeneric2B.f dgeneric2w.f dgeneric2W.f \
                     dgeneric2i.f dgeneric2r.f dgeneric2d.f; do
-           if [[ -e "$part" ]]; then
+           if [ -e "$part" ]; then
               rm $part
            fi
         done
-        if [[ -z "$2" ]]; then
+        if [ -z "$2" ]; then
            @FGENERIC@ -t n  -s dgeneric2.gen
         else
            @FGENERIC@ -t "$2" -s dgeneric2.gen
@@ -131,7 +131,7 @@
         fname="${file%.*}"
         for part in dgeneric2*.f; do
            this_part="${part%.*}"
-           exten="${this_part/dgeneric/}"
+           exten=`echo "$this_part" | sed 's/dgeneric2//'`
            mv "$part" "${fname}${exten}.f"
         done
      fi
