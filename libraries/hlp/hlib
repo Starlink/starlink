@@ -25,9 +25,9 @@
 #
 for file in "$@"; do
    crehlp "$file" "${file%.*}.shl"
-   if [[ $? != 0 ]]; then
+   if [ $? -ne 0 ]; then
      echo Error running crehlp
-     if [[ -e "${file%.*}".shl ]]; then
+     if [ -e "${file%.*}".shl ]; then
        rm "${file%.*}".shl
      fi
      exit 1
