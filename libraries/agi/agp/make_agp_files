@@ -46,7 +46,7 @@
    dsclen=0
    for v in $desc; do
       l=`echo $v | awk '{print length($0)}'`
-      if [[ $l -gt $dsclen ]]; then
+      if [ $l -gt $dsclen ]; then
          dsclen=$l
       fi
    done
@@ -54,7 +54,7 @@
    anmlen=0
    for v in $aname; do
       l=`echo $v | awk '{print length($0)}'`
-      if [[ $l -gt $anmlen ]]; then
+      if [ $l -gt $anmlen ]; then
          anmlen=$l
       fi
    done
@@ -62,7 +62,7 @@
    pfnlen=0
    for v in $pfile; do
       l=`echo $v | awk '{print length($0)}'`
-      if [[ $l -gt $pfnlen ]]; then
+      if [ $l -gt $pfnlen ]; then
          pfnlen=$l
       fi
    done
@@ -70,7 +70,7 @@
    gtylen=0
    for v in $gtype; do
       l=`echo $v | awk '{print length($0)}'`
-      if [[ $l -gt $gtylen ]]; then
+      if [ $l -gt $gtylen ]; then
          gtylen=$l
       fi
    done
@@ -78,7 +78,7 @@
    ptylen=0
    for v in $ptype; do
       l=`echo $v | awk '{print length($0)}'`
-      if [[ $l -gt $ptylen ]]; then
+      if [ $l -gt $ptylen ]; then
          ptylen=$l
       fi
    done
@@ -277,7 +277,7 @@ FOO
    echo "*  GNS device type" >> agp1_init.f
    echo "      DATA AGP_GTY / '$1'," >> agp1_init.f
    shift
-   while [[ $# -gt 1 ]]; do
+   while [ $# -gt 1 ]; do
    echo "     :               '$1'," >> agp1_init.f
       shift
    done
@@ -289,7 +289,7 @@ FOO
    echo "*  PGPLOT device type" >> agp1_init.f
    echo "      DATA AGP_PTY / '$1'," >> agp1_init.f
    shift
-   while [[ $# -gt 1 ]]; do
+   while [ $# -gt 1 ]; do
    echo "     :               '$1'," >> agp1_init.f
       shift
    done
@@ -299,15 +299,15 @@ FOO
    set nonoption $pfile
    shift
    echo "*  PGPLOT default file names" >> agp1_init.f
-   if [[ "$1" != "-" ]]; then
+   if [ "$1" != "-" ]; then
       pf=$1
    else
       pf=" "
    fi
    echo "      DATA AGP_PFN / '$pf'," >> agp1_init.f
    shift
-   while [[ $# -gt 1 ]]; do
-      if [[ "$1" != "-" ]]; then
+   while [ $# -gt 1 ]; do
+      if [ "$1" != "-" ]; then
          pf=$1
       else
          pf=" "
@@ -315,7 +315,7 @@ FOO
       echo "     :               '$pf'," >> agp1_init.f
       shift
    done
-   if [[ "$1" != "-" ]]; then
+   if [ "$1" != "-" ]; then
       pf=$1
    else
       pf=" "
@@ -328,7 +328,7 @@ FOO
    echo "*  AGI device names" >> agp1_init.f
    echo "      DATA AGP_ANM / '$1'," >> agp1_init.f
    shift
-   while [[ $# -gt 1 ]]; do
+   while [ $# -gt 1 ]; do
    echo "     :               '$1'," >> agp1_init.f
       shift
    done
@@ -339,7 +339,7 @@ FOO
    set $desc
    echo "*  Device descriptions" >> agp1_init.f
    echo "      DATA AGP_DSC /"  >> agp1_init.f
-   while [[ $# -gt 1 ]]; do
+   while [ $# -gt 1 ]; do
    echo "     :  '$1'," | tr "_" " " >> agp1_init.f
       shift
    done
