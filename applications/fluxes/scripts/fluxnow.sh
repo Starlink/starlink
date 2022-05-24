@@ -44,8 +44,8 @@
 
 # Define the location of fluxes and its data files.
 # This is edited into this script during installation.
-if [[ -n "$FLUXES_DIR" ]]; then
-  if [[ ! -d "$FLUXES_DIR" ]]; then
+if [ -n "$FLUXES_DIR" ]; then
+  if [ ! -d "$FLUXES_DIR" ]; then
     echo FLUXES_DIR environment variable not set to a directory.
     echo Using default fluxes location
     export FLUXES_DIR=@bindir@
