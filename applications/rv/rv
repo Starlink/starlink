@@ -32,17 +32,17 @@
       _prompts="$_tty"
 
 #  Echo to terminal if input file specified
-      if [[ -n "$_input" ]]; then
+      if [ -n "$_input" ]; then
          _echo="$_tty"
       else
          _echo="$_null"
       fi
 
 #  Resolve defaults
-      if [[ -z "$_input" ]]; then
+      if [ -z "$_input" ]; then
          _input="$_tty"
       fi
-      if [[ -z "$_report" ]]; then
+      if [ -z "$_report" ]; then
          _report=rv.lis
       fi
 
@@ -50,6 +50,6 @@
       rv.x "$_tty" "$_report" "$_input" "$_prompts" "$_echo"
 
 #  Report the output filename if appropriate
-      if [[ "$_report" != "$_tty" ]]; then
+      if [ "$_report" != "$_tty" ]; then
          echo "Report is in $_report"
       fi
