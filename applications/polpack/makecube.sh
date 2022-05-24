@@ -60,8 +60,8 @@
 #  script to extract those lines comprising the prologue. Use sed to
 #  strip off comment characters and pipe the result through more. Then
 #  exit.
-      if [[ $# -gt 0 ]]; then
-         if [[ "$1" == "-h" ]]; then
+      if [ $# -gt 0 ]; then
+         if [ "$1" = "-h" ]; then
 
             awk '{if($1=="#-")p=0;if(p)print $0;if($0=="#+"){p=1;print""}}' ${0} \
             | sed -e 's/^#/ /' -e 's/^  //' \
@@ -72,7 +72,7 @@
       fi
 
 #  Check that there are 4 arguments present.
-      if [[ $# -ne 5 ]]; then
+      if [ $# -ne 5 ]; then
          echo "Usage: makecube [-h] i q u cube angrot"
          exit
       fi
