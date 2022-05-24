@@ -117,13 +117,13 @@
 #
 #-
 
-if [[ $# -gt 0 ]]; then
+if [ $# -gt 0 ]; then
    ndfparam="$1"
 else
    ndfparam=
 fi
 
-if [[ $# -gt 1 ]]; then
+if [ $# -gt 1 ]; then
 #
 #   Remove the parameter name from the start of the parameter value
 #   (if present).
@@ -137,7 +137,7 @@ fi
 #   Obtain the plotting style
 #   =========================
 #
-if [[ $# -gt 2 ]]; then
+if [ $# -gt 2 ]; then
 #
 #   Remove the parameter name from the start of the parameter value
 #   (if present).
@@ -154,18 +154,18 @@ fi
 #   supplied.
 #
 ok=
-while [[ -z "$ok" ]]; do
+while [ -z "$ok" ]; do
 #
 #   Prompt if the NDF name was not supplied on the command line.
 #
-   if [[ -z "$ndfparam" ]]; then
+   if [ -z "$ndfparam" ]; then
 #
 #
 #   Ensure that the following invocation of parget will return a non-zero
 #   status value if anything goes wrong.
 #
       adam_exit_set=
-      if [[ -n "$ADAM_EXIT" ]]; then
+      if [ -n "$ADAM_EXIT" ]; then
          adam_exit_set=1
       fi
       export ADAM_EXIT=1
@@ -175,7 +175,7 @@ while [[ -z "$ok" ]]; do
 #   "$<KAPPA_DIR>/m31" by "$KAPPA_DIR/m31" ), and any NDF section specifier.
 #
       defndf=`$KAPPA_DIR/parget data_array GLOBAL`
-      if [[ $? -ne 0 || -z "$defndf" ]]; then
+      if ([ $? -ne 0 ] || [ -z "$defndf" ]); then
          defndf=
          prstring="NDF - Name of the NDF > "
       else
@@ -185,7 +185,7 @@ while [[ -z "$ok" ]]; do
 #
 #   Clear ADAM_EXIT unless it was already set.
 #
-      if [[ -z "$adam_exit_set" ]]; then
+      if [ -z "$adam_exit_set" ]; then
          unset ADAM_EXIT
       fi
 #
@@ -193,11 +193,12 @@ while [[ -z "$ok" ]]; do
 #   later.  Prompt for the value.
 #
       ok=1
-      read -p "$prstring" ndf
+      echo -n "$prstring" 1>&2
+      read ndf
 #
 #   Write some help information, but continue in the loop.
 #
-      if [[ "$ndf" == '?' ]]; then
+      if [ "$ndf" = '?' ]; then
          echo '  ' 1>&2
          echo '   NDF  = NDF (Read)' 1>&2
          echo '      The name of the NDF conting the clump information.' 1>&2
@@ -207,13 +208,13 @@ while [[ -z "$ok" ]]; do
 #
 #   Abort when requested.
 #
-      elif [[ "$ndf" == '!!' || "$ndf" == '!' ]]; then
+      elif ([ "$ndf" = '!!' ] || [ "$ndf" = '!' ]); then
          exit
 #
 #   Reprompt when no value is given.
 #
-      elif [[ -z "$ndf" ]]; then
-         if [[ -z "$defndf" ]]; then
+      elif [ -z "$ndf" ]; then
+         if [ -z "$defndf" ]; then
             echo 'No NDF specified.  Enter "!!" to abort.' 1>&2
             ok=
             continue
@@ -252,7 +253,7 @@ while [[ -z "$ok" ]]; do
 #
    case "$ndf" in
    *.*)
-      if [[ ! -e "$ndf" ]]; then
+      if [ ! -e "$ndf" ]; then
          echo "Data file \"$ndf\" does not exist." 1>&2
          ok=
       fi
@@ -263,7 +264,7 @@ while [[ -z "$ok" ]]; do
 #   NDF or a foreign format defined by the NDF_FORMATS_IN environment
 #   variable.  First test for an NDF.
 #
-      if [[ ! -e "${ndf}.sdf" ]]; then
+      if [ ! -e "${ndf}.sdf" ]; then
 #
 #   The file might be in a foreign format.  Obtain the number and a list
 #   of the valid file extensions in search-order from NDF_FORMATS_IN.
@@ -286,7 +287,7 @@ while [[ -z "$ok" ]]; do
             set $formats
             shift
             for format in "$@"; do
-               if [[ -e "${ndf}${format}" ]]; then
+               if [ -e "${ndf}${format}" ]; then
                   ok=1
                   break
                fi
@@ -294,7 +295,7 @@ while [[ -z "$ok" ]]; do
 #
 #   Report the case where no foreign file could be found.
 #
-            if [[ -z "$ok" ]]; then
+            if [ -z "$ok" ]; then
                echo "Data file \"$ndf\" does not exist." 1>&2
             fi
          esac
@@ -307,12 +308,12 @@ while [[ -z "$ok" ]]; do
 #
 #   See if the NDF has a CUPID extension.
 #
-   if [[ -n "$ok" ]]; then
+   if [ -n "$ok" ]; then
       $KAPPA_DIR/ndftrace "$ndf" quiet
       ok=
-      if [[ `$KAPPA_DIR/parget nextn ndftrace` -gt 0 ]]; then
+      if [ `$KAPPA_DIR/parget nextn ndftrace` -gt 0 ]; then
          for ext in `$KAPPA_DIR/parget extname ndftrace`; do
-            if [[ "$ext" == "CUPID" ]]; then
+            if [ "$ext" = "CUPID" ]; then
                ok=1
                break
             fi
@@ -321,7 +322,7 @@ while [[ -z "$ok" ]]; do
 #
 #   Report an error if the NDF has no CUPID extension.
 #
-      if [[ -z "$ok" ]]; then
+      if [ -z "$ok" ]; then
          echo "outlineclump: '$ndf' has no CUPID extension!"
          echo "Please supply an NDF that has been created by the CUPID:FINDCLUMPS command."
       fi
@@ -346,26 +347,27 @@ maxindex=`$HDSTOOLS_DIR/hdir "${ndf}.more.cupid.clumps" | awk '/dimensions/ {pri
 #   supplied.  If there is only one index, there's no need to ask the
 #   user.
 #
-if [[ "$maxindex" == "1" ]]; then
+if [ "$maxindex" = "1" ]; then
    ok=1
    indexlist=1
 else
    ok=
 fi
 
-while [[ -z "$ok" ]]; do
+while [ -z "$ok" ]; do
 
-   if [[ -z "$indexparam" ]]; then
+   if [ -z "$indexparam" ]; then
 #
 #   Assume that the value will be fine unless we discover otherwise
 #   later.  Prompt for the index.
 #
       ok=1
-      read -p 'INDEX - The index of the clump to be outlined > ' index
+      echo -n 'INDEX - The index of the clump to be outlined > ' 1>&2
+      read index
 #
 #   Write some help information, but continue in the loop.
 #
-      if [[ "$index" == '?' ]]; then
+      if [ "$index" = '?' ]; then
          echo ' ' 1>&2
          echo '   INDEX = _INTEGER (Read)' 1>&2
          echo "      The index of the clump to be plotted.  It should be a positive integer not more than $maxindex." 1>&2
@@ -375,7 +377,7 @@ while [[ -z "$ok" ]]; do
 #
 #   Abort when requested.
 #
-      elif [[ "$index" == '!!' || "$index" == '!' ]]; then
+      elif ([ "$index" = '!!' ] || [ "$index" = '!' ]); then
          exit
       fi
 #
@@ -414,13 +416,13 @@ while [[ -z "$ok" ]]; do
 #   Use a logical to expression to decide whether or not the value
 #   given is valid.
 #
-   if [[ -z "$indexlist" ]]; then
+   if [ -z "$indexlist" ]; then
       echo 'No index supplied' 1>&2
       ok=
 
    else
       for index in $indexlist; do
-         if [[ "$index" -lt 1 || "$index" -gt $maxindex ]]; then
+         if ([ "$index" -lt 1 ] || [ "$index" -gt $maxindex ]); then
             echo "The clump index must be a positive integer between 1 and $maxindex." 1>&2
             ok=
             break
@@ -437,10 +439,10 @@ done
 #
 set $indexlist
 for index in "$@"; do
-   if [[ $# -gt 1 ]]; then
+   if [ $# -gt 1 ]; then
       echo "Plotting clump index $index"
    fi
-   if [[ -z "$style" ]]; then
+   if [ -z "$style" ]; then
       $KAPPA_DIR/contour ndf="$ndf.more.cupid.clumps\($index\).model" \
                          labpos=\! mode=good clear=no
    else
