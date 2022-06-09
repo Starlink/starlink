@@ -1116,7 +1116,7 @@ sub calc_shared_scuba2_acsis {
   my $lwvmtau = " n/a";
   my $domestate = " n/a";
 
-  $obstime = $genitem2{UTEND} - $genitem{UTSTART}
+  $obstime = sprintf("%4d", $genitem2{UTEND} - $genitem{UTSTART})
     if (defined $genitem2{UTEND} and defined $genitem{UTSTART});
   $seeing = 0.01 * int(100.0*
                        0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
@@ -1147,7 +1147,7 @@ sub calc_shared_scuba2_acsis {
   }
 
   %results = ( %results,
-               OBSTIME => sprintf("%4d",$obstime),
+               OBSTIME => $obstime,
                SEEING => $seeing,
                CSOTAU => $csotau,
                WVMTAU => $wvmtau,
