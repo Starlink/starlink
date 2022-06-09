@@ -543,7 +543,10 @@ sub acsis_header {
     my $josmin = (defined $fitsitem->{JOS_MIN} ? $fitsitem->{JOS_MIN} : 0);
     $josmult = ( $josmult > $josmin ? $josmult : $josmin );
     my $numnods = ( defined $fitsitem->{NUM_NODS} ? 4*$fitsitem->{NUM_NODS} : 1 );
-    my $intt = 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5);
+    my $intt = ((defined $fitsitem->{NUM_CYC} and defined $step)
+      ? 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5)
+      : 'n/a');
+    $step //= 'n/a';
 
     my %A = calc_shared_scuba2_acsis( $fitsitem, $fitsitem );
 
