@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/sh
 #+
 #  Name:
 #     FITSHEAD
@@ -7,10 +7,10 @@
 #     Lists the headers of FITS files.
 
 #  Language:
-#     C-shell
+#     Bourne shell
 
 #  Type of Module:
-#     C-shell script
+#     Bourne shell script
 
 #  Description:
 #     This procedure lists to standard output the headers of the primary
@@ -113,6 +113,8 @@
 #     2003 January 24 (MJC):
 #        Revised the sed termination patterns.  No longer support
 #        illegally formatted END lines.
+#     2022 June 13 (GSB):
+#        Convert to sh.
 #     {enter_further_changes_here}
 
 #-
@@ -127,8 +129,8 @@
 #   comment or equals sign, this cannot be accommodated while continuing
 #   beyond a keyword beginning END.
 #
-set sedsim = '/^SIMPLE  = /,/^END$/p'
-set sedext = '/^XTENSION= /,/^END$/p'
+sedsim='/^SIMPLE  = /,/^END$/p'
+sedext='/^XTENSION= /,/^END$/p'
 #
 #   Process input file as standard input.
 #   =====================================
@@ -137,10 +139,10 @@ set sedext = '/^XTENSION= /,/^END$/p'
 #   standard input.  So continue the pipeline.  Format the output as
 #   80-character lines.
 #
-if ( $#argv == 0 ) then
+if [ "$#" -eq 0 ]; then
    dd cbs=80 conv=unblock | sed -n -e "$sedsim" -e "$sedext"
    exit
-endif
+fi
 #
 #   Remove special keywords.
 #   ========================
@@ -150,21 +152,22 @@ endif
 #   or its backslash abbreviation.  Form a new list and count of the
 #   words on the command line, excluding these special keywords.
 #
-set i = 1
-set cmd =
-set narg = 0
-set prompt = 0
-while ($i <= $#argv)
-   if ($argv[$i] =~ [Pp][Rr][Oo][Mm][Pp][Tt]) then
-      set prompt = 1
-   else if ($argv[$i] =~ [Aa][Cc][Cc][Ee][Pp][Tt] || \
-            $argv[$i] =~ \\ ) then
-   else
-      @ narg = $narg + 1
-      set cmd = ($cmd $argv[$i])
-   endif
-   @ i = $i + 1
-end
+cmd=
+prompt=
+for arg in "$@"; do
+   case "$arg" in
+   [Pp][Rr][Oo][Mm][Pp][Tt])
+      prompt=1
+      ;;
+   [Aa][Cc][Cc][Ee][Pp][Tt])
+      ;;
+   "\\")
+      ;;
+   *)
+      cmd="$cmd $arg"
+      ;;
+   esac
+done
 #
 #   Check the existence of the files.
 #   =================================
@@ -172,109 +175,105 @@ end
 #   Initialise logical that decides whether user needs to be prompted because
 #   a supplied file does not exist.
 #
-set prfile = 0
-if ($narg > 0) then
+prfile=
+set $cmd
+if [ "$#" -gt 0 ]; then
 #
 #   Find whether or not the first argument is a tape drive.
 #   *** This may not be portable. ***
 #
-   if ( ( (! -f $cmd[1]) && -e $cmd[1] ) || $cmd[1] =~ /dev/*) then
+   case "$1" in
+   /dev/*)
 #
 #   Check that the tape or every file exists.  If any do not exist
 #   record this so that the user can be prompt for a new value or values.
 #
-      if (! -e $cmd[1]) then
-         sh -c "echo 'Tape unit "$cmd[1]" does not exist.' 1>&2"
-         set prfile = 1
-      endif
-   else
-      foreach file ($cmd[*])
-         if (! -e $file) then
-            sh -c "echo 'File "$file" does not exist.' 1>&2"
-            set prfile = 1
-         endif
-      end
-   endif
-endif
+      if [ ! -e "$1" ]; then
+         echo "Tape unit \"$1\" does not exist." 1>&2
+         prfile=1
+      fi
+      ;;
+   *)
+      if ( [ ! -f "$1" ] && [ -e "$1" ] ); then
+         :
+      else
+         for file in "$@"; do
+            if [ ! -e "$file" ]; then
+               echo "File \"$file\" does not exist." 1>&2
+               prfile=1
+            fi
+         done
+      fi
+      ;;
+   esac
+fi
 #
 #   Obtain the file(s) to be listed.
 #   ================================
 #
-if ($narg < 1 || $prfile == 1) then
+if ([ "$#" -lt 1 ] || [ -n "$prfile" ]); then
 #
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-   set ok = 0
-   while ($ok == 0)
+   ok=
+   while [ -z "$ok" ]; do
 #
 #   Assume that the value will be fine unless we discover otherwise
-#   later.  Prompt for the value.  We must prevent the ? from being
-#   treated as a single-character pattern match.  Various combinations
-#   of quotes and backslashes do not seem to work.  Hence we use noglob.
+#   later.  Prompt for the value.
 #
-      set ok = 1
-      set noglob
-      sh -c "echo -n 'FILE - List of FITS files or tape drive > ' 1>&2"
-      set files = $<
+      ok=1
+      echo -n 'FILE - List of FITS files or tape drive > ' 1>&2
+      read files
 #
 #   Write some help information, but continue in the loop.
 #
-      if ($files[1] == '?') then
-         sh -c "echo '  ' 1>&2"
-         sh -c "echo '   file  = FILENAME (Read)' 1>&2"
-         sh -c "echo '      A space-separated list of FITS files whose headers are to be' 1>&2"
-         sh -c "echo '      listed, or the name of a single no-rewind tape device.  The list,' 1>&2"
-         sh -c "echo '      of files can include wildcard characters.' 1>&2"
-         sh -c "echo ' ' 1>&2"
-         set ok = 0
+      if [ "$files" = '?' ]; then
+         echo '  ' 1>&2
+         echo '   file  = FILENAME (Read)' 1>&2
+         echo '      A space-separated list of FITS files whose headers are to be' 1>&2
+         echo '      listed, or the name of a single no-rewind tape device.  The list' 1>&2
+         echo '      of files can include wildcard characters.' 1>&2
+         echo ' ' 1>&2
+         ok=
 #
 #   Abort when requested.
 #
-      else if ("$files[1]" == \!\!) then
+      elif ([ "$files" = '!!' ] || [ "$files" = '!' ]); then
          exit
 #
 #   Reprompt when no value is given.
 #
-      else if ("$files" ==  ) then
-         sh -c "echo 'No files given.  Enter "\!\!" to abort.' 1>&2"
-         set ok = 0
+      elif [ -z "$files" ]; then
+         echo 'No files given.  Enter "!!" to abort.' 1>&2
+         ok=
 #
 #   Check that all the supplied files exist.
 #
       else
-         unset noglob
-         foreach f ($files)
-            if (! -e $f ) then
-               sh -c "echo 'File "$f" does not exist.' 1>&2"
-               set ok = 0
-            endif
-         end
-      endif
-      unset noglob
-   end
-else
-   set files = ($cmd)
-endif
+         for f  in $files; do
+            if [ ! -e "$f" ]; then
+               echo "File \"$f\" does not exist." 1>&2
+               ok=
+            fi
+         done
+      fi
+   done
+
+   set $files
+fi
 #
 #   Find whether or not the first argument is a tape drive.  Since the
 #   user may have supplied a wildcarded set of files, these must be
 #   expanded through the () syntax.  Assign a logical value for whether
-#   or not the first file is a tape drive.  Once the first file has been
-#   tested break out of the loop.
+#   or not the first file is a tape drive.
 #
-set i = 1
-foreach f ($files)
-   if ($i == 1) then
-      if (-f $f) then
-         set tape = 0
-      else
-         set tape = 1
-      endif
-      break
-   endif
-end
-if ($tape == 1) then
+if [ -f "$1" ]; then
+   tape=
+else
+   tape=1
+fi
+if [ -n "$tape" ]; then
 #
 #   Obtain the blocking factor.
 #   ===========================
@@ -282,83 +281,95 @@ if ($tape == 1) then
 #   Use a logical to expression to decide whether or not the value
 #   of the command line is valid.
 #
-   set badval = 1
-   if ( $narg > 1 ) then
-      @ badval = ( $cmd[2] !~ [0-9]* || $cmd[2] < 1 || $cmd[2] > 12 )
+   badval=1
+   if [ "$#" -gt 1 ]; then
+      case "$2" in
+      [0-9]|[0-9][0-9])
+         if ([ "$2" -ge 1 ] && [ "$2" -le 12 ]); then
+            badval=
+         fi
+         ;;
+      esac
    else
-      set badval = 0
-   endif
+      badval=
+   fi
 #
 #   Decide whether prompting is needed.
 #
-   if ( ($narg < 2 && $prompt == 1) || $badval == 1 ) then
+   if (([ "$#" -lt 2 ] && [ -n "$prompt" ]) || [ -n "$badval" ]); then
 #
 #   Inform the user of the error before prompting.
 #
-      if ($badval == 1) then
-         sh -c "echo 'Tape blocking factor must be an integer between 1 and 12.' 1>&2"
-      endif
+      if [ -n "$badval" ]; then
+         echo 'Tape blocking factor must be an integer between 1 and 12.' 1>&2
+      fi
 #
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-      set ok = 0
-      while ($ok == 0)
+      ok=
+      while [ -z "$ok" ]; do
 #
 #   Assume that the value will be fine unless we discover otherwise
 #   later. Prompt for the blocking factor.
 #
-         set ok = 1
-         set noglob
-         sh -c "echo -n 'BLOCK - Give the FITS blocking factor /1/ >' 1>&2"
-         set block = $<
+         ok=1
+         echo -n 'BLOCK - Give the FITS blocking factor /1/ > ' 1>&2
+         read block
 #
 #   Write some help information, but continue in the loop.
 #
-         if ($block == '?') then
-            sh -c "echo ' ' 1>&2"
-            sh -c "echo '   BLOCK = _INTEGER (Read)' 1>&2"
-            sh -c "echo '      The FITS blocking factor of the tape to list.  This is the tape' 1>&2"
-            sh -c "echo '      blocksize in bytes divided by the FITS record length of 2880' 1>&2"
-            sh -c "echo '      bytes.  BLOCK must be a positive integer, between 1 and 12,' 1>&2"
-            sh -c "echo '      otherwise you will be prompted for a new value.  Should the first' 1>&2"
-            sh -c "echo '      argument not be a tape device, this argument will be treated as' 1>&2"
-            sh -c "echo '      a file name. [1]' 1>&2"
-            sh -c "echo ' ' 1>&2"
-            set ok = 0
+         if [ "$block" = '?' ]; then
+            echo ' ' 1>&2
+            echo '   BLOCK = _INTEGER (Read)' 1>&2
+            echo '      The FITS blocking factor of the tape to list.  This is the tape' 1>&2
+            echo '      blocksize in bytes divided by the FITS record length of 2880' 1>&2
+            echo '      bytes.  BLOCK must be a positive integer, between 1 and 12,' 1>&2
+            echo '      otherwise you will be prompted for a new value.  Should the first' 1>&2
+            echo '      argument not be a tape device, this argument will be treated as' 1>&2
+            echo '      a file name. [1]' 1>&2
+            echo ' ' 1>&2
+            ok=
 #
 #   Abort when requested.
 #
-         else if ("$block" == \!\!) then
+         elif [ "$block" = '!!' ]; then
             exit
 #
 #   Accept the value.  Take the the null value to mean use the default.
 #
-         else if ("$block" == \! || "$block" ==  ) then
-            set block = 1
+         elif ([ "$block" = '!' ] || [ -z "$block" ] ); then
+            block=1
 
 #   Use a logical to expression to decide whether or not the value
 #   given is valid.
 #
-         else if (!($block =~ [0-9]* && $block > 0 && $block < 13)) then
-            sh -c "echo 'Tape blocking factor must be an integer between 1 and 12.' 1>&2"
-            set ok = 0
          else
-            continue
-         endif
-         unset noglob
-      end
+            case "$block" in
+            [0-9]|[0-9][0-9])
+               if ([ "$block" -lt 1 ] || [ "$block" -gt 12 ]); then
+                  echo 'Tape blocking factor must be an integer between 1 and 12.' 1>&2
+                  ok=
+               fi
+               ;;
+            *)
+               echo 'Tape blocking factor must be an integer between 1 and 12.' 1>&2
+               ok=
+               ;;
+            esac
+         fi
+      done
 #
 #   No prompting is required so use the default value.
 #
-   else if ($narg < 2) then
-      set block = 1
+   elif [ "$#" -lt 2 ]; then
+      block=1
 #
 #   Use the validated value from the command line.
 #
    else
-      set block = $cmd[2]
-   endif
+      block="$2"
+   fi
 #
 #   Obtain the lower file limit.
 #   ============================
@@ -366,79 +377,92 @@ if ($tape == 1) then
 #   Use a logical to expression to decide whether or not the value
 #   of the command line is valid.
 #
-   if ( $narg > 2 ) then
-      @ badval = ($cmd[3] !~ [0-9]* || $cmd[3] < 1 )
+   badval=1
+   if [ "$#" -gt 2 ]; then
+      case "$3" in
+      [0-9]|[0-9][0-9]|[0-9][0-9][0-9])
+         if [ "$3" -ge 1 ]; then
+            badval=
+         fi
+         ;;
+      esac
    else
-      set badval = 0
-   endif
+      badval=
+   fi
 #
 #   Decide whether prompting is needed.
 #
-   if ( ($narg < 3 && $prompt == 1) || $badval == 1) then
+   if (([ "$#" -lt 3 ] && [ -n "$prompt" ]) || [ -n "$badval" ]); then
 #
 #   Inform the user of the error before prompting.
 #
-      if ($badval == 1) then
-         sh -c "echo 'Tape file number must be a positive integer.' 1>&2"
-      endif
+      if [ -n "$badval" ]; then
+         echo 'Tape file number must be a positive integer.' 1>&2
+      fi
 #
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-      set ok = 0
-      while ($ok == 0)
+      ok=
+      while [ -z "$ok" ]; do
 #
 #   Assume that the value will be fine unless we discover otherwise
 #   later.  Prompt for the lower file limit.
 #
-         set ok = 1
-         set noglob
-         sh -c "echo -n 'START - First tape file to list /1/ >' 1>&2"
-         set start = $<
+         ok=1
+         echo -n 'START - First tape file to list /1/ > ' 1>&2
+         read start
 #
 #   Write some help information, but continue in the loop.
 #
-         if ($start == '?') then
-            sh -c "echo ' ' 1>&2"
-            sh -c "echo '   START = _INTEGER (Read)' 1>&2"
-            sh -c "echo '      The first file on the tape to list.  This defaults to 1, i.e.' 1>&2"
-            sh -c "echo '      the start of the tape.  It must be a positive integer,' 1>&2"
-            sh -c "echo '      otherwise you will be prompted for a new value. [1]' 1>&2"
-            sh -c "echo ' ' 1>&2"
-            set ok = 0
+         if [ "$start" = '?' ]; then
+            echo ' ' 1>&2
+            echo '   START = _INTEGER (Read)' 1>&2
+            echo '      The first file on the tape to list.  This defaults to 1, i.e.' 1>&2
+            echo '      the start of the tape.  It must be a positive integer,' 1>&2
+            echo '      otherwise you will be prompted for a new value. [1]' 1>&2
+            echo ' ' 1>&2
+            ok=
 #
 #   Abort when requested.
 #
-         else if ("$start" == \!\!) then
+         elif [ "$start" = '!!' ]; then
             exit
 #
 #   Accept the value.  Take the the null value to mean the end of the tape.
 #
-         else if ("$start" == \! || "$start" ==  ) then
-            set start = 1
+         elif ([ "$start" = '!' ] || [ -z "$start" ]); then
+            start=1
 
 #   Use a logical to expression to decide whether or not the value
 #   given is valid.
 #
-         else if (!($start =~ [0-9]* && $start > 0)) then
-            sh -c "echo 'The start file on the tape must be a positive integer.' 1>&2"
-            set ok = 0
          else
-            continue
-         endif
-         unset noglob
-      end
+            case "$start" in
+            [0-9]|[0-9][0-9]|[0-9][0-9][0-9])
+               if [ "$start" -lt 1 ]; then
+                  echo 'The start file on the tape must be a positive integer.' 1>&2
+                  ok=
+               fi
+               ;;
+            *)
+               echo 'The start file on the tape must be a positive integer.' 1>&2
+               ok=
+               ;;
+            esac
+         fi
+      done
 #
 #   No prompting is required so use the default value.
 #
-   else if ($narg < 3) then
-      set start = 1
+   elif [ "$#" -lt 3 ]; then
+      start=1
 #
 #   Use the validated value from the command line.
 #
    else
-      set start = $cmd[3]
-   endif
+      start="$3"
+   fi
 #
 #   Obtain the upper file limit.
 #   ============================
@@ -446,51 +470,57 @@ if ($tape == 1) then
 #   Use a logical to expression to decide whether or not the value
 #   of the command line is valid.
 #
-   if ( $narg > 3 ) then
-      @ badval = ( $cmd[4] !~ [0-9]* || $cmd[4] < $start )
+   badval=1
+   if [ "$#" -gt 3 ]; then
+      case "$4" in
+      [0-9]|[0-9][0-9]|[0-9][0-9][0-9])
+         if [ "$4" -ge "$start" ]; then
+            badval=
+         fi
+         ;;
+      esac
    else
-      set badval = 0
-   endif
+      badval=
+   fi
 #
 #   Decide whether prompting is needed.
 #
-   if ( ($narg < 4 && $prompt == 1) || $badval == 1) then
+   if (([ "$#" -lt 4 ] && [ -n "$prompt" ]) || [ -n "$badval" ]); then
 #
 #   Inform the user of the error before prompting.
 #
-      if ($badval == 1) then
-         sh -c "echo 'Last tape file number must be a positive integer greater than the start value ("$start")' 1>&2"
-      endif
+      if [ -n "$badval" ]; then
+         echo "Last tape file number must be a positive integer greater than the start value ($start)" 1>&2
+      fi
 #
 #   Set the logical that says whether or not a valid value has been
 #   supplied.
 #
-      set ok = 0
-      while ($ok == 0)
+      ok=
+      while [ -z "$ok" ]; do
 #
 #   Assume that the value will be fine unless we discover otherwise
 #   later.  Prompt for the upper file limit.
 #
-         set ok = 1
-         set noglob
-         sh -c "echo -n 'FINISH - Last tape file to list /last/ >' 1>&2"
-         set finish = $<
+         ok=1
+         echo -n 'FINISH - Last tape file to list /last/ > ' 1>&2
+         read finish
 #
 #   Write some help information, but continue in the loop.
 #
-         if ($finish == '?') then
-            sh -c "echo ' ' 1>&2"
-            sh -c "echo '   FINISH = _INTEGER (Read)' 1>&2"
-            sh -c "echo '      The last file on the tape to list.  This defaults to the end' 1>&2"
-            sh -c "echo '      of the tape.  It must be a positive integer and at least equal' 1>&2"
-            sh -c "echo '      to the value of start, otherwise you will be prompted for a new' 1>&2"
-            sh -c "echo '      value. []' 1>&2"
-            sh -c "echo ' ' 1>&2"
-            set ok = 0
+         if [ "$finish" = '?' ]; then
+            echo ' ' 1>&2
+            echo '   FINISH = _INTEGER (Read)' 1>&2
+            echo '      The last file on the tape to list.  This defaults to the end' 1>&2
+            echo '      of the tape.  It must be a positive integer and at least equal' 1>&2
+            echo '      to the value of start, otherwise you will be prompted for a new' 1>&2
+            echo '      value. []' 1>&2
+            echo ' ' 1>&2
+            ok=
 #
 #   Abort when requested.
 #
-         else if ("$finish" == \!\!) then
+         elif [ "$finish" = '!!' ]; then
             exit
 #
 #   Accept the value.  Take the string "last" or the null value to mean the
@@ -498,100 +528,114 @@ if ($tape == 1) then
 #   the tape files to the end of the tape should be listed.  This ought to be
 #   enough.
 #
-         else if ("$finish" == \! || $finish =~ [Ll][Aa][Ss][Tt] || "$finish" ==  ) then
-            set finish = 999999
-
+         else
+            case "$finish" in
+            '!'|''|[Ll][Aa][Ss][Tt])
+               finish=999999
+               ;;
 #   Use a logical to expression to decide whether or not the value
 #   given is valid, i.e. is an integer not less than the start value.
 #
-         else if (!($finish =~ [0-9]* && $finish >= $start )) then
-            sh -c "echo 'Last tape file number must be a positive integer greater than the start value ("$start")' 1>&2"
-            set ok = 0
-         else
-            continue
-         endif
-         unset noglob
-      end
+            [0-9]|[0-9][0-9]|[0-9][0-9][0-9])
+               if [ "$finish" -lt "$start" ]; then
+                  echo 'Last tape file number must be a positive integer greater than the start value ("$start")' 1>&2
+                  ok=
+               fi
+               ;;
+            *)
+               echo 'Last tape file number must be a positive integer greater than the start value ("$start")' 1>&2
+               ok=
+               ;;
+            esac
+         fi
+      done
 #
 #   No prompting is required so use the default value.
 #
-   else if ($narg < 4) then
-      set finish = 999999
+   elif [ "$#" -lt 4 ]; then
+      finish=999999
 #
 #   Use the validated value from the command line.
 #
    else
-      set finish = $cmd[4]
-   endif
+      finish="$4"
+   fi
 #
 #   Position the tape.
 #   ==================
 #
 #   Rewind the tape.
 #
-   mt -f $files[1] rewind
+   mt -f "$1" rewind
 #
 #   Skip over files as requested.
 #
-   if ($start > 1 ) then
-      @ skip = $start - 1
-      mt -f $files[1] fsf $skip
+   if [ "$start" -gt 1 ]; then
+      skip=$(( $start - 1 ))
+      mt -f "$1" fsf $skip
 #
 #   Look for an error.  Exit if unable to skip down the tape.
 #
-      if ($status > 0) then
-         sh -c "echo 'Unable to move to file number "$start"' 1>&2"
+      if [ $? -ne 0 ]; then
+         echo "Unable to move to file number \"$start\"" 1>&2
          exit
-      endif
-   endif
+      fi
+   fi
 #
 #   Evaluate the tape blocksize.
 #
-   @ block = $block * 2880
+   block=$(( $block * 2880 ))
 #
 #   Loop from the start to the end file.
 #
-   set i = $start
-   while ($i <= $finish)
+   i=$start
+   while [ $i -le $finish ]; do
 #
 #   Have a blank line between headers.
 #
-      if ($i > $start > 1) echo " "
-      echo "FITS headers in "$files[1]" file number "$i":"
+      if [ $i -gt $start ]; then
+         echo " "
+      fi
+      echo "FITS headers in \"$1\" file number \"$i\":"
 #
 #   List the headers for the current file on the tape.
 #
-      dd ibs=$block if=$files[1] cbs=80 conv=unblock | \
+      dd ibs=$block if="$1" cbs=80 conv=unblock | \
          sed -n -e "$sedsim" -e "$sedext"
 #
 #   The most-likely error is for the EOT to be found, so there is no
 #   error message reported.  Break from the loop.
 #
-      if ($status > 0) break
+      if [ $? -ne 0 ]; then
+         break
+      fi
 #
 #   Increment the file counter.
 #
-      @ i = $i + 1
-   end
+      i=$(( $i + 1 ))
+   done
 #
 #   A list of files have been given.  The files have already been checked
 #   for existence.
 #
 else
-   set i = 0
-   foreach file ($files)
-      @ i = $i + 1
+   i=0
+   for file in "$@"; do
+      i=$(( $i + 1 ))
 #
 #   Have a blank line between headers.
 #
-      if ($i > 1) echo " "
-      echo "FITS headers in "$file":"
+      if [ $i -gt 1 ]; then
+         echo " "
+      fi
+      echo "FITS headers in \"$file\":"
 #
 #   List the headers for the current file.
 #
-      dd cbs=80 bs=80 conv=unblock if=$file | sed -n -e "$sedsim" -e "$sedext"
-   end
-endif
+      dd cbs=80 bs=80 conv=unblock if="$file" | \
+         sed -n -e "$sedsim" -e "$sedext"
+   done
+fi
 #
 #   Exit the procedure.
 #
