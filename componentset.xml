@@ -3278,7 +3278,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="pal" support="S">
-  <version>0.9.9</version>
+  <version>0.9.10</version>
   <path>libext/pal</path>
   <description>Positional Astronomy Library</description>
   <abstract><p>
