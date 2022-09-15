@@ -380,15 +380,17 @@ for fname in $gfiles; do
 
 # See if all numeric types should be generated.
 
-      if [ `echo $types | grep n` != "" ]; then
+      case "$types" in
+      *n*)
          types="${types}bBdikrwW"
-      fi
+         ;;
 
 # See if all types should be generated.
 
-      if [ `echo $types | grep a` != "" ]; then
+      *a*)
          types="bBcdikrlwW"
-      fi
+         ;;
+      esac
 
 # Remove the trailing x character of the file name, when the -x option
 # has been selected.
