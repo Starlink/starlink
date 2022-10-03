@@ -1,7 +1,5 @@
 Perl/bin/autoastrom
 Perl/bin/convert_dr_files
-Perl/bin/dpCapture
-Perl/bin/dpRetrieve
 Perl/bin/gsdprint
 Perl/bin/maparea2region
 Perl/bin/sourceplot
