@@ -430,12 +430,12 @@ FORMAT                           FORMAT                                  FORMAT
 
 Cols 1-6   Document Number: The current version number is shown after the
            serial number.  Thus, 1.2 means paper 1, version 2.
-Cols 9-16  Date of issue: yyyy-mm-dd
-Cols 18-20 Authors initials.  If there is more than one author, the first or
+Cols 9-18  Date of issue: yyyy-mm-dd
+Cols 20-22 Authors initials.  If there is more than one author, the first or
            principle author is indicated in lower case.  Authors full names are
            shown after the titles.
-Cols 22-25 Number of pages.
-Cols 27-80 Document title.
+Cols 26-28 Number of pages.
+Cols 31-80 Document title.
 
 The Authors list gives the Starlink site code at which the author has a primary
 user account, and is not an indication of affiliation to a particular
