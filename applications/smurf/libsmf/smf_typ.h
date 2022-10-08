@@ -195,6 +195,11 @@
 *        Added new smfFts fields for quality statistics
 *     2015-11-19 (GSB):
 *        Add WVMFIT option to smf_tausrc.
+*     2022-10-07 (GSB):
+*        Add information about ACSIS status bits to comments
+*        of the drcntrl_bits enum.  Added a dummy bit (highest
+*        bit for signed int, presumed not to appear in raw data)
+*        to be used to flag position problems with ACSIS.
 *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1018,7 +1023,15 @@ typedef struct smfSampleTable {
    structure to indicate whether we are missing information from a particular
    DRAMA task. A completely valid state item will have a DRCONTROL flag
    of zero. These definitions should match those defined in sc2headman_struct.h
-   in the online software. */
+   in the online software.
+
+   Note that ACSIS uses a different set of meanings for these bits:
+
+   END_SEQUENCE_BIT = 1
+   END_OBSERVATION_BIT = 2
+   SHARED_OFFS = 4
+
+   See acsis header: code/hia/implement/ACSIS/ControlBits.h */
 
 typedef enum {
   DRCNTRL__SMU_BIT = 1,
@@ -1026,7 +1039,10 @@ typedef enum {
   DRCNTRL__SCUBA2_BIT = 4,
   DRCNTRL__RTS_BIT = 8,
   DRCNTRL__FTS2_BIT = 16,
-  DRCNTRL__POL2_BIT = 32
+  DRCNTRL__POL2_BIT = 32,
+
+  /* Dummy value for internal use in ACSIS data processing: */
+  DRCNTRL__TCS_POSN_BIT = 16384,
 } drcntrl_bits;
 
 /* and define a combo value to indicate loss of telescope-ness */
