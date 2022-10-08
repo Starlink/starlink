@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_get_global0I
+*     smf_get_global0<X>
 
 *  Purpose:
-*     Get a scalar integer value from the smurf globals keymap.
+*     Get a scalar value from the smurf globals keymap.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     result = smf_get_global0I( const char *name, int def, int *status )
+*     CGEN_TYPE smf_get_global0<X>( const char *name, CGEN_TYPE def, int *status )
 
 *  Arguments:
 *     name = const char * (Given)
 *        The key name for the required item.
-*     def = int (Given)
+*     def = CGEN_TYPE (Given)
 *        The default value to use if the required item is not present in
 *        the globals keymap.
 *     status = int* (Given and Returned)
@@ -28,7 +28,7 @@
 *     The required item value.
 
 *  Description:
-*     This function returns the scalar integer value associated with the
+*     This function returns the scalar value associated with the
 *     given key within the smurf globals keymap. This is a keymap created
 *     in smurf_mon.c, and which is accessable by all smf functions.
 *
@@ -42,6 +42,8 @@
 *  History:
 *     20-JAN-2016 (DSB):
 *        Original version.
+*     2022-10-08 (GSB):
+*        Convert to generic function.
 
 *  Copyright:
 *     Copyright (C) 2016 East Asian Observatory.
@@ -77,10 +79,10 @@
 #include "libsmf/smf.h"
 
 /* Main entry point . */
-int smf_get_global0I( const char *name, int def, int *status ){
+CGEN_TYPE CGEN_FUNCTION(smf_get_global0)( const char *name, CGEN_TYPE def, int *status ){
 
 /* Local Variables: */
-   int result;
+   CGEN_TYPE result;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return def;
@@ -92,7 +94,7 @@ int smf_get_global0I( const char *name, int def, int *status ){
 
 /* Get the value, assigning the supplied default value if there is no
    value in the KeyMap. */
-   if( !astMapGet0I( smurf_global_keymap, name, &result ) ) result = def;
+   if( !CGEN_FUNCTION(astMapGet0)( smurf_global_keymap, name, &result ) ) result = def;
 
 /* Unlock the smurf globals keymap pointer so that it can be used by
    other threads. */

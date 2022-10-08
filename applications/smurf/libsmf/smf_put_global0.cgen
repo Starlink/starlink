@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_put_global0I
+*     smf_put_global0<X>
 
 *  Purpose:
-*     Put a scalar integer value into the smurf globals keymap.
+*     Put a scalar value into the smurf globals keymap.
 
 *  Language:
 *     Starlink ANSI C
@@ -13,18 +13,18 @@
 *     Library routine
 
 *  Invocation:
-*     smf_put_global0I( const char *name, int value, int *status )
+*     void smf_put_global0<X>( const char *name, CGEN_TYPE value, int *status )
 
 *  Arguments:
 *     name = const char * (Given)
 *        The key name for the item.
-*     value = int (Given)
+*     value = CGEN_TYPE (Given)
 *        The value of the item to put into the keymap.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This function puts a scalar integer value into smurf globals
+*     This function puts a scalar value into smurf globals
 *     keymap, associating it with the supplied key name.
 *
 *     The globals KeyMap should be unlocked on entry, and will be
@@ -37,6 +37,8 @@
 *  History:
 *     20-JAN-2016 (DSB):
 *        Original version.
+*     2022-10-08 (GSB):
+*        Convert to generic function.
 
 *  Copyright:
 *     Copyright (C) 2016 East Asian Observatory.
@@ -72,7 +74,7 @@
 #include "libsmf/smf.h"
 
 /* Main entry point . */
-void smf_put_global0I( const char *name, int value, int *status ){
+void CGEN_FUNCTION(smf_put_global0)( const char *name, CGEN_TYPE value, int *status ){
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return;
@@ -83,7 +85,7 @@ void smf_put_global0I( const char *name, int value, int *status ){
    astLock( smurf_global_keymap, 1 );
 
 /* Put the value into the KeyMap. */
-   astMapPut0I( smurf_global_keymap, name, value, NULL );
+   CGEN_FUNCTION(astMapPut0)( smurf_global_keymap, name, value, NULL );
 
 /* Unlock the smurf globals keymap pointer so that it can be used by
    other threads. */

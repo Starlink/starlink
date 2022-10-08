@@ -422,6 +422,8 @@
  *       Added new smfFts fields for quality statistics
  *     2017-01-10 (GSB)
  *       Add "dtai" argument to some functions.
+ *     2022-10-08 (GSB)
+ *       Converted smf_get_global0I and smf_put_global0I to generic functions.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1432,8 +1434,6 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 size_t smf_get_freemem ( double * mbytes, size_t *pagesize,
                          int64_t *physsize, int * status );
 
-int smf_get_global0I( const char *name, int def, int *status );
-
 void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
                         size_t tstride, smf_qual_t mask,
                         size_t *istart, size_t *iend, int *status );
@@ -1763,8 +1763,6 @@ void smf_projbox( Grp *igrp, AstFrameSet *refwcs,
                   int dims[ NDF__MXDIM ], int *status );
 
 void smf_puthistory( smfData *data, const char *appn, int *status );
-
-void smf_put_global0I( const char *name, int value, int *status );
 
 size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
 
