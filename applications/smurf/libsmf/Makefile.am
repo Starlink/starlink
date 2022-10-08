@@ -463,6 +463,7 @@ smf_update_valbad.c \
 smf_updateprov.c \
 smf_validate_smfData.c \
 smf_validate_smfHead.c \
+smf_validate_tcs_position.c \
 smf_whiten.c \
 smf_write_bolomap.c \
 smf_write_bolotable.c \

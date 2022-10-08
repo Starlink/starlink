@@ -2111,6 +2111,8 @@ int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
 int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
 
+int smf_validate_tcs_position( smfHead* hdr, double tolerance, int setbad, int* status );
+
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
                  int complement, int *status );
 
