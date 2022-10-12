@@ -175,3 +175,15 @@
 [submodule "applications/smurf/wvm"]
 	path = applications/smurf/wvm
 	url = https://github.com/eaobservatory/jcmt-wvm.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-HWMap"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-ACSIS-HWMap
+	url = https://github.com/eaobservatory/perl-JCMT-ACSIS-HWMap.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-SMU-Jiggle"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-SMU-Jiggle
+	url = https://github.com/eaobservatory/perl-JCMT-SMU-Jiggle.git
+[submodule "thirdparty/perlsys/perlmods/perl-JCMT-TCS-Pong"]
+	path = thirdparty/perlsys/perlmods/perl-JCMT-TCS-Pong
+	url = https://github.com/eaobservatory/perl-JCMT-TCS-Pong.git
+[submodule "thirdparty/perlsys/perlmods/perl-JAC-OCS-Config"]
+	path = thirdparty/perlsys/perlmods/perl-JAC-OCS-Config
+	url = https://github.com/eaobservatory/perl-JAC-OCS-Config.git

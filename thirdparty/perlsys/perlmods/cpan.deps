@@ -30,3 +30,4 @@ Parse::RecDescent
 Astro::VEX
 Astro::Catalog
 App::SourcePlot
+XML::LibXML

@@ -21,3 +21,7 @@ perl-JSA
 perl-Astro-ITC-SCUBA2
 perl-UKIRT-Archive
 perl-Pod-SST
+perl-JCMT-ACSIS-HWMap
+perl-JCMT-SMU-Jiggle
+perl-JCMT-TCS-Pong
+perl-JAC-OCS-Config
