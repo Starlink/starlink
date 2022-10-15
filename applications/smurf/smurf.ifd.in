@@ -3681,6 +3681,15 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter telposerrmax {
+                type _DOUBLE
+                vpath DEFAULT
+                ppath DEFAULT
+                prompt {Maximum separation between TCS ACn and DCn (arcsec)}
+                default 0.0
+                helpkey *
+            }
+
             parameter tileborder {
                 type _INTEGER
                 prompt {Width of tile overlap in pixels}

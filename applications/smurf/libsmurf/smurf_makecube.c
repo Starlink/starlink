@@ -597,6 +597,11 @@
 *          had for the first time slice. For any other system, no such
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TELPOSERRMAX = _DOUBLE (Read)
+*          Maximum separation between the actual position (TCS_TR_AC1/2) and
+*          demand position (TCS_TR_DC1/2) in the JCMTSTATE extension (arcsec).
+*          If non-zero, time slices which exceed this separation will be
+*          excluded.  [0.0]
 *     TILEBORDER = _INTEGER (Read)
 *          Only accessed if a non-null value is supplied for parameter
 *          TILEDIMS. It gives the width, in pixels, of a border to add to
@@ -936,6 +941,8 @@
 *        processing the first file as the list of legal detectors supplied to 
 *        smf_rebincube when processing the next file. Instead, accumulate the 
 *        detector names returned by smf_rebincube in a separate group.
+*     14-OCT-2022 (GSB):
+*        Added parameter TELPOSERRMAX.
 
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory.
@@ -1041,6 +1048,7 @@ void smurf_makecube( int *status ) {
    double fcon;               /* Tsys factor for file */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
+   double telposerrmax;       /* Max error between TCS_TR_AC1/2 and DC1/2, arcsec */
    float *eff_array = NULL;   /* Pointer to array of eff times  */
    float *exp_array = NULL;   /* Pointer to array of exp times */
    float *ipd = NULL;         /* Pointer to the next output data value */
@@ -1158,6 +1166,10 @@ void smurf_makecube( int *status ) {
 /* Find the number of cores/processors available and create a pool of
    threads of the same size. */
    wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
+
+/* Get the maximum allowed separation between TCS_TR_AC1/2 and DC1/2. */
+   parGet0d( "TELPOSERRMAX", &telposerrmax, status );
+   smf_put_global0D( "TEL_POS_TOLERANCE", telposerrmax, status );
 
 /* Get a group of input files */
    ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
