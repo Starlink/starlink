@@ -128,6 +128,8 @@
 *     29-OCT-2020 (DSB):
 *        "detgrp" is now used to return the names of the detectors that
 *        contributed good data to the cube.
+*     15-OCT-2022 (GSB):
+*        Add check of jos_drcontrol position problem flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -227,6 +229,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
    size_t irec;          /* Index of current input detector */
    size_t itime;         /* Index of current time slice */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+   drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -434,6 +437,11 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
       if( nexttime ){
          if( *nexttime != itime ) continue;
          nexttime++;
+      }
+
+/* Skip this time slice if flagged due to a position problem. */
+      if( (hdr->allState)[itime].jos_drcontrol & drcntrl_mask ) {
+         continue;
       }
 
 /* Store a pointer to the first input data value in this time slice. */

@@ -209,6 +209,8 @@
 *        AlignOffset).
 *     11-MAY-2017 (DSB):
 *        Add argument poserrmax.
+*     15-OCT-2022 (GSB):
+*        Add check of jos_drcontrol position problem flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -313,6 +315,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
    void *cols_info;      /* Data used inside smf_extracols */
+   drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
 
 /* Initialise the returned array to hold vad values. */
    if( par ) {
@@ -474,6 +477,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Loop round all the time slices in the input file. */
       for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
+
+/* Skip this time slice if flagged due to a position problem. */
+          if( (hdr->allState)[itime].jos_drcontrol & drcntrl_mask ) {
+             continue;
+          }
 
 /* Get a FrameSet describing the spatial coordinate systems associated with
    the current time slice of the current input data file. The base frame in
