@@ -1065,9 +1065,9 @@ void smurf_makecube( int *status ) {
    float poserrmax;           /* Max error between RECEPPOS and FPLANEX/Y, arcsec */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
-   int ***ptime;              /* Holds time slice indices for each bol bin */
+   int ***ptime;              /* Holds time slice indices for each pol bin */
    int *hist = NULL;          /* Histogram array */
-   int *pt;                   /* Holds time slice indices for each bol bin */
+   int *pt;                   /* Holds time slice indices for each pol bin */
    int alignsys;              /* Align data in the output system? */
    int autogrid;              /* Determine projection parameters automatically? */
    int axes[ 2 ];             /* Indices of selected axes */

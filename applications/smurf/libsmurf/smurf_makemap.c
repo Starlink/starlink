@@ -962,8 +962,8 @@ void smurf_makemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   char *pname = NULL;        /* Name of currently opened data file */
-  int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
-  int *pt = NULL;            /* Holds time slice indices for each bol bin */
+  int ***ptime = NULL;       /* Holds time slice indices for each pol bin */
+  int *pt = NULL;            /* Holds time slice indices for each pol bin */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   size_t size;               /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
