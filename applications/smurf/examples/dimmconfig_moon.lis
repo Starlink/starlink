@@ -6,7 +6,7 @@
 # the moon (tuned using 850um observations 20110328 #40). Astronomical
 # signal dominates everything else, so we place map estimation
 # *before* the removal of low-frequency noise (see modelorder). In
-# addition, we set the filter scale to 2000 arcsec, slightly beyond
+# addition, we set the filter scale to 2000 arcsec, slightly beyond the
 # disk.  Common-mode removal is completely turned off.  Noise in the
 # WVM signal can cause significant steps, so we instead use CSOTAU as
 # a fixed zenith opacity monitor (which internally gets converted into

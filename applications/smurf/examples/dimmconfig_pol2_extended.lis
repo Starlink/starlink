@@ -3,12 +3,12 @@
 #     dimmconfig_pol2_extended.lis
 
 #  Purpose:
-#     A MAKEMAP configuration for POL2 data suitable for extended sources .
+#     A MAKEMAP configuration for POL-2 data suitable for extended sources.
 
 #  Description:
 #     This file provides values for parameters used by the SMURF:MAKEMAP
 #     command to control the details of the map-making algorithm when
-#     making maps from POL2 "scan & spin" data. To use it, assign it to
+#     making maps from POL-2 "scan & spin" data. To use it, assign it to
 #     the CONFIG parameter on the command line when running MAKEMAP. For
 #     instance:
 #

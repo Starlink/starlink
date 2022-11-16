@@ -3,7 +3,7 @@
 #     .dimmconfig_pol2.lis
 
 #  Purpose:
-#     A MAKEMAP configuration for making POL2 scan & spin maps
+#     A MAKEMAP configuration for making POL-2 scan & spin maps.
 
 #  Description:
 #     This file provides values for parameters used by the SMURF:MAKEMAP
@@ -11,7 +11,7 @@
 #
 #     This file is not intended to be used directly by users. Its purpose
 #     is to provide settings that are common to other, more specialised,
-#     POL2 configurations that handle various forms of sources. See
+#     POL-2 configurations that handle various forms of sources. See
 #     for instance, /star/share/smurf/dimmconfig_pol2_compact.lis. For
 #     this reason, the file has been "hidden" by putting a dot at the
 #     start of the name.
@@ -35,28 +35,28 @@
 #-
 
 
-#  Use PCA to model and remove the  background polarisation.
+#  Use PCA to model and remove the background polarisation.
    modelorder = (pca,ext,ast,noi)
 
 #  Time based despiking.
    spikebox = 10
    spikethresh = 5
 
-#  POL" scans are very slow, so avoid flagging slow samples.
+#  POL-2 scans are very slow, so avoid flagging slow samples.
    flagslow = 0.01
 
-#  Aggreive noise clipping.
+#  Aggressive noise clipping.
    noisecliphigh = 3
 
-#  The data has already been downsampled by CALCQU, so don't  do any more
+#  The data has already been downsampled by CALCQU, so don't do any more
 #  down sampling.
    downsampscale = 0
 
 #  Weight bolometers using the RMS residuals calculated by CALQU and
-#  stored i nthe variance component of the CALCQU output NDFs.
+#  stored in the variance component of the CALCQU output NDFs.
    noi.usevar = 1
 
 #  Use smaller boxes when finding DC steps because of the very low sample
-#  rate of POL2 Stokes vector time-series created by calcqu.
+#  rate of POL-2 Stokes vector time-series created by calcqu.
    dcfitbox = 5
    dcsmooth = 10
