@@ -55,7 +55,7 @@ dnl    make in the VTK directory. Remove cmConfigure.h file as that
 dnl    maybe from a full build and include components that are not to be
 dnl    used during a bootstrap (cmELF for instance).
 (
-   cmd="cd cmake && rm -f Source/cmConfigure.h && ./bootstrap";\
+   cmd="cd cmake && rm -f Source/cmConfigure.h && ./bootstrap --no-qt-gui --system-curl";\
    echo $cmd; \
    eval $cmd
 )
