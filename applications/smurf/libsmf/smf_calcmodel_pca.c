@@ -395,7 +395,7 @@ void smf_calcmodel_pca( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* See if a mask should be used to exclude bright source areas from
    the PCA model. */
-         mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, status );
+         mask = smf_get_mask( wf, SMF__PCA, keymap, dat, flags, NULL, status );
 
 /* See if the number of PCA components to remove as the PCA model is now
    frozen. If not, the number of components to remove as the PCA model is

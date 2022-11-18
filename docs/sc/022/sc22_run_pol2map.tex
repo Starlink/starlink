@@ -3,16 +3,16 @@
 \label{sec:rundr}
 
 The previous chapter, \cref{Chapter}{sec:dr}{POL-2 Data Reduction --
-  The Theory}, described how \poltwomap\ produces I, Q and U maps from raw
-POL-2 data.  It showed that this reduction process -- which uses
-\task{pol2map} -- comprises three steps.
+  The Theory}, described how \poltwomap\ produces $I$, $Q$, and $U$ maps from raw
+POL-2 data.  It showed that this reduction process----which uses
+\task{pol2map}---comprises three steps.
 
-As with the other Python scripts in \SMURF, you can get more
-information about the available parameters by doing either:
+As with the other Python scripts in \SMURF, it is possible to get more
+information about the available parameters by running either:
 \begin{terminalv}
 % pol2map --help
 \end{terminalv}
-or
+or the
 \begin{terminalv}
 % smurfhelp pol2map
 \end{terminalv}
@@ -27,8 +27,9 @@ package started (see \cref{Section}{sec:starinit}{Initialising
   processing}).
 
 This chapter describes how to run \task{pol2map} firstly to produce an
-initial I map and then again to produce the final I, Q, U maps and
-vector catalogue as described in Section~\ref{sec:how-step1}.
+initial $I$ map; and then again to produce the final $I$, $Q$, and $U$ maps
+and a vector catalogue, as described in \cref{Section}{sec:how-step1}{
+pol2map -- producing the initial $I$ map}.
 
 To run \task{pol2map}, values should normally be supplied for the following
 command-line parameters\footnote{Note the distinction between
@@ -36,115 +37,113 @@ command-line parameters\footnote{Note the distinction between
   \task{pol2map} command line, and ``configuration parameters'' that
   are specified within a configuration file. Values for all
   \emph{configuration} parameters are obtained using a single
-  \emph{command-line} parameter called \param{CONFIG}.} to produce
-the initial intensity image (if a parameter description ends with a value
-in square brackets, it is the default value that will be used for
-the parameter if no value is supplied on the command line).
+  \emph{command-line} parameter called \param{CONFIG}.}, in order to
+  produce the initial intensity image. Note that if a parameter description ends
+  with a value in square brackets, it is the default value that will be used for
+  the parameter if no value is supplied on the command line.
 
 \begin{aligndesc}
 \item[\texttt{IN}] A list of input NDFs containing raw POL-2 data.
   There are many ways in which the list of files can be supplied, as
-  described in Section ``\xref{Specifying Groups of
-    Objects}{sun95}{se_groups}'' in \xref{SUN/95}{sun95}{}. The
-  easiest is to create a simple text file containing the names of the
-  raw data files -- one per line -- and then supply the name of the
+  described in the ``\xref{Specifying Groups of
+    Objects}{sun95}{se_groups}'' section of \xref{SUN/95}{sun95}{}. The
+  easiest of these is to create a simple text file containing the names of the
+  raw data files (one per line), and then supply the name of the
   text file, preceded by an up-caret character (\,\texttt{\^{}}\,), as
-  the value for parameter \param{IN}. Note, the names of the raw data
-  files can contain wildcards such as ``$*$'' and ``?''.
+  the value for parameter \param{IN}. Note that the specified names of the raw
+  data files can contain wildcards such as ``$*$'' and ``?''.
 
 \item[\texttt{IOUT}] The name of the NDF in which to store the
-  total intensity (I) map (in pW) incorporating all supplied observations.
+  total intensity ($I$) map (in pW) incorporating all supplied observations.
   The supplied file name should either have a file type of
   \texttt{.sdf}, or no file type at all (in which case
   \texttt{.sdf} will be appended to the supplied value). Any existing
   file with the same name will be overwritten.
 
-\item[\texttt{QOUT}] The output NDF in which to return the Q map
-  including all supplied observations. This will be in units of
-  pW. Null (\texttt{!}) should be supplied if no Q map is required.
+\item[\texttt{QOUT}] The output NDF in which to return the $Q$ map
+  incorporating all supplied observations. This will be in units of
+  pW. Null (\texttt{!}) should be supplied if no $Q$ map is required.
 
-\item[\texttt{UOUT}] The output NDF in which to return the U map
-  including all supplied observations. This will be in units of
-  pW. Null (\texttt{!}) should be supplied if no U map is required.
+\item[\texttt{UOUT}] The output NDF in which to return the $U$ map
+  incorporating all supplied observations. This will be in units of
+  pW. Null (\texttt{!}) should be supplied if no $U$ map is required.
 
-\item[\texttt{MAPDIR}] The name of a directory in which to put the Q,
-  U and I maps made from each individual observation supplied via
-  \param{IN}, before co-adding them. If null (\texttt{!}) is supplied, the new maps are
-  placed in the same temporary directory (chosen automatically) as all the
-  other intermediate files and so will be deleted when the script exists
-  (unless Parameter \param{RETAIN} is set \texttt{TRUE}). Note, these maps are always in
-  units of pW. Each one will contain FITS headers specifying the pointing
-  corrections needed to align the map with the reference map. [\texttt{!}]
+\item[\texttt{MAPDIR}] The name of the directory in which to place the $Q$,
+  $U$, and $I$ maps made from each individual observation supplied via
+  \param{IN}, before co-adding them. If null (\texttt{!}) is supplied, the new
+  maps are placed in the same temporary directory (chosen automatically)
+  as all the other intermediate files, and so will be deleted when the script
+  exits (unless the parameter \param{RETAIN} is set to be \texttt{TRUE}). Note
+  that these maps are always in units of pW. Each one will contain FITS
+  headers specifying the pointing corrections needed to align the map with
+  the reference map. [\texttt{!}]
 
-
-\item[\texttt{QUDIR}] The name of a directory in which to put the Q, U
-  and I time series generated by \SMURF\ \task{calcqu}, prior to generating
+\item[\texttt{QUDIR}] The name of a directory in which to place the $Q$, $U$,
+  and $I$ time series generated by \SMURF\ \task{calcqu}, prior to generating
   maps from them. If null (\texttt{!}) is supplied, they are placed in the same
-  temporary directory as all the other intermediate files and so will
-  be deleted when the script exists (unless Parameter \param{RETAIN} is set
-  \texttt{TRUE}). [\texttt{!}]
+  temporary directory as all the other intermediate files, and so will
+  be deleted when the script exits (unless the parameter \param{RETAIN} is
+  set to be \texttt{TRUE}). [\texttt{!}]
 \end{aligndesc}
 
-Some additional command-line parameters are required when \task{pol2map} is
-used for the second time -- as discussed in Section~\ref{sec:how-step23}
--- to produce the final I, Q, U maps and vector catalogue\footnote{This
+Some additional command-line parameters are required when \poltwomap\ is
+used for the second time---as discussed in
+\cref{Section}{sec:how-step23}{pol2map -- producing the $I$, $Q$, $U$ maps
+and catalogue}---to produce the final $I$, $Q$, $U$ maps and vector catalogue\footnote{This
 second usage of \task{pol2map} includes both ``Run 2'' and ``Run 3'' in
-Figure~\ref{fig:pol2drflow}.}.
+\cref{Figure}{fig:pol2drflow}{}.}.
 
 \begin{aligndesc}
 
 \item[\texttt{CAT}] The output FITS vector catalogue. No catalogue is
-  created if null (!) is supplied. Note -- by default the Q, U and
-  I$_{\textnormal{p}}$ values in this catalogue will be in units of mJy/beam. [!]
-
+  created if null (!) is supplied. Note that, by default, the $Q$, $U$, and
+  $I_{\textnormal{p}}$ values in this catalogue will be in units of mJy/beam. [!]
 
 \item[\texttt{MASK}] Specifies the type of masking to be used within
-  \makemap\ (the same type of masking is used to create all three maps --
-  I, Q and U).
-
+  \makemap\ (the same type of masking is used to create all three maps---$I$,
+  $Q$, and $U$).
 
 \item[\texttt{MASKOUT1}] If a non-null value is supplied for \param{MASKOUT1},
-  it specifies the NDF in which to store the AST mask created from the
-  NDF specified by Parameter \param{MASK}. Only used if an NDF is supplied for
+  it specifies the NDF in which to store the AST mask created from the NDF
+  specified by Parameter \param{MASK}. Only used if an NDF is supplied for
   Parameter \param{MASK}. [!]
-
 
 \item[\texttt{MASKOUT2}] If a non-null value is supplied for \param{MASKOUT2},
-  it specifies the NDF in which to store the PCA mask created from the
-  NDF specified by Parameter \param{MASK}. Only used if an NDF is supplied for
+  it specifies the NDF in which to store the PCA mask created from the NDF
+  specified by Parameter \param{MASK}. Only used if an NDF is supplied for
   Parameter \param{MASK}. [!]
-
 
 \item[\texttt{IPREF}] The total intensity map to be used for IP
   correction. The map must be in units of pW. If the same value is
-  supplied for both \param{IOUT} and \param{IPREF}, the output I map will be used for
-  IP correction. [\texttt{!}]
+  supplied for both \param{IOUT} and \param{IPREF}, the output $I$
+  map will be used for IP correction. [\texttt{!}]
 
 \item[\texttt{DEBIAS}] \texttt{TRUE} if a correction for statistical bias is to
   be made to percentage polarisation and polarised intensity in the
-  output vector catalogue specified by Parameter \param{CAT}. [\texttt{FALSE}]
+  output vector catalogue specified by the parameter \param{CAT}. [\texttt{FALSE}]
 \end{aligndesc}
 
-The \task{pol2map} command provides many other parameters that can be used to
-modify its behaviour in various ways. To see a full list, do this.
+The \task{pol2map} command provides many other parameters that may be used to
+modify its behaviour in various ways. To see a full list, type the
+following.
 
 \begin{terminalv}
 % pol2map --help
 \end{terminalv}
 
 
-\section{\xlabel{how-step1}pol2map -- producing the initial I map.}
+\section{\xlabel{how-step1}pol2map -- producing the initial \textit{I} map}
 \label{sec:how-step1}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
   Theory}, \poltwomap\ must first be run on the raw data to produce an
-initial I map.  In this first step:
+initial $I$ map.  In this first step:
 
 \begin{terminalv}
 % pol2map in=^myfiles.list iout=iauto qout=! uout=! mapdir=maps qudir=qudata
 \end{terminalv}
 
-the file \texttt{myfiles.lis} contains a list of the raw data
+where the file \texttt{myfiles.lis} contains a list of the raw data
 files to be included in the map, and could (for instance) look like
 this.
 
@@ -156,29 +155,27 @@ this.
 /jcmtdata/raw/scuba2/s8d/20160125/00043/*
 \end{terminalv}
 
-This uses all available data for all four 850\,$\mu$m sub-arrays, for
-Observation 43 taken on 25th January 2016\footnote{The input files
+This uses all available data from all four \SI{850}{\micro\metre} sub-arrays, for
+  Observation~43 taken on 2016 January 25\footnote{The input files
   should all be for a single waveband from one or more POL-2
-  observations -- do not mix files from different wavebands and/or
-  astronomical regions}. In addition, the data used in this example
-also comes from Observations 56 and 59 taken on January 11th 2016 (UT).
+  observations. Users should not mix files from different wavebands and/or
+  astronomical regions.}. In addition, the data used in this example
+  also come from Observations~56 and 59 taken on 2016 January 11 (UT).
 
 \begin{tip}
-  An up-caret ( $ \hat{} $ ) is required any time you are reading in a
-  group text file in Starlink. For the map-maker this includes the
+  An up-caret ( $ \hat{} $ ) is required any time the user is reading in
+  a group text file in Starlink. For the map-maker, this includes the
   configuration file (a group of configuration parameters) and the
   list of input files (a group of NDFs \emph{e.g.} \texttt{in= $
     \hat{} $ myfiles.lis}).
 
-  To check if the files are POL-2 files, run the \smurf\ command
-  \xref{pol2check}{sun258}{POL2CHECK}.
-\begin{terminalv}
-% pol2check ^myfiles.list
-\end{terminalv}
+  Note that the \poltwomap\ script also invokes the \ \smurf\
+  \xref{pol2check}{sun258}{POL2CHECK} command, in order to
+  first ensure that the input files are actually POL-2 files.
 \end{tip}
 
-Note that \texttt{qout} and \texttt{uout} are set to null values as no
-Q or U maps are required to be produced during this initial step 1
+Note that \texttt{qout} and \texttt{uout} are set to null values, as no
+$Q$ or $U$ maps are required to be produced during this initial Step~1
 reduction stage.
 
 The following shows the output from running this initial \task{pol2map}
@@ -210,41 +207,41 @@ for future use
 
 \end{terminalv}
 
-The files and folders produced in this reduction are described below.
+The files and folders produced by this reduction process are described below.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \task{pol2map}
-  command (\task{pol2map} is a Python script, which runs various other
-  Starlink tasks behind the scenes to perform the bulk of the work).
+  various \SMURF, \KAPPA\ and \POLPACK\ commands run as part of the \poltwomap\
+  command (\task{pol2map}\ is actually a Python script that runs various other
+  Starlink tasks behind the scenes in order to perform the bulk of the work).
 
-\item[\file{qudata/}] A folder containing the I, Q and U time-series data
-  for each sub array for each observation (these are produced by
-  \task{calcqu} (see Section~\cref{Chapter}{sec:calcqu}{CALCQU}).
+\item[\file{qudata/}] A folder containing the $I$, $Q$, and $U$ time-series data
+  for each sub array for each observation. These are produced by
+  \task{calcqu} (see  \cref{Section}{sec:calcqu}{CALCQU}).
 
-\item[\file{maps/}] A folder containing the individual I maps from
+\item[\file{maps/}] A folder containing the individual $I$ maps from
   each separate observation. These will have names that end with
   \file{$\_$imap.sdf}.
 
-\item[\file{iauto.sdf}] Output total intensity map (the term ``auto'' is
-used to indicate that it was created using an automatically generated
-AST mask).
+\item[\file{iauto.sdf}] Output total intensity map. The included term ``auto'' is
+  used to indicate that it was created using an automatically generated
+  AST mask.
 
 \end{aligndesc}
 
-The output I map, \file{iauto.sdf}, can be opened and viewed with \GAIA.
+The output $I$ map, \file{iauto.sdf}, can be opened and viewed with \GAIA.
 
 \begin{figure}[t!]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{sc22-gaia-view-iauto.png}
 \label{fig:gaia-iauto}
-\caption [I map in GAIA]{
-  \small The I map, \file{iauto.sdf}, as viewed with \GAIA.
+\caption [$I$ map in GAIA]{
+  \small The $I$ map, \file{iauto.sdf}, as viewed with \GAIA.
 }
 \end{center}
 \end{figure}
 
-The \file{maps} folder contains the individual I maps from each separate
+The \file{maps} folder contains the individual $I$ maps from each separate
 observation:
 
 \begin{terminalv}
@@ -269,12 +266,12 @@ s8b20160112_00056_0003_UT.sdf  s8c20160112_00059_0003_UT.sdf  s8d20160125_00043_
 \end{terminalv}
 
 
-\section{\xlabel{how-step23}pol2map -- producing the I, Q, U maps and catalogue}
+\section{\xlabel{how-step23}pol2map -- producing the \textit{I}, \textit{V}, \textit{U} maps and catalogue}
 \label{sec:how-step23}
 
 As discussed in \cref{Chapter}{sec:dr}{POL-2 Data Reduction -- The
-  Theory}, the I map output from the initial run of \poltwomap\ is used to
-derive the final I, Q and U maps. If requested, a vector catalogue is
+  Theory}, the $I$ map output from the initial run of \poltwomap\ is used to
+derive the final $I$, $Q$, and $U$ maps. If requested, a vector catalogue is
 also produced.
 
 The second and third steps of the POL-2 data reduction process can be
@@ -286,10 +283,10 @@ run via a single command.
 \end{terminalv}
 
 The following shows the output from running this second \task{pol2map}
-command. First, \task{pol2map} produces new I maps for each map, correcting
-the position using the correction stored in the old I
-map\footnote{This correction is found by aligning the old I map with the
-\file{iauto.sdf} map.}, and then coadds all the observations.
+command. First, \task{pol2map} produces new $I$ maps for each map, correcting
+the position using the correction stored in the old $I$
+map\footnote{This correction is found by aligning the old $I$ map with the
+\file{iauto.sdf} map.}, and then co-adds all the observations.
 
 \begin{terminalv}
 Logging to file pol2map.log
@@ -311,7 +308,7 @@ Masking will be based on SNR values in 'iauto'.
 Coadding I maps from all observations:
 \end{terminalv}
 
-As \task{pol2map} continues, the Q and U maps are produced, again with
+As \task{pol2map} continues, the $Q$ and $U$ maps are produced, again with
 pointing corrections. This is followed by the creation of the output
 vector catalogue.
 
@@ -347,36 +344,36 @@ Creating the output catalogue: 'mycat'...
 \end{terminalv}
 
 
-The output of this final run of \task{pol2map} is as follows.
+The output of this final run of \poltwomap\ is as follows.
 
 \begin{aligndesc}
 \item[\file{pol2map.log}] A log file containing the output from the
-  pol2map command. Note previous log files are moved to a new name
+  \task{pol2map} command. Note previous log files are moved to a new name
   such as \texttt{pol2map.log.1}.
 
 \item[\file{astmask.sdf}] The AST mask used in the creation
-  of the final I, Q and U maps.
+  of the final $I$, $Q$, and $U$ maps.
 
 \item[\file{pcamask.sdf}] The PCA mask used in the creation of the
-  final I, Q and U maps.
+  final $I$, $Q$, and $U$ maps.
 
 \item[\file{iext.sdf}] The total intensity image, created using the
   external AST and PCA masks described above.
 
-\item[\file{qext.sdf}] The Q map (\emph{i.e} the intensity of the radiation
+\item[\file{qext.sdf}] The $Q$ map (\emph{i.e} the intensity of the radiation
   linearly polarised in the direction parallel or perpendicular to the
   reference plane), created using an external AST and PCA mask.
 
-\item[\file{maps/}] A folder containing the individual I, Q and U
+\item[\file{maps/}] A folder containing the individual $I$, $Q$, and $U$
   maps from each separate observation. These will have names that end with
-  \file{$\_$Imap.sdf}, \file{$\_$Qmap.sdf} or \file{$\_$Umap.sdf}.
+  \file{$\_$Imap.sdf}, \file{$\_$Qmap.sdf}, or \file{$\_$Umap.sdf}.
 
-\item[\file{uext.sdf}] The U map (\emph{i.e.} the intensity of the radiation
+\item[\file{uext.sdf}] The $U$ map (\emph{i.e.} the intensity of the radiation
   linearly polarised in the direction $\pm45^{\circ }$ to the reference plane).
 
-\item[\file{mycat.FIT}] The output vector catalogue containing a
+\item[\file{mycat.FIT}] The output vector catalogue, containing a
   range of values derived by \task{pol2map} for each pixel contained within
-  the I map.
+  the $I$ map.
 
 \end{aligndesc}
 
@@ -386,9 +383,9 @@ The output of this final run of \task{pol2map} is as follows.
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-iauto.png}
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-iext.png}
 \label{fig:gaia-iext}
-\caption [Final I map in GAIA]{
-  \small Left: I map, \file{iauto}, as produced by the automask on the first pass
-         of \task{pol2map}. Right: Final I map, \file{iext}, as viewed in \GAIA.
+\caption [Final $I$ map in GAIA]{
+  \small Left: $I$ map, \file{iauto}, as produced by the automask on the first pass
+         of \poltwomap. Right: Final $I$ map, \file{iext}, as viewed with \GAIA.
          The flatter background is due to the increase in \param{pca.pcathresh}.
 }
 \end{center}
@@ -401,15 +398,15 @@ The output of this final run of \task{pol2map} is as follows.
 \includegraphics[width=0.46\linewidth]{sc22-gaia-view-uext.png}
 \label{fig:gaia-qext-uext}
 \caption [Q and U maps in GAIA]{
-  \small Left: Q map, \file{qext.sdf}. Right: U map \file{uext.sdf}, as viewed with \GAIA.
+  \small Left: $Q$ map, \file{qext.sdf}. Right: $U$ map \file{uext.sdf}, as viewed with \GAIA.
 }
 \end{center}
 \end{figure}
 
 
 
-The maps folder now contains individual Q and U maps alongside the
-existing I maps listed below.
+The maps folder now contains individual $Q$ and $U$ maps, alongside the
+existing $I$ maps listed below.
 
 \begin{terminalv}
 20160112_00056_0003_Imap.sdf  20160112_00059_0003_Imap.sdf  20160125_00043_0003_Imap.sdf
@@ -424,31 +421,40 @@ existing I maps listed below.
 \section{\xlabel{vector-cat}Output vectors from pol2map}
 
 
-
 The output vector catalogue contains a range of values derived by
-\poltwomap\ for each pixel contained within the I map. Intensity values and
+\poltwomap\ for each pixel contained within the $I$ map. Intensity values and
 errors in the
-catalogue are expressed in units of mJy/beam.  If desired it is possible
+catalogue are expressed in units of mJy/beam.  If desired, it is possible
 to switch the catalogue to units of pW by using \texttt{Jy=no} on the \task{pol2map}
 command line.  The columns are listed below.
 
 \begin{aligndesc}
-\item[\texttt{X}] Pixel coordinate at the centre of the pixel
-\item[\texttt{Y}] Pixel coordinate at the centre of the pixel
-\item[\texttt{RA}] RA coordinate at the centre of the pixel
-\item[\texttt{Dec}] Dec coordinate at the centre of the pixel
-\item[\texttt{I}] Total intensity
-\item[\texttt{DI}] Error in I
-\item[\texttt{Q}] Stokes Q parameter
-\item[\texttt{DQ}] Error in Q
-\item[\texttt{U}] Stokes U parameter
-\item[\texttt{DU}] Error in U
-\item[\texttt{P}] Percentage polarisation
-\item[\texttt{DP}] Error in P
-\item[\texttt{ANG}] Angle of polarisation
-\item[\texttt{DANG}] Error in ANG
-\item[\texttt{PI}] Polarised intensity (I$_{\textnormal{p}}$)
-\item[\texttt{DPI}] Error in polarised intensity
+\item[\catcol{X}] Pixel coordinate at the centre of the pixel
+\item[\catcol{Y}] Pixel coordinate at the centre of the pixel
+\item[\catcol{RA}] RA coordinate at the centre of the pixel
+\item[\catcol{Dec}] Dec coordinate at the centre of the pixel
+\item[\catcol{I}] Total intensity
+\item[\catcol{DI}] Error in \catcol{I}
+\item[\catcol{Q}] Stokes $Q$ parameter
+\item[\catcol{DQ}] Error in \catcol{Q}
+\item[\catcol{U}] Stokes $U$ parameter
+\item[\catcol{DU}] Error in \catcol{U}
+\item[\catcol{P}] Percentage polarisation
+\item[\catcol{DP}] Error in \catcol{P}
+\item[\catcol{ANG}] Angle of polarisation
+\item[\catcol{DANG}] Error in \catcol{ANG}
+\item[\catcol{PI}] Polarised intensity ($I_{\textnormal{p}}$)
+\item[\catcol{DPI}] Error in polarised intensity
+\item[\catcol{AST}] Integer values that indicate if the corresponding vector position is inside the
+                    AST mask. If the vector is outside the mask, the corresponding column for the
+                    mask will have a blank/null value. Vectors that are inside a mask will have a
+                    non-zero integer value for the corresponding column. Each ``island'' within a
+                    mask (i.e. a contiguous group of source pixels) will have a different integer
+                    value assigned, starting at 1. All vectors within an island  are assigned the
+                    integer value of the island.
+\item[\catcol{PCA}] Contains integer values that indicate if the corresponding vector position is
+                    inside the PCA mask. Value conventions are the same as for the \catcol{AST}
+                    column (above).
 \end{aligndesc}
 
 
@@ -456,29 +462,30 @@ command line.  The columns are listed below.
 \label{sec:pol2map-fcf}
 
 Inserting POL-2 in front of SCUBA-2 reduces the throughput to SCUBA-2.
-POL-2 is not a perfect polarimiter. Its wire grid absorbs and scatters incoming
+POL-2 is not a perfect polarimeter. Its wire grid absorbs and scatters incoming
 signal so the modulation amplitude is lower than for a perfect polarimeter.
-In addition cross polarization and depolarization decreases the modulation
+In addition cross polarisation and depolarisation decreases the modulation
 amplitude without decreasing the power in the transmitted signal. The first
 type of inefficiencies can be measured by comparing normal SCUBA-2 maps with
 and without the polarimeter inserted. Such observations have been done on Uranus,
-Mars and Jupiter. The second type of losses can be measured with a source of know polarization.
+Mars and Jupiter. The second type of losses can be measured with a source of known polarisation.
 
 To convert POL-2 data to astronomical units such as mJy/beam a Flux Conversion
-Factor, FCF, must be applied to the data. For POL-2 the FCFs are quoted in terms of
-the SCUBA-2 FCF.
+Factor, FCF, must be applied to the data. For POL-2, the FCFs are quoted in terms of
+the non-polarimetric SCUBA-2 FCFs.
 
-At \SI{850}{\micro\metre} and \SI{450}{\micro\metre} the FCFs for POL-2
-are found to be a factor of 1.35 and 1.96 times higher than the
-standard SCUBA-2 FCF for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}, respectively.
-
+POL-2 FCFs are now applied automatically within \poltwomap\ when catalogue columns
+in mJy/beam are required by the user, i.e. if the \task{pol2map} parameter \texttt{JY} is set
+to \texttt{TRUE} (the default option). The current version of \task{pol2map} uses the new,
+revised POL-2 FCFs for \SI{850}{\micro\metre} and \SI{450}{\micro\metre}
+and takes account of cases where the supplied raw data span one of the
+dates at which the FCF changed (20180630 and 20161101).
 
 \section{\xlabel{tweaking}Changing pixel size in pol2map}
 \label{sec:pol2map-pixelsize}
 
-Inevitably, as with unpolarised SCUBA-2 data reduction, it will
-probably be necessary for you to tweak the \poltwomap\ reduction for
-specific situations.
+Inevitably, as with unpolarised SCUBA-2 data reduction, users will sometimes find it
+necessary to fine-tune the \poltwomap\ reduction process for specific situations.
 
 The bin size within the final vector catalogue is controlled by the
 \param{BINSIZE} parameter in the \SMURF\ \task{pol2map} command.
@@ -491,8 +498,8 @@ Changing the catalogue bin size in this way does not change the pixel
 size of the maps created \task{pol2map}. Instead, the maps are binned up
 to the requested bin size before the catalogue is created. There is
 another parameter, called \param{PIXSIZE}, which controls the map pixel
-size, but it is usually advisable to leave this at its default value
-as the map pixel size can affect the behaviour of the iterative algorithm
+size, but it is usually advisable to leave this at its default value. This is
+because the map pixel size can affect the behaviour of the iterative algorithm
 used to create maps.
 
 

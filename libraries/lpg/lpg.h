@@ -47,5 +47,6 @@
 
 void lpgAssoc( const char *param, const char *mode, int *indf, int *status );
 void lpgProp( int indf1, const char *clist, const char *param, int *indf2, int *status );
+void lpgState( const char *param, int *state, int *status );
 
 #endif

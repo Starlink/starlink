@@ -59,32 +59,37 @@
 #        Add location of WVM fits data file.
 #     2016-01-29 (GSB):
 #        Add WVM despiking parameters.
+#     2021-02-04 (GSB):
+#        Add third coefficient for opacity relations.
+#     2021-06-04 (GSB):
+#        Use opacity relations from new SCUBA-2 calibration paper.
 
 #-
 
 #-----------------------------------------------------------------
 #  Name: 	ext.taurelation.450
-#  Type: 	(real,real)
-#  Default: 	(26.0,-0.012)
+#  Type: 	(real,real,real)
+#  Default: 	(23.3,-0.018,0.05)
 #  Purpose: 	Controls the 450 um extinction values used in the EXT model
 #               and the EXTINCTION task.
 #  Description: Each tau relation is parameterised in the form:
-#   		"tau_filt = a ( tau_cso + b )", where "a" and "b" are the
-#		two values supplied for this parameter. See also parameter
+#   		"tau_filt = a ( tau_cso + b + c sqrt(tau_cso) )",
+#               where "a", "b" and "c" are the
+#		three values supplied for this parameter. See also parameter
 #               "ext.taurelation.850". Here, the trailing ".450" in the
 #		parameter name is the filter name, not the sub-instrument
 #		name as would be the case if it appeared at the start of
 #		parameter name.
-ext.taurelation.450 = (26.0,-0.012)
+ext.taurelation.450 = (23.3,-0.018,0.05)
 
 #-----------------------------------------------------------------
 #  Name: 	ext.taurelation.850
-#  Type: 	(real,real)
-#  Default:     (4.6,-0.0043)
+#  Type: 	(real,real,real)
+#  Default:     (3.71,-0.040,0.202)
 #  Purpose: 	Controls the 850 um extinction values used in the EXT model
 #               and the EXTINCTION task.
 #  Description: The 850 um equivalent to the parameter "ext.taurelation.450".
-ext.taurelation.850 =  (4.6,-0.0043)
+ext.taurelation.850 = (3.71,-0.040,0.202)
 
 #-----------------------------------------------------------------
 #  Name: 	ext.smoothwvm

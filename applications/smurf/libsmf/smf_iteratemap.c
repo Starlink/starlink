@@ -25,7 +25,7 @@
 *                    char data_units[], char data_label[], double *nboloeff,
 *                    size_t *numcontchunks, size_t *ncontig, int *memlow,
 *                    size_t *numinsmp, size_t *numcnvg, int *iters,
-*                    int *masked, double *totexp, int *status );
+*                    int *masked, double *totexp, double *nomfcf, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -134,6 +134,8 @@
 *     totexp = double * (Returned)
 *        Total exposure time (i.e. clock time on the sky) for all chunks,
 *        in seconds.
+*     nomfcf = double * (Returned)
+*        The nominal beam FCF (Jy/beam/pW) in the returned map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -551,6 +553,8 @@
 *     2020-12-04 (DSB):
 *        Calculate and report the weighted chi-squared, summed over all chunks.
 *        This primarily gives the chi-squared in the source regions.
+*     2022-JAN-19 (DSB):
+*        Added argument nomfcf.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -668,7 +672,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     double *totexp, int *status ) {
+                     double *totexp, double *nomfcf, int *status ) {
 
   /* Local Variables */
   float ast_filt_diff;          /* Size of map-change filter */
@@ -707,6 +711,10 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int *exportNDF_which=NULL;    /* Which models in modelorder will be exported*/
   double exptime;               /* Exposure time for current chunk */
+  double tot_exptime;           /* Exposure time for all pixels */
+  double fcf_s1;                /* Sum of weighted FCF values */
+  double fcf_s2;                /* Sum of FCF weight values */
+  double fcf;                   /* Nominal FCF for output map */
   int firstiter;                /* First iteration in this invocation of makemap? */
   size_t count_mcnvg=0;         /* # chunks fail to converge */
   size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
@@ -1158,7 +1166,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
          less than 0, the scale is a multiple of PIXSIZE. */
       astMapGet0D( keymap, "DOWNSAMPSCALE", &downsampscale );
       if( (*status == SAI__OK) && (downsampscale < 0) ) {
-         downsampscale = abs(downsampscale) * pixsize;
+         downsampscale = fabs(downsampscale) * pixsize;
          astMapPut0D( keymap, "DOWNSAMPSCALE", downsampscale, NULL );
       }
 
@@ -1695,6 +1703,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   *totexp = 0.0;
   sumwchisq1 = 0.0;
   sumwchisq2 = 0.0;
+  fcf_s1 = 0.0;
+  fcf_s2 = 0.0;
 
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt && *status == SAI__OK;
        contchunk++ ) {
@@ -2866,23 +2876,25 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                           "using a box filter of %zu pixels.", status, ibox );
 
                usemap = smf_tophat2( wf, mapchange, mdims, ibox, 0, 0.0, 1, status );
+               if( usemap ){
 
-               /* Calculate the max of the smoothed map change values. */
-               mapchange_max = 0;
-               int maxat = -1;
-               for( ipix = 0; ipix < msize; ipix++ ) {
-                  if( usemap[ipix] != VAL__BADD ){
-                     if( usemap[ipix] > mapchange_max ) {
-                        mapchange_max = usemap[ipix];
-                        maxat = ipix;
+                  /* Calculate the max of the smoothed map change values. */
+                  mapchange_max = 0;
+                  int maxat = -1;
+                  for( ipix = 0; ipix < msize; ipix++ ) {
+                     if( usemap[ipix] != VAL__BADD ){
+                        if( usemap[ipix] > mapchange_max ) {
+                           mapchange_max = usemap[ipix];
+                           maxat = ipix;
+                        }
                      }
                   }
-               }
 
-               msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
-                          "at pixel (%d,%d).", status,
-                          ( maxat % (int)mdims[0] ) + lbnd_out[0],
-                          ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+                  msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
+                             "at pixel (%d,%d).", status,
+                             ( maxat % (int)mdims[0] ) + lbnd_out[0],
+                             ( maxat / (int)mdims[0] ) + lbnd_out[1] );
+               }
 
             } else {
                usemap = mapchange;
@@ -3720,15 +3732,31 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         }
 
         /* Add this chunk of exposure time to the total. We assume the array was
-           initialised to zero and will not contain bad values. */
+           initialised to zero and will not contain bad values. ALso find
+           the total exposure time in this continuous chunk. */
         if( *status == SAI__OK ) {
+          tot_exptime = 0.0;
           steptime = res[0]->sdata[0]->hdr->steptime;
           for (ipix = 0; ipix < msize; ipix++ ) {
             if ( thishits[ipix] != VAL__BADI) {
-              exp_time[ipix] += chunkweight*steptime * (double)thishits[ipix];
+              exptime = chunkweight * steptime * (double)thishits[ipix];
+              exp_time[ipix] += exptime;
+              tot_exptime += exptime;
             }
           }
+
+          /* Calculate the running sums needed to get the weighted nominal
+             FCF for the resulting map, allowing for different continuous
+             chunks to  be from different FCF periods. */
+          if( tot_exptime > 0.0 ) {
+             fcf = smf_fcf( res[0]->sdata[0]->hdr, status );
+             if( fcf != VAL__BADD ) {
+                fcf_s1 += tot_exptime * fcf;
+                fcf_s2 += tot_exptime;
+             }
+          }
         }
+
         /* Update the sum of all chunk weights. */
         sumchunkweights += chunkweight;
       }
@@ -3813,6 +3841,21 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
     }
 
   }
+
+  /* Find and report the nominal FCF. */
+  if( fcf_s2 > 0.0 ) {
+     fcf = fcf_s1/fcf_s2;
+     msgOutiff( MSG__VERB, "", "Nominal FCF for output map is %g", status,
+                fcf );
+  } else {
+     fcf = 0.0;
+     msgOutif( MSG__VERB, "", "WARNING: Cannot calculate nominal FCF for "
+               "output map", status );
+  }
+  parPut0d( "NOMFCF", fcf, status );
+
+  /* Return the nominal FCF value */
+  if( nomfcf ) *nomfcf = fcf;
 
   /* Normalise the weighted chi-squared, display it and write it out to a
      parameter. */

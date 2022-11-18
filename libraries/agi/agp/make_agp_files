@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/sh
 #+
 #  Name:
 #     make_agp_files
@@ -7,7 +7,7 @@
 #     Creates AGP source files defining the available graphics devices
 
 #  Type of Module:
-#     C-shell script
+#     Bourne Shell
 
 #  Description:
 #     This file is run by the AGP makefile as part of the build target.
@@ -25,60 +25,63 @@
 #  History:
 #     31-OCT-2001 (DSB):
 #        Original version.
+#     7-MAY-2022 (GSB):
+#        Convert to sh.
 
 #-
 
 #  Extract the columns from the pgnames.txt file into separate shell
 #  variables.
-   set gtype = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $1}' pgnames.txt `
-   set ptype = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $2}' pgnames.txt | tr \[a-z\] \[A-Z\]`
-   set pfile = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $3}' pgnames.txt `
-   set aname = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $4}' pgnames.txt | tr \[a-z\] \[A-Z\]`
-   set desc  = `awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $5}' pgnames.txt | tr " /" "_"`
+   gtype=`awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $1}' pgnames.txt `
+   ptype=`awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $2}' pgnames.txt | tr \[a-z\] \[A-Z\]`
+   pfile=`awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $3}' pgnames.txt `
+   aname=`awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $4}' pgnames.txt | tr \[a-z\] \[A-Z\]`
+   desc=`awk 'BEGIN { FS = "/ +" } /^[^#]/ {print $5}' pgnames.txt | tr " /" "_"`
 
 #  Save the number of devices
-   set ndev = $#gtype
+   set $gtype
+   ndev=$#
 
 #  Save the maximum string length in each column.
-   set dsclen = 0
-   foreach v ($desc)
-      set l = `echo $v | awk '{print length($0)}'`
-      if( $l > $dsclen ) then
-         set dsclen = $l
-      endif
-   end
+   dsclen=0
+   for v in $desc; do
+      l=`echo $v | awk '{print length($0)}'`
+      if [ $l -gt $dsclen ]; then
+         dsclen=$l
+      fi
+   done
 
-   set anmlen = 0
-   foreach v ($aname)
-      set l = `echo $v | awk '{print length($0)}'`
-      if( $l > $anmlen ) then
-         set anmlen = $l
-      endif
-   end
+   anmlen=0
+   for v in $aname; do
+      l=`echo $v | awk '{print length($0)}'`
+      if [ $l -gt $anmlen ]; then
+         anmlen=$l
+      fi
+   done
 
-   set pfnlen = 0
-   foreach v ($pfile)
-      set l = `echo $v | awk '{print length($0)}'`
-      if( $l > $pfnlen ) then
-         set pfnlen = $l
-      endif
-   end
+   pfnlen=0
+   for v in $pfile; do
+      l=`echo $v | awk '{print length($0)}'`
+      if [ $l -gt $pfnlen ]; then
+         pfnlen=$l
+      fi
+   done
 
-   set gtylen = 0
-   foreach v ($gtype)
-      set l = `echo $v | awk '{print length($0)}'`
-      if( $l > $gtylen ) then
-         set gtylen = $l
-      endif
-   end
+   gtylen=0
+   for v in $gtype; do
+      l=`echo $v | awk '{print length($0)}'`
+      if [ $l -gt $gtylen ]; then
+         gtylen=$l
+      fi
+   done
 
-   set ptylen = 0
-   foreach v ($ptype)
-      set l = `echo $v | awk '{print length($0)}'`
-      if( $l > $ptylen ) then
-         set ptylen = $l
-      endif
-   end
+   ptylen=0
+   for v in $ptype; do
+      l=`echo $v | awk '{print length($0)}'`
+      if [ $l -gt $ptylen ]; then
+         ptylen=$l
+      fi
+   done
 
 #  AGP_CONST...
 #  ------------
@@ -272,70 +275,75 @@ FOO
    echo "" >> agp1_init.f
 
    echo "*  GNS device type" >> agp1_init.f
-   echo "      DATA AGP_GTY / '$gtype[1]'," >> agp1_init.f
-   shift gtype 
-   while ( $#gtype > 1 ) 
-   echo "     :               '$gtype[1]'," >> agp1_init.f
-      shift gtype 
-   end 
-   echo "     :               '$gtype[1]'/" >> agp1_init.f
+   echo "      DATA AGP_GTY / '$1'," >> agp1_init.f
+   shift
+   while [ $# -gt 1 ]; do
+   echo "     :               '$1'," >> agp1_init.f
+      shift
+   done
+   echo "     :               '$1'/" >> agp1_init.f
    echo "" >> agp1_init.f
 
 
+   set $ptype
    echo "*  PGPLOT device type" >> agp1_init.f
-   echo "      DATA AGP_PTY / '$ptype[1]'," >> agp1_init.f
-   shift ptype
-   while ( $#ptype > 1 )
-   echo "     :               '$ptype[1]'," >> agp1_init.f
-      shift ptype
-   end
-   echo "     :               '$ptype[1]'/" >> agp1_init.f
+   echo "      DATA AGP_PTY / '$1'," >> agp1_init.f
+   shift
+   while [ $# -gt 1 ]; do
+   echo "     :               '$1'," >> agp1_init.f
+      shift
+   done
+   echo "     :               '$1'/" >> agp1_init.f
    echo "" >> agp1_init.f
 
+   set nonoption $pfile
+   shift
    echo "*  PGPLOT default file names" >> agp1_init.f
-   if( "$pfile[1]" != "-" ) then
-      set pf = $pfile[1]
+   if [ "$1" != "-" ]; then
+      pf=$1
    else
-      set pf = " "
-   endif
+      pf=" "
+   fi
    echo "      DATA AGP_PFN / '$pf'," >> agp1_init.f
-   shift pfile
-   while ( $#pfile > 1 )
-      if( "$pfile[1]" != "-" ) then
-         set pf = $pfile[1]
+   shift
+   while [ $# -gt 1 ]; do
+      if [ "$1" != "-" ]; then
+         pf=$1
       else
-         set pf = " "
-      endif
+         pf=" "
+      fi
       echo "     :               '$pf'," >> agp1_init.f
-      shift pfile
-   end
-   if( "$pfile[1]" != "-" ) then
-      set pf = $pfile[1]
+      shift
+   done
+   if [ "$1" != "-" ]; then
+      pf=$1
    else
-      set pf = " "
-   endif
+      pf=" "
+   fi
    echo "     :               '$pf'/" >> agp1_init.f
    echo "" >> agp1_init.f
 
 
+   set $aname
    echo "*  AGI device names" >> agp1_init.f
-   echo "      DATA AGP_ANM / '$aname[1]'," >> agp1_init.f
-   shift aname
-   while ( $#aname > 1 )
-   echo "     :               '$aname[1]'," >> agp1_init.f
-      shift aname
-   end
-   echo "     :               '$aname[1]'/" >> agp1_init.f
+   echo "      DATA AGP_ANM / '$1'," >> agp1_init.f
+   shift
+   while [ $# -gt 1 ]; do
+   echo "     :               '$1'," >> agp1_init.f
+      shift
+   done
+   echo "     :               '$1'/" >> agp1_init.f
    echo "" >> agp1_init.f
 
 
+   set $desc
    echo "*  Device descriptions" >> agp1_init.f
    echo "      DATA AGP_DSC /"  >> agp1_init.f
-   while ( $#desc > 1 )
-   echo "     :  '$desc[1]'," | tr "_" " " >> agp1_init.f
-      shift desc
-   end
-   echo "     :  '$desc[1]'/" | tr "_" " " >> agp1_init.f
+   while [ $# -gt 1 ]; do
+   echo "     :  '$1'," | tr "_" " " >> agp1_init.f
+      shift
+   done
+   echo "     :  '$1'/" | tr "_" " " >> agp1_init.f
    echo "" >> agp1_init.f
    echo "      END" >> agp1_init.f
 

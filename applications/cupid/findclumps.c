@@ -1424,7 +1424,7 @@ void findclumps( int *status ) {
 
 /* Switch for each method */
    if( !strcmp( method, "GAUSSCLUMPS" ) ) {
-      ndfs = cupidGaussClumps( type, nsig, slbnd, subnd, ipd, ipv, rms,
+      ndfs = cupidGaussClumps( wf, type, nsig, slbnd, subnd, ipd, ipv, rms,
                                aconfig, velax, beamcorr, &nrej, status );
 
    } else if( !strcmp( method, "CLUMPFIND" ) ) {

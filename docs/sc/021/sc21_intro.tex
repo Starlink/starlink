@@ -22,7 +22,7 @@ a description of the configuration files.
 \item \cref{Chapter}{sec:pipe}{Chapter 4}  -- Instructions for using the \oracdr\ pipeline to reduce
 your data ``the easy way'', along with details on data retrieved from the JSA.
 \item \cref{Chapter}{sec:manual}{Chapter 5}  -- Instructions for using individual \smurf\ commands to
-reduce your data ---  useful if you need extra flexibility.
+reduce your data---useful if you need extra flexibility.
 \item \cref{Chapter}{sec:tweak}{Chapter 6}  -- Options for tailoring the configuration parameters to
 improve your final map.
 \item \cref{Chapter}{sec:eg}{Chapter 7}  -- Two worked examples covering a \htmlref{blank cosmology
@@ -105,7 +105,7 @@ document (\xref{SUN/95}{sun95}{}) contain much useful information on
 the contents of an NDF structure and how to manipulate them.
 
 A single NDF structure describes a single data array with associated
-meta-data. NDFs are usually stored within files of type ``\verb+.sdf+''.
+metadata. NDFs are usually stored within files of type ``\verb+.sdf+''.
 In most cases (but not all), a single \verb+.sdf+ file will contain just
 one top-level NDF structure, and the NDF can be referred to simply by
 giving the name of the file (with or without the ``\verb+.sdf+'' prefix).
@@ -118,16 +118,16 @@ JCMT data on disk is also known as a `sub-scan'.
 
 The main components of any NDF structure are:
 \begin{itemize}
-\item An array of numerical data (may have up to seven
+\item an array of numerical data (may have up to seven
 dimensions---usually three for JCMT data);
-\item An array of variance values corresponding to the numerical data
+\item an array of variance values corresponding to the numerical data
 values;
-\item An array holding up to eight boolean flags (known as ``quality
-flags'', see Section \ref{sec:maskshow}) for each pixel;
+\item an array holding up to eight boolean flags (known as ``quality
+flags'', see \cref{Section}{sec:maskshow}{Displaying masks}) for each pixel;
 \item World Coordinate System information;
-\item History;
-\item Data units
-\item Other extensions items. These are defined by particular packages,
+\item history;
+\item data units; and
+\item other extension items. These are defined by particular packages,
 but usually include a list of FITS-like headers together with provenance
 information that indicates how the NDF was created. Raw JCMT files also
 include extensions that define the state of the telescope and instrument
@@ -209,7 +209,7 @@ map at the end of each iteration}.
 
 \subsection{ORAC-DR for running the pipeline}
 
-The \oracdr\ Data Reduction Pipeline \cite{oracdr} (hereafter just
+The \oracdr\ Data-Reduction Pipeline \cite{oracdr} (hereafter just
 \textsc{Orac-dr}) is an automated reduction pipeline. \textsc{Orac-dr}
 uses \smurf\ and \Kappa\ (along with other Starlink tools) to perform
 an automated reduction of the raw data following pre-defined recipes

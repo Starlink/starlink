@@ -355,7 +355,7 @@ feenableexcept(FE_DIVBYZERO| FE_INVALID|FE_OVERFLOW);
 
 /* See if a mask should be used to exclude bright source areas from
    the SSN model. */
-      mask = smf_get_mask( wf, SMF__SSN, keymap, dat, flags, status );
+      mask = smf_get_mask( wf, SMF__SSN, keymap, dat, flags, NULL, status );
 
 /* If we have a mask, copy it into the quality array of the map.
    Also set map pixels that are not used (e.g. corner pixels, etc)

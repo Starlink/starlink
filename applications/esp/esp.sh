@@ -55,7 +55,7 @@
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-if [ -n "$ADAM_USER" ]; then
+if [ -z "$ADAM_USER" ]; then
    adamdir=$HOME/adam
 else
    adamdir=$ADAM_USER
@@ -68,7 +68,7 @@ else
       echo "You have a file called $adamdir"
       echo "Please rename this, or define the environment variable ADAM_USER"
       echo "to point to a directory for ADAM files."
-      exit
+#      exit
    else
       mkdir $adamdir
     fi

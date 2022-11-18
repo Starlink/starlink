@@ -3,7 +3,7 @@
 #     dimmconfig_bright_extended.lis
 
 #  Purpose:
-#     A MAKEMAP configuration suitable for bright extended sources .
+#     A MAKEMAP configuration suitable for bright extended sources.
 
 #  Description:
 #     This file provides values for parameters used by the SMURF:MAKEMAP
@@ -42,14 +42,14 @@
 #        rationale for each value.
 #     5-JUN-2014 (DSB):
 #        - Use 5 initial no-AST iteration to determine a reasonable map
-#        that can then be used a the basis for FLT-masking when the AST
+#        that can then be used as the basis for FLT-masking when the AST
 #        model is re-introduced. Should help with convergence, and reduce
 #        bowling. (DSB)
 #        - Define the AST mask at SNR=3 instead of SNR=5 (HP)
 #        - Extend the mask defined at SNR=3 down to SNR=2. This has the
 #        side effect of smoothing the perimeter of the mask and removing
 #        isolated pixels. (DSB)
-#        - Reduce the filter scale from 600 to 480 (HP)
+#        - Reduce the filter scale from 600 to 480. (HP)
 #     17-MAR-2015 (DSB):
 #        Remove dependence on dimmconfig.lis.
 #-

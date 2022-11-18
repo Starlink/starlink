@@ -564,7 +564,8 @@ void smf_clean_smfArray( ThrWorkForce *wf, smfArray *array,
        smf_filter_execute). */
 
     filt = smf_create_smfFilter( data, status );
-    smf_filter_fromkeymap( filt, keymap, NULL, data->hdr, &dofft, &whiten, status );
+    smf_filter_fromkeymap( filt, keymap, NULL, data->hdr, &dofft,
+                           &whiten, NULL, status );
 
     if( (*status == SAI__OK) && dofft ) {
       msgOutif( MSG__VERB, "", FUNC_NAME ": frequency domain filter", status );

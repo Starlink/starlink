@@ -71,17 +71,25 @@
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-if (-d $HOME/adam) then
+if ($?ADAM_USER) then
+   set adamdir=$ADAM_USER
+else
+   set adamdir=$HOME/adam
+endif
+
+if (-d $adamdir) then
    echo -n
 else
-   if (-f $HOME/adam) then
-      echo "You have a file called adam in your home directory."
-      echo "Please rename it since adam must be a directory for ADAM files."
+   if (-f $adamdir) then
+      echo "You have a file called $adamdir"
+      echo "Please rename this, or define the environment variable ADAM_USER"
+      echo "to point to a directory for ADAM files."
       exit
    else
-      mkdir $HOME/adam
+      mkdir $adamdir
    endif
 endif
+unset adamdir
 
 #
 #  Define symbols for the applications. Relies on CONVERT_DIR which is defined

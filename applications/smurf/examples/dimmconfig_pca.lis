@@ -11,7 +11,7 @@
 #     algorithm.
 #
 #     The parameters defined by this file attempt to reduce noise in the
-#     in the final map. It also seens to do a good job at removing bright
+#     in the final map. It also seems to do a good job at removing bright
 #     blobs of emission. It does this by adding an extra noise component
 #     into the iterative map-making process. This extra noise component
 #     represents the correlated noise across multiple bolometers, and is
@@ -64,7 +64,7 @@ ast.zero_snrlo = 1.5
 #  run much more slowly but removes more noise. The much reduced map
 #  variance causes the normalised map-change to be much larger at each
 #  iteration, resulting in more iterations being required to reach a
-#  specificied maptol value.
+#  specified maptol value.
 pca.pcathresh = -20
 
 #  The source areas need to be masked on all iterations (except the last).
@@ -75,7 +75,7 @@ pca.pcathresh = -20
 #  for the PCA model to treat these residuals as a correlated signal.
 #  This causes problems if the positive residuals are removed by PCA but
 #  not the negative (or vice-versa), as can sometimes happen. This
-#  results in the source appearing in the PCA model, with a correspsonding
+#  results in the source appearing in the PCA model, with a corresponding
 #  equal and opposite source in the residuals. This can then cause bad
 #  bowling in the following FLT model. To avoid such issues, mask the PCA
 #  model on all iterations. Do not mask on the final iteration so that
@@ -83,17 +83,17 @@ pca.pcathresh = -20
 pca.zero_snr = 5
 pca.zero_snrlo = 3
 
-#  Freese the PCA mask when the normalised map-change drops to 0.5. This
+#  Freeze the PCA mask when the normalised map-change drops to 0.5. This
 #  helps convergence.
 pca.zero_freeze = 0.5
 
-#  When filling the time-streams gaps left by the masking, do not add any
+#  When filling the time-stream gaps left by the masking, do not add any
 #  random noise, as doing so can upset convergence due to the noise being
 #  different on each iteration.
 fillgaps_noise = 0
 
 #  Mask the FLT model on all iterations (except the last). This helps to
-#  prevent blooms. The above setting of "sillgaps_noise" means that this
+#  prevent blooms. The above setting of "fillgaps_noise" means that this
 #  does not adversely affect convergence. The mask is frozen when the
 #  normalised map change reached 0.5.
 flt.zero_niter = 0

@@ -367,6 +367,13 @@ Platform specific build notes
 
   http://wiki.debian.org/ToolChain/DSOLinking
 
+
+  Bootstrap in thirdparty/kitware/vtk may fail during bootstrap of cmake
+  if QT5 devel packges are installed on the local system. The answer
+  seems to be to remove such packages before building starlink,
+  reinstalling them again afterwards if necessary..
+
+
   - OS X
 
   The build situation under OS X follows much like that of GNU/Linux,
@@ -445,6 +452,16 @@ will require a reasonably complete up-to-date TeX install that includes the
 TeX4HT system -- for example, a recent TeXLive installation which includes
 a variety of standard packages.
 
+On all operating systems, Python must be available via a simple
+unversioned "python" command (not "python3", "python3.6", etc). Some
+operating systems (e.g. Debian 11) do not provide an unversioned python
+command by default. On such systems it may be necessary to install an
+extra unversioned python package, or to create a simple soft link
+something like this:
+
+% ln -s /usr/bin/python3 /usr/bin/python
+
+
 Ubuntu:
    git
    build-essential (includes libc6-dev libc-dev gcc g++ make dpkg-dev)
@@ -469,6 +486,9 @@ Ubuntu:
    cm-super
    texinfo
    texi2html
+   libglu1-mesa-dev
+   freeglut3-dev
+   mesa-common-dev
 
 Fedora:
    Mainly as for Ubuntu, but note that package names are usually changed
@@ -549,6 +569,11 @@ Debian 10:
    xutils-dev
    zlib1g-dev
 
+Debian 11:
+   In adition to the packages listed above for Debian 10, Debian 11 also
+   requires the following packages:
+
+   python-is-python3
 
 Arch Linux:
    base-devel

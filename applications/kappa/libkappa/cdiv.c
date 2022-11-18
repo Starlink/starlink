@@ -109,6 +109,11 @@ F77_SUBROUTINE(cdiv)( INTEGER(STATUS) ){
 *     21-MAY-2021 (DSB):
 *        Original C version, based on equivalent Fortran function by RFWS
 *        et al.
+*     12-JUL-2021 (DSB):
+*        Divide Variance arrays by the square of the supplied constant.
+*        This code was accidentally omitted when converting from Fortran to C.
+*     13-JUL-2021 (DSB):
+*        No need to propagate Variances from input to output.
 *     {enter_further_changes_here}
 
 *-
@@ -117,16 +122,19 @@ F77_SUBROUTINE(cdiv)( INTEGER(STATUS) ){
 
 /* Local Variables: */
    ThrWorkForce *wf;     /* Pointer to pool of worker threads */
+   const char *comp;     /* Component list */
    char form[ NDF__SZFRM + 1 ];    /* Form of the ARRAY */
+   char dtype[ NDF__SZFTP + 1 ];   /* Output data type */
    char itype[ NDF__SZTYP + 1 ];   /* Data type for processing */
    double cons;          /* Constant to be used. */
    int bad;              /* Need to check for bad pixels? */
    int ndf1;             /* Identifier for 1st NDF (input) */
    int ndf2;             /* Identifier for 2nd NDF (input) */
+   int var;              /* Variance component present? */
    size_t el;            /* Number of mapped elements */
    size_t nerr;          /* Number of numerical errors */
-   void *pntr1;          /* Pointer to 1st NDF mapped array */
-   void *pntr2;          /* Pointer to 2nd NDF mapped array */
+   void *pntr1[2];       /* Pointers to 1st NDF mapped arrays */
+   void *pntr2[2];       /* Pointers to 2nd NDF mapped arrays */
 
 /* Check inherited global status. */
    if( *STATUS != SAI__OK ) return;
@@ -141,15 +149,28 @@ F77_SUBROUTINE(cdiv)( INTEGER(STATUS) ){
    parGet0d( "SCALAR", &cons, STATUS );
 
 /* Create a new output NDF based on the input NDF. Propagate the WCS, axis,
-   quality, units and variance components. */
-   lpgProp( ndf1, "WCS,Axis,Quality,Units,Variance", "OUT", &ndf2, STATUS );
+   quality and units components. */
+   lpgProp( ndf1, "WCS,Axis,Quality,Units", "OUT", &ndf2, STATUS );
 
-/* Determine which data type to use to process the input data array. */
-   ndfType( ndf1, "Data", itype, sizeof(itype), STATUS );
+/* See if the input NDF has a variance component and set the list of
+   components to process accordingly. */
+   ndfState( ndf1, "Variance", &var, STATUS );
+   if( var ) {
+      comp = "Data,Variance";
+   } else {
+      comp = "Data";
+   }
+
+/* Determine the data type to use for processing and set the output data
+   type accordingly. */
+   ndfMtype( "_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_INT64,_REAL,_DOUBLE",
+             ndf1, ndf1, comp, itype, sizeof(itype), dtype, sizeof(dtype),
+             STATUS );
+   ndfStype( dtype, ndf2, comp, STATUS );
 
 /* Map the input and output data arrays. */
-   ndfMap( ndf1, "Data", itype, "READ", &pntr1, &el, STATUS );
-   ndfMap( ndf2, "Data", itype, "WRITE", &pntr2, &el, STATUS );
+   ndfMap( ndf1, comp, itype, "READ", pntr1, &el, STATUS );
+   ndfMap( ndf2, comp, itype, "WRITE", pntr2, &el, STATUS );
 
 /* See if checks for bad pixels are needed. */
    ndfBad( ndf1, "Data", 0, &bad, STATUS );
@@ -158,31 +179,31 @@ F77_SUBROUTINE(cdiv)( INTEGER(STATUS) ){
    threads of the same size. */
    wf = thrGetWorkforce( thrGetNThread( "KAPPA_THREADS", STATUS ), STATUS );
 
-/* Select the appropriate function for the data type being processed and
-   do the arithmetic. */
+/* Select the appropriate routine for the data type being processed and
+   divide the data array by the constant. */
    if( !strcmp( itype, "_BYTE" ) ) {
-      kpgCdivB( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivB( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_UBYTE" ) ) {
-      kpgCdivUB( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivUB( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_DOUBLE" ) ) {
-      kpgCdivD( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivD( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_INTEGER" ) ) {
-      kpgCdivI( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivI( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_INT64" ) ) {
-      kpgCdivK( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivK( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_REAL" ) ) {
-      kpgCdivF( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivF( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_WORD" ) ) {
-      kpgCdivW( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivW( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( !strcmp( itype, "_UWORD" ) ) {
-      kpgCdivUW( wf, bad, el, pntr1, cons, pntr2, &(nerr), STATUS );
+      kpgCdivUW( wf, bad, el, pntr1[0], cons, pntr2[0], &(nerr), STATUS );
 
    } else if( *STATUS == SAI__OK ){
       *STATUS = SAI__ERROR;
@@ -196,9 +217,53 @@ F77_SUBROUTINE(cdiv)( INTEGER(STATUS) ){
    ndfForm( ndf2, "Data", form, sizeof(form), STATUS );
    if( strcmp( form, "PRIMITIVE" ) ) ndfSbad( bad, ndf2, "Data", STATUS );
 
-/* Unmap the data arrays. */
-   ndfUnmap( ndf1, "Data", STATUS );
-   ndfUnmap( ndf2, "Data", STATUS );
+/* If there is a variance component to be processed, then square the
+   constant to be used for division. */
+   if( var ){
+      cons *= cons;
+
+/* See if checks for bad pixels are needed when processing the NDF's
+   variance array. */
+      ndfBad( ndf1, "Variance", 0, &bad, STATUS );
+
+/* Select the appropriate routine for the data type being processed and
+   divide the data array by the constant. */
+      if( !strcmp( itype, "_BYTE" ) ) {
+         kpgCdivB( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_UBYTE" ) ) {
+         kpgCdivUB( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_DOUBLE" ) ) {
+         kpgCdivD( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_INTEGER" ) ) {
+         kpgCdivI( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_INT64" ) ) {
+         kpgCdivK( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_REAL" ) ) {
+         kpgCdivF( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_WORD" ) ) {
+         kpgCdivW( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( !strcmp( itype, "_UWORD" ) ) {
+         kpgCdivUW( wf, bad, el, pntr1[1], cons, pntr2[1], &(nerr), STATUS );
+
+      } else if( *STATUS == SAI__OK ){
+         *STATUS = SAI__ERROR;
+         errRepf( " ", "Unsupported data type'%s'.", STATUS, itype );
+      }
+
+/* See if there may be bad pixels in the output variance array and set the
+   output bad pixel flag value accordingly unless the output NDF is
+   primitive. */
+      if( nerr > 0 ) bad = 1;
+      ndfForm( ndf2, "Variance", form, sizeof(form), STATUS );
+      if( strcmp( form, "PRIMITIVE" ) ) ndfSbad( bad, ndf2, "Variance", STATUS );
+   }
 
 /* Obtain a new title for the output NDF. */
    ndfCinp( "TITLE", ndf2, "Title", STATUS );

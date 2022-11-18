@@ -13,9 +13,9 @@
 #  recommending that people use dimmconfig_jsa_generic.lis as the
 #  starting point for their map-making experiments since it produces
 #  superior results (but one of the more specific dimmconfigs such as
-#  dimmconfig_bright_extended.lis etc will usually be more appropriate).
+#  dimmconfig_bright_extended.lis etc. will usually be more appropriate).
 #
-#  Users existing personal configuration files that start by including
+#  Users' existing personal configuration files that start by including
 #  dimmconfig.lis should be unaffected by this change. In future, if you
 #  want to create a configuration file that starts from the defaults that
 #  were previously in dimmconfig.lis, you should simply omit the starting

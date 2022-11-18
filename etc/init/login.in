@@ -348,7 +348,7 @@ endif
 
 #
 #  FLUXES
-if ( -e ${bindir}/fluxes/fluxes.csh ) then
+if ( -e ${bindir}/fluxes/fluxes.sh ) then
 setenv FLUXES_DIR ${bindir}/fluxes
 endif
 

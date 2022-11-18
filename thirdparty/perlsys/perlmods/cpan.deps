@@ -26,6 +26,8 @@ Astro::FITS::HdrTrans
 Astro::FITS::Header
 Astro::WaveBand
 HTTP::Daemon
+Parse::RecDescent
+Astro::VEX
 Astro::Catalog
 App::SourcePlot
-
+XML::LibXML

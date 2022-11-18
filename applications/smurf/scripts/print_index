@@ -1,5 +1,4 @@
-#!/local/perl/bin/perl
-##/usr/bin/env starperl   # -*- cperl -*-
+#!/usr/bin/env starperl
 
 =head1 NAME
 
@@ -544,7 +543,10 @@ sub acsis_header {
     my $josmin = (defined $fitsitem->{JOS_MIN} ? $fitsitem->{JOS_MIN} : 0);
     $josmult = ( $josmult > $josmin ? $josmult : $josmin );
     my $numnods = ( defined $fitsitem->{NUM_NODS} ? 4*$fitsitem->{NUM_NODS} : 1 );
-    my $intt = 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5);
+    my $intt = ((defined $fitsitem->{NUM_CYC} and defined $step)
+      ? 0.1*int(10.0*$fitsitem->{NUM_CYC}*$numnods*$josmult*$step+0.5)
+      : 'n/a');
+    $step //= 'n/a';
 
     my %A = calc_shared_scuba2_acsis( $fitsitem, $fitsitem );
 
@@ -1114,26 +1116,26 @@ sub calc_shared_scuba2_acsis {
   my $lwvmtau = " n/a";
   my $domestate = " n/a";
 
-  $obstime = $genitem2{UTEND} - $genitem{UTSTART}
+  $obstime = sprintf("%4d", $genitem2{UTEND} - $genitem{UTSTART})
     if (defined $genitem2{UTEND} and defined $genitem{UTSTART});
   $seeing = 0.01 * int(100.0*
                        0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
-    if defined $fitsitem->{SEEINGST};
+    if defined $fitsitem->{SEEINGST} and defined $fitsitem2->{SEEINGEN};
   $csotau = 0.01 * int(100.0*
                        0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
-    if defined $fitsitem->{TAU225ST};
+    if defined $fitsitem->{TAU225ST} and defined $fitsitem2->{TAU225EN};
   $wvmtau = 0.01 * int(100.0*
                        0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
-    if defined $fitsitem->{WVMTAUST};
+    if defined $fitsitem->{WVMTAUST} and defined $fitsitem2->{WVMTAUEN};
   $lseeing = 0.001 * int(1000.0*
                          0.5*($fitsitem->{SEEINGST}+$fitsitem2->{SEEINGEN})+0.5)
-    if defined $fitsitem->{SEEINGST};
+    if defined $fitsitem->{SEEINGST} and defined $fitsitem2->{SEEINGEN};
   $lcsotau = 0.001 * int(1000.0*
                          0.5*($fitsitem->{TAU225ST}+$fitsitem2->{TAU225EN})+0.5)
-    if defined $fitsitem->{TAU225ST};
+    if defined $fitsitem->{TAU225ST} and defined $fitsitem2->{TAU225EN};
   $lwvmtau = 0.001 * int(1000.0*
                          0.5*($fitsitem->{WVMTAUST}+$fitsitem2->{WVMTAUEN})+0.5)
-    if defined $fitsitem->{WVMTAUST};
+    if defined $fitsitem->{WVMTAUST} and defined $fitsitem2->{WVMTAUEN};
 
   if (defined $genitem{'DOME_OPEN'} and defined $genitem2{'DOME_OPEN'}) {
     if ($genitem{'DOME_OPEN'} != $genitem2{'DOME_OPEN'}) {
@@ -1145,7 +1147,7 @@ sub calc_shared_scuba2_acsis {
   }
 
   %results = ( %results,
-               OBSTIME => sprintf("%4d",$obstime),
+               OBSTIME => $obstime,
                SEEING => $seeing,
                CSOTAU => $csotau,
                WVMTAU => $wvmtau,

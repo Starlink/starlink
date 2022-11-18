@@ -1,14 +1,15 @@
-\chapter{\xlabel{calib}SCUBA-2 data calibration}
+y\chapter{\xlabel{calib}SCUBA-2 Data Calibration}
 \label{app:cal}
 
-\section{\xlabel{fcf}Flux conversion factors (FCF)}
+\section{\xlabel{fcf}Flux-conversion factors (FCFs)}
 \label{app:fcf}
 
 Primary and secondary calibrator observations have been reduced using
 the specifically designed \file{dimmconfig\_bright\_compact.lis}.  The
 maps produced from this are then analysed using tailor-made \picard\
 recipes. For instructions on applying the FCFs to your map see
-\cref{Section}{sec:cmult}{this page}.
+\cref{Section}{sec:cmult}{this page} and
+\cref{Appendix}{app:fcfs}{FCFs by reduction date}.
 
 A map reduced by the map-maker has units of pW. To calibrate the data
 into units of janskys (Jy), a set of bright, point-source objects with
@@ -40,12 +41,11 @@ follows:
   and \param{FLUX\_850.MYSRC~=~0.005} (where the values are in Jy),
   for example.
 
-\item Three different FCF values are calculated, two of which are
-  described below.
+\item Three different FCF values are calculated:
 
   \begin{enumerate}
 
-  \item \textbf{The arcsecond FCF}
+  \item \textbf{The Arcsecond (Aperture) FCF}
     \begin{equation}
       \label{eq:fcf_arcsec}
       \mathrm{FCF_{arcsec}} = \frac{S_{\mathrm{tot}}}{P_{\mathrm{int}} \times
@@ -57,29 +57,57 @@ follows:
     in the map (in pW) and $A_{\mathrm{pix}}$ is the pixel area in
     arcsec$^2$, producing an FCF in Jy/arcsec$^2$/pW.
 
-  \item\textbf{The beam FCF}
+   \vspace{3mm}
+
+  \item\textbf{The Beam (Peak) FCF}
     \begin{equation}
       \label{eq:fcf_beam}
       \mathrm{FCF_{beam}} = \frac{S_{\mathrm{peak}}}{P_{\mathrm{peak}}}
     \end{equation}
-    producing an FCF in units of Jy/beam/pW.
+    producing an FCF in units of Jy/beam/pW. The measured peak signal here is
+    derived from the Gaussian fit of \task{beamfit}. The peak value is susceptible
+    to pointing and focus errors, and we have found this number to be somewhat unreliable,
+    particularly at 450\,$\mu$m.
+
+   \vspace{3mm}
+
+  \item\textbf{The Beammatch FCF}
+    This FCF is calculated in the same way as the Beam FCF decribed
+    above, but after a matched filter is applied to the data (see
+    \cref{Appendix}{app:mf}{SCUBA-2 matched filter}).
+    This FCF is less commonly used than the former two types.
+
   \end{enumerate}
 
 \end{enumerate}
 
-The measured peak signal here is derived from the Gaussian fit of
-\task{beamfit}. The peak value is susceptible to pointing and focus
-errors, and we have found this number to be somewhat unreliable,
-particularly at 450$\mu$m.
-
+For a true point source, the measured peak pixel in a map calibrated in units of Jy/beam
+(using the Beam FCF) is equivalent to the integrated total flux of the same source in a map
+calibrated in units of Jy/arcsec$^{2}$ (using the Arcsecond FCF). The \oracdr\ processing
+routine will automatically select the appropriate FCF based on the default data-reduction recipe
+that was linked to your data at the time of observations. Note that the data-reduction recipe can
+easily be changed when running \oracdr\ (see
+\cref{Section}{subsec:ChangeRecipe}{Changing the pipeline recipe} for details).
 
 \section{\xlabel{extinction}Extinction correction}
 
-Analysis of the SCUBA-2 secondary calibrators has allowed calculation
-of the transmission relationships for the SCUBA-2 450\,$\mu$m and
+Starlink automatically applies the following multiplicative extinction correction to SCUBA-2 data:
+
+\begin{equation}
+\label{eq:extcor}
+\mathrm{Extinction\:Correction} = \frac{1}{\mathrm{exp}[-\tau_{\nu}\times\mathrm{Airmass}]}
+\end{equation}
+
+where $\tau_{\nu}$ is the opacity at the given frequency, $\nu$.
+
+The atmospheric opacity at SCUBA-2’s operating frequencies are defined in
+terms of the opacity at 225 GHz. Optimizing the uniformity of the SCUBA-2 secondary
+calibrator fluxes as a function of atmospheric transmission has allowed calculation
+of the atmospheric opacity relationships for the SCUBA-2 450\,$\mu$m and
 850\,$\mu$m pass-bands to be determined. Full details of the analysis
 and on-sky calibration methods of SCUBA-2 can be found in Dempsey et
-al.\ (2013)~\cite{dempsey12}\cite{dempsey-spie}.
+al.\ (2013)~\cite{dempsey12}\cite{dempsey-spie} with
+updated relations provided in Mairs et al.\ (2021)~\cite{mairs21}.
 
 Archibald et al. (2002)\,\cite{archibald} describes how the Caltech
 Submillimeter Observatory (CSO) 225\,GHz opacity, $\tau_{225}$,
@@ -88,8 +116,23 @@ $\tau_{850}$. The JCMT water-vapour radiometer (WVM) uses the 183\,GHz
 water line to calculate the precipitable water vapour (PWV) along the
 line-of-sight of the telescope. This PWV is then input into an
 atmospheric model to calculate the zenith opacity at 225\,GHz
-($\tau_{225}$). This allows ease of comparison with the adjacent CSO
-225\,GHz tipping radiometer. The opacities have been as:
+($\tau_{225}$). Historically, this has allowed for ease of
+comparison with the adjacent CSO 225\,GHz tipping radiometer.
+
+The updated opacity relationships (to be used in \cref{Equation}{eq:extcor}{})
+derived by Mairs et al. (2021)~\cite{mairs21}
+have been adopted as the default as of \textbf{Starlink Release 2021A}:
+
+\begin{equation}
+\tau_{450} = 23.3 \times (\tau_{225} - 0.018 + 0.05\sqrt{\tau_{225}});
+\end{equation}
+and
+\begin{equation}
+\tau_{850} = 3.71 \times (\tau_{225} - 0.040 + 0.20\sqrt{\tau_{225}}).
+\end{equation}
+
+Previously, (\textbf{Starlink Versions 2018A and before}) adopted as 
+defaults the opacity relationships found by Dempsey et al. (2013)~\cite{dempsey12}:
 
 \begin{equation}
 \tau_{450} = 26.0 \times (\tau_{225} - 0.012);
@@ -99,6 +142,32 @@ and
 \tau_{850} = 4.6 \times (\tau_{225} - 0.0043).
 \end{equation}
 
+The updated opacity relationships as of Starlink Release 2021A will affect
+450-$\mu$m data obtained in very dry conditions and 850-$\mu$m data
+obtained in very dry or very wet conditions by up to 5\% (see \cref{Figure}{fig:NewExtCor}{}).
+
+\textbf{Note that the default extinction corrections are intrinsically connected to the default FCFs
+applied. If applying extinction corrections derived by Mairs et al. 2021 (\cite{mairs21}), the matching
+FCFs must also be applied (see \cref{Appendix}{app:fcfs}{FCFs by reduction date}).
+The \oracdr\ software assumes the Mairs et al. (2021)~\cite{mairs21}
+results beginning in Starlink Release 2021A. Starlink Release 2018A and previous
+versions assume the Dempsey et al. 2013~\cite{dempsey12} values by default.}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.4\linewidth]{sc21-NewExtCor-450} \hspace{0.02\linewidth}
+\includegraphics[width=0.4\linewidth]{sc21-NewExtCor-850}
+\caption[Updated Extinction Corrections]{The new extinction corrections
+derived by Mairs et al. (2021, \cite{mairs21}) divided by the original extinction corrections (Dempsey et al. 2013~\cite{dempsey12})
+as a function of atmospheric transmission. Vertical lines show the atmospheric transmission of the typical JCMT
+weather bands at each wavelength, assuming an airmass of 1.2. Left: 450\,$\mu$m. Right: 850\,$\mu$m. At 450\,$\mu$m,
+the original correction is modified by a maximum of 5\% in very dry weather while at 850\,$\mu$m the original correction is
+modified by a maximum of 5\% in very dry or very wet conditions. The majority of 850-$\mu$m observations, however, require no modification
+to the original correction and less than 4\% of SCUBA-2 data are obtained in weather band 5. \label{fig:NewExtCor}}
+\end{center}
+\end{figure}
+
+
 The SCUBA-2 filter characteristics are described in detail
 \htmladdnormallinkfoot{on the JCMT
   website}{http://www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/filters/}.
@@ -106,8 +175,8 @@ The SCUBA-2 filter characteristics are described in detail
 The extinction correction parameters that scale from $\tau_{225}$ to
 the relevant filter have been added to the map-maker code. You can
 override these values by setting \param{ext.taurelation.filtname} in
-your map-maker config files to the two coefficients `($a$,$b$)' that
-you want to use (where \param{filtname} is the name of the
+your map-maker config files to the three coefficients `($a$,$b$,$c$)' that
+you want to use (following the form $\tau_{\nu} = a \times (\tau_{225} + b + c\sqrt{\tau_{225}})$), where \param{filtname} is the name of the
 filter). The defaults are listed in
 \file{\$SMURF\_DIR/smurf\_extinction.def}.
 

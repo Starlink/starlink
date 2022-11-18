@@ -175,8 +175,8 @@
 *     FCF = _REAL (Read)
 *        The FCF value that is used to convert I, Q and U values from pW
 *        to Jy/Beam. If a null (!) value is supplied a default value is
-*        used that depends on the waveband in use - 725.0 for 850 um and
-*        962.0 for 450 um. [!]
+*        used that depends on the waveband in use and the dates of the
+*        observations being processed. [!]
 *     GLEVEL = LITERAL (Read)
 *        Controls the level of information to write to a text log file.
 *        Allowed values are as for "ILEVEL". The log file to create is
@@ -521,11 +521,12 @@
 *        (approximately) 8 arc-sec (the 450 um beam width) to
 *        (approximately) 13 arc-seconds (the 850 um beam width), and
 *        also reduces the noise. The smoothing kernel is derived from the
-*        two-component beam models described in the paper "SCUBA-2: on-sky
-*        calibration using submillimetre standard sources" (Dempsey et al,
-*        2018). If parameter MAPVAR is TRUE, the individual observation
-*        maps will be smoothed prior to determining the variances, thus
-*        ensuring that the resulting variances are still accurate. [FALSE]
+*        two-component beam models described in the paper "A Decade of
+*        SCUBA-2: A Comprehensive Guide to Calibrating 450 um and 850 um
+*        Continuum Data at the JCMT" (Mairs et al, 2021). If parameter
+*        MAPVAR is TRUE, the individual observation maps will be smoothed
+*        prior to determining the variances, thus ensuring that the
+*        resulting variances are still accurate. [FALSE]
 *     TRIM = _REAL (Read)
 *        This indicates how the edges of the final I, Q and U coadds should
 *        be trimmed to remove the noisey edges. If a null (!) value is
@@ -771,6 +772,34 @@
 *    4-JUN-2021 (DSB):
 *       Add a PCA column to the final catalogue that indicates the island
 *       within the PCA mask that contains each vector.
+*    10-JUN-2021 (DSB):
+*       Use the updated SCUBA-2 FCF values, which depend on observation date.
+*    13-SEP-2021 (DSB):
+*       If UTDATE is not present, use DATE-OBS to determine the FCF to use.
+*    27-OCT-2021 (DSB):
+*       Change JCMT beam shape parameters to those given in Mairs et al
+*       2021 (only affects the SMOOTH450 parameter).
+*    19-JAN-2022 (DSB):
+*       If observations span a date at which the nominal FCF changed, the
+*       default FCF value is now a weighted mean of the FCFs before and
+*       after the change.
+*    20-JAN-2022 (DSB):
+*       If an existing NDF was supplied for parameter IPREF on the command
+*       line but an error occurred before the IPREF parameter was accessed, the
+*       ParSys cleanup function would previously add a history record to the existing
+*       NDF suggesting it had been created by pol2map. Fix this bug by changing
+*       the definition of the IPREF parameter so that it always expects an existing
+*       NDF. Then temporarily change its "exists" preoperty just before the parameter
+*       value is accessed to cater for cases where the IPREF map is also the output
+*       total intensity map and should therefore have a history record added.
+*    8-FEB-2022 (DSB):
+*       Streamline the handling of nominal FCF values in order to simplify
+*       it and fix a bug that left "nomfcf" set to None when the IN
+*       parameter contain only previously created maps.
+*    2-MAR-2022 (DSB):
+*       Correct syntax error when applying POL-2 degradation factor to
+*       the I map.
+*-
 
 '''
 
@@ -799,6 +828,80 @@ retain = 0
 kernel = None
 
 
+
+
+#  A function to calculate a nominal FCF from a set of maps and store the
+#  value in the corresponding coadded map, allowing for maps that span
+#  the dates at which the nominal FCF changed. The coadd fcf is the weighted
+#  mean of the FCFs from the individual maps. The exposure time of the
+#  map is used as the weight.
+def StoreNomFCF( maps, coadd, filter ):
+
+#  Initialise the sums needed to find the weighted mean FCF.
+   s1 = 0.0
+   s2 = 0.0
+
+#  Loop over the maps:
+   for key in maps:
+
+#  Get the nominal beam FCF and median exposure time from the map.
+      nomfcf = GetNomFCF( maps[key], filter )
+      exptime = float( get_fits_header( maps[key], "EXP_TIME" ) )
+
+#  Increment the sums needed to find the weighted mean FCF.
+      s1 = exptime*nomfcf
+      s2 = exptime
+
+#  Calculate the weighted mean FCF.
+   if s2 > 0.0:
+      nomfcf = s1/s2
+
+#  Store it in the coadd.
+      invoke("$KAPPA_DIR/fitsmod ndf={0} keyword=NOMFCF edit=a value={1} "
+             "comment=\"'[Jy/beam/pW] Nominal beam FCF for map'\""
+             " position=! mode=interface".format(coadd,nomfcf))
+
+
+
+
+#  A function to get the nominal FCF from the header of a map.
+def GetNomFCF( map, filter ):
+
+#  Get the nominal beam FCF header from the NOMFCF FITS header in the map.
+   nomfcf = get_fits_header( map, "NOMFCF" )
+   if nomfcf is not None:
+      nomfcf = float( nomfcf )
+
+#  If no value was obtain, use a nominal FCF based on the date of
+#  observation, stored int he UTDATE header (use DATE-OBS if UTDATE is
+#  not available).
+   else:
+      utdate = get_fits_header( map, "UTDATE" )
+      if utdate is None:
+         dateobs = get_fits_header( map, "DATE-OBS" )
+         if dateobs is not None:
+            (date,time) = dateobs.split("T")
+            utdate = float( date.replace("-","") )
+         else:
+            raise starutil.InvalidParameterError("Neither 'UTDATE' "
+                   "nor 'DATE-OBS' FITS header found in {0}".
+                   format(map))
+      utdate = float( utdate )
+
+      if filter == 450:
+         if utdate < 20180630:
+            nomfcf = 531.0
+         else:
+            nomfcf = 472.0
+      else:
+         if utdate < 20161101:
+            nomfcf = 525.0
+         elif utdate < 20180630:
+            nomfcf = 516.0
+         else:
+            nomfcf = 495.0
+   return nomfcf
+
 #  A function to check the pixel size and units of a map and report an error
 #  if either is not the required value.
 def CheckNDF( param, ndf, pixsize, units ):
@@ -825,7 +928,7 @@ def CheckNDF( param, ndf, pixsize, units ):
 
 
 #  A function to create an NDF holding a two-component beam shape, as
-#  defined in Dempsey et al 2018, using the supplied parameter values.
+#  defined in Mairs et al 2021, using the supplied parameter values.
 def Beam( alpha, beta, thetaM, thetaS, pixsize ):
 
 #  Create an image of the main beam using the supplied pixel size.
@@ -882,10 +985,10 @@ def Smooth450( inmap, outmap ):
       pixsize = math.sqrt( xsize*ysize )
 
 #  Create a pair of NDFs holding the expected model beam shape at
-#  450 um and at 850 um. The expected beams are defined in Dempsey et al
-#  2018.
-      b450 = Beam( 0.94, 0.06, 7.9, 25.0, pixsize )
-      b850 = Beam( 0.98, 0.02, 13.0, 48.0, pixsize )
+#  450 um and at 850 um. The expected beams are defined in Mairs et al
+#  2021.
+      b450 = Beam( 0.89, 0.11, 6.2, 18.8, pixsize )
+      b850 = Beam( 0.98, 0.02, 11.0, 49.1, pixsize )
 
 #  Deconvolve the 850 um beam using the 450 um beam as the PSF. The
 #  resulting map is the kernel that smooths a 450 um map so that the
@@ -973,7 +1076,7 @@ def cleanup():
 #  to the coadd get higher weight. The weight for each observation is
 #  stored in the CHUNKWGT header within the FITS extension of the
 #  observation's I map.
-def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask, obsweight ):
+def MakeCoadd( qui, qui_maps, i_maps, coadd, filter, mapvar, automask, obsweight ):
    allmaps = []
    allkeys = []
    for key in qui_maps:
@@ -1119,6 +1222,8 @@ def MakeCoadd( qui, qui_maps, i_maps, coadd, mapvar, automask, obsweight ):
              "conserve=no method=near variance=yes genvar={2} "
              "weights={3}".format(allmaps,coadd,mapvar,weights))
 
+#  Calculate and store the nominal FCF in the coadd.
+   StoreNomFCF( qui_maps, coadd, filter )
 
 
 
@@ -1429,7 +1534,7 @@ try:
                                  noprompt=True))
 
    params.append(starutil.ParNDG("IPREF", "The total intensity map to use "
-                                 "for IP correction", default=None, exists=False,
+                                 "for IP correction", default=None, exists=True,
                                  noprompt=True, minsize=0, maxsize=1 ))
 
    params.append(starutil.Par0L("REUSE", "Re-use existing time-streams and maps?", True,
@@ -1665,11 +1770,13 @@ try:
              "'{0} found in {1}.".format( filter, indata[0] ) )
 
 #  If we have 450 um data, see if the resulting maps and catalogues should be
-#  smoothed to the 850 um resolution.
+#  smoothed to the 850 um resolution. Also set the POL2 FCF degradation factor.
    if filter == 450:
       smooth450 = parsys["SMOOTH450"].value
+      degrade = 1.96
    else:
       smooth450 = False
+      degrade = 1.35
 
 #  See if we should use skyloop instead of makemap.
    skyloop = parsys["SKYLOOP"].value
@@ -1692,23 +1799,34 @@ try:
 #  calatlogue.
    jy = parsys["JY"].value
 
-#  If we are converting to mJy/beam, get the FCF (Jy/pw).
+#  If we are converting to mJy/beam, get any user-supplied FCF to use (Jy/pw).
    if jy:
       fcf = parsys["FCF"].value
-
-#  If no FCF supplied, get the default FCF for the waveband
-      if fcf is None:
-         if filter == 450:
-            fcf = 962.0
-         else:
-            fcf = 725.0
+   else:
+      fcf = None
 
 #  If IP correction is to be performed, get the map to be used to define
 #  the IP correction.
    ipref = None
    parsys["IPCOR"].default = ( qmap is not None or umap is not None )
    if parsys["IPCOR"].value:
+
+#  If the output total intensity map is also to be used as the IPREF map,
+#  it will not currently exist. Modify the IPREF parameter "exists"
+#  property to allow for this possibility. The IPREF parameter was defined
+#  initially with "exists=True" because this prevents a new history record
+#  being added erroneously to the existing NDF in the case of an error
+#  occuring before this point in the code (the parsys class adds history
+#  records to all NDFs that have a False value for the 'exists' property).
+      parsys["IPREF"].exists = False
       ipref = parsys["IPREF"].value
+
+#  Ensure no history record is added to the ip reference map suggesting it
+#  was created by pol2map. This would otherwise happen at cleanup. If it *is*
+#  created by pol2map (due to being the IOUT image), then a suitable history
+#  record will be created as a result of it being assigned to parameter IOUT.
+      parsys["IPREF"].exists = True
+
       if not ipref:
          ipref = ref
       if not ipref or ipref == "!":
@@ -1718,11 +1836,6 @@ try:
          CheckNDF( "IPREF", ipref, pixsize, "pW" )
       ip = "ipref={0}".format(ipref)
 
-#  Ensure no history record is added to the ip reference map suggesting it
-#  was created by pol2map. This would otherwise happen at cleanup. If it *is*
-#  created by pol2map (due to being the IOUT image), then a suitable history
-#  record will be created as a result of it being assigned to parameter IOUT.
-      parsys["IPREF"].exists = True
    else:
       ip = "ipref=!"
 
@@ -2550,6 +2663,7 @@ try:
 
 #  If we are using skyloop to generate the observation maps...
 #  -----------------------------------------------------------
+      skyloop_used = False
       if skyloop:
 
 #  If the current coadd already exists and is being used as the IP
@@ -2874,6 +2988,7 @@ try:
             starutil.ilevel = old_ilevel
             msg_out("\n--------------------------------------------------\n")
             msg_out("Back from skyloop...")
+            skyloop_used = True
 
 #  Append the skyloop logfile output to the pol2map logfile.
             msg_log("Contents of skyloop logfile follows...")
@@ -3175,17 +3290,12 @@ try:
 
 
 
-
-
-
-
-
 #  -----------  CREATE THE COADDED MAP FOR THE CURRENT STOKES PARAMETER -------------
 
 #  We do not need to create the coadd if it already exists and has not
 #  been surplanted by a new set of observation maps.
       if coadd_exists and not make_new_maps:
-         msg_out("Re-using existing {0} coadd".format(qui))
+         msg_out("Re-using existing {0} coadd ({1})".format(qui,coadd))
 
       else:
 
@@ -3194,10 +3304,10 @@ try:
             raise starutil.InvalidParameterError("No usable {0} maps remains "
                                                  "to be coadded.".format(qui))
 
-#  If skyloop was used above, the coadd will already exist. First deal
-#  with cases where skyloop was not used.
+#  First deal with cases where skyloop has not been used above to create
+#  the coadd.
          allmaps = NDG( list( qui_maps.values() ) )
-         if not skyloop:
+         if not skyloop_used:
 
 #  If we have only one observation just copy it to the output maps.
             if len(qui_maps) == 1:
@@ -3214,7 +3324,7 @@ try:
 #  the individual maps (skyloop does not put the extension NDFs into the
 #  individual observation maps).
             elif len(qui_maps) > 1:
-               MakeCoadd( qui, qui_maps, imaps, coadd, mapvar, automask, obsweight )
+               MakeCoadd( qui, qui_maps, imaps, coadd, filter, mapvar, automask, obsweight )
 
                try:
                   invoke("$KAPPA_DIR/erase object={0}.more.smurf.exp_time ok=yes".format(coadd))
@@ -3375,13 +3485,22 @@ try:
 #  these maps will be equal to the value of parameter BINSIZE.
       if imap_cat and qmap_cat and umap_cat:
 
+#  Get the nominal FCF values. Report an error if they differ.
+         nomfcf = GetNomFCF( imap_cat, filter )
+         qfcf = GetNomFCF( qmap_cat, filter )
+         ufcf = GetNomFCF( umap_cat, filter )
+         if qfcf != nomfcf or ufcf != nomfcf:
+            raise starutil.InvalidParameterError("I, Q and U coadds have "
+                  "different nominal FCF values (I={0}, Q={1}, U={2}).".
+                  format(nomfcffcf,qfcf,ufcf))
+
 #  If the I coadd was created from non-POL2 data incorporate the POL2
 #  degradation factor.
          inbeam = get_fits_header( imap_cat, "INBEAM" )
          if not inbeam or ("pol" not in inbeam):
             tmp = NDG( 1 )
-            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar=1.35".
-                 format(imap_cat,tmp ))
+            invoke( "$KAPPA_DIR/cdiv in={0} out={1} scalar={2}".
+                 format(imap_cat,tmp,degrade))
             imap_cat = tmp
 
 #  Ensure the Q, U and I images all have the same bounds, equal to the
@@ -3420,6 +3539,16 @@ try:
 
 #  If required, scale the I, Q and U values from pW to mJy/beam.
          if jy:
+
+#  If no FCF was supplied on the command line, use the nominal beam
+#  FCF from the map reduced by the POL2 degradation factor.
+            if fcf is None:
+               msg_out( "Converting catalogue values to Jy using FCF {0}*{1}".format(degrade,nomfcf) )
+               fcf = degrade*nomfcf
+            else:
+               msg_out( "Converting catalogue values to Jy using supplied FCF {0}".format(fcf) )
+
+#  Scale the I, Q and U values from pW to mJy/beam.
             tcube = NDG( 1 )
             invoke( "$KAPPA_DIR/cmult in={0} out={1} scalar={2}".
                     format(cube,tcube,1000*fcf) )

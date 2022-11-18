@@ -2,8 +2,8 @@
 
 
 # These are modified on copy from the scripts directory
-bin_SCRIPTS = fluxes.csh fluxnow.csh
-dist_noinst_SCRIPTS = fluxes_link_adam scripts/fluxes.csh scripts/fluxnow.csh
+bin_SCRIPTS = fluxes.sh fluxnow.sh
+dist_noinst_SCRIPTS = fluxes_link_adam scripts/fluxes.sh scripts/fluxnow.sh
 
 bin_MONOLITHS = fluxes
 fluxes_SOURCES = fluxes.f
@@ -28,14 +28,14 @@ IFL_FILES = fluxes.ifl
 edit = sed \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@staretcdir\@,$(staretcdir),g' \
-	-e 's,@csh\@,$(CSH),g'
+	-e 's,@sh\@,$(SH),g'
 
-fluxes.csh: scripts/fluxes.csh
-	-rm -f fluxes.csh
-	$(edit) scripts/fluxes.csh > fluxes.csh
+fluxes.sh: scripts/fluxes.sh
+	-rm -f fluxes.sh
+	$(edit) scripts/fluxes.sh > fluxes.sh
 
 
-fluxnow.csh: scripts/fluxnow.csh
-	-rm -f fluxnow.csh
-	$(edit) scripts/fluxnow.csh > fluxnow.csh
+fluxnow.sh: scripts/fluxnow.sh
+	-rm -f fluxnow.sh
+	$(edit) scripts/fluxnow.sh > fluxnow.sh
 

@@ -3,7 +3,7 @@
 
 \section{\xlabel{pl_overview}Pipeline overview}
 
-SCUBA-2 data reduction pipelines have been developed based on the
+SCUBA-2 data-reduction pipelines have been developed based on the
 existing \oracdr\ pipeline (Cavanagh et al., 2008\cite{oracdr}) used
 for ACSIS. There are three distinct pipelines currently utilised by
 SCUBA-2. Users will likely only need to run the science pipeline. The
@@ -18,8 +18,8 @@ made for each complete observation which are combined to create the final
 image. Users wishing to reduce their own data should use this pipeline.
 This pipeline is responsible for producing the reduced data that is
 accessible to users via CADC.
-\item The QL runs quality assurance checks on the data as it comes in.
-For science data it calculates the noise between 2\,Hz and 10\,Hz,
+\item The QL runs quality assurance checks on the data as they arrive.
+For science data, it calculates the noise between 2\,Hz and 10\,Hz,
 along with the NEP and effective NEP, for each 30-second scan. These
 values undergo quality-assurance checks to ensure SCUBA-2 is within
 an acceptable operating range.
@@ -31,13 +31,12 @@ quality of their data.
 \end{itemize}
 
 The manual for the SCUBA-2 pipeline can be found at \pipelinesun,
-while the pipeline software comes as part of the \starlink\ suite. Data
-reduction tutorials are available 
+while the pipeline software comes as part of the \starlink\ suite.
+Data-reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}\footnote{
 \url{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}}
 
-
-\section{\xlabel{science_pl}The Science Pipeline}
+\section{\xlabel{science_pl}The science pipeline}
 
 The science pipeline will perform the following:
 \vspace{-0.3cm}
@@ -53,14 +52,14 @@ The science pipeline will perform the following:
 \label{sec:recipes}
 
 When a project is initially created and MSBs (Minimum Scheduling Blocks)
-are constructed using the \href{https://www.eaobservatory.org/jcmt/observing/omp/observing-tool/}{JCMT Observing Tool}, 
+are constructed using the \href{https://www.eaobservatory.org/jcmt/observing/omp/observing-tool/}{JCMT Observing Tool},
 the PI can select a pipeline recipe to assign
 to the data. When the data are run through the science pipeline this
 recipe is then called by default. This can be overridden on the command
 line---see \cref{Section}{sec:parameterfile}{Changing the defaults}.
-Described below are the six main \oracdr\ science recipes. 
+Described below are the six main \oracdr\ science recipes.
 
-\textbf{Note:} the ``dimmconfig*'' files can be found in: 
+\textbf{Note:} the ``dimmconfig*'' files can be found in:
 
 \begin{terminalv}
 % ls $STARLINK_DIR/share/smurf/
@@ -79,7 +78,6 @@ calculated and written to log files (\file{log.noise} and
 \file{log.nefd} respectively). Finally, the \cupid\ task \findclumps\
 is run using the FellWalker algorithm (Berry, 2015\cite{fellwalker}) to
 create a source catalogue.
-
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN\_CHECKRMS}}
 
@@ -123,7 +121,7 @@ results are written as a FITS catalogue (with file extension
 
 This is the recipe used for processing calibrator data. It can also
 be used for any map of a single bright, isolated source at the
-tracking position. 
+tracking position.
 
 This reduction constrains the map to zero beyond a radius of 1 arc-min
 from the source centre. See \cref{Section}{sec:brightcompact}{dimmconfig\_bright\_compact.lis}
@@ -149,24 +147,24 @@ in mJy/beam using a corrected FCF.  See \cref{Section}{sec:jk}{Example
 this recipe and the files produced.
 
 
-\section{\xlabel{running_pl}Running the Science Pipeline}
+\section{\xlabel{running_pl}Running the science pipeline}
 \label{sec:plsteps}
 
-\textbf{Note:} Data reduction tutorials are available 
+\textbf{Note:} Data-reduction tutorials are available
 \href{https://www.eaobservatory.org/jcmt/science/reductionanalysis-tutorials/}{online}.
 
 \begin{aligndesc}
 \item[Step~1:]
 \textbf{Initialise ORAC-DR}
 
-For 850 micron data, this is done by:
+For 850-$\mu$m data, this is done by:
 \begin{terminalv}
 % oracdr_scuba2_850 -cwd
 \end{terminalv}
 
 \vspace{0.2cm}
 
-For 450 micron data, this is done by:
+For 450-$\mu$m data, this is done by:
 
 \begin{terminalv}
 % oracdr_scuba2_450 -cwd
@@ -198,7 +196,7 @@ directory for C shells (csh, tcsh):
 % setenv ORAC_DATA_IN ./
 \end{terminalv}
 
-\newpage 
+\newpage
 
 and for Bourne shells (sh, bash, zsh):
 
@@ -218,7 +216,7 @@ This is done by:
 \vspace{0.2cm}
 
 where the list of files that you wish to reduce can be
-an individual or multiple observations (one per line in a text file, 
+an individual or multiple observations (one per line in a text file,
 with full path names).
 
 \end{aligndesc}
@@ -226,15 +224,15 @@ with full path names).
 
 \begin{tip}
   If you run with -verbose on the command line then you will obtain all messages
- from the Starlink engines (rather than just ORAC-DR messages). This is
+ from the Starlink engines (rather than just \oracdr\ messages). This is
  particularly useful for understanding what is occurring during the map-maker stage
  of reduction. This is particularly recommended for new users.
 \end{tip}
 
 When executing the \oracdr command, unless ``-nodisplay'' is specified,
 a new Xwindow will appear within which
-will contain the pipeline output, as shown in Figures
-\ref{pipeline-oracdr-1}--\ref{pipeline-oracdr-4}.
+will contain the pipeline output, as shown in \cref{Figures}
+{pipeline-oracdr-1}{}--\cref{}{pipeline-oracdr-4}{}.
 
 \begin{figure}
 \begin{center}
@@ -261,7 +259,7 @@ observation being reduced and the duration of the observation. \label{pipeline-o
 \caption[Output from the pipeline]{The Xwindows output from the \oracdr\
 pipeline---here we we see the FCF being applied, the graphics
 being created along with a group file (file containing co-added observations
-from a single night - if provided). \label{pipeline-oracdr-3}}
+from a single night, if provided). \label{pipeline-oracdr-3}}
 \end{center}
 \end{figure}
 
@@ -281,9 +279,9 @@ pipeline---here we see the pipeline process has completed. \label{pipeline-oracd
 \label{sec:parameterfile}
 
 
-\subsection{Changing ORAC-DR's behavior}
+\subsection{Changing ORAC-DR's behaviour}
 
-ORAC-DR's behavior cab be changed on the command line. For help simply type
+{\oracdr}'s behaviour can be changed on the command line. For help simply type
 
 
 \begin{terminalv}
@@ -291,7 +289,7 @@ ORAC-DR's behavior cab be changed on the command line. For help simply type
 \end{terminalv}
 
 To run the pipeline and obtain all messages from the Starlink engines
-(rather than just ORAC-DR messages) you will need to run with verbose (\emph{recommended})
+(rather than just \oracdr\ messages) you will need to run with verbose (\emph{recommended})
 
 \begin{terminalv}
 % oracdr -loop file -files <list_of_files>  -verbose
@@ -310,6 +308,8 @@ and is a hidden file) is specified using the \param{-log} command.
 
 
 \subsection{Changing the pipeline recipe}
+\label{subsec:ChangeRecipe}
+
 You can override the recipe set in the header by listing any different
 one on the command line when starting \oracdr. For example
 \begin{terminalv}
@@ -348,7 +348,7 @@ Then run the pipeline calling the parameter file via the
 % oracdr -file <list_of_files> -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
-\subsection{Parameter file options}
+\subsection{Parameter-file options}
 
 To supply both a new configuration file and a different set of
 clump-finding parameters we would update the parameter file
@@ -388,7 +388,7 @@ CALUNITS = arcsec
 
 Once the map-maker has completed you can open your output map using
 \gaia\ (see \cref{Figure}{fig:itermap}{this example}). The excerpt in
-\cref{Chapter}{sec:manual}{Running the iterative map-maker} shows the
+\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline} shows the
 output written to the terminal as you run the map-maker. There are a
 number of clues in this output that indicate the status of the
 reduction.
@@ -411,7 +411,7 @@ reduction.
 
 \item[Map dimension] Next the basic dimensions of the data being
   processed are listed near the start of the first iteration. The
-  example above has 4\,arcsec pixels---the default at 850$\mu$m.
+  example above has 4\,arcsec pixels---the default at 850\,$\mu$m.
 
 
 \item[Chunking] The map-maker then determines if the raw data should
@@ -465,7 +465,7 @@ iteration. The convergence can be checked from the line reporting\\*
 \hspace*{0.5cm} \texttt{smf\_iteratemap: *** NORMALIZED MAP CHANGE:
   0.10559 (mean) 2.81081 (max)}
 
-The number to look out for is the mean value of the NORMALIZED MAP CHANGE. 
+The number to look out for is the mean value of the NORMALIZED MAP CHANGE.
 This will have to drop
 below your required \param{maptol} for convergence to be achieved.
 
@@ -495,7 +495,7 @@ The final maps in your output directory will have the suffix
 will start with an \file{s} for ``SCUBA-2'' (e.g.
 \file{s20140620\_00030\_850\_reduced.sdf}). Group maps, which may
 contain co-added observations from a single night, are also produced
-which have the prefix \file{gs} for ``group SCUBA-2'' and the date/scan 
+which have the prefix \file{gs} for ``group SCUBA-2'' and the date/scan
 of the \textit{first input file}
 (e.g. \file{gs20140620\_30\_850\_reduced.sdf}).
 

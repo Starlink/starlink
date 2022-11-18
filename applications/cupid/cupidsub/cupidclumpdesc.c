@@ -10,7 +10,7 @@
 #include <string.h>
 
 /* The maximum number of columns in the catalogue */
-#define MXPAR 30
+#define MXPAR 40
 
 /* The maximum length of a column name. */
 #define MXNAMLEN 30

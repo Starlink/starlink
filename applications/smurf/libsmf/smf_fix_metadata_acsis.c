@@ -75,6 +75,9 @@
 *        Ensure that we have obsmode information
 *     2013-05-08 (DSB):
 *        Change bad TCS_AZ_JIG_X/Y values to zero in PSSW mode.
+*     2022-10-14 (GSB):
+*        Added call to smf_validate_tcs_position based on TEL_POS_TOLERANCE
+*        value in global keymap.
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -189,6 +192,8 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   size_t i;
   int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
+  double posn_tolerance;     /* Tolerance for TCS position validation */
+  int posn_valid = 1;        /* Did all TCS positions pass validation? */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
   AstKeyMap * objmap = NULL; /* All the object names used */
   double steptime = 0.0;     /* Step time */
@@ -967,6 +972,16 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
                                  hdr->nframes, have_fixed, status );
   }
 
+  /* Check for invalid TCS position (i.e. discrepancy between demand and
+     actual position. */
+  posn_tolerance = smf_get_global0D( "TEL_POS_TOLERANCE", 0.0, status );
+  if( posn_tolerance != 0.0 ) {
+    posn_valid = smf_validate_tcs_position( hdr, posn_tolerance, 1, status );
+
+    if( ! posn_valid ) {
+      have_fixed |= SMF__FIXED_JCMTSTATE;
+    }
+  }
 
   return have_fixed;
 }

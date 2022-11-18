@@ -850,9 +850,9 @@ class ObjectDialog(QDialog):
 
    def save(self):
       if self.objectwidget and self.objectwidget.object:
-         fname = QtGui.QFileDialog.getSaveFileName(self, 'Save {0} to file:'.format(self.objectwidget.object.Class))
+         fname = QFileDialog.getSaveFileName(self, 'Save {0} to file:'.format(self.objectwidget.object.Class))
          if fname:
-            Ast.Channel( None, None, "SinkFile={0}".format(fname) ).write( self.objectwidget.object )
+            Ast.Channel( None, None, "SinkFile={0}".format(fname[0]) ).write( self.objectwidget.object )
 
    def addTabs( self, object ):
       for itab in range(self.tabs.count()):

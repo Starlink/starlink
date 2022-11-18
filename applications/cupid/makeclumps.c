@@ -6,6 +6,7 @@
 #include "ast.h"
 #include "par.h"
 #include "prm.h"
+#include "prm_par.h"
 #include "star/pda.h"
 #include "star/thr.h"
 #include "cupid.h"
@@ -379,15 +380,16 @@ void makeclumps( int *status ) {
    MakeclumpsData *job_data;     /* Memory for job descriptions */
    MakeclumpsData *pdata;        /* Pointer to a single job description */
    ThrWorkForce *wf = NULL;      /* Pointer to a pool of worker threads */
-   char attr[ 11 ];              /* AST attribute name */
+   char attr[ 21 ];              /* AST attribute name */
    char shape[ 10 ];             /* Shape for spatial STC-S regions */
    char text[ 8 ];               /* Value of PARDIST parameter */
    const char *dom;              /* Pointer to AST Domain value */
    const char *envvar;           /* Pointer to environment variable text */
    const gsl_rng_type *type;     /* GSL random number generator type */
    double beamcorr[ 3 ];         /* Beam widths */
+   double csum;                  /* Clump integrated intensity */
    double par[ 11 ];             /* Clump parameters */
-   double sum;                   /* Integrated intensity */
+   double sum;                   /* Total integrated intensity */
    float *ipd2;                  /* Pointer to data array */
    float *ipd;                   /* Pointer to data array */
    float angle[ 2 ];             /* Values for ANGLE parameter */
@@ -417,6 +419,7 @@ void makeclumps( int *status ) {
    hdsdim subnd[ 3 ];            /* Upper bounds of significant pixel axes */
    hdsdim ubnd[ 3 ];             /* Upper pixel bounds */
    int addnoise;                 /* Add Gaussian noise to output array? */
+   int curlev;                   /* MERS information level */
    int deconv;                   /* Store deconvolved clump properties */
    int dist;                     /* Clump parameters distribution */
    int grid;                     /* Border for regular grid (-ve if random) */
@@ -610,7 +613,7 @@ void makeclumps( int *status ) {
       dist = 0;
    } else if( !strcmp( text, "NORMAL" ) ) {
       dist = 1;
-   } else if( !strcmp( text, "POISSON" ) ) {
+   } else {
       dist = 2;
    }
 
@@ -675,6 +678,8 @@ void makeclumps( int *status ) {
    pos1[ 0 ] = 0.5*( dims[ 0 ]  + 1 );
    pos1[ 1 ] = 0.5*dims[ 0 ];
    grid_delta1 = (hdsdim)( 0.5 + ( (float) dims[ 0 ] - 2*grid )/grid_dims[ 0 ] );
+   grid_delta2 = 0.0;
+   grid_delta3 = 0.0;
 
    if( sdims > 1 ) {
 
@@ -693,6 +698,9 @@ void makeclumps( int *status ) {
 
 /* Set the PDA random number seed to a non-repeatable value */
    kpg1Pseed( status );
+
+/* Get the MERS information level. */
+   curlev = msgIflev( NULL, status );
 
 /* Loop round creating clumps. Clumps that touch the edge of the output
    array will be ignored by cupidGCUpdateArrays, so we keep on looping
@@ -761,14 +769,12 @@ void makeclumps( int *status ) {
          }
       }
 
-      msgOutiff( MSG__VERB, " ", "Creating clump %d at (%g,%g,%g)", status,
-                 nc, par[2], par[4], par[7] );
-
 /* Add the clump into the output array. This also creates a "Clump" NDF
    containing the clump data values, appended to the end of the array of
    NDF structures in the HDS object located by "obj". */
       cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms, trunc, 0,
-                            0.0, 0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, status );
+                            0.0, 0, slbnd, &obj, i, 0, 0.0, 0, &area, &sum, &csum,
+                            status );
 
 /* Update the largest peak value. */
       if( par[ 0 ] > maxpeak ) maxpeak = par[ 0 ];
@@ -778,6 +784,18 @@ void makeclumps( int *status ) {
       if( obj ) {
          datSize( obj, &st, status );
          nc = (int) st;
+
+/* Give a short or long descripton of the clump parameters, if a new
+   clump was created. */
+         if( nc == ncold + 1 ){
+            if( curlev == MSG__VERB  ){
+               msgOutf( " ", "Creating clump %d at (%g,%g,%g)", status,
+                        nc, par[2], par[4], par[7] );
+            } else if( curlev == MSG__DEBUG ) {
+               cupidGCListClump( nc, sdims, par, VAL__BADD, slbnd, rms,
+                                 csum, status );
+            }
+         }
 
 /* If an NDF was created, and if PRECAT is true, we create the clump a
    second time, but this time without any beam smoothing. These secondary
@@ -790,7 +808,7 @@ void makeclumps( int *status ) {
    in the HDS object located by "obj_precat". */
             cupidGCUpdateArraysF( NULL, NULL, nel, sdims, dims, par, rms,
                                   trunc, 0, 0.0, 0, slbnd, &obj_precat, i, 0,
-                                  0.0, 0, &area, &sum, status );
+                                  0.0, 0, &area, &sum, &csum, status );
 
 /* Check we have the same number of NDFs as in the main HDS array. */
             datSize( obj_precat, &st, status );

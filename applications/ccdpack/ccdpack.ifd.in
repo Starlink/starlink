@@ -225,8 +225,8 @@ package ccdpack {
       else
           export NDF_XTN=CCDPACK
       fi
-      export NDF_IMP_CCDPACK='$CCDPACK_DIR/ccdimp.csh ^ndf'
-      export NDF_EXP_CCDPACK='$CCDPACK_DIR/ccdexp.csh ^ndf'
+      export NDF_IMP_CCDPACK='$CCDPACK_DIR/ccdimp.sh ^ndf'
+      export NDF_EXP_CCDPACK='$CCDPACK_DIR/ccdexp.sh ^ndf'
 
 #  For IRAF data we really do need to keep hold of the bad pixels
 #  so make sure of this, unless the NDF_TO_IRAF_PARS variable
@@ -274,8 +274,8 @@ package ccdpack {
       else
          setenv NDF_XTN CCDPACK
       endif
-      setenv NDF_IMP_CCDPACK '$CCDPACK_DIR/ccdimp.csh ^ndf'
-      setenv NDF_EXP_CCDPACK '$CCDPACK_DIR/ccdexp.csh ^ndf'
+      setenv NDF_IMP_CCDPACK '$CCDPACK_DIR/ccdimp.sh ^ndf'
+      setenv NDF_EXP_CCDPACK '$CCDPACK_DIR/ccdexp.sh ^ndf'
 
 #  For IRAF data we really do need to keep hold of the bad pixels
 #  so make sure of this, unless the NDF_TO_IRAF_PARS variable
@@ -383,8 +383,8 @@ package ccdpack {
       } else {
          set NDF_XTN=(envget("NDF_XTN")//",CCDPACK")
       }
-      set NDF_IMP_CCDPACK="$CCDPACK_DIR/ccdimp.csh ^ndf"
-      set NDF_EXP_CCDPACK="$CCDPACK_DIR/ccdexp.csh ^ndf"
+      set NDF_IMP_CCDPACK="$CCDPACK_DIR/ccdimp.sh ^ndf"
+      set NDF_EXP_CCDPACK="$CCDPACK_DIR/ccdexp.sh ^ndf"
 
 #  For IRAF data we really do need to keep hold of the bad pixels
 #  so make sure of this, unless the NDF_TO_IRAF_PARS variable

@@ -41,6 +41,8 @@
 
 */
 
+/* IEEE floating poitn exceptions ot be handled by PRM */
+#define PRM__FPEXCEPTS ( FE_DIVBYZERO | FE_OVERFLOW | FE_INVALID )
 
 /* Required by prm_cgen.h */
 #include <stddef.h>

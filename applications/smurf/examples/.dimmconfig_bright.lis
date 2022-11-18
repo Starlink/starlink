@@ -21,7 +21,7 @@
 #     presence of strong astronomical signals (which may accidentally be
 #     identified as steps, throw-off the common-mode bolometer rejection,
 #     contaminate noise estimates etc.). They also generally require a
-#     larger number of iterations to maximize the sensitivty to large
+#     larger number of iterations to maximize the sensitivity to large
 #     dynamic signal ranges in the map.
 
 #  Notes:

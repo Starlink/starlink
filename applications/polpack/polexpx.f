@@ -21,7 +21,7 @@
 
 *  Description:
 *     This application is not for general use. It is a version of POLEXP
-*     which is used within the polexp.csh script to export POLPACK
+*     which is used within the polexp.sh script to export POLPACK
 *     information during on-thr-fly data conversion. In this context, it
 *     is known that only a single input file will be specified, and that
 *     it will be a native NDF. We can therefore make big speed gains by

@@ -90,7 +90,7 @@ double *cupidCFLevels( AstKeyMap *config, double maxd, double mind,
 
 /* Local Variables: */
 
-   char name[ 10 ];        /* Name of "LEVELn" value */
+   char name[ 20 ];        /* Name of "LEVELn" value */
    double *ret;            /* Pointer to returned array of contour levels */
    double cdelta;          /* Increment between contour levels */
    double clevel;          /* Contour level */

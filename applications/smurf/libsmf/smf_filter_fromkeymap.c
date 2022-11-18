@@ -15,7 +15,8 @@
 *  Invocation:
 *     smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
 *                            const char *qualifier, smfHead *hdr,
-*                            int *dofilt, int *whiten, int *status )
+*                            int *dofilt, int *whiten, int *box,
+*                            int *status )
 
 *  Arguments:
 *     filt = smfFilter * (Given and Returned)
@@ -37,6 +38,9 @@
 *        If true, frequency-domain filtering is required
 *     whiten = int * (Returned)
 *        Set if whitening filter was also requested
+*     box = int * (Returned)
+*        Returned holding the number of time samples corresponding to the
+*        largest spatial frequency passed by the filter. May be NULL;
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -74,6 +78,8 @@
 *        required because we are padding with artifical data.
 *     2013-03-18 (DSB):
 *        Added argument "qualifier".
+*     2021-09-09 (DSB):
+*        Added argument "box".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -121,7 +127,7 @@
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qualifier,
                             const smfHead *hdr, int *dofilt, int *whiten,
-                            int *status ) {
+                            int *box, int *status ) {
 
   char buf[255];            /* Buffer for qualified parameter names */
   int dofft=0;              /* Set if freq. domain filtering the data */
@@ -132,6 +138,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
   double f_low;             /* Lowest edge frequency */
   double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
+  int boxval = 0;           /* Number of samples across largest spatial structure */
   int f_order;              /* Order of Butterworth filter (0=hard-edged) */
   int f_nnotch=0;           /* Number of notch filters in array */
   int i;                    /* Loop count */
@@ -203,6 +210,18 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
        filt->wlim = VAL__BADD;
     }
 
+    /* Calculate the number of samples corresponding to the lowest
+       frequency passed by the filter - 1/(steptime*freq) where freq
+       is the lowest edge or notch frequency. */
+
+    f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
+    if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
+
+    for( i = 0; i < f_nnotch; i++ ) {
+      if( f_notchlow[ i ] > 0.0 && f_notchlow[ i ] < f_low ) f_low = f_notchlow[ i ];
+    }
+
+    if( f_low != VAL__MAXD ) boxval = filt->df[0]*filt->rdims[0]/f_low;
 
     /* If no apodisation length has been given, use a default of
        1/(steptime*freq) where freq is the lowest edge or notch
@@ -216,19 +235,7 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
           filt->apod_length = ival;
 
        } else {
-
-         f_low = ( f_edgehigh > 0.0 ) ? f_edgehigh : VAL__MAXD;
-         if( f_edgelow > 0.0 && f_edgelow < f_low ) f_low = f_edgelow;
-         for( i = 0; i < f_nnotch; i++ ) {
-           if( f_notchlow[ i ] > 0.0 && f_notchlow[ i ] < f_low ) f_low = f_notchlow[ i ];
-         }
-
-         if( f_low != VAL__MAXD ) {
-            filt->apod_length = 0.5*filt->df[0]*filt->rdims[0]/f_low;
-         } else {
-            filt->apod_length = 0;
-         }
-
+         filt->apod_length = 0.5*boxval;
          msgSeti( "P", (int) filt->apod_length );
          msgOutif( MSG__VERB, "", "Apodising ^P samples at start and end of "
                    "each time stream.", status );
@@ -240,6 +247,9 @@ void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap, const char *qual
                 "are being padded with artificial data rather than zeros.", status );
     }
   }
+
+  /* Return box size if requested */
+  if( box ) *box = boxval;
 
   /* Return whiten if requested */
   if( whiten ) *whiten = whitening;

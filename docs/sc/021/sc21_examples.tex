@@ -22,12 +22,13 @@ steps: 1. running the data through the map-maker using the
 \file{dimmconfig\_blank\_field.lis} configuration file (see
 \cref{Section}{sec:config}{Specialised configuration files}), and 2.
 applying the \picard\ \drrecipe{SCUBA2\_MATCHED\_FILTER} recipe (see
-\cref{Section}{sec:mf}{Point-source extraction}).
+\cref{Section}{sec:mf}{Point-source extraction} and
+\cref{Appendix}{app:mf}{}).
 \\ \\
 \textbf{Step 1: Run the map-maker}\\
 In this example the raw data are stored locally in a directory called
-\file{data}. We have three observations (\#13, \#18, \#21) of the field
-which we will reduced independently.
+\file{data}. We have three observations (\#13, \#18, \#21) of the field,
+which we will reduce independently.
 
 \begin{terminalv}
 % makemap data/s8*00013_00\*.sdf cosmo1 \
@@ -50,7 +51,7 @@ file.
 \begin{terminalv}
 % picard MOSAIC_JCMT_IMAGES cosmo*.sdf
 \end{terminalv}
-The output map, \file{cosmo3\_mos.sdf} (named for the last input file
+The output map, \file{cosmo3\_mos.sdf} (automatically named for the last input file
 appended by \_mos), is shown in the left-hand panel of
 \cref{Figure}{fig:cosmomap}{the figure below}. The advantage of using the
 \textsc{Picard} recipe over standalone \Kappa\ commands is that the exposure
@@ -74,7 +75,7 @@ in the \texttt{MORE.SMURF.EXP\_TIME} extension).
 In order to optimally find sources that are the size of the telescope
 beam, we apply the matched filter recipe, namely
 \xref{\drrecipe{SCUBA2\_MATCHED\_FILTER}}{sun265}{SCUBA2_MATCHED_FILTER}.
-We create a simple parameter file called \file{smooth.ini}:
+We create a simple parameter file called \file{smooth.ini} containing the following lines:
 
 \begin{terminalv}
 [SCUBA2_MATCHED_FILTER]
@@ -88,19 +89,28 @@ Gaussian. Next, the recipe is executed as follows:
 % picard -recpars smooth.ini SCUBA2_MATCHED_FILTER cosmo2_mos.sdf
 \end{terminalv}
 %
-The output of this operation is a smoothed image called
-\file{cosmo3\_mos\_mf.sdf} and a cropped version is shown in the
+The output of this operation is a smoothed image that is named by appending \_mf
+to the input file (\file{cosmo3\_mos\_mf.sdf}) and a cropped version is shown in the
 right-hand panel of \cref{Figure}{fig:cosmomap}{figure above}. You can immediately
 see the contrast to the left-hand panel which is the output from the
 map-maker. A number of signal peaks now emerge as possible sources.
 \\ \\
 \textbf{Step 4: Crop the map}\\
 Next we shall crop the map to remove the noisy edges,
-in this case to a 900-arcsec radius circle. The output file will be named
-\file{cosmo2\_mos\_mf\_crop.sdf}.
-\begin{terminalv}
-% picard CROP_JCMT_IMAGES cosmo3_mos_mf.sdf
+in this case to a 900-arcsec radius circle. The parameter file
+called \file{crop.ini} contains the following lines:
 
+\begin{terminalv}
+[CROP_SCUBA2_IMAGES]
+CROP_METHOD = CIRCLE
+MAP_RADIUS = 900
+\end{terminalv}
+
+The output file from the following command will be named
+\file{cosmo2\_mos\_mf\_crop.sdf}:
+
+\begin{terminalv}
+% picard -recpars crop.ini CROP_SCUBA2_IMAGES cosmo3_mos_mf.sdf
 \end{terminalv}
 
 \starfig{sc21_850cosmo_mf_crop_snr}{}{width=0.6\linewidth}{fig:snrmask}{
@@ -139,13 +149,12 @@ But how can we check if these sources are real?
   a given S/N with the number of \emph{positive} peaks.
 \end{itemize}
 
-\subsection{Example 2 -- Advanced pipeline method}
+\subsection{Example 2 -- Advanced pipeline method (Recommended)}
 \label{sec:jk}
 
 Although this method is considerably simpler to execute, the products
-have undergone more advanced processing than the manual method just
-given. The pipeline is particularly recommended for this recipe due to
-its extra analysis steps.
+have undergone more advanced processing than the manual method shown
+above. Due to these extra analysis steps, this pipeline method is particularly recommended.
 
 \textbf{Step 1: Create input file}\\
 Create a file with the full path names of all the files you wish to process, one per line (e.g.
@@ -160,7 +169,7 @@ The pipeline is run using the
 recipe; this uses \file{dimmconfig\_blank\_field.lis} as the
 configuration file. If you wish to provide an alternative file you
 will need to put the name of the new configuration file in a recipe
-parameter file.  See \cref{Section}{sec:pipe}{The SCUBA-2 Pipeline}
+parameter file.  See \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline}
 for details.
 \begin{terminalv}
 % oracdr_scuba2_850 -cwd YYYYMMDD
@@ -199,8 +208,9 @@ filter output map.
 
 The recipe processes each observation twice, a standard reduction
 first, then a re-run with a fake point source added to the time
-series. This produces a co-added signal map (\file{\_wmos}) and a
-coadded PSF map (\file{\_mappsf}).
+series (see parameter ``\xparam{FAKEMAP}{fakemap}''). This produces
+a co-added signal map (\file{\_wmos}) and a
+co-added PSF map (\file{\_mappsf}).
 
 \begin{tip}
 The recipe name \drrecipe{FAINT\_POINT\_SOURCES\_JACKKNIFE} can be used
@@ -235,7 +245,7 @@ is determined automatically, but the method may fail if the box is too
 small.
 
 If you decide to re-run this step you first co-add all the
-\file{\_mappsf} files to create a coadded PSF using the \picard\ recipe
+\file{\_mappsf} files to create a co-added PSF using the \picard\ recipe
 \xref{\drrecipe{MOSAIC\_JCMT\_IMAGES}}{sun265}{MOSAIC_JCMT_IMAGES}.
 \begin{terminalv}
 % picard MOSAIC_JCMT_IMAGES *_mappsf
@@ -244,7 +254,7 @@ Next create a parameter file (\file{recpars.lis}) for the jack-knife
 recipe (\drrecipe{SCUBA2\_JACKKNIFE}) containing the following lines.
 \begin{terminalv}
 [SCUBA2_JACKKNIFE]
-PSF_MATCHFILTER = <name_of_above_coadded_PSF>.sdf
+PSF_MATCHFILTER = <name_of_above_co-added_PSF>.sdf
 \end{terminalv}
 Another option for this parameter file is \param{WHITEN\_BOX} to set the
 size of the region used to calculate the angular power spectrum.
@@ -266,7 +276,8 @@ The signal from extended emission varies slowly as seen by the array
 passing over it. It thus appears at lower frequencies in the power
 spectrum and complicates the high-pass filter selection. Too harsh a
 filter will make flat maps but any extended emission will have been
-removed in doing so.
+removed in doing so (see \cref{Section}{sec:filt}{Large-scale filtering} and
+Mairs et al. 2015~\cite{extendedrecovery}).
 \\ \\
 \textbf{Step 1: Running the map-maker}
 \vspace{0.2cm}\\
@@ -274,7 +285,8 @@ We run the map-maker using \file{dimmconfig\_bright\_extended.lis};
 we have also specified a couple of overrides on the command
 line---\xparam{MAPTOL}{maptol}~=~0.04 is slightly more stringent than default and
 \xparam{AST.ZERO_SNR}{ast.zero\_snr}~=~3.5 constrains everything below
-3.5\,$\sigma$ to zero.
+3.5\,$\sigma$ to zero (see also the \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo})
+parameter.
 
 In this example we give the map-maker a file containing a list of the
 input files (\file{filelist.txt}) and
@@ -310,7 +322,8 @@ everything above to 1.
 The thresholded map is shown in the left-hand panel of
 \cref{Figure}{fig:mask}{this figure}. The next step is to smooth this map
 by convolving it with a Gaussian of 16\,arcsec. For this we use a factor
-of 4 (pixels) for the FWHM parameter (since the default pixel size at 850 microns is 4 arcseconds).
+of 4 (pixels) for the FWHM parameter (since the default pixel size at
+850\,$\mu$m is 4 arcseconds).
 
 \begin{terminalv}
 % gausmooth 850map_mask 850map_mask_sm fwhm=4
@@ -366,7 +379,7 @@ ast.zero_snr = 0
 \textbf{Step 4: Cropping the map}
 \vspace{0.2cm}\\
 We now crop the map to remove the noisy edges using the \picard\ recipe
-\drrecipe{CROP\_JCMT\_IMAGES}. To determine what to trim we can look
+\drrecipe{CROP\_SCUBA2\_IMAGES}. To determine what to trim we can look
 at the exposure-time image with \gaia.  See
 \cref{Figure}{fig:exptime}{the exposure time image}.
 
@@ -380,15 +393,17 @@ at the exposure-time image with \gaia.  See
 }
 
 The exposure-time map shows a sharp drop off at a radius of 30\,arcmin.
-We can thus specify a parameter file like below.
+We can thus specify a parameter file called \file{crop1800.ini} like below:
 
 \begin{terminalv}
-[CROP_JCMT_IMAGES]
+[CROP_SCUBA2_IMAGES]
 MAP_RADIUS = 1800
 \end{terminalv}
 
+and then run:
+
 \begin{terminalv}
-% picard CROP_JCMT_IMAGES 850galactic.sdf
+% picard -recpars crop1800.ini CROP_SCUBA2_IMAGES 850galactic.sdf
 \end{terminalv}
 The final cropped map is shown in \cref{Figure}{fig:crop_map}{this plot}.
 Compared with the first map out of the map-maker
@@ -407,7 +422,7 @@ a different dataset, e.g. a
 See \cref{Chapter}{sec:tweak}{Tailoring Your Reduction} for further
 discussion.
 
-\starfig{sc21_gal12_crop}{[b!]}{width=0.65\hsize}{fig:crop_map}{
+\starfig{sc21_gal12_crop}{[h!]}{width=0.85\hsize}{fig:crop_map}{
   Galactic example: cropped final map}{
   The final cropped, reduced map from the map-maker run with
   an external mask supplied.

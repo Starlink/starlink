@@ -50,6 +50,7 @@
  *       SMF__NOCREATE_DATA: Do not map DATA/VARIANCE/QUALITY
  *       SMF__NOCREATE_FTS: Do not allocate smfFts
  *       SMF__NOFIX_METADATA: Do not fix metadata using smf_fix_metadata
+ *       SMF__NOFIX_DATA: Do not fix data arrays using smf_fix_data
  *       SMF__NOTTSERIES: File is not a time series file even if 3d
  *       SMF__ISFLAT: File should not be flat-fielded, even if it is _INTEGER.
 

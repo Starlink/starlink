@@ -57,6 +57,9 @@
 *  History:
 *     11-MAR-2014 (DSB):
 *        Original version.
+*     6-MAY-2022 (DSB):
+*        Modified to handle cases where there is a very large number of
+*        threads in the workforce.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,15 +146,18 @@ double *smf_tophat2( ThrWorkForce *wf, const double *map, const dim_t dims[2],
 /* How many threads do we get to play with */
    nw = wf ? wf->nworker : 1;
 
+/* If there are more threads than rows or columns, reduce the number of
+   threads in use so that each thread has at least one row and column to
+   process. */
+   if( (dim_t) nw > NDF_MIN( dims[0], dims[1] ) ) nw = NDF_MIN( dims[0], dims[1] );
+
 /* Allocate job data for threads. */
    job_data = astCalloc( nw, sizeof(*job_data) );
    if( *status == SAI__OK ) {
 
 /* Decide how many rows and columns to process in each thread. */
       colstep = dims[ 0 ]/nw;
-      if( colstep == 0 ) colstep = 1;
       rowstep = dims[ 1 ]/nw;
-      if( rowstep == 0 ) rowstep = 1;
 
 /* Do the required number of smoothings. */
       for( iter = 0; iter < niter; iter++ ) {

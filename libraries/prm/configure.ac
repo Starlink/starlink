@@ -39,9 +39,6 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
 AC_CHECK_SIZEOF(long long int)
 
-STAR_PLATFORM_SOURCES([num_han.c],
-                      [mips _dec_osf _sun_solaris _sun default])
-
 AC_C_BIGENDIAN
 
 

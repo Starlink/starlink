@@ -1,10 +1,9 @@
 Perl/bin/autoastrom
 Perl/bin/convert_dr_files
-Perl/bin/dpCapture
-Perl/bin/dpRetrieve
 Perl/bin/gsdprint
 Perl/bin/maparea2region
 Perl/bin/sourceplot
 Perl/bin/stime
 Perl/bin/translatehdr
 Perl/bin/pod2sst
+Perl/bin/catalog_convert

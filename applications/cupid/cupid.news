@@ -6,6 +6,24 @@
  and  analyse clumps of emission within 2- or 3- dimensional
  data arrays.
 
+Changes introduced at V2.8
+   - The GaussClumps algorithm within the findclumps command has been
+   multi-threaded and so runs roughly twice as fast.
+   - The scheme used by the GaussClumps algorithm to down-weight pixel
+   that have large contribution from neighbouring clumps has been
+   changed. Previously, the weights were modified after each iteration of
+   the least-squares fitting process. Now, the weights are modified once
+   before the first iteration and then left unchanged during further
+   iterations. The continuous changing of the weights used previously
+   tended to confused the least-squares fitter, causing it to produce
+   poor fits. The associated undocumented gaussclumps configuration
+   parameters MINWF, MAXWF and NWF have been removed.
+
+Changes introduced at V2.7
+
+   - A bug has been fixed in the FINDCLUMPS GaussClumps algorithm that
+   could in some cases cause very poor fitting of clumps within 3D arrays.
+
 Changes introduced at V2.6
 
    - The FINDCLUMPS GaussClumps algorithm has a new configuration

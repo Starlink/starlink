@@ -422,6 +422,8 @@
  *       Added new smfFts fields for quality statistics
  *     2017-01-10 (GSB)
  *       Add "dtai" argument to some functions.
+ *     2022-10-08 (GSB)
+ *       Converted smf_get_global0I and smf_put_global0I to generic functions.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -1101,9 +1103,16 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode,
 void smf_extracols( smfHead *hdr, Grp *colgrp, void **cols_info,
                     AstKeyMap **km, int *status );
 
+double smf_fcf( const smfHead * hdr, int *status );
+
 double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
                      const dim_t dims[2], dim_t box, dim_t box0, double thresh,
                      int resids, int neg, double *sigma, int *status );
+
+size_t smf_ffmask( ThrWorkForce *wf, double *data, smf_qual_t *qua,
+                   dim_t nbolo, dim_t ntime, size_t tstride,
+                   size_t bstride, size_t t_first, size_t t_last,
+                   size_t box, double cliphi, double cliplo, int *status );
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status );
 
@@ -1134,7 +1143,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
 
 void smf_filter_fromkeymap( smfFilter *filt, AstKeyMap *keymap,
                             const char *qualifier, const smfHead *hdr,
-                            int *dofft, int *whiten, int *status );
+                            int *dofft, int *whiten, int *box, int *status );
 
 void smf_filter_getlowf( smfFilter *filt, smfHead *hdr, double *period,
                          int *status );
@@ -1425,8 +1434,6 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status );
 size_t smf_get_freemem ( double * mbytes, size_t *pagesize,
                          int64_t *physsize, int * status );
 
-int smf_get_global0I( const char *name, int def, int *status );
-
 void smf_get_goodrange( const smf_qual_t *quality, dim_t ntslice,
                         size_t tstride, smf_qual_t mask,
                         size_t *istart, size_t *iend, int *status );
@@ -1439,7 +1446,7 @@ void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
 
 unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
                              AstKeyMap *config, smfDIMMData *dat, int flags,
-                             int *status );
+                             int *domask, int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule,
                         const char **transition, int *status );
@@ -1550,7 +1557,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      char data_units[], char data_label[], double * nboloeff,
                      size_t *numcontchunks,  size_t *ncontig, int *memlow,
                      size_t *numinsmp, size_t *numcnvg, int *iters,
-                     double *totexp, int *status );
+                     double *totexp, double *nomfcf, int *status );
 
 const char *smf_keyname( AstKeyMap *keymap, const char *basename,
                          const char *qualifier, char *buf, size_t lbuf,
@@ -1756,8 +1763,6 @@ void smf_projbox( Grp *igrp, AstFrameSet *refwcs,
                   int dims[ NDF__MXDIM ], int *status );
 
 void smf_puthistory( smfData *data, const char *appn, int *status );
-
-void smf_put_global0I( const char *name, int value, int *status );
 
 size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
 
@@ -2103,6 +2108,8 @@ int smf_validate_smfData( const smfData * data, int hashdr, int hasfile,
 
 int smf_validate_smfHead( const smfHead * hdr, int hasfits, int hasstate,
                           int *status );
+
+int smf_validate_tcs_position( smfHead* hdr, double tolerance, int setbad, int* status );
 
 void smf_whiten( double *re, double *im, double df, dim_t nf, size_t box,
                  int complement, int *status );

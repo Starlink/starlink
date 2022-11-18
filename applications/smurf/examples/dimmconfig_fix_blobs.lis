@@ -15,7 +15,7 @@
 #     this by 1) identifying and flagging samples that appear to suffer
 #     from ringing following the subtraction of the FLT model, 2) using
 #     a soft-edged Butterworth filter in place of the normal hard-edged
-#     filter, and 3) rejecting samples foir which the separate sub-arrays
+#     filter, and 3) rejecting samples for which the separate sub-arrays
 #     see a markedly different common-mode signal (this last parameter
 #     can be lowered if the value of 5 supplied by this file does not
 #     remove all the blobs).
@@ -55,10 +55,10 @@
 #  Ringing filter.
 flt.ring_box1=0.5
 
-#  Soft-edgeds filter.
+#  Soft-edged filter.
 flt.filt_order=4
 
-#  Reject samples for which the differetn sub-arrays see different
+#  Reject samples for which the different sub-arrays see different
 #  common-modes. This can be lowered to (say) 2 if the blobs are not
 #  removed by using a value of 5, but lower values cause more data to be
 #  rejected, potentially resulting in higher over-all noise in the map.

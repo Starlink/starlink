@@ -1,7 +1,5 @@
 \documentclass[11pt,oneside,chapters]{starlink}
 
-%\newcommand{\polpack}{\xref{\textsc{POLPACK}}{sun223}{}}
-
 \usepackage{amsfonts}
 \usepackage{longtable}
 \usepackage{amsmath}
@@ -9,16 +7,15 @@
 
 \stardoccategory {Starlink Cookbook}
 \stardocinitials {SC}
-\stardoccopyright{Copyright \copyright\ 2017 East Asian Observatory}
+\stardoccopyright{Copyright \copyright\ 2021 East Asian Observatory}
 \stardocnumber   {22}
 \stardoctitle    {The POL-2 Data Reduction Cookbook}
-\stardocversion  {1.0}
+\stardocversion  {1.1}
 \stardocabstract {
   This cookbook provides an introduction to POL-2 data reduction,
   using the Starlink facilities \smurf (the Sub-Millimetre
   User Reduction Facility) and in particular its command
-  \xref{\task{pol2map}}{{sun258}{POL2MAP}}. This cookbook illustrates
-  the various steps
+  \poltwomap. This cookbook illustrates the various steps
   required to reduce the data, including an overview of the method. It
   also describes how to calibrate and display the data as images or
   vector maps.}
@@ -26,12 +23,13 @@
 \stardocauthors{H.\ A.\ L.\ Parsons, D.\ S.\ Berry,
   M.\ G.\ Rawlings, and S.\ F.\ Graves}
 
-\stardocdate{2018 February 21}
+\stardocdate{2021 July 15}
 
 %-------------------------------------------------------------------
 
 % Local Definitions
 \newcommand{\xparam}[2]{\xref{#2}{sun258}{#1}}
+\providecommand{\PGPLOTref}{\htmladdnormallink{PGPLOT}{http://www.astro.caltech.edu/~tjp/pgplot/}}
 
 %-------------------------------------------------------------------
 
@@ -64,6 +62,7 @@
 \textbf{I$_{p}$}     & Polarised intensity \\
 \textbf{SCUBA-2}& Submillimetre Common User Bolometer Array-2\\
 \textbf{SMURF}  & Sub-Millimetre User Reduction Facility\\
+\textbf{SNR}    & Signal-to-noise ratio\\
 \textbf{SUN}    & Starlink User Note\\
 \textbf{WCS}    & World Coordinate System\\
 \end{tabular}
@@ -94,13 +93,17 @@ of ground-based submillimetre astronomy using array receivers}}{http://dx.doi.or
 (DOI:10.1046/j.1365-8711.2002.05582.x)
 
 \bibitem{Bastien2011}
-Bastien,~P.,et~al., 2011  \htmladdnormallink{\textit{POL-2: The SCUBA-2 Polarimeter}}{http://aspbooks.org/custom/publications/paper/449-0068.html} ASP, 449, 68B
+Bastien,~P.,et~al., 2011, \htmladdnormallink{\textit{POL-2: The SCUBA-2 Polarimeter}}{http://aspbooks.org/custom/publications/paper/449-0068.html} ASP, 449, 68B
 
 \bibitem{fellwalker}
 Berry~D.~S.,  2015,
 \htmladdnormallink{\textit{FellWalker - a Clump Identification Algorithm}}
 {http://dx.doi.org/10.1016/j.ascom.2014.11.004},
 Ast. \& Comp., 10, 22-31 (DOI:10.1016/j.ascom.2014.11.004)
+
+\bibitem{polpack}
+Berry~D.~S, Gledhill~T.~M, 2015, \textit{POLPACK -- An Imaging Polarimetry Reduction Package},
+\xref{Starlink User Note 223}{sun223}{}
 
 \bibitem{oracdr}
 Cavanagh~B., Jenness~T., Economou~F., Currie~M.~J., 2008,
@@ -127,10 +130,6 @@ Paper 38.2}{sgp38}{}
 Currie~M.~J., Berry~D.~S, 2013, \textit{KAPPA -- Kernel Application Package},
 \xref{Starlink User Note 95}{sun95}{}
 
-\bibitem{polpack}
-Berry~D.~S, Gledhill~T.~M, 2015, \textit{POLPACK -- An Imaging Polarimetry Reduction Package},
-\xref{Starlink User Note 223}{sun223}{}
-
 \bibitem{dempsey12}
 Dempsey~J.~T. et al., 2013, \htmladdnormallink{\textit{SCUBA-2: on-sky calibration using
 submillimetre standard sources}}{http://dx.doi.org/10.1093/mnras/stt090},
@@ -146,6 +145,12 @@ Proc.\ SPIE, 7741 (DOI:10.1117/12.856476)
 Draper~P.~W., Gray~N., Berry~D.~S., Taylor~M., 2012,
 \textit{GAIA -- Graphical Astronomy and Image Analysis Tool},
 \xref{Starlink User Note 214}{sun214}{}
+
+\bibitem{Friberg}
+Friberg,~P., et~al, 2016, \htmladdnormallink{\textit{POL-2: a polarimeter
+for the James-Clerk-Maxwell telescope}}{http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=2536885},
+SPIE, Volume 9914, id. 991403
+(DOI: 10.1117/12.2231943)
 
 \bibitem{picard}
 Gibb~A.~G., Jenness~T., Economou~F., 2012, \textit{PICARD --- a
@@ -168,13 +173,14 @@ MNRAS, 336, 14-21 (DOI:10.1046/j.1365-8711.2002.05604.x)
 Jenness~T., et~al, 2014,
 \htmladdnormallink{\textit{Learning from 25 years of the extensible
 N-Dimensional Data Format}} {http://dx.doi.org/10.1016/j.ascom.2014.11.001},
-Ast. \& Comp., in press, (DOI:10.1016/j.ascom.2014.11.001)
+Ast. \& Comp., 12, 146, (DOI:10.1016/j.ascom.2014.11.001)
 
-\bibitem{Friberg}
-Friberg,~P., et~al, 2016 \htmladdnormallink{\textit{POL-2: a polarimeter
-for the James-Clerk-Maxwell telescope}}{http://proceedings.spiedigitallibrary.org/proceeding.aspx?articleid=2536885},
-SPIE, Volume 9914, id. 991403
-(DOI: 10.1117/12.2231943)
+\bibitem{Savini}
+Savini, G., et~al. 2009, \htmladdnormallink{\textit{Recovering the frequency
+dependent modulation function of the achromatic half-wave plate for POL-2:
+the SCUBA-2 polarimeter}} {https://doi.org/10.1364/AO.48.002006},
+Applied Optics, 48, 2006
+(DOI: 10.1364/AO.48.002006)
 
 \bibitem{sc2ana005}
 Scott~D., Van Engelen~A., 2005, \htmladdnormallink{\textit{Scan Mode Strategies for

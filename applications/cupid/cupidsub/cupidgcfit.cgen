@@ -121,6 +121,11 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
 *        Ensure returned spatial position angle is in the range +/- PI.
 *     8-APR-2020 (DSB):
 *        Set the relative function change convergence criterion.
+*     13-JUL-2021 (DSB):
+*        If the background level is fixed, re-order the parameters
+*        before making any use of the parameters. Previously, the
+*        spatial position angle was being misused as the velocity
+*        axis position if the backround was fixed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -159,6 +164,17 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
       n = CUPID__GCNP3;
    }
 
+/* The minimiser uses the offsets from the peak position as the
+   parameters to be minimised, rather than the absolute coordinate
+   value. The offsets are initially zero. */
+   x[ 2 ] = 0.0;
+   if( cupidGC.ndim > 1 ) {
+      x[ 4 ] = 0.0;
+      if( cupidGC.ndim > 2 ) {
+         x[ 7 ] = 0.0;
+      }
+   }
+
 /* If the background level is to remain fixed at its initial value (i.e. be
    excluded from the fitting process) move the background level to the end
    of the array of parameter values and reduce the number of free parameters
@@ -175,11 +191,8 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
    {  double f;
       double f0;
       double g[ CUPID__GCNP3 ];
-      int nf, nwf;
+      int nf;
       double dx;
-
-      nwf = cupidGC.nwf;
-      cupidGC.nwf = 0;
 
       nf = 1;
       cupidGCcalcf( n, x, &nf, &f0, status );
@@ -198,9 +211,6 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
 
       }
       getchar();
-
-      cupidGC.nwf = nwf;
-
    }
 */
 
@@ -225,15 +235,12 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
    that the original background value is re-instated), but preventing any
    changes to the weights this time. */
    if( iv[ 0 ] == 8 ) {
-      int nwf;
 
       msgBlankif( MSG__DEBUG2, status );
       msgOutif( MSG__DEBUG2, "",
                 "   pdaSumsl reports false convergence. Trying again...", status );
       msgBlankif( MSG__DEBUG2, status );
 
-      nwf = cupidGC.nwf;
-      cupidGC.nwf = 0;
       if( !cupidGC.fixback ) x[ 1 ] = bg;
 
       for( i = 0; i < n; i++ ) d[ i ] = 1.0;
@@ -241,8 +248,6 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
       pdaDeflt( 2, iv, LIV, LV, v);
       iv[ 16 ] = cupidGC.maxnf;
       pdaSumsl( n, d, x, cupidGCcalcf, cupidGCcalcg, iv, LIV, LV, v );
-
-      cupidGC.nwf = nwf;
 
       msgBlankif( MSG__DEBUG2, status );
       msgOutif( MSG__DEBUG2, "",
@@ -268,6 +273,13 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
       }
    }
 
+/* If the background level was kept fixed at its initial value move the
+   background level back to its original position in "x". */
+   if( cupidGC.fixback ) {
+      for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
+      x[ 1 ] = bg;
+   }
+
 /* Ensure the spatial position angle is in the range +/- PI */
    x[ 6 ] = fmod( x[ 6 ], 2*AST__DPI );
    if( x[ 6 ] > 0.0 ) {
@@ -277,25 +289,19 @@ int CGEN_FUNCTION(cupidGCFit)( CGEN_TYPE *res, double *x,
    }
 
 /* Check the size of the fitted model is significant. */
-   if( cupidGC.fixback ) {
-      if( x[ 2 ] < 0.5 ) ret = 0;
-      if( cupidGC.ndim > 1 ) {
-         if( x[ 4 ] < 0.5 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 7 ] < 0.5 ) ret = 0;
-      }
-   } else {
-      if( x[ 3 ] < 0.5 ) ret = 0;
-      if( cupidGC.ndim > 1 ) {
-         if( x[ 5 ] < 0.5 ) ret = 0;
-         if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
-      }
+   if( x[ 3 ] < 0.5 ) ret = 0;
+   if( cupidGC.ndim > 1 ) {
+      if( x[ 5 ] < 0.5 ) ret = 0;
+      if( cupidGC.ndim > 2 ) if( x[ 8 ] < 0.5 ) ret = 0;
    }
 
-/* If the background level was kept fixed at its initial value move the
-   background level back to its original position in "x". */
-   if( cupidGC.fixback ) {
-      for( ip = n; ip > 1; ip-- ) x[ ip ] = x[ ip - 1 ];
-      x[ 1 ] = bg;
+/* Convert peak offsets to peak positions. */
+   x[ 2 ] += cupidGC.x_max[ 0 ];
+   if( cupidGC.ndim > 1 ) {
+      x[ 4 ] += cupidGC.x_max[ 1 ];
+      if( cupidGC.ndim > 2 ) {
+         x[ 7 ] += cupidGC.x_max[ 2 ];
+      }
    }
 
 /* Return the final chi-squared value */

@@ -3077,7 +3077,8 @@ class Equals(Item):
                self.cast = cast
 
                if isinstance( ival, str ):
-                  Leave("Expression returns type '{0}' but is assigned to type '{1}'.\n   '{2} = {3}'".format(dtype[0],lhsvar.ctype,self.lhs,self.rhs))
+                  if dtype[0] != "generic" and "CGEN" not in lhsvar.ctype:
+                     Leave("Expression returns type '{0}' but is assigned to type '{1}'.\n   '{2} = {3}'".format(dtype[0],lhsvar.ctype,self.lhs,self.rhs))
                elif ival == 2:
                   if lhsvar.ctype[-1] == "*":
                      self.lhstar = True
@@ -5282,11 +5283,11 @@ class Subroutine(Unit):
                argdec = argDecs[arg]
                argdesc = argDescs[arg].arg
                if argdec.ctype != argdesc.ctype and argdec.ctype_orig != argdesc.ctype:
-                  Leave("Subroutine: Type for argument '{0}' wrong in prologue".format(arg))
+                  Leave("Subroutine: Type for argument '{0}' wrong in prologue (disagrees with declaration)".format(arg))
                if argdec.access != argdesc.access:
-                  Leave("Subroutine: Access for argument '{0}' wrong in prologue".format(arg))
+                  Leave("Subroutine: Access for argument '{0}' wrong in prologue (disagrees with declaration)".format(arg))
                if argdec.fsize != argdesc.fsize:
-                  Leave("Subroutine: Size for argument '{0}' wrong in prologue".format(arg))
+                  Leave("Subroutine: Size for argument '{0}' wrong in prologue (disagrees with declaration)".format(arg))
 
 #  Ensure the prologue includes extra arguments that give the max length of
 #  returned character strings.

@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([cupid],[2.6],[starlink@jiscmail.ac.uk])
+AC_INIT([cupid],[2.8],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([build-aux])
 PACKAGE_UPCASE='CUPID'
 AC_DEFINE( [PACKAGE_UPCASE], "CUPID", [Upper cased package name] )

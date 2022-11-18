@@ -111,6 +111,11 @@
 *        Provide an option to disable the addition of noise to the gaps
 *        (see config param FILLGAPS_NOISE). This can help makemap
 *        convergence.
+*     2021-09-98 (DSB):
+*        Ensure a fit is done to the data in the box before or after the
+*        gap only if the box ocntains at least minbox good values (otherwise
+*        the mean of the values in the box is used directly instead of doing 
+*        a fit and using the end value of the fitted line).
 
 *  Copyright:
 *     Copyright (C) 2010 Univeristy of British Columbia.
@@ -618,6 +623,7 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
    int k;
    int s2;
    int jj;
+   int ngood;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -666,25 +672,27 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
 /* Copy the box data values into two arrays suitable for kpg1Fit1d. */
          k = 0;
          pd = data + jlo*tstride;
+         ngood = 0;
          for( jj = jlo; jj <= jhi; jj++,k++ ) {
             x[ k ] = jj;
             y[ k ] = *pd;
+            if( *pd != VAL__BADD ) ngood++;
             pd += tstride;
          }
 
 /* Attempt to do the fit, annulling any error (e.g. caused by too few
    good values in the box - i.e. if there are other gaps very close to
    the one we are filling). */
-         if( *status == SAI__OK ) {
+         if( *status == SAI__OK && ngood >= minbox ) {
             kpg1Fit1d( 1, k, y, x, &grad, &offset, &sigmal, status );
             if( *status != SAI__OK ) {
                errAnnul( status );
                sigmal = VAL__BADD;
 
 /* If the fit succeeded, find the data value which the line has at the
-   start of the gap. */
+   end of the box. */
             } else {
-               vl = grad*jstart + offset;
+               vl = grad*jhi + offset;
             }
          }
       }
@@ -727,27 +735,29 @@ static void smf1_fillgap( double *data, int pstart, int pend, size_t tstride,
       if( jhi - jlo + 1 >= minbox ) {
 
 /* Copy the box data values into two arrays suitable for kpg1Fit1d. */
+         ngood = 0;
          k = 0;
          pd = data + jlo*tstride;
          for( jj = jlo; jj <= jhi; jj++,k++ ) {
             x[ k ] = jj;
             y[ k ] = *pd;
+            if( *pd != VAL__BADD ) ngood++;
             pd += tstride;
          }
 
 /* Attempt to do the fit, annulling any error (e.g. caused by too few
    good values in the box - i.e. if there are other gaps very close to
    the one we are filling). */
-         if( *status == SAI__OK ) {
+         if( *status == SAI__OK && ngood >= minbox ) {
             kpg1Fit1d( 1, k, y, x, &grad, &offset, &sigmar, status );
             if( *status != SAI__OK ) {
                errAnnul( status );
                sigmar = VAL__BADD;
 
 /* If the fit succeeded, find the data value which the line has at the
-   end of the gap. */
+   start of the box. */
             } else {
-               vr = grad*jend + offset;
+               vr = grad*jlo + offset;
             }
          }
       }

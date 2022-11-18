@@ -3,8 +3,8 @@
 % -----------------------------------------------------------------------------
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
-\stardocsource    {sun95.44}
-\stardocnumber    {95.44}
+\stardocsource    {sun95.45}
+\stardocnumber    {95.45}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
 \stardocdate      {2021 May 21}
 \stardoctitle     {KAPPA --- Kernel Application Package}
@@ -89,7 +89,7 @@ and alphabetical summaries.}
 \providecommand{\OKULARref}{\htmladdnormallink{\OKULAR}{http://okular.kde.org/}}
 \providecommand{\PDAref}{\xref{PDA}{sun194}{}}
 \providecommand{\PGPLOT}{{\footnotesize PGPLOT}\normalsize}
-\providecommand{\PGPLOTref}{\htmladdnormallink{\PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
+\providecommand{\PGPLOTref}{\htmladdnormallink{\PGPLOT}{http://www.astro.caltech.edu/~tjp/pgplot/}}
 \providecommand{\PHOTOMref}{\xref{{\footnotesize PHOTOM}}{sun45}{}}
 \providecommand{\PISAref}{\xref{{\footnotesize PISA}}{sun109}{}}
 \providecommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
@@ -2279,7 +2279,7 @@ library (see \xref{SUN/57}{sun57}{GKSWorkstationNames}).  In this scheme a compl
 workstation specification is of the form \verb+<type>;<file>+.  This is
 very similar to the \PGPLOT\  scheme described above, but the device type
 and file are swapped round, and the separator is a semicolon instead of
-a solidus.  As for \PGPLOT\ , the device file can be omitted, in which case a
+a solidus.  As for \PGPLOT, the device file can be omitted, in which case a
 default is used, but note that \emph{in this case the semicolon should
 also be omitted}.  The only supported devices are those for which \PGPLOT\
 drivers are available.  If a device was also available in the GKS-based
@@ -2835,7 +2835,7 @@ persistent attributes in a group expression.
 
 The available plotting attributes and their names are defined by the
 AST subroutine library (see \xref{SUN/210}{}{sun210}) upon which
-\KAPPA\ graphics are based (together with \PGPLOT\ ).
+\KAPPA\ graphics are based (together with \PGPLOT).
 However, \KAPPA\ provides synonyms for certain
 plotting attributes where this would provide a clearer indication of the
 purpose of the attribute within the context of a particular application.
@@ -4805,7 +4805,7 @@ portrait, encapsulated PostScript device:
 Since we are using an accumulating PostScript device, we have chosen to use
 \OKULARref\ above to display the contents of \file{pgplot.ps}.  We have
 just run \htmlref{GDCLEAR}{GDCLEAR}, and so this will produce a blank display.
-Note that we have put \OKULAR\ into the background by appending texttt{\&} to
+Note that we have put \OKULAR\ into the background by appending \texttt{\&} to
 the end of the command line.  This means that \OKULAR\ will continue to run
 throughtout the following example.  As each subsequent graphics application
 modifies the contents of \file{pgplot.ps}, the resulting composite plot will
@@ -5998,7 +5998,7 @@ Such co-ordinate files can also be created interactively with images by
 \section{\xlabel{se_coltab}Graphics Device Colour Table and Palette
 \label{se:coltab}}
 
-The \PGPLOT\ ref\ graphics package, which is used by \KAPPA\ ,
+The \PGPLOTref\ graphics package, which is used by \KAPPA,
 draws images and line graphics using a set of `pens'.  The number of pens
 available is limited to 256, even on modern 16- or 24-bit graphics devices which
 nominally have `millions' of colours.  On older 8-bit graphics devices, the
@@ -6053,6 +6053,11 @@ part of the \PGPLOT\  colour table that has not been reserved for annotation
 annotation \emph{palette}).  The context should usually make it obvious
 which understanding of the phrase `colour table' is being used.
 
+% Save current unit length for pictures.
+\newlength{\oldunit}
+\setlength{\oldunit}{\unitlength}
+\setlength{\unitlength}{3pt}
+
 \begin{center}
 \begin{picture}(136,28)
 % Thick outline.
@@ -6094,6 +6099,9 @@ which understanding of the phrase `colour table' is being used.
 \put(34,4){\makebox[100mm][c]{{\large Colour Table}}}
 \end{picture}
 \end{center}
+
+% Restore default unit length.
+\setlength{\unitlength}{\oldunit}
 
 \subsection{\xlabel{se_lookuptables}Lookup Tables\label{se:lookuptables}}
 
@@ -12152,6 +12160,9 @@ KAPPA: \htmlref{CONVOLVE}{CONVOLVE},
          All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.  Arithmetic
          is performed using single-precision floating point, or double
          precision if appropriate.
+
+         \sstitem
+         Huge NDFs are supported.
       }
    }
 }

@@ -7,7 +7,7 @@ noinst_DATA = kapmon.hlp
 
 libkappa_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
-F1_ROUTINES = aperadd.f ardgen.f ardmask.f beamfit.f block.f \
+F1_ROUTINES = aperadd.f ardgen.f ardmask.f beamfit.f \
 calc.f calpol.f centroid.f chanmap.f chpix.f \
 collapse.f compadd.f compave.f compick.f convolve.f copybad.f      \
 creframe.f cumulvec.f errclip.f expon.f ffclean.f fillbad.f \
@@ -29,7 +29,7 @@ F3_ROUTINES = kaphelp.f
 F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 
 C_ROUTINES = carpet.c makesnr.c configecho.c complex.c pixbin.c \
-add.c sub.c mult.c kap_div.c cadd.c csub.c cmult.c cdiv.c
+add.c sub.c mult.c kap_div.c cadd.c csub.c cmult.c cdiv.c block.c
 
 # Create help for this library
 kapmon.hlp: $(F_ROUTINES) $(C_ROUTINES)

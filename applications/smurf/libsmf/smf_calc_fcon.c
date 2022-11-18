@@ -191,7 +191,7 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
       gin[ 1 ] = at + 0.5;
       astTran1( fmap, 2, gin, 1, gout );
       if( gout[ 0 ] != AST__BAD && gout[ 1 ] != AST__BAD ) {
-         dnu = abs( gout[ 0 ] - gout[ 1 ] );
+         dnu = fabs( gout[ 0 ] - gout[ 1 ] );
          gotdnu = 1;
 
 /* Modify the channel width to take account of the effect of the FFT windowing

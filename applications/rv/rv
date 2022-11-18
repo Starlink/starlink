@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/sh
 #
 #  To invoke the rv utility, type:
 #
@@ -18,44 +18,38 @@
 #  P.T.Wallace   Starlink   8 December 1993
 #
 
-#  Declare interrupt handler
-      onintr end
-
 #  String to indicate defaulted terminal I/O arguments
-      set _tty = .
+      _tty=.
 
 #  Name of null device
-      set _null = /dev/null
+      _null=/dev/null
 
 #  Copy arguments
-      set _input = $1
-      set _report = $2
+      _input="$1"
+      _report="$2"
 
 #  Prompts/help/errors to terminal
-      set _prompts = $_tty
+      _prompts="$_tty"
 
 #  Echo to terminal if input file specified
-      if ($_input != "") then
-         set _echo = $_tty
+      if [ -n "$_input" ]; then
+         _echo="$_tty"
       else
-         set _echo = $_null
-      endif
+         _echo="$_null"
+      fi
 
 #  Resolve defaults
-      if ($_input == "") then
-         set _input = $_tty
-      endif
-      if ($_report == "") then
-         set _report = rv.lis
-      endif
+      if [ -z "$_input" ]; then
+         _input="$_tty"
+      fi
+      if [ -z "$_report" ]; then
+         _report=rv.lis
+      fi
 
 #  Run the job
-      rv.x $_tty $_report $_input $_prompts $_echo
+      rv.x "$_tty" "$_report" "$_input" "$_prompts" "$_echo"
 
 #  Report the output filename if appropriate
-      if ($_report != $_tty) then
+      if [ "$_report" != "$_tty" ]; then
          echo "Report is in $_report"
-      endif
-
-end:
-      exit
+      fi

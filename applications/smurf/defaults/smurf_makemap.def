@@ -1422,6 +1422,56 @@ flagmap = <undef>
 flt.apod = <undef>
 
 #-----------------------------------------------------------------
+#  Name: 	flt.clip
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Speeds up convergences and reduces ringing by excluding
+#		sharp features in the bolometer time streams from the
+#               filtering performed by the FLT model.
+#  Description: If this parameter is non-zero, each bolometer time stream
+#               is examined for sharp features prior to applying the hi-pass
+#               filter specified by parameter "flt.filt_edge_largescale" etc.
+#               Any such sharp features are replaced by a linear function
+#               joining the data values before and after the sharp feature.
+#               Sharp features are found by first smoothing the time stream
+#               using a simple box kernel with a width corresponding to
+#               the largest features passed by the FLT filter. The RMS of
+#               the residuals between the smoothed and original time stream
+#               is then found. Any samples that have residual greater
+#               than "flt.clip" times the RMS are set bad. Additional
+#               samples equivalent to 0.25 of the filter size are also set
+#               bad on either side of a clipped sample. If any such
+#               samples are found, the process is repeated (i.e. the
+#               remaining data is smoothed, the RMS residual recalculated
+#               and the check for outliers repeated). Once no further
+#               outliers are found, the bad data values are replaced by
+#               values that interpolate the adjoining good values using a
+#               linear function.
+#
+#               The value supplied for this parameter can optionally be a
+#               comma-separated list of two clipping levels enclosed in
+#               parentheses. In this case the first clipping level is
+#               used as described above. The second clipping level should
+#               be smaller than the first. It is used in much the same
+#               way as the first clipping level, except that points that
+#               would be clipped using the second clipping level are only
+#               clipped if at least 3 of the 5 nearest neighbours (including
+#               the point itself) are above the second clipping level.
+#
+#               This parameter is used to prevent the ringing that would
+#               otherwise be caused by the action of the filter on the sharp
+#               features. It should usually be seen as an alternative to the
+#               masking controlled via the "flt.zero_" set of parameters.
+#               Note, in some cases it may slow down convergence due to
+#               the fact that each bolometer is masked independently of the
+#               sky, thus reducing the consistency between each bolometer
+#               and the sky map.
+#
+#               Note, the masking described above can be restricted to selected
+#               iterations by setting a value for the parameter "flt.zero_niter".
+flt.clip = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	flt.filt_edge_largescale
 #  Type: 	real
 #  Default: 	600 (for 450 um), 300 (for 850 um)
@@ -1900,7 +1950,9 @@ flt.zero_mask0 = <undef>
 #		convergence. Also, any initial iterations specified by
 #               parameter "ast.skip" are not included in the count of
 #               iterations. A negative value will disable all masking
-#               of the FLT model.
+#               of the FLT model. This parameter controls the masking
+#               requested via parameter "flt.clip", in addition to the
+#               masking requested via the "flt.zero_xxx" set of parameters.
 flt.zero_niter = 2
 
 #-----------------------------------------------------------------
@@ -3365,3 +3417,4 @@ pca.perarray_last = <undef>
 pca.sig_limit = 0
 pca.sig_wing = 1.0
 pca.weight = 0
+pca.svd_eps=2E-15

@@ -30,7 +30,7 @@
 *     value occurs.  In such cases, it may be useful to regard the
 *     distribution as continuous, and therefore to interpolate linearly
 *     between data values when obtaining the result.
-*     
+*
 *     b) Alternatively, the values may represent residuals from some
 *     fitted function.  In this case, by setting FRACT to 0.5, the
 *     "weighted median residual" may be found.  This has the property
@@ -197,12 +197,12 @@
 *     modify it under the terms of the GNU General Public License as
 *     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
-*     
+*
 *     This program is distributed in the hope that it will be
 *     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
-*     
+*
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
 *     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
@@ -242,10 +242,10 @@
       LOGICAL INTERP
       <TYPE> FRACT
       INTEGER EL
-
-*  Arguments Given and Returned:
       <TYPE> X( * )
       <TYPE> W( * )
+
+*  Arguments Given and Returned:
       INTEGER IP( EL )
 
 *  Arguments Returned:
@@ -570,7 +570,7 @@
          ITMP = IP( L )
          IP( L ) = IP( K )
          IP( K ) = ITMP
-            
+
          IF ( X( IP( R ) ) .GT. T ) THEN
             ITMP = IP( R )
             IP( R ) = IP( L )
@@ -723,7 +723,7 @@
 *  cumulative sum of weights for each element.
          I1 = MAX( 1, L - 1 )
          I2 = MIN( R + 1, EL )
-         ALPHA = ( WTARG - WLEFT + HALF * W( IP( I1 ) ) ) /      
+         ALPHA = ( WTARG - WLEFT + HALF * W( IP( I1 ) ) ) /
      :           ( HALF * ( W( IP( I1 ) ) + W( IP( I2 ) ) ) )
          ALPHA = MIN( MAX( 0<CONST>, ALPHA ), 1<CONST> )
 

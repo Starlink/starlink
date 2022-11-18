@@ -75,6 +75,32 @@
 /* Type Definitions */
 /* ---------------- */
 
+
+/* A structure holding cached information used to speed up cupidGCModel. */
+typedef struct CupidGCModelCache {
+   int newx;        /* Set if cupidGCModel "x" argument has changed since previous invocation */
+   int newp;        /* Set if cupidGCModel "par" argument has changed since previous invocation */
+   double X0;       /* Rotated spatial axis 0 offset */
+   double X1;       /* Rotated spatial axis 1 offset */
+   double cosv;     /* Cos of spatial rotation angle */
+   double dv_sq;    /* Total FWHM in pixels on vel axis, squared */
+   double dx0_sq;   /* Total FWHM in pixels on axis 0, squared */
+   double dx1_sq;   /* Total FWHM in pixels on axis 1, squared */
+   double em;       /* Scalar argument to exp function  */
+   double expv;     /* Value of exp function */
+   double f3;       /* Constant for gradient wrt p[3] */
+   double f5;       /* Constant for gradient wrt p[5] */
+   double f8;       /* Constant for gradient wrt p[8] */
+   double m;        /* Finalmodel value */
+   double peak;     /* Peak value after instrumental smoothing */
+   double peakfactor;  /* Peak value factor */
+   double sinv;     /* Sin of spatial rotation angle */
+   double v_off;    /* Offset on vel axis from "x" to model peak */
+   double vt_off;   /* Total offset on vel axis from "x" to model peak */
+   double x0_off;   /* Offset on axis 0 from "x" to model peak */
+   double x1_off;   /* Offset on axis 1 from "x" to model peak */
+} CupidGCModelCache;
+
 /* A structure used to describe an iterator that iterates round the
    pixels in a rectangular subsection of a 3D array. */
 typedef struct CupidBoxIter {
@@ -100,14 +126,13 @@ typedef struct CupidBoxIter {
 /* A structure holding the global parameters of the GaussClump algorithm
    needed by service functions. */
 typedef struct CupidGC  {
+   ThrWorkForce *wf;       /* Pointer to workforce */
    double *data;           /* Pointer to copy of data section being fitted */
    double *res;            /* Pointer to array to receive scale residuals */
    double *resu;           /* Pointer to array to receive unscale residuals */
    double *weight;         /* Pointer to weights for section being fitted */
    double beam_sq;         /* Square of spatial beam FWHM in pixels */
    double lbnd[ 3 ];       /* Lower grid bounds of section being fitted */
-   double maxwf;           /* Maximum factor for modifying weights */
-   double minwf;           /* Minimum factor for modifying weights */
    double rfctol;          /* Relative function change for convergence */
    double s0p1;            /* Chi-square stiffness parameter s0, minus 1.0 */
    double sa;              /* Chi-square stiffness parameter sa */
@@ -125,8 +150,6 @@ typedef struct CupidGC  {
    int nel;                /* Number of pixels in section being fitted */
    int nf;                 /* The invocation count from calcf */
    int npar;               /* No of free params in fit (inc. background level) */
-   int nwf;                /* Number of times to modifiy the weight array */
-
    double initpars[ CUPID__GCNP3 ];
    double pars[ CUPID__GCNP3 ];
    double *initmodel;
@@ -267,14 +290,14 @@ CupidPixelSet *cupidCFFreePS( CupidPixelSet *, int *, size_t, int * );
 CupidPixelSet *cupidCFMakePS( int, int * );
 HDSLoc *cupidClumpFind( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], int *, size_t *, int * );
 HDSLoc *cupidFellWalker( ThrWorkForce *, int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, int, double[3], size_t *, int * );
-HDSLoc *cupidGaussClumps( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], size_t *, int * );
+HDSLoc *cupidGaussClumps( ThrWorkForce *, int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], size_t *, int * );
 HDSLoc *cupidReinhold( int, int, hdsdim *, hdsdim *, void *, double *, double, AstKeyMap *, int, double[3], size_t *, int * );
 double *cupidCFLevels( AstKeyMap *, double, double, double, int *, int * );
 double *cupidClumpDesc( int, int, AstMapping *, AstFrame *, const char *, double[ 3 ], int, int, int, double *, const char ***, const char ***, int *, int *, char **, AstRegion **, int * );
 double cupidConfigD( AstKeyMap *, const char *, double, int * );
 double cupidConfigRMS( AstKeyMap *, const char *, double, double, int * );
-double cupidGCChiSq( int, double *, int, int, int * );
-double cupidGCModel( int, double *, double *, int, int, int, int * );
+double cupidGCChiSq( ThrWorkForce *, int, double *, int, int, int * );
+double cupidGCModel( int, const double *, const double *, const double *, int, CupidGCModelCache *, int * );
 float cupidRanVal( int, float[2], int * );
 int *cupidRCA( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], double, int, int, int, int, int * );
 int *cupidRCA2( ThrWorkForce *, int *, int *, size_t, hdsdim[ 3 ], size_t[ 3 ], int * );
@@ -296,7 +319,7 @@ void cupidDumpF( float *, int, hdsdim *, hdsdim *, const char *, int * );
 void cupidDumpI( int *, int, hdsdim *, hdsdim *, const char *, int * );
 void cupidEdges( float *, size_t, hdsdim[3], size_t[3], float, float, int * );
 void cupidFindback0( void *, int * );
-void cupidGCListClump( size_t, int, double *, double, hdsdim *, double, int * );
+void cupidGCListClump( size_t, int, double *, double, hdsdim *, double, double, int * );
 void cupidGCNdfClump( HDSLoc **, double, double *, double, int, hdsdim *, hdsdim *, size_t, double *, hdsdim *, hdsdim *, size_t, int *, AstKeyMap *, int, int *);
 void cupidGCcalcf( int, double *, int *, double * );
 void cupidGCcalcg( int, double *, int *, double * );

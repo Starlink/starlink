@@ -264,6 +264,13 @@
 *     NMINSMP = _INTEGER (Write)
 *          Total number of continuous data chunks processed by makemap
 *          when METHOD=iterate that failed due to insufficient samples. [!]
+*     NOMFCF = _DOUBLE (Write)
+*          The nominal beam FCF for the output map (Jy/beam/pW). This will
+*          depend on the observation dates of the input time-seroes files
+*          and the filter (450 or 850). If the input data spans a critical
+*          date at which the FCF changed, the stored value will be weighted
+*          by the amount of data included in the map that was taken before
+*          and after the critical date.
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
 *          array (see parameters JSATILES and TILEDIMS). If no input data
@@ -807,6 +814,8 @@
 *        contiguous chunks that failed to converge.
 *     2019-07-9 (DSB):
 *        Ensure no output NDF is created if an error occurs.
+*     2022-1-19 (DSB):
+*        Added output parameter NOMFCF and FITS header NOMFCF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -953,8 +962,8 @@ void smurf_makemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   char *pname = NULL;        /* Name of currently opened data file */
-  int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
-  int *pt = NULL;            /* Holds time slice indices for each bol bin */
+  int ***ptime = NULL;       /* Holds time slice indices for each pol bin */
+  int *pt = NULL;            /* Holds time slice indices for each pol bin */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   size_t size;               /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
@@ -1673,6 +1682,7 @@ void smurf_makemap( int *status ) {
     int memlow=0;
     NdgProvenance * oprov = NULL;
     double totexp;
+    double nomfcf;
 
     /************************* I T E R A T E *************************************/
 
@@ -1816,7 +1826,7 @@ void smurf_makemap( int *status ) {
                       fts_port, maxmem-mapmem, abortsoon, &abortedat,
                       map, hitsmap, exp_time, variance, mapqual, weights, data_units,
                       data_label, &nboloeff, &ncontchunks, &ncontig, &memlow, &ninsmp,
-                      &ncnvg, &iters, &totexp, status );
+                      &ncnvg, &iters, &totexp, &nomfcf, status );
 
       /* If we have just run smf_iteratemap for the second time, free the
          snr mask allocated after the first run. */
@@ -1999,6 +2009,10 @@ void smurf_makemap( int *status ) {
     atlPtftd( fchan, "ELAPTIME", totexp,
               "[s] Total duration of all observations in map", status );
 
+    /* Store the nominal beam FCF. */
+    atlPtftd( fchan, "NOMFCF", nomfcf,
+              "[Jy/beam/pW] Nominal beam FCF for map", status );
+
     /* If the FitsChan is not empty, store it in the FITS extension of the
        output NDF (any existing FITS extension is deleted). No need to
        annul the FitsChan as it will be annulled when astEnd is called in
@@ -2028,7 +2042,7 @@ void smurf_makemap( int *status ) {
     smf_add_spectral_axis( tndf, fchan, status );
 
     /* If required, split the output map up into JSA tiles. Delete the
-       original output NDF afterwards. Always delete the output NDF if 
+       original output NDF afterwards. Always delete the output NDF if
        an error has occurred. */
     if( jsatiles ) {
        parGet0l( "TRIMTILES", &trimtiles, status );

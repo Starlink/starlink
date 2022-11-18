@@ -1,0 +1,303 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "kaplibs.h"
+#include "star/thr.h"
+#include "mers.h"
+#include <string.h>
+
+/* Structure used to pass information to each worker thread. */
+typedef struct CGEN_FUNCTION(KpgBlonData) {
+   CGEN_TYPE *b;
+   const CGEN_TYPE *a;
+   const int *ibox;
+   const size_t *dims;
+   int bad;
+   int badout;
+   int ndim;
+   int nlim;
+   int sambad;
+   int var;
+   size_t hi;
+   size_t lo;
+   size_t wdim;
+} CGEN_FUNCTION(KpgBlonData);
+
+/* Prototype for function that will do the work in each worker thread. */
+static void CGEN_FUNCTION(kpgBlonWork)( void *job_data_ptr, int *status );
+
+
+
+
+void CGEN_FUNCTION( kpgBlon )( ThrWorkForce *wf, int bad, int sambad, int var,
+                               int ndim, const size_t dims[], const CGEN_TYPE a[],
+                               const int ibox[], int nlim, CGEN_TYPE b[],
+                               int *badout, int *status ){
+/*
+*+
+*  Name:
+*     kpgBlon<T>
+
+*  Purpose:
+*     Smooths an n-dimensional image using box filter.
+
+*  Synopsis:
+*     void kpgBlon<T>( ThrWorkForce *wf, int bad, int sambad, int var,
+*                      int ndim, const size_t dims[], const CGEN_TYPE a[],
+*                      const int ibox[], int nlim, CGEN_TYPE b[],
+*                      int *badout, int *status )
+
+*  Description:
+*     This function smooths an n-dimensional array using an n-dimensional
+*     box filter; each pixel is replaced by the mean of those good
+*     neighbours which lie within a box of specified size.
+
+*  Parameters:
+*     wf
+*        Pointer to a pool of worker threads created by the thr library,
+*        or NULL (in which case the code will run in a single thread).
+*     bad
+*        Whether it is necessary to check for bad pixels in the input
+*        image.
+*     sambad
+*        If a non-zero value is given for this parameter, then bad input
+*        pixels will be propagated to the output image unchanged (a
+*        smoothed output value will be calculated for all other pixels). If
+*        a zero value is given, then the "nlim" parameter determines
+*        whether an output pixel is good or bad.  The value of "sambad" is
+*        not relevant if "bad" is zero.
+*     var
+*        If a zero value is given for this parameter, then the smoothing
+*        applied will be appropriate to a data image. If a non-zero value
+*        is given, then the smoothing will be appropriate to an image
+*        containing variance values. In the latter case the output values
+*        will be (on average) smaller than the input values to take account
+*        of the variance-reducing effect which smoothing produces.
+*     ndim
+*        The number of dimensions of the array to be smoothed.
+*     dims
+*        The dimensions of the array to be smoothed. The supplied "dims"
+*        array should have at least "ndim" elements.
+*     a
+*        Input array to be smoothed.  Its dimensions are given by parameter
+*        "dims".
+*     ibox
+*        Half-size of the smoothing box in pixels along eeach axis (the
+*        actual size of the ith axis's box used will be 2*ibox[i]+1
+*        pixels). The supplied "ibox" array should have at least "ndim"
+*        elements.
+*     nlim
+*        Minimum number of good pixels which must be present in the
+*        smoothing box in order to calculate a smoothed output pixel. If
+*        this minimum number is not satisfied, then a bad output pixel will
+*        result. "a" value between 1 and the total number of pixels in the
+*        smoothing box should be supplied.
+*     b
+*        Returned holding the smoothed output array.  It has the same
+*        dimensions as "a".
+*     *badout
+*        Returned holding a flag indicating whether bad pixels are present
+*        in the output image.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  There is a function for processing single- and double-precision
+*     arrays; replace "x" in the function name by R or D as appropriate.
+*     The data type of the "a", "b" and "asum" arguments must match the
+*     function used.
+*     -  It would be straightforward to extract each box in turn and sum
+*     within it in.  However, this is inefficient and a rolling window
+*     is used so only the values leaving and entering the smoothing
+*     region need be processed.
+*     -  The function uses recursion of the standard filter algorithm for
+*     each dimension moving from the highest to lowest. Recursion ends when
+*     there is only the integrated value and the corresponding number of
+*     contributing pixels sums used to find the output smoothed value for
+*     the current element of the input array.  At each dimension the filter
+*     box is initialised with the required number of values for the box
+*     width, and then as the function progresses through each position in
+*     the current dimension a new section is incorporated into the
+*     summations, while a section leaving the box is subtracted.
+
+*  Copyright:
+*     Copyright (C) 2022 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR "a" PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     25-APR-2022 (DSB):
+*        Original version, based on equivalent Fortran function by MJC.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(KpgBlonData) *job_data;/* Pointer to array of job data structures */
+   CGEN_FUNCTION(KpgBlonData) *pdata;   /* Pointer to a single job data structure */
+   int i;                /* Loop counter */
+   int iw;               /* Index of a worker thread */
+   int nw;               /* Number of worker threads to use */
+   size_t step;          /* No. of elements to be processed by a worker */
+   size_t wdim;          /* Workspace size */
+
+/* Initialise the bad-output-pixel flag. */
+   *badout = 0;
+
+/* Check the inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* How many worker threads should we use? The final pixel axis is divided
+   into disjoint sections and each worker thread processes one section.
+   Therefore check for cases where the length of the final axis is less than
+   the number of worker threads, in which case some worker threads remain
+   idle. */
+   if( wf ) {
+      nw = wf->nworker;
+      if( dims[ ndim - 1 ] < nw ) nw = (int) dims[ ndim - 1 ];
+   } else {
+      nw = 1;
+   }
+
+/* Allocate a job data structure for each used thread. */
+   job_data = astMalloc( nw*sizeof(*job_data) );
+
+/* Check pointers can be dereferenced safely. */
+   if( *status == SAI__OK ){
+
+/* Compute the dimension of the accumulation arrays.  These provide storage
+   for the sums at each dimensionality concatenated into single sum and pixel
+   counter arrays. workspaces.  They must have at least 1 + dims[0] for a two
+   dimensional array, and at least 1 + ( dims[0] * ... ( 1 + dims[ndim-2] ) ... )
+   for an "ndim"-dimensional array.  For example a 20x16x27-element array
+   would need WLIM not fewer than 1+(20*(1+16))=341 elements. */
+      wdim = dims[ 0 ];
+      if( ndim > 2 ) {
+         for( i = 1; i < ndim - 1; i++ ){
+            wdim = wdim*( dims[ i ] + 1 );
+         }
+      }
+      wdim++;
+
+/* Find the length of each section (on the final pixel axis) that is to
+   be processed by each worker thread. */
+      step = dims[ ndim - 1 ]/nw;
+
+/* Store the range of hyper-planes indices (zero-based) to be processed by
+   each worker. Ensure that the last thread picks up any left-over
+   hyper-planes. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         pdata->lo = iw*step;
+         if( iw < nw - 1 ) {
+            pdata->hi = pdata->lo + step - 1;
+         } else {
+            pdata->hi = dims[ ndim - 1 ] - 1;
+         }
+
+/* Store info required by kpgBlonWork. */
+         pdata->a = a;
+         pdata->b = b;
+         pdata->dims = dims;
+         pdata->ibox = ibox;
+         pdata->bad = bad;
+         pdata->ndim = ndim;
+         pdata->nlim = nlim;
+         pdata->sambad = sambad;
+         pdata->var = var;
+         pdata->wdim = wdim;
+
+/* Submit the job to the workforce. This will cause the kpgBlonWork
+   function to be called, which will be passed the "pdata" pointer and a
+   status pointer. */
+         thrAddJob( wf, 0, pdata, CGEN_FUNCTION(kpgBlonWork), 0, NULL,
+                    status );
+      }
+
+/* Wait for all the jobs submitted above to complete. */
+      thrWait( wf, status );
+
+/* Accumulate the "badout" flags from all threads. */
+      for( iw = 0; iw < nw; iw++ ) {
+         pdata = job_data + iw;
+         if( pdata->badout ) *badout = 1;
+      }
+   }
+
+/* Free the job data structures. */
+   job_data = astFree( job_data );
+}
+
+static void CGEN_FUNCTION(kpgBlonWork)( void *job_data_ptr, int *status ) {
+/*
+*  Name:
+*     kpgBlonWork<X>
+
+*  Purpose:
+*     Executed in a worker thread to do various calculations for
+*     kpgBlon
+
+*  Invocation:
+*     kpgBlonWork<X>( void *job_data_ptr, int *status )
+
+*  Arguments:
+*     job_data_ptr = KpgBlonData<X> * (Given)
+*        Data structure describing the job to be performed by the worker
+*        thread.
+*     status = int * (Given and Returned)
+*        Inherited status.
+
+*/
+
+/* Local Variables: */
+   CGEN_FUNCTION(KpgBlonData) *pdata;   /* Pointer to job data structure */
+   CGEN_TYPE *asum;                     /* Pointer to work array */
+   int *nsum;                           /* Pointer to work array */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* Get a pointer that can be used for accessing the required items in the
+   supplied structure. */
+   pdata = (CGEN_FUNCTION(KpgBlonData) *) job_data_ptr;
+
+/* Obtain workspace arrays for the smoothing algorithm. */
+   asum = astCalloc( pdata->wdim, sizeof(CGEN_TYPE) );
+   nsum = astCalloc( pdata->wdim, sizeof(int) );
+
+/* Call the function to smooth the section of the array specified by
+   pdata->lo and pdata->hi. */
+   CGEN_FUNCTION(kpgBlonSec)( pdata->bad, pdata->sambad, pdata->var,
+                              pdata->ndim, pdata->dims, pdata->lo + 1,
+                              pdata->hi + 1, pdata->a, pdata->ibox,
+                              pdata->nlim, pdata->wdim, pdata->b,
+                              &(pdata->badout), asum, nsum, status );
+
+/* Free the work arrays. */
+   asum = astFree( asum );
+   nsum = astFree( nsum );
+
+}
+
+
+
+

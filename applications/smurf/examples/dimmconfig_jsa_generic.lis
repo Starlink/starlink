@@ -3,7 +3,7 @@
 #     dimmconfig_jsa_generic.lis
 
 #  Purpose:
-#     A MAKEMAP configuration suitable for general purpose use.
+#     A MAKEMAP configuration suitable for general-purpose use.
 
 #  Description:
 #     This file provides values for parameters used by the SMURF:MAKEMAP
@@ -43,10 +43,10 @@
 #        - Remove dependence on dimmconfig.lis.
 #-
 
-#  Inherit the values defined in the parent dimmconfig file
+#  Inherit the values defined in the parent dimmconfig file.
 ^$STARLINK_DIR/share/smurf/dimmconfig.lis
 
-#  Less aggressive cleaning to cope with bright sources
+#  Less aggressive cleaning to cope with bright sources.
 noisecliphigh=10.0
 dcthresh = 100
 
@@ -57,11 +57,11 @@ com.perarray = 1
 #  Aggressive filtering.
 flt.filt_edge_largescale=200
 
-#  Use a maximum of 20 iterations
+#  Use a maximum of 20 iterations.
 numiter=-25
 maptol=0.01
 
-# new recommendations and using an ast model
+# New recommendations and using an AST model.
 ast.zero_snr = 5
 ast.zero_snrlo = 3
 

@@ -6,20 +6,25 @@ Users---particularly new users---are encouraged to use the pipeline for
 their map-making. However, greater control of the map-making
 process is available by running the \makemap\ command directly, rather
 than from within the pipeline. This chapter describes how to do this, but
-should be seen as ``advanced usage''.
+should be seen as \textbf{``advanced usage''}.
 
 \begin{quote}
 \emph{
 Note, when \makemap\ is run manually (rather than from the pipeline) the
-resulting image will be in units of pW, not Jy. Each pixel value
+atmospheric extinction correction is applied automatically (see
+\cref{Appendix}{app:cal}{SCUBA-2 data calibration}),
+but the resulting image will be in units of pW, not Jy. Each pixel value
 in the map represents the weighted mean value of the bolometer samples
-(in pW) that fall within the pixel, after removal of the noise components
-described in \cref{Section}{sec:models}{The individual models}. Each
+(in pW) that fall within the pixel, removal of the noise components
+described in \cref{Section}{sec:models}{The individual models}.  Each
 weight is the reciprocal of the variance associated with the bolometer.
 Thus each pixel value can be thought of as the astronomical power
 received by a typical bolometer at each point on the sky.
-\cref{Section}{sec:cmult}{Flux conversion factors} describes how to
-convert a map from units of pW to Jy.
+\cref{Section}{sec:cmult}{Flux-conversion factors} describes how to
+convert a map from units of pW to Jy; see
+\cref{Appendices}{app:cal}{SCUBA-2 data calibration},
+\cref{}{app:fcfs}{FCFs by reduction date}, and
+\cref{}{app:fcfstime}{FCFs by Time of Night} for more information.
 }
 \end{quote}
 
@@ -44,10 +49,11 @@ parameter called \texttt{CONFIG}.}:
 {Data formats}). There are many ways in which the list of files can be supplied,
 as described in Section ``\xref{Specifying Groups of Objects}{sun95}{se_groups}''
 in \xref{SUN/95}{sun95}{}. The easiest is to create a simple text
-file containing the names of the raw data files -- one per line --- and
+file containing the names of the raw data files -- one per line---and
 then supply the name of the text file, preceded by an up-caret character
 (\,\texttt{\^{}}\,), as the value for parameter \texttt{IN}. Note, the names of
 the raw data files can contain wild-cards such as ``$*$'' and ``?''.
+See below for examples.
 
 \item[\texttt{OUT}] The name of the NDF in which to store the final
 map. The supplied file name should either have a file type of
@@ -98,7 +104,7 @@ files to be included in the map, and could for instance look like this:
 
 This uses all available data for all four 850\,$\mu$m sub-arrays, for
 observation 30 taken on 20th July 2012\footnote{The input files should all be
-for a single waveband and a single observation --- do not mix files from
+for a single waveband and a single observation---do not mix files from
 different wavebands and/or observations.}.
 
 The file \brightcompact\ is one of the pre-defined configuration files
@@ -109,7 +115,7 @@ optimised for creating maps from bright compact sources.
   An up-caret (\,\texttt{\^{}}\,) is required any time you are reading
   in a group text file in \starlink. For the map-maker this includes
   the configuration file (a group of configuration parameters) and the
-  list of input files ( a group of NDFs --- \emph{e.g.}  \texttt{in=\^{}\,myfiles.lis}).
+  list of input files ( a group of NDFs---\emph{e.g.}  \texttt{in=\^{}\,myfiles.lis}).
 \end{tip}
 
 After the \texttt{makemap} command completes, the final map will be left in file
@@ -129,8 +135,8 @@ document, \xref{SUN/258}{sun258}{}.
 You can supply values for any of these extra parameters on the command
 line. For instance, one of the command-line parameters that is usually
 defaulted is \texttt{PIXSIZE}, which specifies the pixel size for the final
-map, in arc-seconds. The default pixel sizes, defined as one quarter of the
-Airy disk rounded up to the nearest half arc-second, are:
+map, in arcseconds. The default pixel sizes, defined as one quarter of the
+Airy disk rounded up to the nearest half arcsecond, are:
 
 \begin{itemize}
 \item 2\,arcsec at 450$\mu$m
@@ -138,7 +144,7 @@ Airy disk rounded up to the nearest half arc-second, are:
 \end{itemize}
 
 So for instance, the above command-line could be modified as follows to
-produce a map with 3 arc-second pixels:
+produce a map with 3-arcsecond pixels:
 
 \begin{terminalv}
 % makemap in=^myfiles.lis out=850_crl2688 pixsize=3 \
@@ -160,7 +166,7 @@ case-insensitive.
   for instance by putting double quotes around it or escaping
   wild-cards using a backslash (\emph{e.g.} ``\texttt{in=\textbackslash*.sdf}''
   or just ``\texttt{in=\textbackslash*}''). Note, this issue applies only to
-  wild-cards included directly on the command line --- there is no need to
+  wild-cards included directly on the command line---there is no need to
   escape or protect wild cards within a text file.
 \end{tip}
 
@@ -178,7 +184,7 @@ information you could set it to (say) ``\texttt{verbose}'':
 \end{terminalv}
 
 Note---unambiguous abbreviations may be used for many command line
-parameters --- so ``\texttt{verb}'' is acceptable instead of
+parameters---so ``\texttt{verb}'' is acceptable instead of
 ``\texttt{verbose}''. Setting \texttt{MSG\_FILTER} to ``\texttt{quiet}''
 will suppress all screen output.
 
@@ -198,7 +204,7 @@ if \texttt{MSG\_FILTER} is left set to its default value of
 ``\texttt{normal}''. Explanatory comments, which are not actually
 part of the output generated by \makemap, are included in \emph{emphasised
 type}. The input data is a short observation of a bright compact source
-(CRL 2688):
+(CRL~2688):
 
 \begin{terminalv}
 % makemap in=^myfiles.lis out=850_crl2688 \
@@ -214,7 +220,7 @@ following observation  :
 including the number that contain on-sky bolometer values (``science''
 data), the astronomical object and the SCUBA-2 observation number.}
 
-~
+
 \begin{terminalv}
 
 MAKEMAP: Map-maker will use no more than 92586 MiB of memory
@@ -238,15 +244,15 @@ MAKEMAP: Map-maker will use no more than 92586 MiB of memory
 \emph{Next comes information about the output map. The world coordinate
 system is described by means of the equivalent \htmladdnormallink{FITS-WCS}
 {http://fits.gsfc.nasa.gov/fits_wcs.html} keywords\footnote{In fact, NDF
-data structures do not use FITS-WCS to describe WCS --- instead they use the
+data structures do not use FITS-WCS to describe WCS---instead they use the
 \htmladdnormallink{AST}{http://www.starlink.ac.uk/ast} library, which
 provides a much more flexible scheme for handling WCS.}}
 
 \emph{The reported pixel bounds of the output map refer to a pixel coordinate
 system in which the source is centred at position (0,0). Note, the definition of
 pixel coordinates within the NDF format allows the origin of pixel
-coordinates to be at any nominated position within the array --- it does
-not have to be at the bottom left corner as in FITS --- and \texttt{makemap}
+coordinates to be at any nominated position within the array---it does
+not have to be at the bottom left corner as in FITS---and \texttt{makemap}
 chooses to put the pixel origin at the specified source position. }
 
 \emph{Finally, the bounds of the map are given in the celestial coordinate
@@ -265,7 +271,7 @@ smf_iteratemap: stop when mean normalized map change < 0.05
 \end{terminalv}
 
 \emph{By default, the data is down-sampled so that the on-sky distance between
-adjacent samples is roughly equal to the pixel size (4 arc-seconds in
+adjacent samples is roughly equal to the pixel size (4\,arcseconds in
 this case). This saves memory and computing time without adversely
 affecting the final map. The degree of down-sampling can be controlled
 using the \xparam{DOWNSAMPSCALE}{downsampscale} configuration parameter.}
@@ -297,7 +303,7 @@ Something may be wrong if the input data contains any breaks.}
 the map. If insufficient memory is available to process all the input
 data together, it will be split into chunks, and a separate map made from
 each chunk. These maps are later co-added to form the final output map.
-This can often result in a poorer map --- see \latexhtml{the box
+This can often result in a poorer map---see \latexhtml{the box
 describing \emph{Data Chunking} on Page~\pageref{box:chunk})~}
 {\htmlref{Data Chunking)}{box:chunk}}.}
 
@@ -313,7 +319,7 @@ smf_iteratemap: Iteration 1 / 40 ---------------
 \emph{We now start the first iteration of the iterative algorithm described in
 \cref{Section}{sec:algorithm}{The reduction step-by-step}, to create a
 map from the current chunk of  input data. We will be performing ----
-at most --- 40 iterations, as set by \xparam{NUMITER}{numiter}.}
+at most---40 iterations, as set by \xparam{NUMITER}{numiter}.}
 
 ~
 \begin{terminalv}
@@ -346,12 +352,12 @@ indicates the percentage of the data that has been flagged as unusable for
 various reasons:}
 
 \begin{itemize}
-\item \emph{BADDA - flagged as unusable during data acquisition.}
-\item \emph{DCJUMP - flagged as unusable because of a sudden step change in
+\item \emph{BADDA -- flagged as unusable during data acquisition.}
+\item \emph{DCJUMP -- flagged as unusable because of a sudden step change in
 the base-line.}
-\item \emph{STAT - flagged as unusable because the telescope was stationary
+\item \emph{STAT -- flagged as unusable because the telescope was stationary
 (or at least moving too slowly).}
-\item \emph{NOISE - flagged as unusable because they were too noisy.}
+\item \emph{NOISE -- flagged as unusable because they were too noisy.}
 \end{itemize}
 
 \emph{The BADBOL item gives the fraction of bolometers that have been
@@ -533,7 +539,7 @@ Total samples available from all chunks: 19172853 (3218.54 bolos)
 performed, the final output map is created. It is always advisable to
 check the final number of samples available for the map, as a low value
 will cause your map to have high noise levels. In this case, 62.86\% of
-the samples are available for the map, which is quite acceptable --- only
+the samples are available for the map, which is quite acceptable---only
 a couple of percent of the samples have been rejected by the map-making,
 mostly flagged by the COM model. The bulk of the bad samples (35.43\%)
 were rejected during data acquisition due to dead bolometers \emph{etc}.}
@@ -543,14 +549,14 @@ were rejected during data acquisition due to dead bolometers \emph{etc}.}
 performed. In this particular case we only needed 4 iterations (plus a
 mandatory extra iteration) to achieve
 our requested \xparam{MAPTOL}{maptol} value. But it is possible for some
-observations --- particularly observations of extended sources --- to
+observations---particularly observations of extended sources---to
 require more than 40 iterations to converge to a \texttt{maptol} of 0.05.
 In such cases the screen output will end with a message saying that the
 solution ``FAILED TO CONVERGE''\footnote{However a map will still be
 created, but should be used with caution.}. In such cases, you \emph{could}
 simply increase \texttt{numiter} and re-run \texttt{makemap}, but you may
 also want to investigate the cause of the slow convergence using one or more
-of the techniques described in \cref{Chapter}{sec:raw}{Chapter 9}, as it
+of the techniques described in \cref{Chapter}{sec:raw}{SCUBA-2 Diagnostic Tools}, as it
 may indicate some issue with the raw data.}
 
 \emph{Map pixels that receive a very small number of samples are automatically
@@ -565,14 +571,19 @@ observation of a calibrator, lasting only 2.6 minutes. Consequently there
 was no need to divide the data up into multiple chunks in order to fit it
 into memory.  However, for very long observations, or for shorter
 observations when using a computer with less than the recommended amount
-of memory (see \cref{Section}{sec:computing}{Chapter 1}), it may be
+of memory (see \cref{Section}{sec:computing}{Before you start:
+computing resources}), it may be
 necessary to process the raw data in multiple chunks. If this happens, a
 map is created from each chunk in turn, and all these maps are then added
 together to form the final map.  The final message ``\texttt{Total
 samples available from all chunks: 19172853 (3218.54 bolos)}'' indicates
 the total number of samples (and equivalent number of bolometers) used
 from all chunks. In this case there was only one chunk, so these values
-are equal to the numbers reported at the end of the last iteration.}
+are equal to the numbers reported at the end of the last iteration.
+Chunking often results in a poorer map and should be avoided
+if possible---see \latexhtml{the box
+describing \emph{Data Chunking} on Page~\pageref{box:chunk})~}
+{\htmlref{Data Chunking)}{box:chunk}}.}
 
 \section{Interacting with \texttt{makemap} during a long run}
 For long observations, \makemap\ can take several hours to run,
@@ -770,7 +781,7 @@ origin is moved by one pixel along the third axis (\emph{i.e.} the axis
 that enumerates iteration). Finally subtract one cube from the other, and
 display the resulting difference cube (this example shows how command-line
 parameters can often be specified by position instead of by name when
-running \textsc{Kappa} commands --- check the help information for each
+running \textsc{Kappa} commands---check the help information for each
 command to see the order in which options should be supplied):
 
 \begin{terminalv}
@@ -886,12 +897,14 @@ INTOPTION - What to do now (1-3) /3/ >
 \end{terminalv}
 
 At this point you should respond to the prompt for parameter
-\texttt{INTOPTION} by typing 1, 2 or 3 followed by \texttt{<return>}. Options 2
-and 3 cause \texttt{makemap} to tidy up its internals and create a map
+\texttt{INTOPTION} by typing 1, 2 or 3 followed by \texttt{<return>}. Option
+1 aborts the process with an error status. Option 2
+ causes \texttt{makemap} to tidy up its internals and create a map
 from the current models just as if the iterative process had reached
 convergence. Option 3 causes one further iteration to be performed,
-without masking (you should use this option if you have been using AST
-masking --- see \cref{Section}{sec:astmask}{AST masking}).
+without masking before creating a final map
+(you should use this option if you have been using AST
+masking---see \cref{Section}{sec:astmask}{AST masking}).
 
 \begin{tip}
 Note if you are running \texttt{makemap} from within a script, then the
@@ -914,7 +927,7 @@ dsb      25407  0.0  0.0  43716  1952 pts/5    0:00 makemap
 \end{tip}
 
 
-\section{Tips and Tricks}
+\section{Tips and tricks}
 \subsection{Aligning your map with a pre-existing image}
 If you want to compare SCUBA-2 data with a map of the same region taken
 with a different instrument, you will usually want to create the
@@ -948,7 +961,7 @@ However, by default \texttt{makemap} will trim the output map to
 exclude blank borders, thus the two maps may have different
 \emph{dimensions}. NDF-based applications such as \textsc{Kappa}
 \xref{\task{div}}{sun95}{DIV} automatically take account of this when
-comparing corresponding pixels in two NDFs --- see
+comparing corresponding pixels in two NDFs---see
 \cref{Figure}{fig:pixelco}{Pixel coordinates}.
 
 \begin{figure}
@@ -1004,7 +1017,7 @@ as \texttt{hershel.sdf}.
 
 \subsection{Limiting the amount of memory used by \texttt{makemap}}
 There may be occasions when you need to limit the amount of memory used
-by \makemap\ --- for instance to leave enough memory for other processes
+by \makemap\---for instance to leave enough memory for other processes
 to function correctly. For machines with more than 20 GB of memory, the
 default is to leave 4 GB free for other processes. For machines with less
 than than 20 GB of memory, the default is to leave 20\% of the total
@@ -1052,7 +1065,7 @@ dump the cleaned data to disk before going onto the iterative map-making
 stage. You can then re-use this cleaned data in subsequent invocations of
 \texttt{makemap}. To dump the cleaned data, you need to add
 ``\setparam{EXPORTCLEAN}{exportclean}{1}'' to the configuration on your
-initial run of \texttt{makemap} --- don't forget to remove it for
+initial run of \texttt{makemap}---don't forget to remove it for
 subsequent runs! The cleaned data are put into files in the current
 directory, one for each sub-array, with names such as
 \texttt{s8c20120706\_00037\_0003\_con\_res\_cln.sdf}. Note the \texttt{\_cln} on

@@ -172,7 +172,7 @@ SUN                            STARLINK USER NOTES                           SUN
 145.06  1996-07-12 bs    58   UNIX - An introduction
 146.03  1996-06-25 gjp   6    OBSERVE - Check star observability, v2.2: UG
 150.06  2003-01-08 DSB   46   GRP - Managing groups of objects v3.0: PM
-152.04  1997-06-13 dm    116  ECHOMOP - Echelle data reduction package v3.3[0&wUM
+152.04  1997-06-13 dm    116  ECHOMOP - Echelle data reduction package v3.3: UM
 160.06  2003-03-03 pwd   46   IMG - Simple image data access 1.2
 161.02  1994-11-10 dcp   67   IRAS90 - Introduction & user guide to CRDD analysis
 162.01  1993-03-18 ACD   25   A guide to astronomical catalogues/databases/archives
@@ -430,12 +430,12 @@ FORMAT                           FORMAT                                  FORMAT
 
 Cols 1-6   Document Number: The current version number is shown after the
            serial number.  Thus, 1.2 means paper 1, version 2.
-Cols 9-16  Date of issue: yyyy-mm-dd
-Cols 18-20 Authors initials.  If there is more than one author, the first or
+Cols 9-18  Date of issue: yyyy-mm-dd
+Cols 20-22 Authors initials.  If there is more than one author, the first or
            principle author is indicated in lower case.  Authors full names are
            shown after the titles.
-Cols 22-25 Number of pages.
-Cols 27-80 Document title.
+Cols 26-28 Number of pages.
+Cols 31-80 Document title.
 
 The Authors list gives the Starlink site code at which the author has a primary
 user account, and is not an indication of affiliation to a particular

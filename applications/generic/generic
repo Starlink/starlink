@@ -1,4 +1,4 @@
-#!/bin/csh -f
+#!/bin/sh
 #+
 #  Name:
 #     generic
@@ -7,7 +7,7 @@
 #     Create multiple instances of a generic FORTRAN or C subprogram
 
 #  Language:
-#     Unix C-shell
+#     Bourne shell
 
 #  Invocation:
 #     generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] \
@@ -212,260 +212,278 @@
 #        Add 64-bit integer support (K)
 #     11-FEB-2020 (DSB):
 #        Support C input files.
+#     6-MAY-2022 (GSB):
+#        Convert to sh.
 #     {enter_further_changes_here}
 
 #-
 
 # Set up the environment variable GENERIC_DIR.
 
-if ( $?GENERIC_DIR == 0 ) then
-   setenv GENERIC_DIR `dirname $0`/../etc
-endif
+if [ -z "$GENERIC_DIR" ]; then
+   GENERIC_DIR=`dirname $0`/../etc
+fi
 
 # Set up default values of parameters.
 
-set chasiz_default = 200
+chasiz_default=200
 
 # Initialize some shell variables.
-set args = ($argv[1-])
-set astflag = 0
-set badarg = 0
-set gfiles
-set sepchar =
-set sepflag = 0
-set uflag = 0
-set xflag = 0
-set settypes = 0
+astflag=
+badarg=
+chasiz=''
+gfiles=''
+sepchar=''
+sepflag=
+uflag=
+xflag=
+types=''
+settypes=
 
 # Check that there are some arguments present.
 
-if ( $#args == 0 ) then
+if [ $# -eq 0 ]; then
    echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.(g|c)<types>...]"
    exit
-endif
+fi
 
 # Process each of the arguments to the script.
 
-while ( $#args > 0 )
-   switch ($args[1])
-   case -t:        #  Type of data flag.
-      shift args
-      set types = $args[1]
-      set settypes = 1
-      shift args
-      breaksw
-   case -a:        #  Convert Asterix tokens.
-      set astflag = 1
-      shift args
-      breaksw
-   case -c:        # Character size for local variables.
-      shift args
-      set chasiz = $args[1]
-      shift args
-      breaksw
-   case -s:        #  Create separate output files for each input data type.
-      set sepflag = 1
-      shift args
-      breaksw
-   case -sc:       # The separator in output file names.
-      shift args
-      set sepchar = $args[1]
-      shift args
-      set sepflag = 1
-      breaksw
-   case -u:        # Use ub and uw tokens for types B and W.
-      set uflag = 1
-      shift args
-      breaksw
-   case -x:        # Remove the last x of the filename.
-      set xflag = 1
-      shift args
-      breaksw
-   case *.g*:     # The names of the Fortran generic files.
-      set gfiles = ($gfiles[1-] $args[1])
-      shift args
-      breaksw
-   case *.c*:     # The names of the C generic files.
-      set gfiles = ($gfiles[1-] $args[1])
-      shift args
-      breaksw
-   default:
-      echo "Unrecognised option: $args[1]"
-      shift args
-      set badarg = 1
-   endsw
-end
+while [ ! -z "$1" ]; do
+   case "$1" in
+   -t)        #  Type of data flag.
+      shift
+      types="$1"
+      settypes=1
+      shift
+      ;;
+   -a)        #  Convert Asterix tokens.
+      astflag=1
+      shift
+      ;;
+   -c)        # Character size for local variables.
+      shift
+      chasiz="$1"
+      shift
+      ;;
+   -s)        #  Create separate output files for each input data type.
+      sepflag=1
+      shift
+      ;;
+   -sc)       # The separator in output file names.
+      shift
+      sepchar="$1"
+      shift
+      sepflag=1
+      ;;
+   -u)        # Use ub and uw tokens for types B and W.
+      uflag=1
+      shift
+      ;;
+   -x)        # Remove the last x of the filename.
+      xflag=1
+      shift
+      ;;
+   *.g*)     # The names of the Fortran generic files.
+      gfiles="$gfiles $1"
+      shift
+      ;;
+   *.c*)     # The names of the C generic files.
+      gfiles="$gfiles $1"
+      shift
+      ;;
+   *)
+      echo "Unrecognised option: $1"
+      shift
+      badarg=1
+      ;;
+   esac
+done
 
 # Check that all arguments were valid.
 
-if ( $badarg ) then
+if [ -n "$badarg" ]; then
    echo "Usage: generic [-t types] [-a] [-c charsize] [-s] [-sc sepchar] [-u] [-x] file1.g<types> [file2.(g|c)<types>...]"
    exit
-endif
+fi
 
 # Check the value of the variable types.
 
-if ( $?types == 0 ) then
-   if ( $?GENERIC_TYPES ) then
-      set types = $GENERIC_TYPES
-      set settypes = 1
+if [ -z "$types" ]; then
+   if [ -n "$GENERIC_TYPES" ]; then
+      types="$GENERIC_TYPES"
+      settypes=1
    else
-      set types = "bBcdikrlwW"
-   endif
-endif
+      types="bBcdikrlwW"
+   fi
+fi
 
 # Check the value of the variable chasiz.
 
-if ( $?chasiz == 0 ) then
-   if ( $?GENERIC_CHASIZ ) then
-      set chasiz = $GENERIC_CHASIZ
+if [ -z "$chasiz" ]; then
+   if [ -n "$GENERIC_CHASIZ" ]; then
+      chasiz="$GENERIC_CHASIZ"
    else
-      set chasiz = $chasiz_default
-   endif
-endif
+      chasiz="$chasiz_default"
+   fi
+fi
 
 # Select the unsigned integer tokens.
 
-if ( $uflag == 1 ) then
-   set ubtoken = "ub"
-   set uwtoken = "uw"
+if [ -n "$uflag" ]; then
+   ubtoken="ub"
+   uwtoken="uw"
 else
-   set ubtoken = "B"
-   set uwtoken = "W"
-endif
+   ubtoken="B"
+   uwtoken="W"
+fi
 
 # Create a temporary file name.
 
-set tempfile = temp$$
+tempfile=temp$$
 
 #  For each of the .gen files, create the set of output files, one for each
 #  data type.
 
-foreach fname ($gfiles[1-])
-   if ( ! -e $fname ) then
+for fname in $gfiles; do
+   if [ ! -e $fname ]; then
       echo "$fname does not exist."
    else
 
 # Obtain the file prefix and extension.
-      set fprefix = $fname:r
-      set fsuffix = $fname:e
+      fprefix="${fname%.*}"
+      fsuffix="${fname##*.}"
 
 # If a C file has been supplied, set "cflag" and change the file suffix
 # to the equivalent Fortran suffix.
-      set firstchar = `echo $fsuffix | awk '{print substr($0,1,1)}'`
-      if( "$firstchar" == "c" ) then
-         set cflag = 1
-         if( "$fsuffix" == "cgen" ) then
-            set fsuffix = "gen"
+      case "$fsuffix" in
+      c*)
+         cflag=1
+         if [ "$fsuffix" = "cgen" ]; then
+            fsuffix="gen"
          else
-            set fsuffix = `echo $fsuffix | sed -e 's#^c#g#'`
-         endif
-      else
-         set cflag = 0
-      endif
+            fsuffix=`echo $fsuffix | sed -e 's/^c/g/'`
+         fi
+         ;;
+      *)
+         cflag=
+         ;;
+      esac
 
 # If the types have not been specified, they may be defined in the file
 # extension of the form g<types>, where <types> follows the -t values.
 
-      if ( $settypes == 0 && $fsuffix != "gen" ) then
-         set types = `echo $fsuffix | awk '{print substr($0,2)}'`
+      if [ -z "$settypes" -a $fsuffix != "gen" ]; then
+         types=`echo $fsuffix | awk '{print substr($0,2)}'`
          echo "Setting types to $types"
-      endif
+      fi
 
 # See if all numeric types should be generated.
 
-      if ( `echo $types | grep n` != "" ) then
-         set types = $types"bBdikrwW"
-      endif
+      case "$types" in
+      *n*)
+         types="${types}bBdikrwW"
+         ;;
 
 # See if all types should be generated.
 
-      if ( `echo $types | grep a` != "" ) then
-         set types = "bBcdikrlwW"
-      endif
+      *a*)
+         types="bBcdikrlwW"
+         ;;
+      esac
 
 # Remove the trailing x character of the file name, when the -x option
 # has been selected.
 
-      if ( $xflag == 1 ) then
-         echo $fprefix > temp2$$
-         set lastchar = `awk '{print substr($1,length($1))}' temp2$$ `
-         if ( "$lastchar" == "x" ) then
-            set fprefix = `awk '{print substr($1,1,length($1)-1)}' temp2$$ `
-         endif
-         rm ./temp2$$
-      endif
+      if [ -n "$xflag" ]; then
+         case "$prefix" in
+         *x)
+            fprefix="${fprefix:0:-1}"
+            $fprefix = `echo $fprefix | sed -e 's/x$//'`
+            ;;
+         esac
+      fi
 
 # If all the output routines for one input file are going to a single file,
 # make sure that the output file is empty. Create composite file.
 
-      if( $cflag )  then
-         if ( ( $sepflag == 0 ) && -f ${fprefix}.c ) then
-            rm ${fprefix}.c
-         endif
-         if ( $sepflag == 0 ) touch ${fprefix}.c
+      if [ -n "$cflag" ]; then
+         if [ -z "$sepflag" ]; then
+            if [ -f ${fprefix}.c ]; then
+               rm ${fprefix}.c
+            fi
+            touch ${fprefix}.c
+        fi
       else
-         if ( ( $sepflag == 0 ) && -f ${fprefix}.f ) then
-            rm ${fprefix}.f
-         endif
-         if ( $sepflag == 0 ) touch ${fprefix}.f
-      endif
+         if [ -z "$sepflag" ]; then
+            if [ -f ${fprefix}.f ]; then
+               rm ${fprefix}.f
+            fi
+            touch ${fprefix}.f
+        fi
+      fi
 
 # Process each data type.
 
-      switch (b)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *b*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/byte $fname \
             | sed -f $GENERIC_DIR/byte_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/byte $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}b.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}b.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (B)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *B*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/ubyte $fname \
             | sed -f $GENERIC_DIR/ubyte_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/ubyte $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}${ubtoken}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${ubtoken}.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (c)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *c*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/character $fname \
             | sed -f $GENERIC_DIR/character_asterix \
             | sed "s/<CHASIZ>/$chasiz/" \
@@ -473,201 +491,226 @@ foreach fname ($gfiles[1-])
          else
             sed -f $GENERIC_DIR/character $fname \
             | sed "s/<CHASIZ>/$chasiz/" >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}c.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}c.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (d)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *d*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/double $fname \
             | sed -f $GENERIC_DIR/double_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/double $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}d.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}d.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (i)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *i*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/integer $fname \
             | sed -f $GENERIC_DIR/integer \
             >$tempfile
          else
             sed -f $GENERIC_DIR/integer $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}i.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}i.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (k)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *k*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/integer8 $fname \
             | sed -f $GENERIC_DIR/integer8 \
             >$tempfile
          else
             sed -f $GENERIC_DIR/integer8 $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}k.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}k.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (l)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *l*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/logical $fname \
             | sed -f $GENERIC_DIR/logical_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/logical $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}l.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}l.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (r)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *r*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/real $fname \
             | sed -f $GENERIC_DIR/real_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/real $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}r.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}r.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (w)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *w*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/word $fname \
             | sed -f $GENERIC_DIR/word_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/word $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}w.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}w.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+         ;;
+      esac
 
-      switch (W)
-      case [$types]:
-         if ( $astflag ) then
+      case "$types" in
+      *W*)
+         if [ -n "$astflag" ]; then
             sed -f $GENERIC_DIR/uword $fname \
             | sed -f $GENERIC_DIR/uword_asterix \
             >$tempfile
          else
             sed -f $GENERIC_DIR/uword $fname >$tempfile
-         endif
-         if ( $sepflag ) then
-            if ( $cflag ) then
+         fi
+         if [ -n "$sepflag" ]; then
+            if [ -n "$cflag" ]; then
                cp $tempfile ${fprefix}${sepchar}${uwtoken}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >${fprefix}${sepchar}${uwtoken}.f
-            endif
+            fi
          else
-            if ( $cflag ) then
+            if [ -n "$cflag" ]; then
                cat $tempfile >>${fprefix}.c
             else
                awk -f $GENERIC_DIR/wrap72 $tempfile >>${fprefix}.f
-            endif
-         endif
-         if ( -f $tempfile ) \rm $tempfile
-      endsw
+            fi
+         fi
+         if [ -f $tempfile ]; then
+            \rm $tempfile
+         fi
+      esac
 
-   endif
-end
+   fi
+done
 
 # Delete the temporary file if it exists.
 
-if ( -f $tempfile ) \rm $tempfile
+if [ -f $tempfile ]; then
+   \rm $tempfile
+fi

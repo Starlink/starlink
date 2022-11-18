@@ -87,6 +87,8 @@
 *        Added argument polobs.
 *     10-JAN-2014 (DSB):
 *        Added argument wf.
+*     15-OCT-2022 (GSB):
+*        Add check of jos_drcontrol position problem flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -194,6 +196,7 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
+   drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
 
 /* Initialise */
    *hasoffexp = 0;
@@ -467,6 +470,11 @@ void smf_sparsebounds( ThrWorkForce *wf, Grp *igrp,  int size, AstSkyFrame *osky
 
 /* Loop round all the time slices in the input file. */
       for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
+
+/* Skip this time slice if flagged due to a position problem. */
+          if( (hdr->allState)[itime].jos_drcontrol & drcntrl_mask ) {
+             continue;
+          }
 
 /* Get a FrameSet describing the spatial coordinate systems associated with
    the current time slice of the current input data file. The base frame in

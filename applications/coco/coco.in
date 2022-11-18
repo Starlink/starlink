@@ -1,4 +1,4 @@
-#!@CSH@ -f
+#!@SH@
 #  @edited_input@
 #  To invoke the coco utility, type:
 #
@@ -21,59 +21,52 @@
 #  P.T.Wallace   Starlink   8 December 1993
 #
 
-#  Declare interrupt handler
-      onintr end
-
 #  String to indicate defaulted terminal I/O arguments
-      set _tty = `tty`
+      _tty=`tty`
 
 #  Name of null device
-      set _null = /dev/null
+      _null=/dev/null
 
 #  Copy arguments
-      set _input = $1
-      set _report = $2
-      set _output = $3
+      _input="$1"
+      _report="$2"
+      _output="$3"
 
 #  Prompts to terminal unless input file specified
-      if ($_input == "") then
-         set _prompts = $_tty
+      if [ -z "$_input" ]; then
+         _prompts="$_tty"
       else
-         set _prompts = $_null
-      endif
+         _prompts="$_null"
+      fi
 
 #  Echo to terminal if input file specified
-      if ($_input != "") then
-         set _echo = $_tty
+      if [ -n "$_input" ]; then
+         _echo="$_tty"
       else
-         set _echo = $_null
-      endif
+         _echo="$_null"
+      fi
 
 #  Errors to terminal if report file specified
-      if ($_report != "") then
-         set _errors = $_tty
+      if [ -n "$_report" ]; then
+         _errors="$_tty"
       else
-         set _errors = $_null
-      endif
+         _errors="$_null"
+      fi
 
 #  Resolve defaults
-      if ($_input == "") then
-         set _input = $_tty
-      endif
-      if ($_report == "") then
-         set _report = $_tty
-      endif
-      if ($_output == "") then
-         set _output = $_null
-      endif
+      if [ -z "$_input" ]; then
+         _input="$_tty"
+      fi
+      if [ -z "$_report" ]; then
+         _report="$_tty"
+      fi
+      if [ -z "$_output" ]; then
+         _output="$_null"
+      fi
 
 #  Run the job, use the related cocomain binary, otherwise anything on PATH.
-      if ( -e $STARLINK_DIR/bin/cocomain ) then
+      if [ -e "$STARLINK_DIR/bin/cocomain" ]; then
          $STARLINK_DIR/bin/cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
       else
          cocomain $_tty $_output $_echo $_report $_input $_prompts $_errors
-      endif
-
-
-end:
-      exit
+      fi

@@ -608,7 +608,7 @@ void smf_calcmodel_com_old( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
   /* See if a mask should be used to exclude bright source areas from
      the COM model. */
-  mask = smf_get_mask( wf, SMF__COM, keymap, dat, flags, status );
+  mask = smf_get_mask( wf, SMF__COM, keymap, dat, flags, NULL, status );
 
   /* Obtain pointers to relevant smfArrays for this chunk */
   res = dat->res[chunk];

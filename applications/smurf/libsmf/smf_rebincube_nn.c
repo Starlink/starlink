@@ -195,6 +195,8 @@
 *        Ignore negative or zero input Tsys values.
 *     7-JUN-2021 (DSB):
 *        Include time slice index in error messages.
+*     15-OCT-2022 (GSB):
+*        Add check of jos_drcontrol position problem flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -290,6 +292,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    int ochan;                  /* Output channel index */
    int use_threads;            /* Use multiple threads? */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
+   drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
 
    static smfRebincubeNNArgs1 *common_data = NULL; /* Holds data common to all detectors */
    static smfRebincubeNNArgs2 *detector_data = NULL; /* Holds data for each detector */
@@ -408,6 +411,11 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
       if( nexttime ){
          if( *nexttime != (int) itime ) continue;
          nexttime++;
+      }
+
+/* Skip this time slice if flagged due to a position problem. */
+      if( (hdr->allState)[itime].jos_drcontrol & drcntrl_mask ) {
+         continue;
       }
 
 /* Store a pointer to the first input data value in this time slice. */

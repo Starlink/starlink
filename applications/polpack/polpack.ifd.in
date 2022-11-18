@@ -2672,7 +2672,7 @@ package polpack {
    }
 
    command makecube {
-      obey {$POLPACK_DIR/makecube.csh}
+      obey {$POLPACK_DIR/makecube.sh}
    }
 
    icl {defhelp kappa $KAPPA_HELP 0}
@@ -2685,17 +2685,25 @@ package polpack {
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-      if (-d $HOME/adam) then
+      if ($?ADAM_USER) then
+         set adamdir=$ADAM_USER
+      else
+         set adamdir=$HOME/adam
+      endif
+
+      if (-d $adamdir) then
          echo -n
       else
-         if (-f $HOME/adam) then
-            echo "You have a file called adam in your home directory.  Please rename "
-            echo "since adam must be a directory for ADAM files."
+         if (-f $adamdir) then
+            echo "You have a file called $adamdir"
+            echo "Please rename this, or define the environment variable ADAM_USER"
+            echo "to point to a directory for ADAM files."
             exit
          else
-            mkdir $HOME/adam
+            mkdir $adamdir
          endif
       endif
+      unset adamdir
 #
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
@@ -2711,8 +2719,8 @@ package polpack {
          setenv NDF_XTN POLPACK
       endif
 
-      setenv NDF_IMP_POLPACK '$POLPACK_DIR/polimp.csh ^ndf'
-      setenv NDF_EXP_POLPACK '$POLPACK_DIR/polexp.csh ^ndf'
+      setenv NDF_IMP_POLPACK '$POLPACK_DIR/polimp.sh ^ndf'
+      setenv NDF_EXP_POLPACK '$POLPACK_DIR/polexp.sh ^ndf'
       setenv NDF_IMP_POLPACK_COMPRESSED ' '
       setenv NDF_EXP_POLPACK_COMPRESSED ' '
       setenv NDF_IMP_POLPACK_GZIP ' '
@@ -2727,17 +2735,25 @@ package polpack {
 #  If there is, issue a warning and exit.  Otherwise create the required
 #  directory.
 #
-      if test -d "$HOME/adam"; then
+      if test ! -z "$ADAM_USER"; then
+         adamdir="$ADAM_USER"
+      else
+         adamdir="$HOME/adam"
+      fi
+
+      if test -d "$adamdir"; then
          echo -n
       else
-         if test -f "$HOME/adam"; then
-            echo "You have a file called adam in your home directory.  Please rename "
-            echo "since adam must be a directory for ADAM files."
-            exit
+         if test -f "$adamdir"; then
+            echo "You have a file called $adamdir"
+            echo "Please rename this, or define the environment variable ADAM_USER"
+            echo "to point to a directory for ADAM files."
+#            exit
          else
-            mkdir $HOME/adam
+            mkdir "$adamdir"
          fi
       fi
+      unset adamdir
 #
 #  Set up the commands and environment variables needed to export and
 #  import POLPACK extension information to and from foreign data formats.
@@ -2755,8 +2771,8 @@ package polpack {
           export NDF_XTN=POLPACK
       fi
 
-      export NDF_IMP_POLPACK='$POLPACK_DIR/polimp.csh ^ndf'
-      export NDF_EXP_POLPACK='$POLPACK_DIR/polexp.csh ^ndf'
+      export NDF_IMP_POLPACK='$POLPACK_DIR/polimp.sh ^ndf'
+      export NDF_EXP_POLPACK='$POLPACK_DIR/polexp.sh ^ndf'
       export NDF_IMP_POLPACK_COMPRESSED=' '
       export NDF_EXP_POLPACK_COMPRESSED=' '
       export NDF_IMP_POLPACK_GZIP=' '

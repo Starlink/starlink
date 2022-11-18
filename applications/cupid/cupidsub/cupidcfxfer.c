@@ -189,9 +189,7 @@ void cupidCFXfer( CupidPixelSet *ps1, CupidPixelSet *ps2, int *ipa,
                }
             }
          }
+         ps2->nneb = jneb;
       }
-
-      ps2->nneb = jneb;
    }
-
 }

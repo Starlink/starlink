@@ -135,10 +135,6 @@
 
 *  Establish the error handler and perform a divide by zero. Check that
 *  the error flag gets set correctly.
-*
-*  Note, however, that there's no support for NUM_HANDL in the default
-*  num_han.cdefault.  Thus it's not necessarily an error (or at least not
-*  a fixable error) if this next test fails.
       CALL NUM_HANDL( NUM_TRAP )
       CALL NUM_CLEARERR()
 
@@ -152,8 +148,7 @@
       ELSE
          WRITE( *, * )
      :    ' Warning: NUM_TRAP error handler not responding (not impl?).'
-*      ...so don't set OK false
-*         OK = .FALSE.
+          OK = .FALSE.
       END IF
       CALL NUM_REVRT
 

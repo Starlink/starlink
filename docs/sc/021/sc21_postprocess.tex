@@ -1,17 +1,28 @@
 \chapter{\xlabel{postprocess}Post-processing Reduction Steps}
 \label{sec:postprocess}
 
-\section{\xlabel{apply_fcf}Flux conversion factors}
+\section{\xlabel{apply_fcf}Flux-conversion factors}
 \label{sec:cmult}
 
-When your data comes out of the map-maker it is in units of picowatts
-(pW). A flux conversion factor, or FCF, needs to be applied to scale
+If you are not using the \oracdr\ pipeline to reduce your data
+(i.e. you are manually employing the map-maker as described in
+\cref{Chapter}{sec:manual}{Running \task{makemap} Outside the Pipeline}),
+your data come out of the map-maker
+in units of picowatts (pW). A flux-conversion factor, or FCF, needs to be applied to scale
 your data from units of pW to janskys (Jy). For more information on
-calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12}.
+calibrating SCUBA-2 data see Dempsey et al. (2013) \cite{dempsey12},
+Mairs et al. (2021) \cite{mairs21}, and \cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
+\vspace{5mm}
 
-Below are our default FCFs.
+\textbf{Below are the default FCF values as of Starlink 2021A and they apply to data
+obtained since 2018 June 30}. The \oracdr\ pipeline automatically accounts for changes
+in the FCFs for earlier dates (see the important notes below) but manually running
+the pipeline requires consulting \cref{Appendix}{app:fcfs}{FCFs by
+reduction date} for the appropriate values.
+
 \vspace{0.5cm}
+
 \renewcommand*\arraystretch{1.2}
 
 \begin{table}[h!]
@@ -24,9 +35,10 @@ Below are our default FCFs.
 \multicolumn{2}{|c|}{\fcfa\ (Jy/pW/arcsec$^2$) }  &
 \multicolumn{2}{c|}{\fcfb\ (Jy/pW/beam)}      \\
 \hline
-\hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm} & 850\,$\mu$m & \hspace{0.4cm} 450\,$\mu$m \hspace{0.3cm}& 850\,$\mu$m \\
-\hline
-4.71 $\pm$ 0.5& 2.34 $\pm$ 0.08& 491 $\pm$ 67& 537 $\pm$ 24 \\
+\multicolumn{1}{|c|}{450\,$\mu$m} & \multicolumn{1}{c|}{850\,$\mu$m} &
+\multicolumn{1}{c|}{450\,$\mu$m}  & \multicolumn{1}{c|}{850\,$\mu$m}\\ \hline
+3.87 $\pm$ 0.53                   & 2.07 $\pm$ 0.12 &
+472 $\pm$ 76                      & 495 $\pm$ 32 \\
 \hline
 \end{tabular}
 \end{table}
@@ -35,24 +47,26 @@ Below are our default FCFs.
 
 \begin{sltextbox}{IMPORTANT NOTES:}
   \begin{itemize}
-  \item The standard FCF to be applied depends on the reduction date
-    for your data. For data that have been \emph{reduced prior} to
-    July 2012 you should see \cref{Appendix}{app:fcfs}{FCFs by
+  \item The standard FCF to be applied depends on the observation date
+    of your data. For data that have been \emph{reduced prior} to
+    2018 June 30 you should consult \cref{Appendix}{app:fcfs}{FCFs by
       reduction date} for alternative FCFs.
 
   \item Due to a glitch in the WVM, data reduced between 2012
     September 19, and 2013 January 18 must be re-reduced using a
     recent version of Starlink (Hikianalia or later), or should have
     an FCF derived from a calibrator reduced at the same time (and not
-    our standard FCF) applied to it.
+    our standard FCF) applied to it. The most recent stable release of
+    the Starlink software is always recommended.
   \end{itemize}
 \end{sltextbox}
 
 
 \subsection{Aperture flux}
 
-To get the flux density of extended sources with aperture photometry
-you should apply the \fcfa.  You can then sum the emission in an
+To measure the flux density of extended sources with aperture photometry
+you should apply the \fcfa (also known as the arcsecond FCF).
+You can then sum the emission in an
 aperture. \fcfa\ was determined using a 60-arcsec diameter
 aperture. If your aperture differs from this you should scale your
 flux accordingly---the scaling factor can be read off the curve of
@@ -61,28 +75,89 @@ the ratio of aperture flux to total flux for a range of aperture
 diameters.
 
 \fcfa\ is determined using 1-arcsec pixels. For different pixel sizes
-you will also need to multiply by the pixelsize squared.
+you will also need to multiply by the pixel size squared for a total
+flux calibrated in units of Jy. For more information, see
+\cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
 \subsection{Peak flux}
 
-If you want to read off the peak flux from your map, you should apply
+If you want to read off the peak flux from your map or fit
+a function to estimate the peak brightness, you should apply
 the \fcfb\ (also known as the peak FCF).  When you open your map in
 \gaia\ the value of the brightest pixel will be the peak flux of your
-source. (If your source is point-like, the peak value in the map is
-the total flux density). Applying \fcfb\ will result in a map with
+source. Applying \fcfb\ will result in a map with
 units of Jy/beam. For point-like or compact sources smaller than the
-beam (with a Gaussian profile), this peak value will be the flux
-density of your source.
+beam (with a Gaussian profile), this peak value will be the total flux
+density of your source. For more information, see
+\cref{Appendix}{app:cal}{SCUBA-2 data calibration}.
 
-\subsection{\xlabel{own_fcf}Determining your own Flux conversion factors}
+\subsection{Manually Applying the FCF}
+\label{subsec:ApplyingFCF}
+
+You can apply an FCF value using the \picard\ recipe
+\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
+By default, this will multiply your map by 1000$\times$\fcfb, where the default \fcfb
+value is presented at the beginning of \cref{Section}{sec:cmult}{Flux-conversion factors}
+or in \cref{Appendix}{app:fcfs}{FCFs by reduction date},
+depending on the observation date and Starlink version used. This produces a
+calibrated map with units of mJy/beam.
+
+You can supply a parameter file if you wish to use a different value
+for the FCF or use \fcfa. For example, the lines below are written in a parameter
+file called \file{cal.ini} to calibrate the data \file{mapinpW.sdf} with \fcfa=2.07:
+
+\begin{terminalv}
+[CALIBRATE_SCUBA2_DATA]
+FCF = 2.07
+FCF_CALTYPE = ARCSEC
+\end{terminalv}
+
+The default SCUBA-2 FCF will be used if not given and FCF\_CALTYPE may either
+be BEAM (default) or ARCSEC. The recipe will write out the calibrated
+file with a \file{\_cal} suffix and will change the units in the map
+header.
+
+\begin{terminalv}
+% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA  mapinpW.sdf
+\end{terminalv}
+
+Note that the recipe will also take account of the pixel size when
+applying \fcfa.
+
+
+\subsection{\xlabel{own_fcf}Determining your own flux-conversion factors}
 \label{sec:own_fcf}
 
-Calibration observations are taken at various points throughout the
-night and we recommend you compare the FCF calculated from your
-nearest calibrator to the standard FCF. You can use this FCF to scale
-the the standard value accordingly. You should chose the calibrator
-nearest in time to your science observations, unless the weather has
-changed significantly.
+Calibration observations are obtained at various points throughout the
+night and each individual observation can be used to determine FCF values.
+As noted in Mairs et al. (2021)~\cite{mairs21}, the spread in FCF values observed
+over periods of months or years is comparable to the scatter that can be observed
+over an individual night.
+
+There is no obvious parameter that is the singular dominant cause of the inherent scatter
+in the observed FCFs. The spread is undoubtedly affected by a combination of:
+
+\begin{enumerate}
+
+\item The bright and variable atmosphere including subtle effects such as the
+submillimeter seeing, wind speed, ambient-temperature changes, humidity and low-lying variations
+in weather conditions with scale heights comparable to several times the height of the JCMT.
+
+\item The stability of the WVM calibration.
+
+\item Dish instability producing variations in the beam profile.
+
+\item Instrumental noise, non-cooled optical components, and uncertainties in the {\sc{makemap}} routine's
+modeling and removal of noise components from the time stream.
+
+\end{enumerate}
+
+We therefore recommend caution if you are calculating your own FCF
+values to apply to data on a given night and suggest using the default values
+supplied above or in \cref{Appendix}{app:fcfs}{FCFs by reduction date}, depending on the observation date.
+Nevertheless, below are instructions on how to perform an investigation into
+the FCFs calculated from the calibrator observations performed close in time
+to your obtained science data:
 
 \begin{enumerate}
 \item Reduce the calibrator with the map-maker using
@@ -98,38 +173,35 @@ changed significantly.
 
 This will produce a log file (\file{log.checkcal}) which records the
 both \fcfb\ and \fcfa. Check that these values closely approximate the
-standard FCF values given above.
+standard FCF values given above (to a reasonable margin within the
+uncertainties).
 
-\item Re-reduce the calibrator using the map-maker with the
-  \emph{same} configuration file you used for your science
-  observations.
+%%
+%%%%%%%
+% STM - 2021, June 29. These steps don't make sense to me
+% I am reframing this section as an ``Investigation of FCFs'' rather
+% than advice on what to apply to data. Using DR recipes
+% that were not intended for maps that have one bright
+% point source in them may not accurately reflect what happens
+% to fluxes in, for example, extended galactic regions as the map-maker
+% models and removes noise components. Without a careful and
+% controlled analysis inputting Fake sources into a variety of maps
+% and comparing the results using different recipes, we should not
+% give the following advice to users.
+%%%%%%%
+%%
 
-\item Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+%\item Re-reduce the calibrator using the map-maker with the
+%  \emph{same} configuration file you used for your science
+%  observations.
 
-\item Apply this FCF to your reduced science data using \cmult---see
-  the next section. Remember to apply the pixel size squared factor if
-  using \fcfa.
+%\item Again determine the FCF using \drrecipe{SCUBA2\_CHECK\_CAL}.
+
+%\item Apply this FCF to your reduced science data using \cmult---see
+%  the next section. Remember to apply the pixel size squared factor if
+%  using \fcfa.
 \end{enumerate}
 
-\subsection{Applying the FCF}
-
-You can apply the FCF using the \picard\ recipe
-\xref{\drrecipe{CALIBRATE\_SCUBA2\_DATA}}{sun265}{CALIBRATE\_SCUBA2\_DATA}.
-By default this will multiply your map by 1000$\times$\fcfb, obtained
-from the start of \cref{Section}{sec:cmult}{Flux conversion
-  factors}. This produces a calibrated map with units of mJy/beam.
-
-You can supply a parameter file if you wish to use a different value
-for the FCF or use \fcfa. The recipe will write out the calibrated
-file with an \file{\_cal} suffix and will change the units in the map
-header.
-
-\begin{terminalv}
-% picard CALIBRATE_SCUBA2_DATA  mapinpW.sdf
-\end{terminalv}
-
-Note that the recipe will also take account of the pixel size when
-applying \fcfa.
 
 \section{\xlabel{crop}Cropping your map}
 \label{sec:crop}
@@ -254,7 +326,9 @@ degrees.
 
 You can use the \picard\ recipe \drrecipe{SCUBA2\_MAPSTATS} to get the
 noise. This recipe estimates the RMS from both the map, the NEP, and
-the RMS predicted by the Integration Time Calculator. It then writes out
+the RMS predicted by the
+ \href{https://www.eaobservatory.org/jcmt/instrumentation/continuum/scuba-2/itc/}{Integration
+ Time Calculator}. It then writes out
 a series of results in a log file called \file{log.mapstats}. The
 parameters written to this file are listed in
 \cref{Appendix}{app:mapstats}{SCUBA2_MAPSTATS}.
@@ -262,20 +336,28 @@ parameters written to this file are listed in
 \begin{terminalv}
 % picard SCUBA2_MAPSTATS map.sdf
 \end{terminalv}
-This recipe will report the noise in the same input units provided. 
+This recipe will report the noise in the same input units provided.
 
 
 \textbf{Note:} \drrecipe{SCUBA2\_MAPSTATS} is only designed to work on
-reductions of single observations. On coadded observations it could
+reductions of single observations. On co-added observations it could
 produce misleading results, or even fail completely to work.
 
 If multiple files are run through \drrecipe{SCUBA2\_MAPSTATS}, either in a single call
 of PICARD or by repeatedly running PICARD in the same terminal on different
-files, the results will be appended to the existing log.mapstats file.
+files, the results will be appended to the existing \file{log.mapstats} file.
 The final columns — project, recipe and filename — are given to ensure it
 is clear to users which line of the logfile corresponds to which input file.
+This table can be viewed in an accessible way by using the \topcat\ software
+included in Starlink:
 
-\subsubsection*{Steps for getting your coadded-map noise}
+\begin{terminalv}
+% topcat -f ascii log.mapstats
+\end{terminalv}
+
+After running the command above, click on “Views” Then “Table Data” to display the table.
+
+\subsubsection*{Steps for getting the noise in your co-added map}
 After applying any necessary FCF, \drrecipe{SCUBA2\_MAPSTATS} simply
 executes the following steps to get the map noise.
 
@@ -283,11 +365,13 @@ executes the following steps to get the map noise.
 \item Crop the map to remove the noisy edges.
 
 \begin{terminalv}
-% picard CROP_JCMT_IMAGES map_cal.sdf
+% picard CROP_SCUBA2_IMAGES map_cal.sdf
 \end{terminalv}
 
 \item Run the \Kappa\ command \stats\ to extract the median value from
-the error array.
+the error array (the ndf extension that describes the uncertainty in each pixel,
+calculated from the square root of the variances in the raw bolometer data
+that contributed to the pixel).
 
 \begin{terminalv}
 % stats map_cal_crop comp=err order
@@ -401,7 +485,7 @@ by using a compression factor of 2.
 SCUBA-2 maps created using ``\model{AST}-masking'' (see \cref{Section}
 {sec:masking}{Masking}) will contain a \texttt{Quality} array indicating the
 background pixels that were masked (i.e. forced to zero). In itself this
-is fairly simple - background pixels have a non-zero Quality value and
+is fairly simple---background pixels have a non-zero Quality value and
 source pixels have a Quality value of zero. However, it is also possible
 to have independent masks for the \model{FLT} and \model{COM} models,
 in addition to the \model{AST} mask. For instance, maps created using
@@ -411,7 +495,7 @@ to be used when interpreting the \texttt{Quality} array.
 
 Each value in the \texttt{Quality} array is restricted to taking integer values
 between 0 and 255, and so can be thought of as 8 separate bits. Each ``bit
-plane'' within the \texttt{Quality} array holds a single mask - \model{AST},
+plane'' within the \texttt{Quality} array holds a single mask---\model{AST},
 \model{FLT} or \model{COM}. The \xref{\task{showqual}}{sun95}{SHOWQUAL}
 command can be used to find out which mask is held by which bit plane:
 
@@ -430,7 +514,7 @@ then the \model{FLT} mask would be stored in bit 1.
 The decimal integer value of any element of the \texttt{Quality} array is
 equal to the binary value formed from the bits listed by \task{showqual}.
 So in the above case the maximum \texttt{Quality} value is 3 (the decimal
-equivalent of binary ``11'' --- both bits set). Remembering that a bit is set
+equivalent of binary ``11''-e--both bits set). Remembering that a bit is set
 (\emph{i.e.} is 1) for background pixels and cleared (\emph{i.e.} is 0) for
 source pixels, it follows that the four possible decimal \texttt{Quality}
 values in the above case (0-3) are:
@@ -439,21 +523,21 @@ values in the above case (0-3) are:
 \item - neither bit set, so the pixel is inside both the \model{AST} and the \model{FLT} mask
 (a source pixel).
 
-\item - bit 1 set but not bit 2, so the pixel is outside the \model{AST} mask but
+\item -- Bit 1 set, but not Bit 2, so the pixel is outside the \model{AST} mask but
 inside the \model{FLT} mask (a border-line pixel).
 
-\item - bit 2 set but not bit 1, so the pixel is inside the \model{AST} mask but
+\item -- Bit 2 set, but not Bit 1, so the pixel is inside the \model{AST} mask but
 outside the \model{FLT} mask (a border-line pixel).
 
-\item - both bits set, so the pixel is inside neither mask (a background
+\item -- Both bits set, so the pixel is inside neither mask (a background
 pixel).
 \end{enumerate}
 
 \cref{Figure}{fig:qualmap}{Quality component displayed as an image} shows
-a simple map of the \texttt{Quality} array values --- the black areas have
+a simple map of the \texttt{Quality} array values---the black areas have
 value zero and are thus inside both masks, the dark brown areas have value 2
 and are thus inside the \model{AST} mask but outside the \model{FLT} mask.
-The light brown areas have value 3 and are inside neither mask. In this
+The light-brown areas have value 3 and are inside neither mask. In this
 particular case, there are no  areas with a quality value of 1, so the
 \model{FLT} mask is contained entirely within the \model{AST} mask.
 
@@ -495,7 +579,7 @@ will set all pixels bad in \texttt{fred.sdf} except for those inside the
 \end{terminalv}
 
 will set all pixels bad except for those inside the \model{FLT} mask.  Note, the
-change made by \task{setbb} is temporary - it can be undone by doing:
+change made by \task{setbb} is temporary---it can be undone by doing:
 
 \begin{terminalv}
 % setbb fred 0
@@ -541,7 +625,7 @@ the \gaiathing{Other image:} box, or selecting with
 \cref{Figure}{fig:maskdisp}{the figure below}.
 
 For more information on the use of masks by \makemap\ and the
-parameters that affect them see \cref{sectyion}{sec:masking}{Masking}.
+parameters that affect them see \cref{section}{sec:masking}{Masking}.
 
 \starfig{sc21_dispmask3}{[hb!]}{width=0.95\linewidth}{fig:maskdisp}{
    Contours of an \model{AST} mask overlaid on a map}{
@@ -614,8 +698,9 @@ pixel mask showing the clump boundaries.
 
 The shape option allows \findclumps\ to create an
 \htmladdnormallink{STC-S}{http://ivoa.net/documents/STC-S/index.html}
-description (polygonal or elliptical) for each clump. These are added
-as extra columns to the output catalogue.
+description (polygonal or elliptical) for each clump that
+can be displayed over any image in \gaia (\cref{Figure}{fig:stcshapes}{}).
+These are added as extra columns to the output catalogue.
 
 \begin{aligndesc}
 \item[Polygon] Each polygon will have, at most, 15 vertices. For

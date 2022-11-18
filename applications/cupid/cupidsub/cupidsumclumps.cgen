@@ -443,8 +443,10 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
 /* Store a pointer of the relevant type to the output array. */
       if( alg == GAUSSCLUMPS ) {
          pd = (CGEN_TYPE *) out;
+         pi = NULL;
       } else {
          pi = (int *) out;
+         pd = NULL;
       }
 
 /* Lock the HDS object for read only access by this thread. */

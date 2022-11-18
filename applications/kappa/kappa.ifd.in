@@ -20277,11 +20277,11 @@ iraf! {
    }
 
    command fitsedit {
-      obey {$KAPPA_DIR/fitsedit.csh}
+      obey {$KAPPA_DIR/fitsedit.sh}
    }
 
    command fitshead {
-      obey {$KAPPA_DIR/fitshead.csh}
+      obey {$KAPPA_DIR/fitshead.sh}
    }
 
    command outline {

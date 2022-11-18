@@ -5,6 +5,8 @@
 /libsmf/smf_average_data.c
 /libsmf/smf_boxcar1.c
 /libsmf/smf_downsamp1.c
+/libsmf/smf_get_global0.c
+/libsmf/smf_put_global0.c
 /libsmf/smf_sigmaclip.c
 /libsmf/smf_sort.c
 /libsmf/smf_stats1.c

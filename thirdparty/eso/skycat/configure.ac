@@ -20,13 +20,13 @@ export star_extra_items
 
 dnl    To configure run ./configure in the subdirectory.
 dnl    Do not invoke AC_CONFIG_SUBDIRS, since that prompts autoreconf
-dnl    to try to reconfigure that directory, and automake to assume 
+dnl    to try to reconfigure that directory, and automake to assume
 dnl    it's allowed to play there, too.
 (
     for f in skycat/tclutil skycat/astrotcl skycat/cat skycat/rtd skycat/skycat; do
        (cd $f ; \
         cmd="./configure --prefix=$prefix \
-                         --with-cfitsio=$prefix/lib \
+                         --with-cfitsio=$prefix \
                          $star_extra_items \
                          --cache-file=../config.cache"; \
         echo $cmd; \

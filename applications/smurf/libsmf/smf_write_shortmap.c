@@ -216,8 +216,6 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
   if( *status == SAI__OK ) {
     if( cycleperiod != 0.0 ) {
       nshort = shortmap;
-      /*gsb_period = 5.54126;*/
-      /*gsb_period = 5.54252569671184;*/
       if( cyclestart == VAL__BADD ) {
         cyclestart = floor(res->sdata[idx]->hdr->allState[istart].rts_end);
       }

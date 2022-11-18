@@ -3,7 +3,7 @@
 #     dimmconfig_bright_compact.lis
 
 #  Purpose:
-#     A MAKEMAP configuration suitable for bright isolated compact sources .
+#     A MAKEMAP configuration suitable for bright isolated compact sources.
 
 #  Description:
 #     This file provides values for parameters used by the SMURF:MAKEMAP
@@ -20,8 +20,8 @@
 #     of calibrators (which may be quite bright). We constrain the map
 #     using ast.zero_circle=(0.01666), which sets all pixels beyond 60
 #     arcsec to zero until the last iteration.  A word of warning: if
-#     the source is near the edge of the map (or has an extent large than
-#     the size of this mask!) this configuration may give odd results due
+#     the source is near the edge of the map (or has an extent larger than
+#     the size of this mask) this configuration may give odd results due
 #     to the value of ast.zero_lowhits!  If you suspect a problem, compare
 #     the location of the source with the zero-masked pixels (see QUALITY
 #     component of the resulting map). If the mask overlaps with the source,
@@ -60,14 +60,14 @@
    com.perarray = 1
 
 #  We can get away with harsher filtering since the boundary conditions are
-#  quite tight
+#  quite tight.
    flt.filt_edge_largescale=200
 
-#  Use boundary constraints since the source is assumed to be isolated
+#  Use boundary constraints since the source is assumed to be isolated.
    ast.zero_circle = (0.016666)
 
 #  Mask the data when forming th FLT model in order to exclude the
-#  source. This only happends on the first two iterations. This usually
+#  source. This only happens on the first two iterations. This usually
 #  speeds up convergence.
    flt.zero_circle = (0.016666)
 

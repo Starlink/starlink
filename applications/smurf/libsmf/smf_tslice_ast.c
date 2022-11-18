@@ -106,6 +106,8 @@
 *        Trap bad telescope position.
 *     2017-01-10 (GSB):
 *        Attempt to read DTAI header.
+*     2022-10-16 (GSB):
+*        Add check of jos_drcontrol position problem flag for ACSIS.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -249,7 +251,10 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
       /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
          still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
 
-      if( hdr->detpos ) {
+      if( tmpState->jos_drcontrol & DRCNTRL__TCS_POSN_BIT ) {
+        /* Do not create WCS. */
+
+      } else if( hdr->detpos ) {
         hdr->cache3 = smf_detpos_wcs( hdr, index, dut1, dtai, hdr->telpos,
                                       &(hdr->wcs), hdr->cache3, status );
 

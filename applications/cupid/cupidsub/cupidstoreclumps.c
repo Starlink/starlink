@@ -234,13 +234,13 @@ void cupidStoreClumps( const char *param1, const char *param2, int indf,
    char *p1;                /* Pointer to next character */
    char *stc_data;          /* Array of fixed-length STC strings */
    char *stcptr = NULL;     /* Pointer to buffer holding STC-S clump description */
-   char attr[ 15 ];         /* AST attribute name */
+   char attr[ 25 ];         /* AST attribute name */
    char buf2[ 2*LOGTAB ];   /* Buffer for a log file unit string */
    char buf[ 2*LOGTAB ];    /* Buffer for a log file column value */
    char cat1[ MAXCAT + 1 ]; /* KAPPA-style catalogue name */
    char cat2[ MAXCAT + 1 ]; /* JSA-style catalogue name */
    char key[ 20 ];          /* KeyMap key */
-   char unit[ 10 ];         /* String for NDF Unit component */
+   char unit[ 20 ];         /* String for NDF Unit component */
    const char **names;      /* Component names */
    const char **units;      /* Component units */
    const char *cname;       /* Pointer to column name string */

@@ -1,0 +1,498 @@
+#include "sae_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+
+void CGEN_FUNCTION( kpgBlonSec )( int bad, int sambad, int var, int ndim,
+                                  const size_t dims[], size_t lo, size_t hi,
+                                  const CGEN_TYPE a[], const int ibox[],
+                                  int nlim, size_t wdim, CGEN_TYPE b[],
+                                  int *badout, CGEN_TYPE asum[], int nsum[],
+                                  int *status ){
+/*
+*+
+*  Name:
+*     kpgBlonSec<T>
+
+*  Purpose:
+*     Smooths a section of an n-dimensional image using box filter.
+
+*  Synopsis:
+*     void kpgBlonSec<T>( int bad, int sambad, int var, int ndim,
+*                         const size_t dims[], size_t lo, size_t hi,
+*                         const CGEN_TYPE a[], const int ibox[],
+*                         int nlim, size_t wdim, CGEN_TYPE b[],
+*                         int *badout, CGEN_TYPE asum[], int nsum[],
+*                         int *status )
+
+*  Description:
+*     This function smooths a section of an n-dimensional array using an
+*     n-dimensional box filter; each pixel is replaced by the mean of those
+*     good neighbours which lie within a box of specified size.
+*
+*     The section to be smoothed is specified by upper and lower limits
+*     on the final pixel axis. See arguments "lo" and "hI". For instance,
+*     if the array is 3-dimensional, each section is a slab of adjacent
+*     XY planes.
+
+*  Parameters:
+*     bad
+*        Whether it is necessary to check for bad pixels in the input
+*        image.
+*     sambad
+*        If a non-zero value is given for this parameter, then bad input
+*        pixels will be propagated to the output image unchanged (a
+*        smoothed output value will be calculated for all other pixels). If
+*        a zero value is given, then the "nlim" parameter determines
+*        whether an output pixel is good or bad.  The value of "sambad" is
+*        not relevant if "bad" is zero.
+*     var
+*        If a zero value is given for this parameter, then the smoothing
+*        applied will be appropriate to a data image. If a non-zero value
+*        is given, then the smoothing will be appropriate to an image
+*        containing variance values. In the latter case the output values
+*        will be (on average) smaller than the input values to take account
+*        of the variance-reducing effect which smoothing produces.
+*     ndim
+*        The number of dimensions of the array to be smoothed.
+*     dims
+*        The dimensions of the array to be smoothed. The supplied "dims"
+*        array should have at least "ndim" elements.
+*     lo
+*        The 1-based grid index on the final pixel axis of the first hyper-plane
+*        in the section to be smoothed.
+*     hi
+*        The 1-based grid index on the final pixel axis of the last hyper-plane
+*        in the section to be smoothed.
+*     a
+*        Input array to be smoothed.  Its dimensions are given by parameter
+*        "dims".
+*     ibox
+*        Half-size of the smoothing box in pixels along eeach axis (the
+*        actual size of the ith axis's box used will be 2*"ibox"(i)+1
+*        pixels). The supplied "ibox" array should have at least "ndim"
+*        elements.
+*     nlim
+*        Minimum number of good pixels which must be present in the
+*        smoothing box in order to calculate a smoothed output pixel. If
+*        this minimum number is not satisfied, then a bad output pixel will
+*        result. "a" value between 1 and the total number of pixels in the
+*        smoothing box should be supplied.
+*     wdim
+*        The dimension of the "asum" and "nsum" workspaces.  It must be at
+*        least 1 + "dims"( 1 ) for a two-dimensional array , and at least 1
+*        + ( "dims"(1) * ... ( 1 + "dims"("ndim"-1) ) ... ) for an
+*        "ndim"-dimensional array.  For example a 20x16x27-element array
+*        would need WLIM not fewer than 1+(20*(1+16)=341 elements.
+*     b
+*        Returned holding the smoothed output array.  It has the same
+*        dimensions as "a".
+*     *badout
+*        Returned holding the whether bad pixels are present in the output
+*        image.
+*     asum
+*        Returned holding the workspace for the pixel sums. The supplied
+*        "asum" array should have at least "wdim" elements.
+*     nsum
+*        Returned holding the workspace for counting good pixels. The
+*        supplied "nsum" array should have at least "wdim" elements.
+*     *status
+*        The global status.
+
+*  Notes:
+*     -  There is a function for processing single- and double-precision
+*     arrays; replace "x" in the function name by R or D as appropriate.
+*     The data type of the "a", "b" and "asum" arguments must match the
+*     function used.
+*     -  The function uses recursion of the standard filter algorithm for
+*     each dimension moving from the highest to lowest. Recursion ends when
+*     there is only the integrated value and the corresponding number of
+*     contributing pixels sums used to find the output smoothed value for
+*     the current element of the input array.  At each dimension the filter
+*     box is initialised with the required number of values for the box
+*     width, and then as the function progresses through each position in
+*     the current dimension a new section is incorporated into the
+*     summations, while a section leaving the box is subtracted.
+
+*  Copyright:
+*     Copyright (C) 2022 East Asian Observatory
+*     All rights reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or modify
+*     it under the terms of the GNU General Public License as published by
+*     the Free Software Foundation; either Version 2 of the License, or (at
+*     your option) any later version.
+*
+*     This program is distributed in the hope that it will be useful, but
+*     WITHOUT ANY WARRANTY; without even the implied warranty of
+*     MERCHANTABILITY or FITNESS FOR "a" PARTICULAR PURPOSE. See the GNU
+*     General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+*     02110-1301, USA.
+
+*  Authors:
+*     DSB: David S. Berry (EAO)
+
+*  History:
+*     25-APR-2022 (DSB):
+*        Original version, based on Fortran function KPG_BLON by MJC.
+
+*-
+*/
+
+/* Local Variables: */
+   CGEN_TYPE denom;      /* Denominator for smoothed output value */
+   CGEN_TYPE npix;       /* Number of pixels in smoothing box */
+   hdsdim k;             /* Loop counter for box initialisation */
+   hdsdim m0;            /* 0-based index of o/p pixel prior to smoothed section */
+   hdsdim m;             /* Loop counter for output elements */
+   int cdim;             /* Current dimension in recursion */
+   int end;              /* New box has been found or there are  no more boxes to sum */
+   size_t bnew;          /* New box pixel offset */
+   size_t bof;           /* Box pixel offset */
+   size_t bold;          /* Old box pixel offset */
+   size_t el;            /* 0-based index of last o/p pixel to be calculated */
+   size_t i;             /* Loop counter */
+   size_t ib;            /* Box index */
+   size_t idim[ NDF__MXDIM ];         /* Indices of an array element */
+   size_t j;             /* Index within summation array */
+   size_t new;           /* Position of new pixel */
+   size_t old;           /* Position of old pixel */
+   size_t sof[ NDF__MXDIM ];/* Summation array offset */
+   size_t stride[ NDF__MXDIM ];       /* Strides through array dimensions */
+
+/* Initialise the bad-output-pixel flag. */
+   *badout = 0;
+
+/* Check the inherited global status. */
+   if( *status != SAI__OK ) return;
+
+/* Compute the strides and numbers of elements.
+   ============================================ */
+
+/* Initialise the stride of dimension number 1 for the data and output
+   array objects. (The stride for a dimension is the amount by which
+   the vectorised array index increases when the n-dimensional array
+   index for that dimension increases by 1.) */
+   stride[ 0 ] = 1;
+
+/* Calculate the stride for each remaining dimension.  The final stride
+   is also the number of elements in the initial summation arrays. */
+   for( i = 1; i < ndim; i++ ){
+      stride[ i ] = stride[ i - 1 ]*dims[ i - 1 ];
+   }
+
+/* Calculate the number of pixels in the averaging box. */
+   npix = 1;
+   for( i = 0; i < ndim; i++ ){
+      npix = npix*( 2*ibox[ i ] + 1 );
+   }
+
+/* Calculate the one-based vectorised index of the last pixel in the
+   section to be smoothed ("el") and the one-based vectorised index of
+   the last pixel prior to the start of the section to be smoothed
+   ("m0"). */
+   el = 1;
+   for( i = 0; i < ndim - 1; i++ ){
+      el *= dims[ i ];
+   }
+   m0 = el*( lo - 1 );
+   el *= hi;
+
+/* Convert these two indices from one-based to zero-based. */
+   m0--;
+   el--;
+
+/* Find the offsets in the summation arrays for each dimensionality. Use
+   a signed int as the loop variable since it will decremented when zero. */
+   sof[ ndim - 1 ] = 0;
+   for( k = ndim - 2; k >= 0; k-- ){
+      sof[ k ] = sof[ k + 1 ] + stride[ k + 1 ];
+   }
+
+
+/* Form the initial summations for the highest dimension.
+   ====================================================== */
+
+/* It would be straightforward to extract each box in turn and sum
+   within it in.  However, this is inefficient and a rolling window
+   is used so only the values leaving and entering the smoothing
+   region need be processed. */
+
+/* Initialise the portion of the workspace arrays required for the
+   "ndim" dimension's summations. */
+   for( i = 0; i < stride[ ndim - 1 ]; i++ ){
+      asum[ i ] = 0.0;
+      nsum[ i ] = 0;
+   }
+
+/* Loop to initialise elements of the two workspace arrays so that they
+   contain sum for the good pixels in a box of size 1x(2*ibox[ndim]+1)
+   centred on pixel location [,,,lo-1].  First loop over all the
+   possible contributing lines. Here, "k" is a one-based index on the
+   final pixel axis. */
+   for( k = (hdsdim)(lo - 1) - ibox[ ndim - 1 ]; k <= (hdsdim)(lo - 1) + ibox[ ndim - 1 ]; k++ ){
+
+/* If the pixel lies outside the input array, then use the boundary
+   instead ("ib" is also one-based). */
+      ib = NDF_MAX( 1, NDF_MIN( k, (hdsdim) dims[ ndim - 1 ] ) );
+
+/* Find the offset of the line to be accumulated. */
+      bof = ( ib - 1 )*stride[ ndim - 1 ];
+
+/* Accumulate sums for each box in the workspace arrays. If bad pixels
+   are present, then test for them. */
+      if( bad ) {
+         for( i = 0; i < stride[ ndim - 1 ]; i++ ){
+            if( a[ i + bof ] != CGEN_BAD ) {
+               asum[ i ] += a[ i + bof ];
+               nsum[ i ]++;
+            }
+         }
+
+/* If no bad pixels are present, then omit the test for them. */
+      } else {
+         for( i = 0; i < stride[ ndim - 1 ]; i++ ){
+            asum[ i ] += a[ i + bof ];
+         }
+      }
+   }
+
+/* Prepare to form the sums.
+   ========================= */
+
+/* Recursive scanning of the array dimensions begins with the highest
+   dimension. The asum and nsum arrays were initialised above for hyper-plane
+   "lo-1". */
+   cdim = ndim;
+   for( i = 0; i < ndim; i++ ){
+      idim[ i ] = 0;
+   }
+   idim[ ndim - 1 ] = lo - 1;
+
+/* Loop for every array element in the section to be smoothed.
+   ========================================================== */
+/* m is initialised to -1 so needs to be a signed integer value, but el is
+   unsigned. Simply comparing them using "m < el" would cause the inital
+   m value of -1 to be cast to a huge unsigned value thus causing the
+   expression value to be zero. So we check for negative m values
+   separately. */
+   m = m0;
+   while( m < 0 || m < el ){
+
+/* This is effectively a "DO UNTIL" loop, which starts with the current
+   dimension summing values and numbers of pixels in the smoothing box,
+   and reduces dimensionality, summing the sums, until just a vector
+   remains. */
+
+/* Determine what should be the current dimension for the summations.
+   ================================================================== */
+      end = 0;
+      while( !end ){
+
+/* Shift the box along the current dimension. */
+         idim[ cdim - 1 ]++;
+
+/* Has it gone beyond the current dimension? */
+         if( idim[ cdim - 1 ] > dims[ cdim - 1 ] ) {
+
+/* Reset index within current dimension. */
+            idim[ cdim - 1 ] = 0;
+
+/* As it has completed the dimension for the current next-higher
+   dimension's smoothing block, go to the next higher dimension.  There
+   must be one since there are still output elements to be computed. */
+            cdim++;
+
+         } else {
+
+/* The next box location has been located successfully within the
+   current dimenson, so exit the loop. */
+            end = 1;
+
+         }
+      }
+
+/* Smooth down the array.
+   ====================== */
+
+/* Loop to form smoothed output values for each image line (or plane
+   or hyperplane depending on the dimensionality) by moving the
+   accumulated sums for each initial box down the input array. */
+
+/* Find the position of the old input line/plane/cube/hypercube that
+   is lost from the box as the box is moved down the array in the
+   current dimension.  Likewise find the position of the new
+   line/plane/cube/hypercube that enters the box.  Allow for the array
+   boundaries. */
+      old = NDF_MAX( 1, (hdsdim) idim[ cdim - 1 ] - ibox[ cdim - 1 ] - 1 );
+      new = NDF_MIN( dims[ cdim - 1 ], idim[ cdim - 1 ] + ibox[ cdim - 1 ] );
+
+/* Find the offset of the slab to be removed and the slab to be
+   accumulated.  Note that the recursion is different for the highest
+   dimension as this is where values are extracted and summed from the
+   input array.  In subsequent recursions, values in the summation
+   array are summed to the next unused portion of the summation arrays. */
+      if( cdim == ndim ) {
+         bold = ( old - 1 )*stride[ cdim - 1 ];
+         bnew = ( new - 1 )*stride[ cdim - 1 ];
+
+/* Remove the pixels in the old line from the accumulated sums and add
+   the pixels in the new line.  If bad pixels are present, then test
+   for them. */
+         if( bad ) {
+            for( i = 0; i < stride[ ndim - 1 ]; i++ ){
+               if( a[ i + bold ] != CGEN_BAD ) {
+                  asum[ i ] += -a[ i + bold ];
+                  nsum[ i ]--;
+               }
+
+               if( a[ i + bnew ] != CGEN_BAD ) {
+                  asum[ i ] += a[ i + bnew ];
+                  nsum[ i ]++;
+               }
+            }
+
+/* If bad pixels are absent, then there is no need to test for them.
+   There is also no need to keep track of the number of good pixels in
+   the box, as this will always be equal to the total number of pixels
+   in the smoothing box. */
+         } else {
+            for( i = 0; i < stride[ cdim - 1 ]; i++ ){
+               asum[ i ] += a[ i + bnew ] - a[ i + bold ];
+            }
+         }
+
+/* Add the sums from a higher dimension to collapse a dimension.
+   ============================================================= */
+      } else {
+
+/* Loop to initialise elements of the two workspace arrays so that they
+   contain sum for the good pixels in a box of size 1x(2*"ibox"("cdim")+1). */
+         if( idim[ cdim - 1 ] == 1 ) {
+
+/* Initialise the portion of the workspace arrays required for the
+   "ndim" dimension's summations. */
+            for( i = 0; i < stride[ cdim - 1 ]; i++ ){
+               asum[ i + sof[ cdim - 1 ] ] = 0.0;
+               nsum[ i + sof[ cdim - 1 ] ] = 0;
+            }
+
+/* Loop to initialise elements of the two workspace arrays so that they
+   contain sum for the good pixels in a box of size 1x(2*"ibox"("cdim")+1)
+   centred on pixel location (IX,0,...). */
+            for( k = -ibox[ cdim - 1 ] - 1; k < ibox[ cdim - 1 ]; k++ ){
+
+/* If the pixel lies outside the input array, then use the boundary
+   instead. */
+               ib = NDF_MAX( 1, NDF_MIN( k + 1, (hdsdim) dims[ cdim - 1 ] ) );
+
+/* Find the offset of the line to be accumulated.  This has two
+   components: the location of the next line/plane/cube in the
+   smoothing box, and the offset of the already summed data within
+   the summation array.  Note that the latter is for the next higher
+   dimension. */
+               bof = ( ib - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
+
+/* Accumulate sums for each box in the workspace arrays. */
+               for( i = 0; i < stride[ cdim - 1 ]; i++ ){
+                  j = i + sof[ cdim - 1 ] + 1;
+                  asum[ j - 1 ] += asum[ i + bof ];
+                  if( bad ) nsum[ j - 1 ] += nsum[ i + bof ];
+               }
+            }
+         }
+
+/* For the smmothing box centred on element "idim"( "cdim" ), find the
+   offset of the slab to be removed for the slab centred and the
+   slab to be accumulated.  As above combine the two components.
+   Note that the ofset for the input summation array is for the
+   next higher dimension. */
+         bold = ( old - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
+         bnew = ( new - 1 )*stride[ cdim - 1 ] + sof[ cdim ];
+
+         for( i = 0; i < stride[ cdim - 1 ]; i++ ){
+            j = i + sof[ cdim - 1 ] + 1;
+            asum[ j - 1 ] += asum[ i + bnew ] - asum[ i + bold ];
+            if( bad ) nsum[ j - 1 ] += nsum[ i + bnew ] - nsum[ i + bold ];
+         }
+      }
+
+/* See if the recursion has ended such that we can evaluate output
+   values. */
+      if( cdim == 1 ) {
+
+/* Find the denominator along each array line.
+   ============================================ */
+
+/* Increment the output-pixel index. */
+         m++;
+
+/* If there are no bad pixels present, then this is equal to the number
+   of pixels in the smoothing box.  Otherwise, use the accumulated sum
+   of good pixels. */
+         if( !bad ) {
+            denom = npix;
+         } else {
+            denom = nsum[ sof[ 0 ] ];
+         }
+
+/* If smoothing a variance image, then use the square of the number of
+   good pixels (this takes account of the variance-reducing effect that
+   smoothing introduces). */
+         if( var ) denom *= denom;
+
+/* Calculate the smoothed output value.
+   ==================================== */
+
+/* This is valid if there are no bad pixels present. */
+         if( denom == 0 ) {
+            b[ m ] = CGEN_BAD;
+            *badout = 1;
+
+         } else if( !bad ) {
+            b[ m ] = asum[ sof[ 0 ] ]/denom;
+
+/* It is also valid if "sambad" is non-zero and the corresponding input
+   pixel is not bad. */
+         } else if( sambad ) {
+            if( a[ m ] != CGEN_BAD ) {
+               b[ m ] = asum[ sof[ 0 ] ]/denom;
+
+/* It is bad if "sambad" is non-zero and the corresponding input pixel is
+   bad.  Note that bad pixels are present in the output image. */
+            } else {
+               b[ m ] = CGEN_BAD;
+               *badout = 1;
+            }
+
+/* It is valid if "sambad" is zero and the "nlim" criterion is met. */
+         } else {
+            if( denom >= nlim ) {
+               b[ m ] = asum[ sof[ 0 ] ]/denom;
+
+/* It is bad if the "nlim" criterion is not met.  Note that bad pixels are
+   present in the output image. */
+            } else {
+               b[ m ] = CGEN_BAD;
+               *badout = 1;
+            }
+         }
+
+/* The algorithm calls itself recursively here.
+   ============================================ */
+
+/* The algorithm invokes itself recursively to process the next lower
+   dimension.  Decrement the current dimension count and branch back to
+   the start. */
+      } else {
+         cdim--;
+      }
+
+   }
+
+}
+

@@ -59,8 +59,7 @@
 *        values minus the select PCA components. If zero, the values returned
 *        in "data" are the select PCA components themselves.
 *     keymap = AstKeyMap * (Given)
-*        Keymap containing parameters that control how flagbad works. See
-*        smf_find_gains for details.
+*        Keymap containing parameters related to the PCA model.
 *     mask = smf_qual_t (Given)
 *        Define which bits in quality indicate locations of gaps to be filled
 *        prior to doing the PCA analysis.
@@ -148,6 +147,9 @@
 *        - When determining the principal components, do not include
 *        boloemeters that too few good samples. This because gap-filled
 *        samples seem to upset the calculation of the components.
+*     2021-10-07 (DSB):
+*        Allow the tolerance of the SVD calculation to be specified via a
+*        config parameter.
 
 *  Copyright:
 *     Copyright (C) 2011 University of British Columbia.
@@ -524,6 +526,7 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   smfPCAData *pdata=NULL; /* Pointer to job data */
   smf_qual_t *qua=NULL;   /* Pointer to quality array */
   gsl_vector *s=NULL;     /* singular values for SVD */
+  double svd_eps;         /* Tolerance for SVD calculation */
   size_t bstep;           /* Bolo step size for job division */
   size_t step;            /* step size for job division */
   size_t tlen;            /* Length of the time-series used for PCA */
@@ -874,8 +877,8 @@ size_t smf_clean_pca( ThrWorkForce *wf, smfData *data, size_t t_first,
   msgOutif( MSG__VERB, "", FUNC_NAME
             ": perfoming singular value decomposition...", status );
 
-  smf_svd( wf, ngoodbolo2, cov->data, s->data, NULL, 10*VAL__EPSD,
-           1, status );
+  astMapGet0D( keymap, "SVD_EPS", &svd_eps );
+  smf_svd( wf, ngoodbolo2, cov->data, s->data, NULL, svd_eps, 1, status );
   if( CHECK ) {
     double check=0;
 

@@ -153,6 +153,9 @@ void CGEN_FUNCTION(cupidFWJoin)( CGEN_TYPE *array, size_t nel, int ndim,
 /* Abort if an error has already occurred. */
    if( *status != SAI__OK ) return;
 
+/* Avoid compiler warnings. */
+   jnew = 0;
+
 /* Get the minimum dip between two adjoining peaks necessary for the two
    peaks to be considered distinct. */
    mindip = cupidConfigRMS( config, "MINDIP", rms, 2.0*rms, status );

@@ -10,3 +10,8 @@ void CGEN_FUNCTION(kpgCadd)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TY
 void CGEN_FUNCTION(kpgCsub)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpgCmult)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
 void CGEN_FUNCTION(kpgCdiv)( ThrWorkForce *wf, int bad, size_t el, const CGEN_TYPE *a, double cons, CGEN_TYPE *b, size_t *nerr, int *status );
+void CGEN_FUNCTION(kpg1Qntl)( int usewt, int interp, CGEN_TYPE fract, int el, const CGEN_TYPE x[], const CGEN_TYPE w[], int ip[], CGEN_TYPE *q, int *status );
+void CGEN_FUNCTION(kpgBlon)( ThrWorkForce *wf, int bad, int sambad, int var, int ndim, const size_t dims[], const CGEN_TYPE a[], const int ibox[], int nlim, CGEN_TYPE b[], int *badout, int *status );
+void CGEN_FUNCTION(kpgBlonSec)( int bad, int sambad, int var, int ndim, const size_t dims[], size_t lo, size_t hi, const CGEN_TYPE a[], const int ibox[], int nlim, size_t wdim, CGEN_TYPE b[], int *badout, CGEN_TYPE asum[], int nsum[], int *status );
+void CGEN_FUNCTION(kpgBmdnSec)( int bad, int sambad, int var, int ndim, const size_t dims[], size_t seclo, size_t sechi, const CGEN_TYPE in[], const int hb[], int nlim, CGEN_TYPE out[], int *badout, CGEN_TYPE work1[], int work2[], int *status );
+void CGEN_FUNCTION(kpgBmdn)( ThrWorkForce *wf, int bad, int sambad, int var, int ndim, const size_t dims[], const CGEN_TYPE in[], const int hb[], int nlim, CGEN_TYPE out[], int *badout, int *status );

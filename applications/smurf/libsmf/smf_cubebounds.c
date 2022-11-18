@@ -237,6 +237,8 @@
 *     22-JAN-2021 (DSB):
 *        Report an error if the cube exceeds 5000 pixels on either of the
 *        two spatial axes.
+*     15-OCT-2022 (GSB):
+*        Add check of jos_drcontrol position problem flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -338,6 +340,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    double specin[ 2];    /* Spectral values to be transformed */
    double specout[ 2];   /* Transformed spectral values */
    double temp;          /* Temporary storage used when swapping values */
+   drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
    float *pdata;         /* Pointer to next data sample */
    int actval;           /* Number of parameter values supplied */
    int found;            /* Was the detector name found in the supplied group? */
@@ -639,6 +642,11 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    This involves finding the spatial extent of each time slice in the
    input. Loop round all the time slices in the input file. */
       for( itime = 0; itime < (data->dims)[ 2 ] && *status == SAI__OK; itime++ ) {
+
+/* Skip this time slice if flagged due to a position problem. */
+         if( (hdr->allState)[itime].jos_drcontrol & drcntrl_mask ) {
+            continue;
+         }
 
 /* Get a FrameSet describing the spatial coordinate systems associated with
    the current time slice of the current input data file. The base frame in

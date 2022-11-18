@@ -7,7 +7,8 @@ libsmf_la_SOURCES = $(C_ROUTINES)
 
 CGENERIC_ROUTINES = smf_boxcar1.cgen smf_templateFit1.cgen smf_sort.cgen \
 	smf_average_data.cgen smf_stats1.cgen smf_tophat1.cgen \
-	smf_downsamp1.cgen smf_weightstats1.cgen smf_sigmaclip.cgen
+	smf_downsamp1.cgen smf_weightstats1.cgen smf_sigmaclip.cgen \
+	smf_get_global0.cgen smf_put_global0.cgen
 
 # The .c files which are built from the above .cgen files.
 BUILT_C_ROUTINES = $(CGENERIC_ROUTINES:.cgen=.c)
@@ -165,7 +166,9 @@ smf_expmodel_init.c \
 smf_export_noi.c \
 smf_ext2km.c \
 smf_extracols.c \
+smf_fcf.c \
 smf_ffclean.c \
+smf_ffmask.c \
 smf_fft_2dazav.c \
 smf_fft_avpspec.c \
 smf_fft_cart2pol.c \
@@ -257,7 +260,6 @@ smf_get_dims.c \
 smf_get_extpar.c \
 smf_get_findex.c \
 smf_get_freemem.c \
-smf_get_global0I.c \
 smf_get_goodrange.c \
 smf_get_gridcoords.c \
 smf_get_grp_metadata.c \
@@ -369,7 +371,6 @@ smf_polang.c \
 smf_polext.c \
 smf_pread.c \
 smf_projbox.c \
-smf_put_global0I.c \
 smf_puthistory.c \
 smf_qfamily_count.c \
 smf_qfamily_str.c \
@@ -461,6 +462,7 @@ smf_update_valbad.c \
 smf_updateprov.c \
 smf_validate_smfData.c \
 smf_validate_smfHead.c \
+smf_validate_tcs_position.c \
 smf_whiten.c \
 smf_write_bolomap.c \
 smf_write_bolotable.c \
