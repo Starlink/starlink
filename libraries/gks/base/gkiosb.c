@@ -52,6 +52,7 @@
 #include "gkerr.h"		/* For KERROR */
 #include "gkdt.h"		/* For KWK */
 #include "gkwca.h"		/* For KWKIX */
+#include "gks.h"
 
 /*
  * Constants:

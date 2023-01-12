@@ -47,7 +47,7 @@
 #endif
 
 #include "f77_type.h"      /* For FORTRAN 77 type equivalencing. */
-
+#include "gks.h"
 
 /*
  * Comments:
