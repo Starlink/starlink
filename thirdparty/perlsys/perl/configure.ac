@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision: 19893 $)
 
 dnl    Initialisation: package name and version number
-AC_INIT(perl, 5.18.2, starlink@jiscmail.ac.uk)
+AC_INIT(perl, 5.36.0, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)

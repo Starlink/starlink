@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="perl" support="U">
-  <version>5.18.2</version>
+  <version>5.36.0</version>
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <!-- <abstract><p></p></abstract> -->
