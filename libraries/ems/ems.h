@@ -206,4 +206,8 @@ void ems1Gesc( const char *escchr, const char *string, int *iposn );
 
 void ems1Gnam( const char *string, int *iposn, char *name, int *namlen, int *status);
 
+/* Used by IDI. */
+
+void ems1Fcerr( char *errstr, int *errnum_p );
+
 #endif	/* EMS_DEFINED */

@@ -58,7 +58,6 @@ void ems1Emark( void );
 void ems1Erlse( void );
 void ems1Estor( const char *param, int plen, const char *msg, int mlen,int *status);
 void ems1Estor1( ems_msgtab_t *msgtab, const char *param, int plen, const char *msg, int mlen,int *status);
-void ems1Fcerr( char *errstr, int *errnum_p );
 void ems1Flush( int *status );
 void ems1Form( const char *text, const int, Logical esctokval, Logical clean,
                char *opstr, int *oplen, int *status );
