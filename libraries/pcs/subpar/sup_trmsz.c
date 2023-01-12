@@ -73,9 +73,7 @@
 *-
 */
 #include <termios.h>
-#ifndef TIOCGWINSZ
 #include <sys/ioctl.h>
-#endif
 #include <unistd.h>
 #include "f77.h"
 
