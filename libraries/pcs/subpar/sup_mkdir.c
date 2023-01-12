@@ -72,6 +72,8 @@
 #include <string.h>
 #include <errno.h>
 
+#include "subpar1.h"
+
 int subpar_mkdir( char *dir )
 {
 char *buff;

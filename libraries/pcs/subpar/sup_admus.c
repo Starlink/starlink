@@ -79,6 +79,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "subpar1.h"
+
 F77_SUBROUTINE(subpar_admus)( CHARACTER(admus), INTEGER(aulen), INTEGER(status)
                            TRAIL(admus) )
 {
