@@ -2136,7 +2136,7 @@ static void tkpg_update_border(TkPgplot *tkpg)
     tkpg->border = bd;
     tkpg_draw_3d_border(tkpg);
   } else {
-    fprintf(stderr, "Tk_Get3DBorder failed: %s\n", tkpg->interp->result);
+    fprintf(stderr, "Tk_Get3DBorder failed: %s\n", Tcl_GetStringResult(tkpg->interp));
   };
 }
 

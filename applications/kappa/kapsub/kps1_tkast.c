@@ -181,11 +181,11 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
          if( Tcl_Init( interp ) != TCL_OK ) {
             *STATUS = SAI__ERROR;
             errRep("", "Failed to initialise Tcl commands.", STATUS );
-            errRepf( "", "%s", STATUS, interp->result );
+            errRepf( "", "%s", STATUS, Tcl_GetStringResult(interp) );
          } else if( Tk_Init( interp ) != TCL_OK ) {
             *STATUS = SAI__ERROR;
             errRep( "", "Failed to initialise Tk commands.", STATUS );
-            errRepf( "", "%s", STATUS, interp->result );
+            errRepf( "", "%s", STATUS, Tcl_GetStringResult(interp) );
          }
       }
 
@@ -197,7 +197,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
          if( Tcl_EvalFile( interp, script ) != TCL_OK ){
             *STATUS = SAI__ERROR;
             errRep( "", "Failed to execute the TCL script...", STATUS );
-            errRepf( "", "%s", STATUS, interp->result );
+            errRepf( "", "%s", STATUS, Tcl_GetStringResult(interp) );
 
 /* If succesfull, loop infinitely, waiting for commands to execute.  When
    there are no windows left, the loop exits. NOTE, it seems that an
@@ -332,7 +332,7 @@ static void SetVar( Tcl_Interp *interp,  char *name,  char *value,
    if( !Tcl_SetVar( interp, name, value, flags) ){
       *STATUS = SAI__ERROR;
       errRepf( "", "Error setting TCL variable \"%s\".", STATUS, name );
-      errRepf( "", "%s", STATUS, interp->result );
+      errRepf( "", "%s", STATUS, Tcl_GetStringResult(interp) );
    }
 }
 
@@ -387,7 +387,7 @@ static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STA
    if ( !ret ) {
       *STATUS = SAI__ERROR;
       errRepf( "", "Error getting TCL variable \"%s\".", STATUS, name );
-      errRepf( "", "%s", STATUS, interp->result );
+      errRepf( "", "%s", STATUS, Tcl_GetStringResult(interp) );
    }
 
    return ret;

@@ -624,7 +624,7 @@ extern F77_SUBROUTINE(ccd1_linflt)();
 
 /* Execute an 'exit' instruction. */
       Tcl_Eval( interpreter, "exit" );
-      fprintf( stderr, "Interpreter returned >%s<\n", interpreter->result );
+      fprintf( stderr, "Interpreter returned >%s<\n", Tcl_GetStringResult(interpreter) );
 
 /* The above ought to terminate this process, but if it doesn't, then this
    is a sensible thing to return. */
