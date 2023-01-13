@@ -9,6 +9,8 @@
 #include "tcl.h"
 #include "tclNbs.h"
 #include "ems.h"
+#include "nbs_typ.h"
+#include "nbs.h"
 
 
 #define TKNBS__SZNAM 48
