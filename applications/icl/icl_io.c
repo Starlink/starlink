@@ -72,9 +72,7 @@
 # error "Unable to locate term.h"
 #endif
 #include <termios.h>
-#ifndef TIOCGWINSZ
 #include <sys/ioctl.h>
-#endif
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/time.h>
