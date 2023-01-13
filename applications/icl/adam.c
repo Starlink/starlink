@@ -71,6 +71,8 @@
 #include "adam_defns.h"
 #include "ams.h"
 #include "nbs_par.h"
+#include "nbs_typ.h"
+#include "nbs.h"
 #include "iclhds.h"
 #include "procs.h"
 #include "adam.h"
