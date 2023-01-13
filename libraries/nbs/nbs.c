@@ -323,6 +323,22 @@
 # include <config.h>
 #endif
 
+/* Include files	*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+/* Error codes */
+
+#include "nbs_err.h"
+
+/* Structure definitions */
+
+#include "nbs_typ.h"
+
 
 /* Depending on whether c_string macro is defined or not, define macros
    for routine names and define module name. */
@@ -332,6 +348,8 @@
 /* C strings are used for character string arguments and input scalars are
    passed by value. Module name is "nbc" and routine names are all prefixed
    "nbc_". */
+
+#include "nbs.h"
 
 #define NBS_TUNE		nbc_tune
 #define NBS_TUNE_NOTICEBOARD	nbc_tune_noticeboard
@@ -426,21 +444,6 @@
 
 #endif
 
-/* Include files	*/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-/* Error codes */
-
-#include "nbs_err.h"
-
-/* Structure definitions */
-
-#include "nbs_typ.h"
 
 /* Macro definitions   */
 

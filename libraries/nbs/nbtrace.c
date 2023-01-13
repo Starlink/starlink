@@ -108,6 +108,8 @@
 #include "ems.h"
 #include "sae_par.h"
 #include "nbs_err.h"
+#include "nbs_typ.h"
+#include "nbs.h"
 
 /*
  * internal prototypes
