@@ -29,6 +29,8 @@
 #include "output.h"
 #include "control.h"
 
+int yyparse();
+
 extern char *currentproc(void);					/* main.c */
 
 /******************************************************************************

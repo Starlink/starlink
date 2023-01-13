@@ -34,6 +34,8 @@
 #include "dtask_err.h"
 #include "f77.h"
 
+int yyparse();
+
 extern int uface_interrupt(void);				/* uface.c  */
 
 /*

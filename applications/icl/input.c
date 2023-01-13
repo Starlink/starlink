@@ -30,6 +30,8 @@
 #include "sae_par.h"
 #include "messys_err.h"
 
+int yyparse();
+
 extern node *node_value(value v);				/* node.c   */
 extern value sys_exception (char * mess);			/* procs.c  */
 extern value sys_exception2
