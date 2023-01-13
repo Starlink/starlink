@@ -266,6 +266,7 @@ extern "C" {
 #   endif
 #endif
 
+#define CONST86 CONST84
 
 /*
  * Make sure EXTERN isn't defined elsewhere

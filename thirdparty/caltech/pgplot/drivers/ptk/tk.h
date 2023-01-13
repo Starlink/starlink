@@ -1555,9 +1555,9 @@ struct Tk_PhotoImageFormat {
 };
 
 EXTERN void             Tk_CreateOldImageType _ANSI_ARGS_((
-				Tk_ImageType *typePtr));
+				const Tk_ImageType *typePtr));
 EXTERN void             Tk_CreateOldPhotoImageFormat _ANSI_ARGS_((
-				Tk_PhotoImageFormat *formatPtr));
+				const Tk_PhotoImageFormat *formatPtr));
 
 #if !defined(USE_TK_STUBS) && defined(USE_OLD_IMAGE)
 #define Tk_CreateImageType Tk_CreateOldImageType
