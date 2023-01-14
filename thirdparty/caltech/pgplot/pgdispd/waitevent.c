@@ -47,6 +47,9 @@
 #include "messages.h"
 #include "commands.h"
 
+int proccom(unsigned short*, int, unsigned short*, int*);
+void returnbuf(short*, int, Window);
+
 /* Choose one of the following to select either good response time or low */
 /* system load, keeping in mind what your system provides.  If none of the */
 /* following defines is chosen, BUSY is used. */

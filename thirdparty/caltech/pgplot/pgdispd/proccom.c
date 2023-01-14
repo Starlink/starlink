@@ -116,6 +116,8 @@ static char rcsid[]="@(#)$Id$";
 #include "globals.h"
 #include "messages.h"
 
+int pggcurs(short*);
+
 /* A trivial macro */
 #define min(x,y) (((x) > (y)) ? (y) : (x))
 

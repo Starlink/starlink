@@ -58,6 +58,9 @@
 #include "figdisp.h"
 #include "globals.h"
 
+int waitevent();
+int handlexevent(XEvent, int*);
+
 int mainloop()
 {
 	XEvent event;	/* the current event */

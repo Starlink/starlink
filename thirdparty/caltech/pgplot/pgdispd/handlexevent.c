@@ -46,6 +46,10 @@ static char rcsid[]="@(#)$Id$";
 #include "globals.h"
 #include "messages.h"
 
+int getdata(XSelectionEvent, short*, int*, Window, int*);
+int pgcursor(XEvent);
+int pggcurs(short*);
+
 int luttransoff=0;
 int modluttransoff=0;
 

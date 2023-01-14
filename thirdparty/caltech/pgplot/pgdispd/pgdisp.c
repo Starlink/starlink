@@ -43,6 +43,11 @@
 #undef DEFINE_GLOBALS
 #undef INC_HEADER_RCS
 
+int initlock();
+int getvisuals();
+int initlgwin();
+int mainloop();
+
 int main(argc,argv)
 int argc;
 char **argv;
