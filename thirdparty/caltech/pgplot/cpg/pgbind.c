@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #ifndef EXIT_SUCCESS
 #define EXIT_SUCCESS 0

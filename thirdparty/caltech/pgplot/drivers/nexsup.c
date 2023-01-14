@@ -11,6 +11,9 @@
 #include <sys/time.h>
 #include <netdb.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 int pgsock=-1;
 struct sockaddr_in server;

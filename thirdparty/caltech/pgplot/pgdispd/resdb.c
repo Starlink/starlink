@@ -47,6 +47,7 @@ static char rcsid[]="@(#)$Id$";
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #ifndef VMS
 #include <pwd.h>
 #endif
@@ -1042,7 +1043,6 @@ char *dest;
 	int uid;
 
 	extern char *getenv();
-	extern int getuid();
 	extern struct passwd *getpwuid();
 	struct passwd *pw;
 	register char *ptr;

@@ -30,6 +30,7 @@
 #include "messages.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_DEPTH	24	/* the maximum visual depth to use */
 
