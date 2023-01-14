@@ -3,6 +3,10 @@
 #include "sae_par.h"
 #include "ccdaux.h"
 
+F77_SUBROUTINE(ccd1_mall)( INTEGER(QUAN), CHARACTER(TYPE),
+                           POINTER(POINT), INTEGER(STATUS)
+                           TRAIL(TYPE) );
+
    void *ccdMall( const char *type, int size, int *status ) {
 /*
 *+

@@ -9,6 +9,11 @@
 #include "ccdaux.h"
 #include "star/grp.h"
 
+F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX),
+                         INTEGER(SIZE), CHARACTER(NAMES),
+                         INTEGER(STATUS)
+                         TRAIL(NAMES) );
+
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), INTEGER(nset),
                               INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof),
                               INTEGER(namgid), DOUBLE_ARRAY(percnt),

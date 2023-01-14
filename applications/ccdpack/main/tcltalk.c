@@ -90,6 +90,16 @@
 #include "msg_par.h"
 #include "cnf.h"
 
+F77_SUBROUTINE(msg_out)( CHARACTER(MSG_NAME), CHARACTER(MSG_TEXT),
+                         INTEGER(STATUS)
+                         TRAIL(MSG_NAME) TRAIL(MSG_TEXT) );
+F77_SUBROUTINE(ccd1_msg)( CHARACTER(ID), CHARACTER(STRING),
+                          INTEGER(STATUS)
+                          TRAIL(ID) TRAIL(STRING) );
+F77_SUBROUTINE(ccd1_errep)( CHARACTER(ID), CHARACTER(STRING),
+                            INTEGER(STATUS)
+                            TRAIL(ID) TRAIL(STRING) );
+
 #define BUFLENG 4096
 
 

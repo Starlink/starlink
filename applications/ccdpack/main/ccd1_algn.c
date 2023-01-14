@@ -11,6 +11,11 @@
 
 #define BUFLENG 200
 
+F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX),
+                         INTEGER(SIZE), CHARACTER(NAMES),
+                         INTEGER(STATUS)
+                         TRAIL(NAMES) );
+
    F77_SUBROUTINE(ccd1_algn)( INTEGER(ndfgr), INTEGER(nndf), INTEGER(nset),
                               INTEGER_ARRAY(imem), INTEGER_ARRAY(imemof),
                               INTEGER(snamgr), INTEGER(refset),
