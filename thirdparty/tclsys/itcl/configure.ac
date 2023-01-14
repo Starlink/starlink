@@ -22,7 +22,7 @@ dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
 dnl    Locate a suitable Starlink Tcl/Tk for this build.
-STAR_PATH_TCLTK(8.5, tk)
+STAR_PATH_TCLTK(8.6, tk)
 
 dnl    Allow user control over Tcl and Tk.
 AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)],

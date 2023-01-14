@@ -22,7 +22,7 @@ STAR_DEFAULTS
 STAR_DECLARE_DEPENDENCIES([build], [tcl tk])
 
 dnl    Locate a suitable Starlink Tcl/Tk for this build.
-STAR_PATH_TCLTK(8.5, tk)
+STAR_PATH_TCLTK(8.6, tk)
 
 dnl    Allow user control over Tcl and Tk.
 AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)],

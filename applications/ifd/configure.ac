@@ -13,7 +13,7 @@ STAR_LATEX_DOCUMENTATION(ssn68)
 dnl    Locate the tclsh binary.
 dnl    Do not care which version of tclsh, but since we're Starlink
 dnl    may as well use that.
-STAR_PATH_TCLTK(8.5, [tcl])
+STAR_PATH_TCLTK(8.6, [tcl])
 
 dnl    But depend on Starlink Tcl to make sure one is always available
 dnl    during the configure stage.

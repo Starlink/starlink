@@ -46,7 +46,7 @@ STAR_CHECK_PROGS([fgeneric])
 
 dnl    Look for a Tcl installation. Prefer the Starlink one as we require
 dnl    itcl, tclx and BLT, but they are not supported by this command.
-STAR_PATH_TCLTK(8.5, [tk])
+STAR_PATH_TCLTK(8.6, [tk])
 
 dnl    Define support for large files.
 STAR_LARGEFILE_SUPPORT
