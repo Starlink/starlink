@@ -490,44 +490,44 @@ smf.h: smf.h.source make_h
 # Create the .c file which defines type-specific code generated from each
 # .cgen file.
 $(CGENERIC_ROUTINES:.cgen=.c):
-	echo "/*" > $@
-	echo "*  Name:" >> $@
-	echo "*    $@" >> $@
-	echo "" >> $@
-	echo "*  Purpose:" >> $@
-	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
-	echo "*    the required type-specific implementations which can be called by" >> $@
-	echo "*    other functions." >> $@
-	echo "" >> $@
-	echo "*  Notes:" >> $@
-	echo "*    - This file is generated automatically at build time (see" >> $@
-	echo "*    libsmf/Makefile.am)" >> $@
-	echo "*/" >> $@
-	echo "" >> $@
-	echo "#include \"prm_par.h\"" >> $@
-	echo "#include \"cgeneric.h\"" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
-	echo "#define CGEN_SMF_TYPE SMF__DOUBLE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_SMF_TYPE" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
-	echo "#define CGEN_SMF_TYPE SMF__FLOAT" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_SMF_TYPE" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
-	echo "#define CGEN_SMF_TYPE SMF__INTEGER" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_SMF_TYPE" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
+	@echo "/*" > $@
+	@echo "*  Name:" >> $@
+	@echo "*    $@" >> $@
+	@echo "" >> $@
+	@echo "*  Purpose:" >> $@
+	@echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	@echo "*    the required type-specific implementations which can be called by" >> $@
+	@echo "*    other functions." >> $@
+	@echo "" >> $@
+	@echo "*  Notes:" >> $@
+	@echo "*    - This file is generated automatically at build time (see" >> $@
+	@echo "*    libsmf/Makefile.am)" >> $@
+	@echo "*/" >> $@
+	@echo "" >> $@
+	@echo "#include \"prm_par.h\"" >> $@
+	@echo "#include \"cgeneric.h\"" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	@echo "#define CGEN_SMF_TYPE SMF__DOUBLE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_SMF_TYPE" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	@echo "#define CGEN_SMF_TYPE SMF__FLOAT" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_SMF_TYPE" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	@echo "#define CGEN_SMF_TYPE SMF__INTEGER" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_SMF_TYPE" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
 
 # Need to distribute the generic files
 EXTRA_DIST = $(CGENERIC_ROUTINES) smf.h.source smf_reorderx.cgen \
