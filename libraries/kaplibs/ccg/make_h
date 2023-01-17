@@ -49,12 +49,3 @@ EOF2
 
 gcc -E -P temp.h -I. -I$STARLINK_DIR/include | grep 'ccg' >> ccg_cgen.h
 rm temp.h
-
-
-#ccodes=(D F I W UW B UB K)
-#fcodes=(d r i w uw b ub k)
-#funlist=`../pygrep "CGEN_FUNCTION2\( *(\w+) *,_ *\)" ccg_cgen.h.source | ../pygrep "ccg\w+"`
-
-
-
-

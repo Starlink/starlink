@@ -54,7 +54,7 @@ BUILT_C_ROUTINES = $(CGEN_ROUTINES:.cgen=.c) $(KPG_N_CGEN:.cn=.c)
 
 BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES)
 
-kpg_cgen.h: kpg_cgen.h.source make_h ../pygrep
+kpg_cgen.h: kpg_cgen.h.source make_h
 	./make_h
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)

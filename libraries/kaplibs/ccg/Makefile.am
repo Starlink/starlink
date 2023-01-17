@@ -67,7 +67,7 @@ GEN_C_ROUTINES = ccg8Is3.cgen ccg8Clip.cgen
 BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
 
 #  Make the header file containing prototypes for the generic C functions.
-ccg_cgen.h: ccg_cgen.h.source make_h ../pygrep
+ccg_cgen.h: ccg_cgen.h.source make_h
 	./make_h
 
 
