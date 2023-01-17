@@ -363,7 +363,7 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
     /* Get the value. */
     value = astGetC( object, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
-        char *buf = ckalloc( 1024 );
+        char *buf = (char*) ckalloc( 1024 );
         sprintf( buf, "Failed to get AST attribute (%s)",
                  Tcl_GetString( objv[2] ) );
         astClearStatus;
@@ -401,7 +401,7 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
     /* Set the attributes */
     astSet( object, Tcl_GetString( objv[2] ), " " );
     if ( ! astOK ) {
-        char *buf = ckalloc( 1024 );
+        char *buf = (char*) ckalloc( 1024 );
         sprintf( buf, "Failed to set AST attribute (%s)",
                  Tcl_GetString( objv[2] ) );
         astClearStatus;
@@ -631,7 +631,7 @@ static int GaiaUtilsAstCreate( ClientData clientData, Tcl_Interp *interp,
         chan = (AstChannel *) astXmlChan( &channel_source, NULL, " " );
     }
     else {
-        char *buf = ckalloc( 1024 );
+        char *buf = (char*) ckalloc( 1024 );
         sprintf( buf, "Unknown AST channel type: %s", encoding );
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
         return TCL_ERROR;
@@ -779,7 +779,7 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
         isa = astIsATimeFrame( picked );
     }
     else {
-        char *buf = ckalloc( 1024 );
+        char *buf = (char*) ckalloc( 1024 );
         sprintf( buf, "not a known frame type (%s)", type );
         astClearStatus;
         Tcl_SetResult( interp, buf, TCL_DYNAMIC );
