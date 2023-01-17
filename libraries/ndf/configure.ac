@@ -24,6 +24,8 @@ LT_INIT
 
 STAR_CHECK_PROGS([cgeneric])
 
+STAR_CHECK_PROGS(perl)
+
 dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 

@@ -2,7 +2,7 @@
 
 dist_bin_SCRIPTS = ndf_link ndf_link_adam
 cincludedir = $(includedir)/star
-dist_noinst_SCRIPTS = make_h pygrep
+dist_noinst_SCRIPTS = make_h
 
 lib_LTLIBRARIES = libndf.la libndf_adam.la
 
@@ -125,10 +125,10 @@ BUILT_C_ROUTINES = $(GEN_C_ROUTINES:.cgen=.c)
 
 BUILT_SOURCES = $(include_MESSAGES) $(BUILT_C_ROUTINES) ndf1_cgen.h
 
-ndf1_cgen.h: ndf1_cgen.h.source make_h pygrep
+ndf1_cgen.h: ndf1_cgen.h.source make_h
 	./make_h
 
-ndf_cgen.h: ndf_cgen.h.source make_h pygrep
+ndf_cgen.h: ndf_cgen.h.source make_h
 	./make_h
 
 #  Additional C files required for the standalone library.

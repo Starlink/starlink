@@ -113,7 +113,7 @@ rm temp.h
 
 ccodes=(D F I W UW B UB K)
 fcodes=(d r i w uw b ub k)
-funlist=`./pygrep "CGEN_FUNCTION2\( *(\w+) *,_ *\)" ndf_cgen.h.source | ./pygrep "ndf\w+"`
+funlist=`@PERL@ -nle 'print $1 if /CGEN_FUNCTION2\( *(ndf\w+) *,_ *\)/' ndf_cgen.h.source`
 
 echo "" >> ndf_cgen.h
 echo "/* Now define the macros used by application code to invoke the appropriate" >> ndf_cgen.h
