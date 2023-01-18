@@ -492,63 +492,63 @@ AM_FCFLAGS = -I../ira
 # Create the .c file which defines type-specific code generated from each
 # .cgen file.
 $(CGEN_ROUTINES:.cgen=.c): kpg_cgen.h
-	echo "/*" > $@
-	echo "*  Name:" >> $@
-	echo "*    $@" >> $@
-	echo "" >> $@
-	echo "*  Purpose:" >> $@
-	echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
-	echo "*    the required type-specific implementations which can be called by" >> $@
-	echo "*    other functions." >> $@
-	echo "" >> $@
-	echo "*  Notes:" >> $@
-	echo "*    - This file is generated automatically at build time (see" >> $@
-	echo "*    Makefile.am)" >> $@
-	echo "*/" >> $@
-	echo "" >> $@
-	echo "#include \"prm_par.h\"" >> $@
-	echo "#include \"cgeneric.h\"" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_WORD_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_UWORD_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_BYTE_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
-	echo "#define CGEN_CODE_TYPE CGEN_INT64_TYPE" >> $@
-	echo "#include \"cgeneric_defs.h\"" >> $@
-	echo "#include \"$(@:.c=.cgen)\"" >> $@
-	echo "#undef CGEN_CODE_TYPE" >> $@
-	echo "" >> $@
+	@echo "/*" > $@
+	@echo "*  Name:" >> $@
+	@echo "*    $@" >> $@
+	@echo "" >> $@
+	@echo "*  Purpose:" >> $@
+	@echo "*    This file expands the generic C code held in $(@:.c=.cgen) to provide" >> $@
+	@echo "*    the required type-specific implementations which can be called by" >> $@
+	@echo "*    other functions." >> $@
+	@echo "" >> $@
+	@echo "*  Notes:" >> $@
+	@echo "*    - This file is generated automatically at build time (see" >> $@
+	@echo "*    Makefile.am)" >> $@
+	@echo "*/" >> $@
+	@echo "" >> $@
+	@echo "#include \"prm_par.h\"" >> $@
+	@echo "#include \"cgeneric.h\"" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_DOUBLE_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_FLOAT_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_INT_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_WORD_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_UWORD_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_BYTE_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_UBYTE_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
+	@echo "#define CGEN_CODE_TYPE CGEN_INT64_TYPE" >> $@
+	@echo "#include \"cgeneric_defs.h\"" >> $@
+	@echo "#include \"$(@:.c=.cgen)\"" >> $@
+	@echo "#undef CGEN_CODE_TYPE" >> $@
+	@echo "" >> $@
 
 # Need to distribute the generic files
 EXTRA_DIST = $(CGEN_ROUTINES)
