@@ -120,21 +120,24 @@ export CYGWIN
 
 #  Set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH to include the installation
 #  directories. Makes sure we pick up the right Tcl/Tk shareable libraries.
-if test "$DYLD_LIBRARY_PATH" = ""; then
-   export LD_LIBRARY_PATH
-   if test "$LD_LIBRARY_PATH" = ""; then
-      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
-   else
-      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
-   fi
-else
+case `uname -s` in
+Darwin*)
    export DYLD_LIBRARY_PATH
-   if test "$DYLD_LIBRARY_PATH" = ""; then
+   if [ -z "$DYLD_LIBRARY_PATH" ]; then
       DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
    else
       DYLD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$DYLD_LIBRARY_PATH"
    fi
-fi
+   ;;
+*)
+   export LD_LIBRARY_PATH
+   if [ -z "$LD_LIBRARY_PATH" ]; then
+      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@"
+   else
+      LD_LIBRARY_PATH="$BASE_DIR/lib:@sharelibdir@:$LD_LIBRARY_PATH"
+   fi
+   ;;
+esac
 
 #  Run up GAIA, trap nasty -help output and show something useful.
 if test "${1}" = "-help" -o "${1}" = "-h"; then
