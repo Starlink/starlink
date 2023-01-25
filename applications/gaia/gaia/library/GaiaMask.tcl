@@ -120,7 +120,7 @@ itcl::class gaia::GaiaMask {
 
       #  Name of input mask.
       itk_component add mask {
-         LabelFileChooser $w_.mask \
+         gaia::LabelFileChooser $w_.mask \
             -text "Input mask:" \
             -labelwidth $lwidth \
             -textvariable [scope itk_option(-mask)] \
@@ -301,7 +301,7 @@ itcl::class gaia::GaiaMask {
       $history_ record_last
 
       if { $mask_namer_ == {} } {
-         set mask_namer_ [GaiaImageName \#auto]
+         set mask_namer_ [gaia::GaiaImageName \#auto]
       }
       $mask_namer_ configure -imagename $itk_option(-mask)
 
@@ -316,7 +316,7 @@ itcl::class gaia::GaiaMask {
       set fullname [$mask_namer_ fullname]
 
       if { $maskaccessor_ == {} } {
-         set maskaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         set maskaccessor_ [uplevel \#0 gaia::GaiaNDAccess \#auto]
       }
       $maskaccessor_ configure -dataset "$fullname"
 

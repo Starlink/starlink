@@ -117,7 +117,7 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Add control for selecting the CUPID catalogue.
       itk_component add chooser {
-         LabelFileChooser $w_.chooser \
+         gaia::LabelFileChooser $w_.chooser \
             -text "Catalogue:" \
             -labelwidth 8 \
             -valuewidth 27 \

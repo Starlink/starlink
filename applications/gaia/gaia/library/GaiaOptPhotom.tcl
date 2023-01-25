@@ -391,7 +391,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Name of the results file.
       itk_component add Results {
-         LabelFileChooser $w_.results \
+         gaia::LabelFileChooser $w_.results \
             -labelwidth 8 \
             -text "Results:" \
 	    -value "GaiaPhotomLog.Dat"
@@ -540,7 +540,7 @@ itcl::class gaia::GaiaOptPhotom {
       $itk_component(TabNoteBook) select 0
 
       #  Create image name control object.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor:

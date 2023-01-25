@@ -263,7 +263,7 @@ itcl::class gaia::GaiaCube {
 
       #  Name of input dataset.
       itk_component add cube {
-         LabelFileChooser $w_.cube \
+         gaia::LabelFileChooser $w_.cube \
             -text "Input cube:" \
             -textvariable [scope itk_option(-cube)] \
             -command [code $this configure -cube] \
@@ -659,7 +659,7 @@ itcl::class gaia::GaiaCube {
       }
 
       if { $cubeaccessor_ == {} } {
-         set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         set cubeaccessor_ [uplevel \#0 gaia::GaiaNDAccess \#auto]
       } elseif { $keeplimits } {
 
          #  Existing cube accessor and keeping limits regardless, so we

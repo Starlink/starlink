@@ -577,7 +577,7 @@ itcl::class gaia::GaiaAutoAstrom {
       }
 
       #  Create an object for dealing with image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
       #  Do guesses.
       guess_position_

@@ -125,7 +125,7 @@ itcl::class gaia::GaiaTextImport {
       #  Name of input file.
       if { $itk_option(-show_infile) } {
          itk_component add infile {
-            LabelFileChooser $w_.infile \
+            gaia::LabelFileChooser $w_.infile \
                -labelwidth 9 \
                -text "Input file:" \
                -textvariable [scope itk_option(-infile)] \
@@ -139,7 +139,7 @@ itcl::class gaia::GaiaTextImport {
       #  Name of output file.
       if { $itk_option(-show_outfile) } {
          itk_component add outfile {
-            LabelFileChooser $w_.outfile \
+            gaia::LabelFileChooser $w_.outfile \
                -labelwidth 9 \
                -text "Output file:" \
                -textvariable [scope itk_option(-outfile)] \

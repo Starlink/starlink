@@ -798,7 +798,7 @@ itcl::class gaia::GaiaXYProfile {
       if { $itk_option(-ukirt_options) } {
          set lwidth 7
          itk_component add logfile {
-            LabelFileChooser $itk_component(lframe).logfile \
+            gaia::LabelFileChooser $itk_component(lframe).logfile \
                -labelwidth $lwidth \
                -text "Logfile:" \
                -anchor e \

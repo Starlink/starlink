@@ -108,7 +108,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Output file name.
       itk_component add filename {
-         LabelFileChooser $w_.filename \
+         gaia::LabelFileChooser $w_.filename \
             -labelwidth $lwidth \
             -text "Output file:" \
             -value $filename_ \

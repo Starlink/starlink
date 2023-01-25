@@ -369,7 +369,7 @@ itcl::class gaia::GaiaArd {
 
       #  And a file for saving the results.
       itk_component add logfile {
-         LabelFileChooser $w_.logfile \
+         gaia::LabelFileChooser $w_.logfile \
             -labelwidth 14 \
             -text "Stats results file:" \
             -textvariable [scope logfile_] \
@@ -439,7 +439,7 @@ itcl::class gaia::GaiaArd {
       pack $itk_component(statsresults) -fill both -expand 1 -side top
 
       #  Create control object for image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
    }
 

@@ -263,7 +263,7 @@ itcl::class gaia::GaiaCubeHduChooser {
          #  Update name with this HDU.
          set dataset [$accessor cget -dataset]
          if { $namer_ == {} } {
-            set namer_ [GaiaImageName \#auto]
+            set namer_ [gaia::GaiaImageName \#auto]
          }
          $namer_ configure -imagename $dataset
 

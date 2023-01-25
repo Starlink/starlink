@@ -152,7 +152,7 @@ itcl::class gaia::StarAppFilter {
       add_menu
 
       #  Create control object for image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
    }
 

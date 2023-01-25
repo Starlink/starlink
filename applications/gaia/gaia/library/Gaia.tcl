@@ -588,7 +588,7 @@ itcl::class gaia::Gaia {
    public method make_rtdimage {} {
       set image_ $w_.image
       itk_component add image {
-         GaiaImageCtrl $image_ \
+         gaia::GaiaImageCtrl $image_ \
             -file_change_cmd [code $this file_loaded_] \
             -file_types $itk_option(-file_types) \
             -usexshm $itk_option(-usexshm) \
@@ -1306,7 +1306,7 @@ itcl::class gaia::Gaia {
    public method make_blink_toolbox {name {cloned 0}} {
       if { [llength [SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
-            GaiaBlink $w_.\#auto \
+            gaia::GaiaBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
                -number $clone_ \
                -clone_cmd [code $this make_toolbox blink 1] \
@@ -1879,7 +1879,7 @@ itcl::class gaia::Gaia {
    #  Open an image, handling the setting of the HDU number if part
    #  of the specification.
    protected method open_image_ {name} {
-      set namer [GaiaImageName \#auto -imagename $name]
+      set namer [gaia::GaiaImageName \#auto -imagename $name]
       $image_ configure -hdu [$namer fitshdunum]
       $image_ configure -file [$namer fullname 0]
       ::delete object $namer
@@ -1893,7 +1893,7 @@ itcl::class gaia::Gaia {
 
       if { "$args" != "" } {
          set imagename [lindex $args 0]
-         set namer [GaiaImageName \#auto -imagename $imagename]
+         set namer [gaia::GaiaImageName \#auto -imagename $imagename]
          if { [$namer exists] } {
 
             #  Release any cubes before proceeding, otherwise this holds

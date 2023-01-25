@@ -102,7 +102,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  Add a control for selecting the logfile.
       itk_component add logfile {
-         LabelFileChooser $w_.logfile \
+         gaia::LabelFileChooser $w_.logfile \
             -labelwidth 8 \
             -text "Logfile:" \
             -textvariable [scope logfile_] \

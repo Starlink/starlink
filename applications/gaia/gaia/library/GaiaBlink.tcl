@@ -329,7 +329,7 @@ itcl::class gaia::GaiaBlink {
 
       #  Add arrows for adjusting image position.
       itk_component add Arrows {
-         ScrollArrows $itk_component(Iframe).arrows \
+         gaia::ScrollArrows $itk_component(Iframe).arrows \
             -command [code $this move_mobile_]
       }
       add_short_help $itk_component(Arrows) \

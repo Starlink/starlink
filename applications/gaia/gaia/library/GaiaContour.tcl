@@ -604,7 +604,7 @@ itcl::class gaia::GaiaContour {
 
       #  Add a control for selecting a image stored in disk file.
       itk_component add conimg {
-         LabelFileChooser $w_.conimg \
+         gaia::LabelFileChooser $w_.conimg \
             -labelwidth 14 \
             -text "Other image:" \
             -filter_types $itk_option(-filter_types) \

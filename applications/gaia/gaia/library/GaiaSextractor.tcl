@@ -276,7 +276,7 @@ itcl::class gaia::GaiaSextractor {
       #  Allow selection of the detection image.
       set lwidth 18
       itk_component add detname {
-         LabelFileChooser $w_.detname \
+         gaia::LabelFileChooser $w_.detname \
             -labelwidth $lwidth \
             -text "Detection image:" \
             -textvariable [scope values_(detname)] \
@@ -452,7 +452,7 @@ itcl::class gaia::GaiaSextractor {
       toggle_draw_iso_ellipses_
 
       #  Create an object for dealing with image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor:

@@ -271,7 +271,7 @@ itcl::class gaia::GaiaEsp {
         $itk_component(notebook) select 0
 
         #  Create an object for dealing with image names
-        set namer_ [GaiaImageName #auto]
+        set namer_ [gaia::GaiaImageName #auto]
     }
 
     # Destructor
@@ -1335,7 +1335,7 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist inardname] >= 0} {
             itk_component add inardname-$toolname {
-                LabelFileChooser $parent.inardname \
+                gaia::LabelFileChooser $parent.inardname \
                         -labelwidth $labelwidth_ \
                         -text "ARD file:" \
                         -textvariable [scope values_($this,ardfile)]
@@ -1348,7 +1348,7 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outndfname] >= 0} {
             itk_component add outndfname-$toolname {
-                LabelFileChooser $parent.outndfname \
+                gaia::LabelFileChooser $parent.outndfname \
                         -labelwidth $labelwidth_ \
                         -text "NDF output:" \
                         -textvariable [scope values_($this,outputndffile)]
@@ -1361,7 +1361,7 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outtextname] >= 0} {
             itk_component add outtextname-$toolname {
-                LabelFileChooser $parent.outtextname \
+                gaia::LabelFileChooser $parent.outtextname \
                         -labelwidth $labelwidth_ \
                         -text "Text output:" \
                         -textvariable [scope values_($this,outputtextfile)]
@@ -1374,7 +1374,7 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outstlname] >= 0} {
             itk_component add outstlname-$toolname {
-                LabelFileChooser $parent.outstltname \
+                gaia::LabelFileChooser $parent.outstltname \
                         -labelwidth $labelwidth_ \
                         -text "STL output:" \
                         -textvariable [scope values_($this,outputstlfile)]
