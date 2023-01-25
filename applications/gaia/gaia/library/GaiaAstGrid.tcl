@@ -1520,7 +1520,7 @@ itcl::class gaia::GaiaAstGrid {
             util::LabelEntry $parent.label$sname \
                -text "$lname:" \
                -labelwidth 8 \
-               -textvariable "::gaia::GaiaAstGrid::label_($this,$sname)" \
+               -textvariable [scope label_($this,$sname)] \
                -command [code $this redraw_]
          }
          pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
