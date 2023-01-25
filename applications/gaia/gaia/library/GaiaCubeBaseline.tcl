@@ -273,8 +273,8 @@ itcl::class gaia::GaiaCubeBaseline {
          if { $enable_range_($i) } {
             set lbp [expr min($lower_limits_($i),$upper_limits_($i))]
             set ubp [expr max($lower_limits_($i),$upper_limits_($i))]
-            set lb [$itk_option(-gaiacube) get_coord $lbp 1 0]
-            set ub [$itk_option(-gaiacube) get_coord $ubp 1 0]
+            set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
+            set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
             lappend ranges $lb $ub
          }
       }
@@ -306,7 +306,7 @@ itcl::class gaia::GaiaCubeBaseline {
          set file $tmpimage_
       }
       if { $file != {} } {
-         $itk_option(-gaiacube) configure -cube $file
+         {*}$itk_option(-gaiacube) configure -cube $file
 
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
@@ -355,14 +355,14 @@ itcl::class gaia::GaiaCubeBaseline {
          set id [expr $itk_option(-ref_id) + $i]
 
          if { $enable_range_($i) } {
-            $itk_option(-gaiacube) make_ref_range $id
-            $itk_option(-gaiacube) set_ref_range_colour $id \
+            {*}$itk_option(-gaiacube) make_ref_range $id
+            {*}$itk_option(-gaiacube) set_ref_range_colour $id \
                $itk_option(-ref_colour)
             $itk_component(bounds$i) configure \
                -value1 $lower_limits_($i) \
                -value2 $upper_limits_($i)
          } else {
-            $itk_option(-gaiacube) remove_ref_range $id
+            {*}$itk_option(-gaiacube) remove_ref_range $id
          }
       }
    }

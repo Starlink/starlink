@@ -193,17 +193,17 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
    #  Update the coordinates readout to show values for two planes.
    protected method update_coords_ {plane1 plane2} {
-      set coord1 [$itk_option(-gaiacube) get_coord $plane1 1 0]
-      set coord2 [$itk_option(-gaiacube) get_coord $plane2 1 0]
+      set coord1 [{*}$itk_option(-gaiacube) get_coord $plane1 1 0]
+      set coord2 [{*}$itk_option(-gaiacube) get_coord $plane2 1 0]
       $itk_component(indexcoord1) configure -value $coord1
       $itk_component(indexcoord2) configure -value $coord2
 
       #  Reposition a related reference range in a spectral plot. Note these
       #  coordinates must be unformatted.
       if { $itk_option(-show_ref_range) } {
-         set coord1 [$itk_option(-gaiacube) get_coord $plane1 0 0]
-         set coord2 [$itk_option(-gaiacube) get_coord $plane2 0 0]
-         $itk_option(-gaiacube) set_spec_ref_range_coord $itk_option(-ref_id) \
+         set coord1 [{*}$itk_option(-gaiacube) get_coord $plane1 0 0]
+         set coord2 [{*}$itk_option(-gaiacube) get_coord $plane2 0 0]
+         {*}$itk_option(-gaiacube) set_spec_ref_range_coord $itk_option(-ref_id) \
             $coord1 $coord2
       }
    }

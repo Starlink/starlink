@@ -273,8 +273,8 @@ itcl::class gaia::GaiaCubeApps {
       if { $system != "default" && $system != {} } {
          $itk_option(-spec_coords) set_system "default" "default" 1
       }
-      set lb [$itk_option(-gaiacube) get_coord $lbp 1 0]
-      set ub [$itk_option(-gaiacube) get_coord $ubp 1 0]
+      set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
+      set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
       if { $system != "default" && $system != {} } {
          $itk_option(-spec_coords) set_system $system $units 1
       }
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  Convert cube to PIXEL domain, if needed.
       blt::busy hold $w_
-      set ndfname [$itk_option(-gaiacube) get_ndfname]
+      set ndfname [{*}$itk_option(-gaiacube) get_ndfname]
       if { $set_current_domain_ } {
          $getwcsattrib_ runwiths "ndf=$ndfname mode=get name=DOMAIN accept"
          ::tkwait variable [scope current_domain_]
@@ -314,7 +314,7 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       #  Now start and run the main application, if not done already.
-      set axis [$itk_option(-gaiacube) get_axis]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       run_main_app_ $ndfname $axis $lb $ub
 
       #  If the reference lines are displayed these need removing.
@@ -341,7 +341,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  If we set the current domain, restore it.
       if { $set_current_domain_ } {
-         set ndfname [$itk_option(-gaiacube) get_ndfname]
+         set ndfname [{*}$itk_option(-gaiacube) get_ndfname]
          $wcsframe_ runwiths "ndf=$ndfname frame=$current_domain_ accept"
       }
       blt::busy release $w_
@@ -379,13 +379,13 @@ itcl::class gaia::GaiaCubeApps {
       $itk_component(bounds1) configure \
          -show_ref_range $itk_option(-show_ref_range)
       if { $itk_option(-show_ref_range) } {
-         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
-         $itk_option(-gaiacube) set_ref_range_colour \
+         {*}$itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) set_ref_range_colour \
             $itk_option(-ref_id) $itk_option(-ref_colour)
          $itk_component(bounds1) configure -value1 $itk_option(-lower_limit) \
             -value2 $itk_option(-upper_limit)
       } else {
-         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
    }
 

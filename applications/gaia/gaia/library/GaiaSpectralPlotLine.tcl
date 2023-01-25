@@ -184,14 +184,14 @@ itcl::class gaia::GaiaSpectralPlotLine {
 
    #  Update the coordinates readout to show values for a plane.
    protected method update_coords_ {plane} {
-      set coord [$itk_option(-gaiacube) get_coord $plane 1 0]
+      set coord [{*}$itk_option(-gaiacube) get_coord $plane 1 0]
       $itk_component(indexcoord) configure -value $coord
 
       #  Reposition a related reference line in a spectral plot. Note this
       #  must be unformatted.
       if { $itk_option(-show_ref_line) } {
-         set coord [$itk_option(-gaiacube) get_coord $plane 0 0]
-         $itk_option(-gaiacube) set_spec_ref_coord $itk_option(-ref_id) $coord
+         set coord [{*}$itk_option(-gaiacube) get_coord $plane 0 0]
+         {*}$itk_option(-gaiacube) set_spec_ref_coord $itk_option(-ref_id) $coord
       }
    }
 
@@ -200,7 +200,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
    #  (change of cube axis, new dataset etc.).
    public method update_coords_type {plane} {
       if { $itk_option(-show_type) } {
-         set vlu [$itk_option(-gaiacube) get_coord $plane 1 1]
+         set vlu [{*}$itk_option(-gaiacube) get_coord $plane 1 1]
          set trail [lassign $vlu value]
          $itk_component(indextype) configure -value $trail
       }

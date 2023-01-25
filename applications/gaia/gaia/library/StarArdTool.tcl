@@ -394,7 +394,7 @@ itcl::class gaia::StarArdTool {
    #  Temporarily disable all the ARD region buttons.
    method disable_types_frame {} {
       if { $Buttonbox_ != {} } {
-         foreach i [$object_list_ known_types {}] {
+         foreach i [{*}$object_list_ known_types {}] {
             set l [string tolower $i]
             $Buttonbox_.$l configure -state disabled
          }
@@ -404,7 +404,7 @@ itcl::class gaia::StarArdTool {
    #  And enable all the ARD region buttons.
    method enable_types_frame {} {
       if { $Buttonbox_ != {} } {
-         foreach i [$object_list_ known_types {}] {
+         foreach i [{*}$object_list_ known_types {}] {
             set l [string tolower $i]
             $Buttonbox_.$l configure -state normal
          }

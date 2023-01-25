@@ -400,7 +400,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -fix_data_range $itk_option(-fix_data_range) \
                 -data_high $itk_option(-data_high) \
                 -data_low $itk_option(-data_low) \
-                -label_prefix [$cube get_ndfname]]
+                -label_prefix [{*}$cube get_ndfname]]
 
          #  Make this a transient of main window, not this one.
          if { $itk_option(-transient_spectralplot) } {
@@ -411,7 +411,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          if { [wm state $spectrum_] == "withdrawn" } {
             $spectrum_ open
             $spectrum_ configure -label_prefix \
-               [$itk_option(-gaiacube) get_ndfname]
+               [{*}$itk_option(-gaiacube) get_ndfname]
          }
       }
    }
@@ -441,8 +441,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Correct spectral extraction bounds to grid indices.
       set lb $itk_option(-lower_limit)
       set ub $itk_option(-upper_limit)
-      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
-      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      set alow [{*}$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [{*}$itk_option(-gaiacube) axis_pixel2grid $ub]
       if { $alow > $ahigh } {
          set tmp $alow
          set alow $ahigh
@@ -458,8 +458,8 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Also autoscale when single click, so that we are not fixed for
       #  all time.
-      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
-      set axis [$itk_option(-gaiacube) get_axis]
+      set cubeaccessor [{*}$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       if { $action == "localstart" } {
          busy {
             $spectrum_ display $cubeaccessor $axis $alow $ahigh $ix $iy 1
@@ -467,7 +467,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
          #  Set first-time position of the main reference line. This is
          #  the position of the current image slice.
-         set coord [$itk_option(-gaiacube) get_plane_coord 0 0]
+         set coord [{*}$itk_option(-gaiacube) get_plane_coord 0 0]
          if { $coord != {} } {
             update;                     # Make sure plot is created first.
             set_spec_ref_coord 1 $coord
@@ -593,8 +593,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Correct spectral extraction bounds to grid indices.
       set lb $itk_option(-lower_limit)
       set ub $itk_option(-upper_limit)
-      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
-      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      set alow [{*}$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [{*}$itk_option(-gaiacube) axis_pixel2grid $ub]
       if { $alow > $ahigh } {
          set tmp $alow
          set alow $ahigh
@@ -602,8 +602,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Also autoscale when doing a localstart.
-      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
-      set axis [$itk_option(-gaiacube) get_axis]
+      set cubeaccessor [{*}$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       if { $action == "localstart" } {
          busy {
             $spectrum_ display_region $cubeaccessor $axis $alow $ahigh \
@@ -612,7 +612,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
          #  Set first-time position of the main reference line. This is
          #  the position of the current image slice.
-         set coord [$itk_option(-gaiacube) get_plane_coord 0 0]
+         set coord [{*}$itk_option(-gaiacube) get_plane_coord 0 0]
          if { $coord != {} } {
             update;                     # Make sure plot is created first.
             set_spec_ref_coord 1 $coord
@@ -654,7 +654,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       if { $spectrum_ == {} || [last_extracted_type] == "none" } {
          return ""
       }
-      set ndfname [$itk_option(-gaiacube) get_ndfname]
+      set ndfname [{*}$itk_option(-gaiacube) get_ndfname]
       set spectype [last_extracted_type]
       if { $spectype == "point" } {
          lassign $last_cxcy_ cx cy
@@ -665,15 +665,15 @@ itcl::class gaia::GaiaCubeSpectrum {
          $rtdimage_ convert coords $ccx $ccy canvas iix iiy image
 
          #  Correct to pixel indices.
-         lassign [$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
+         lassign [{*}$itk_option(-gaiacube) image_grid2pixel $iix $iiy] ix iy
 
          #  Create the right section. Use extraction bounds on the
          #  spectral axis.
          set lb $itk_option(-lower_limit)
          set ub $itk_option(-upper_limit)
          set range "$lb:$ub"
-         set axis [$itk_option(-gaiacube) get_axis]
-         set close_section [$itk_option(-gaiacube) get_close_section]
+         set axis [{*}$itk_option(-gaiacube) get_axis]
+         set close_section [{*}$itk_option(-gaiacube) get_close_section]
 
          if { $axis == 1 } {
             set section "($range,$ix,${iy}${close_section}"
@@ -693,7 +693,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Return proper section name for possible NDFs.
       if { $spectype == "point"
-           && [$itk_option(-gaiacube) get_type] == ".sdf" } {
+           && [{*}$itk_option(-gaiacube) get_type] == ".sdf" } {
          return "${ndfname}${section}"
       } else {
          return "${ndfname}:${section}"
@@ -796,8 +796,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Correct extraction bounds to grid indices.
       set lb $itk_option(-lower_limit)
       set ub $itk_option(-upper_limit)
-      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
-      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      set alow [{*}$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [{*}$itk_option(-gaiacube) axis_pixel2grid $ub]
       if { $alow > $ahigh } {
          set tmp $alow
          set alow $ahigh
@@ -809,8 +809,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       set iy [expr round($iiy)]
 
       #  Display it as a reference spectrum.
-      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
-      set axis [$itk_option(-gaiacube) get_axis]
+      set cubeaccessor [{*}$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       busy {
          $spectrum_ display_reference $cubeaccessor $axis $alow $ahigh $ix $iy
       } 0
@@ -837,8 +837,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Correct extraction bounds to grid indices.
       set lb $itk_option(-lower_limit)
       set ub $itk_option(-upper_limit)
-      set alow [$itk_option(-gaiacube) axis_pixel2grid $lb]
-      set ahigh [$itk_option(-gaiacube) axis_pixel2grid $ub]
+      set alow [{*}$itk_option(-gaiacube) axis_pixel2grid $lb]
+      set ahigh [{*}$itk_option(-gaiacube) axis_pixel2grid $ub]
       if { $alow > $ahigh } {
          set tmp $alow
          set alow $ahigh
@@ -846,8 +846,8 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Display it as a reference spectrum.
-      set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
-      set axis [$itk_option(-gaiacube) get_axis]
+      set cubeaccessor [{*}$itk_option(-gaiacube) get_cubeaccessor]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       busy {
          $spectrum_ display_region_reference $cubeaccessor $axis $alow $ahigh \
             $region $combination_type_
@@ -1120,14 +1120,14 @@ itcl::class gaia::GaiaCubeSpectrum {
       $itk_component(bounds) configure \
          -show_ref_range $itk_option(-show_ref_range)
       if { $itk_option(-show_ref_range) } {
-         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
-         $itk_option(-gaiacube) set_ref_range_colour \
+         {*}$itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) set_ref_range_colour \
             $itk_option(-ref_id) "orange"
          $itk_component(bounds) configure \
             -value1 $itk_option(-lower_limit) \
             -value2 $itk_option(-upper_limit)
       } else {
-         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
    }
 
@@ -1241,8 +1241,8 @@ itcl::class gaia::GaiaCubeSpectrum {
          #  Distance from the source position. Take a guess at these. Try the
          #  SkyRef positions from the image, failing that see if we have a
          #  SpecFrame use RefRA and RefDec.
-         set cubeaccessor [$itk_option(-gaiacube) get_cubeaccessor]
-         set axis [$itk_option(-gaiacube) get_axis]
+         set cubeaccessor [{*}$itk_option(-gaiacube) get_cubeaccessor]
+         set axis [{*}$itk_option(-gaiacube) get_axis]
          if { [$cubeaccessor isaxisframetype $axis "specframe"] ||
               [$cubeaccessor isaxisframetype $axis "dsbspecframe"] } {
 
