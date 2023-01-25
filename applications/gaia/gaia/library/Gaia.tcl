@@ -451,7 +451,7 @@ itcl::class gaia::Gaia {
             $samp_client_ reg_change_command [code $this samp_reg_changed_]
             samp_reg_changed_
             set tracker [$samp_client_ cget -client_tracker]
-            $tracker client_change_command [code $this samp_client_changed_]
+            {*}$tracker client_change_command [code $this samp_client_changed_]
             samp_client_changed_
          }
       }

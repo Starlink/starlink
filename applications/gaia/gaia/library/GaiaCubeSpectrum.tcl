@@ -956,9 +956,9 @@ itcl::class gaia::GaiaCubeSpectrum {
                        -notify_started_cmd [code $this region_started_]]
 
       #  Just use sensible types, no Pixel.
-      set types [$toolbox_ get_known_types]
+      set types [{*}$toolbox_ get_known_types]
       regsub "Pixel" $types "" clean_types
-      $toolbox_ known_types $clean_types
+      {*}$toolbox_ known_types $clean_types
 
       #  Pack buttons like a labelled object.
       itk_component add bframe {
@@ -969,7 +969,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -width $itk_option(-labelwidth) -anchor w
       }
 
-      set buttons_ [$toolbox_ make_types_frame $itk_component(bframe).tools]
+      set buttons_ [{*}$toolbox_ make_types_frame $itk_component(bframe).tools]
       add_short_help $buttons_ {Choose a region, then draw on main image}
 
       pack $itk_component(bframe) -side top -fill x -expand 1 -ipadx 1m

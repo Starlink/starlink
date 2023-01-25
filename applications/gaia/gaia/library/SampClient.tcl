@@ -422,7 +422,7 @@ itcl::class samp::SampClient {
    #  Informs the hub of this client's current subscriptions if registered.
    private method update_subscriptions_ {} {
       foreach agent [get_all_agents_] {
-         foreach mtype [$agent get_subscribed_mtypes] {
+         foreach mtype [{*}$agent get_subscribed_mtypes] {
             set subs($mtype) [rpcvar struct {}]
          }
       }

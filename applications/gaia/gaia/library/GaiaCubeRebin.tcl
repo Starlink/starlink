@@ -276,7 +276,7 @@ itcl::class gaia::GaiaCubeRebin {
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {} {
       if { $itk_option(-gaiacube) != {} } {
-         set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
+         set rtdimage_ [{*}$itk_option(-gaiacube) cget -rtdimage]
       }
    }
 

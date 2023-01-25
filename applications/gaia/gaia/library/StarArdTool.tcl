@@ -255,7 +255,7 @@ itcl::class gaia::StarArdTool {
                      set incomplete_ 0
 
                      #  Create the required ARD region.
-                     if { ![$object_list_ createard $full_line_] } {
+                     if { ![{*}$object_list_ createard $full_line_] } {
                         error "Unable to interpret \"$full_line_\" as an ARD \
                                region. Check that this file contains an ARD \
                                description that can be processed by \
@@ -288,7 +288,7 @@ itcl::class gaia::StarArdTool {
    method save_description {filename} {
       if { $filename != {} } {
          set fid [open $filename w]
-         set ok [$object_list_ save_description $fid]
+         set ok [{*}$object_list_ save_description $fid]
          ::close $fid
       }
       return $ok
@@ -298,7 +298,7 @@ itcl::class gaia::StarArdTool {
    method save_selected_description {filename} {
       if { $filename != {} } {
          set fid [open $filename w]
-         set ok [$object_list_ save_selected_description $fid]
+         set ok [{*}$object_list_ save_selected_description $fid]
          ::close $fid
       }
       return $ok
@@ -306,13 +306,13 @@ itcl::class gaia::StarArdTool {
 
    #  Return a description of all regions as a string.
    method get_description {} {
-      return [$object_list_ get_description]
+      return [{*}$object_list_ get_description]
    }
 
    #  Return a description of the currently selected regions as a string.
    #  with no spaces or newlines if requested.
    method get_selected_description {{oneline 1}} {
-      set desc [$object_list_ get_selected_description]
+      set desc [{*}$object_list_ get_selected_description]
       if {$oneline} {
          regsub -all {\n} $desc {} desc
          regsub -all {\s+} $desc {} desc
@@ -322,20 +322,20 @@ itcl::class gaia::StarArdTool {
 
    #  Set the description of the selected region (first if more than one).
    method set_selected_description {desc} {
-      $object_list_ set_selected_description $desc
+      {*}$object_list_ set_selected_description $desc
    }
 
    #  Find an ARD region that matches the given description and make it
    #  the currently selected region.
    method match_description {desc} {
-      return [$object_list_ match_description $desc]
+      return [{*}$object_list_ match_description $desc]
    }
 
    #  Parse an ARD description stored in a single string and create the
    #  region.
    method parse_description {desc} {
       #  Create the required ARD region.
-      if { ![$object_list_ createard $desc] } {
+      if { ![{*}$object_list_ createard $desc] } {
          error "Unable to interpret \"$desc\" as an ARD region."
       }
    }
@@ -346,7 +346,7 @@ itcl::class gaia::StarArdTool {
       if { $notify_started_cmd != {} } {
          eval $notify_started_cmd
       }
-      $object_list_ create_region $type
+      {*}$object_list_ create_region $type
    }
 
    #  Method to deal with ARD object created callback.
@@ -369,7 +369,7 @@ itcl::class gaia::StarArdTool {
       set Buttonbox_ [frame $w -bd 3]
       set row 0
       set col 0
-      foreach i [$object_list_ known_types {}] {
+      foreach i [{*}$object_list_ known_types {}] {
          set l [string tolower $i]
          set bitmap $l
          # allan: conflict with rtd bitmap named "rect", use "rectangle" here...
@@ -414,7 +414,7 @@ itcl::class gaia::StarArdTool {
    #  Return a bounding box for all ARD objects, in image coordinates.
    method bbox {} {
       if { $object_list_ != {} } {
-         return [$object_list_ bbox]
+         return [{*}$object_list_ bbox]
       }
    }
 
@@ -423,7 +423,7 @@ itcl::class gaia::StarArdTool {
    method known_types {newtypes} {
       if { $newtypes != {} } {
          if { $object_list_ != {} } {
-            set known_types [$object_list_ known_types $newtypes]
+            set known_types [{*}$object_list_ known_types $newtypes]
          }
       }
    }
@@ -432,7 +432,7 @@ itcl::class gaia::StarArdTool {
    #  controlled ).
    method get_known_types {} {
       if { $object_list_ != {} } {
-         return [$object_list_ known_types ""]
+         return [{*}$object_list_ known_types ""]
       }
       return ""
    }
@@ -440,7 +440,7 @@ itcl::class gaia::StarArdTool {
    #  Clear all ARD objects.
    method clear {} {
       if { $object_list_ != {} } {
-         $object_list_ clear
+         {*}$object_list_ clear
       }
    }
 
@@ -463,7 +463,7 @@ itcl::class gaia::StarArdTool {
          set frmset [$rtdimage astgetclone]
          lassign [$rtdimage wcsset] ra dec secpix nxpix nypix rotate equinox epoch
          set maxres [expr $secpix * 0.25]
-         set ok [$object_list_ save_fitsmoc $frmset $maxres $filename]
+         set ok [{*}$object_list_ save_fitsmoc $frmset $maxres $filename]
          gaiautils::astannul $frmset
       }
       return $ok
@@ -475,33 +475,33 @@ itcl::class gaia::StarArdTool {
    #  Name of a StarCanvasDraw widget to use to control objects.
    public variable canvasdraw {} {
       if { $object_list_ != {} } {
-         $object_list_ configure -canvasdraw $canvasdraw
+         {*}$object_list_ configure -canvasdraw $canvasdraw
       }
    }
 
    #  Name of canvas.
    public variable canvas {} {
       if { $object_list_ != {} } {
-         $object_list_ configure -canvas $canvas
+         {*}$object_list_ configure -canvas $canvas
       }
    }
 
    #  Name of starrtdimage widget.
    public variable rtdimage {} {
       if { $object_list_ != {} } {
-         $object_list_ configure -rtdimage $rtdimage
+         {*}$object_list_ configure -rtdimage $rtdimage
       }
    }
 
    #  Colours of regions when selected/deselected.
    public variable selected_colour white {
       if { $object_list_ != {} } {
-         $object_list_ configure -selected_colour $selected_colour
+         {*}$object_list_ configure -selected_colour $selected_colour
       }
    }
    public variable deselected_colour green {
       if { $object_list_ != {} } {
-         $object_list_ configure -deselected_colour $deselected_colour
+         {*}$object_list_ configure -deselected_colour $deselected_colour
       }
    }
 
@@ -515,7 +515,7 @@ itcl::class gaia::StarArdTool {
    #  Change continuous updates of object information.
    public variable continuous_updates 1 {
       if { $object_list_ != {} } {
-         $object_list_ configure -continuous_updates $continuous_updates
+         {*}$object_list_ configure -continuous_updates $continuous_updates
       }
    }
 
@@ -523,7 +523,7 @@ itcl::class gaia::StarArdTool {
    #  regions. Normally this is "StarArd", as in StarArdCircle.
    public variable routine_prefix StarArd {
       if { $object_list_ != {} } {
-         $object_list_ configure -routine_prefix $routine_prefix
+         {*}$object_list_ configure -routine_prefix $routine_prefix
       }
    }
 
