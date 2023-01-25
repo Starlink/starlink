@@ -170,7 +170,7 @@ itcl::class gaia::GaiaTextImport {
          add_short_help $itk_component(system) {Celestial coordinate system}
 
          itk_component add equinox {
-            LabelEntryMenu $w_.equinox \
+            gaia::LabelEntryMenu $w_.equinox \
                -text "Equinox:" \
                -labelwidth 9
          }
@@ -312,7 +312,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Delimitered or fixed format.
       itk_component add separated {
-         StarLabelCheck $parent.separated \
+         gaia::StarLabelCheck $parent.separated \
             -text "Use delimiter (otherwise fixed width):" \
             -onvalue 1 \
             -offvalue 0 \

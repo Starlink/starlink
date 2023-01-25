@@ -831,7 +831,7 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Action buttons.
       itk_component add fix {
-         StarLabelCheck $itk_component(bframe).fix \
+         gaia::StarLabelCheck $itk_component(bframe).fix \
             -text "Fix data range:" \
             -onvalue 1 -offvalue 0 \
             -variable [scope fixed_] \

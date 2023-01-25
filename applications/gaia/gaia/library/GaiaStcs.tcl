@@ -161,7 +161,7 @@ itcl::class gaia::GaiaStcs {
 
       #  Text area for the description.
       itk_component add mainrule {
-         LabelRule $w_.astrule \
+         gaia::LabelRule $w_.astrule \
             -text "STC-S region descriptions:"
       }
       pack $itk_component(mainrule) -side top -fill x -expand 1

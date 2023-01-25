@@ -95,7 +95,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Whether to enable spectral extraction.
       itk_component add extraction {
-         StarLabelCheck $itk_component(tframe).extraction \
+         gaia::StarLabelCheck $itk_component(tframe).extraction \
             -text "Spectrum extraction:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -119,7 +119,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Whether to show the extraction limits as a range object on the
       #  spectral plot.
       itk_component add showrange {
-         StarLabelCheck $w_.showrange \
+         gaia::StarLabelCheck $w_.showrange \
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -132,7 +132,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             figure}
 
       itk_component add bounds {
-         GaiaSpectralPlotRange $w_.bounds \
+         gaia::GaiaSpectralPlotRange $w_.bounds \
             -gaiacube $itk_option(-gaiacube) \
             -ref_id $itk_option(-ref_id) \
             -text1 {Lower index:} \
@@ -150,7 +150,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Setting of the data range.
       itk_component add fixdatarange {
-         StarLabelCheck $w_.fixdatarange \
+         gaia::StarLabelCheck $w_.fixdatarange \
             -text "Fix data range:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -198,7 +198,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Stop point tracking, can be confusing then also using regions.
       itk_component add pointtracking {
-         StarLabelCheck $w_.pointtracking \
+         gaia::StarLabelCheck $w_.pointtracking \
             -text "Point tracking:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \

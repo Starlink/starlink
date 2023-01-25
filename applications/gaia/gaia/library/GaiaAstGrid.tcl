@@ -869,7 +869,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These values are scale factors.
       itk_component add space1 {
-         LabelRule $parent.space1 -text "$scaleannounce_"
+         gaia::LabelRule $parent.space1 -text "$scaleannounce_"
       }
       pack $itk_component(space1) -fill x -ipadx 1m
       foreach {sname lname default} $scaleattrib_ {
@@ -893,7 +893,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These values are a fraction of the plotting area.
       itk_component add space2 {
-         LabelRule $parent.space2 -text "$spacingannounce_"
+         gaia::LabelRule $parent.space2 -text "$spacingannounce_"
       }
       pack $itk_component(space2) -fill x -ipadx 1m
       foreach {sname lname default} $spacingattrib_ {
@@ -917,7 +917,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These are integers (number of ticks usually).
       itk_component add space3 {
-         LabelRule $parent.space3 -text "$minorannounce_"
+         gaia::LabelRule $parent.space3 -text "$minorannounce_"
       }
       pack $itk_component(space3) -fill x -ipadx 1m
       foreach {sname lname default} $minorattrib_ {
@@ -955,7 +955,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Determine which edges the axes are plotted on.
       itk_component add position1 {
-         LabelRule $parent.position1 -text "Label placement:"
+         gaia::LabelRule $parent.position1 -text "Label placement:"
       }
       pack $itk_component(position1) -fill x -ipadx 1m
 
@@ -989,11 +989,11 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Labelling of the numbers. Interior or exterior.
       itk_component add position2 {
-         LabelRule $parent.position2 -text "Suggested axis placement:"
+         gaia::LabelRule $parent.position2 -text "Suggested axis placement:"
       }
       pack $itk_component(position2) -fill x -ipadx 1m
       itk_component add Labelling {
-         StarLabelCheck $parent.labelling \
+         gaia::StarLabelCheck $parent.labelling \
             -text "Interior:" \
             -onvalue "interior" \
             -offvalue "exterior" \
@@ -1006,7 +1006,7 @@ itcl::class gaia::GaiaAstGrid {
       #  LabelAt, where to place the numeric labels. These require
       #  either a RA, Dec set of values or some other sensible value.
       itk_component add position3 {
-         LabelRule $parent.position3 -text "Place numeric labels along:"
+         gaia::LabelRule $parent.position3 -text "Place numeric labels along:"
       }
       pack $itk_component(position3) -fill x -ipadx 1m
       itk_component add Xat {
@@ -1029,11 +1029,11 @@ itcl::class gaia::GaiaAstGrid {
       #  LabelUp: determine whether the numeric labels are plotted
       #  upright or rotated.
       itk_component add position4 {
-         LabelRule $parent.position4 -text "Non-rotated numeric labels:"
+         gaia::LabelRule $parent.position4 -text "Non-rotated numeric labels:"
       }
       pack $itk_component(position4) -fill x -ipadx 1m
       itk_component add Upright1 {
-         StarLabelCheck $parent.upright1 \
+         gaia::StarLabelCheck $parent.upright1 \
             -text "X Axis:" \
             -labelwidth $lwidth_ \
             -variable [scope position_($this,labelup1)] \
@@ -1043,7 +1043,7 @@ itcl::class gaia::GaiaAstGrid {
       pack $itk_component(Upright1) -side top -fill x -ipadx 1m -ipady 1m
 
       itk_component add Upright2 {
-         StarLabelCheck $parent.upright2 \
+         gaia::StarLabelCheck $parent.upright2 \
             -text "Y Axis:" \
             -labelwidth $lwidth_ \
             -variable [scope position_($this,labelup2)] \
@@ -1078,7 +1078,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Size of various text elements.
       itk_component add style1 {
-         LabelRule $parent.style1 -text "$fontannounce1_"
+         gaia::LabelRule $parent.style1 -text "$fontannounce1_"
       }
       pack $itk_component(style1) -fill x -ipadx 1m
       foreach {sname lname deffont defsize} $fontattrib_ {
@@ -1102,7 +1102,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Width of various line elements.
       itk_component add scale2 {
-         LabelRule $parent.scale2 -text "$widthannounce_"
+         gaia::LabelRule $parent.scale2 -text "$widthannounce_"
       }
       pack $itk_component(scale2) -fill x -ipadx 1m
       foreach {sname lname default} $widthattrib_ {
@@ -1126,7 +1126,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Lengths of various line elements.
       itk_component add scale3 {
-         LabelRule $parent.scale3 -text "$lengthannounce_"
+         gaia::LabelRule $parent.scale3 -text "$lengthannounce_"
       }
       pack $itk_component(scale3) -fill x -ipadx 1m
       foreach {sname lname default} $lengthattrib_ {
@@ -1151,11 +1151,11 @@ itcl::class gaia::GaiaAstGrid {
       #  Control what area the plot covers. This can be the whole just
       #  or just the part that is displayed.
       itk_component add scale4 {
-         LabelRule $parent.scale4 -text "Grid size:"
+         gaia::LabelRule $parent.scale4 -text "Grid size:"
       }
       pack $itk_component(scale4) -fill x -ipadx 1m
       itk_component add Whole {
-         StarLabelCheck $parent.whole \
+         gaia::StarLabelCheck $parent.whole \
             -text "Whole of image:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -1249,7 +1249,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Width of various line elements.
       itk_component add scale1 {
-         LabelRule $parent.scale1 -text "$styleannounce_"
+         gaia::LabelRule $parent.scale1 -text "$styleannounce_"
       }
       pack $itk_component(scale1) -fill x -ipadx 1m
 
@@ -1289,13 +1289,13 @@ itcl::class gaia::GaiaAstGrid {
    #  to display as part of the plot.
    protected method add_element_selections_ {parent} {
       itk_component add element1 {
-         LabelRule $parent.element1 -text "$elementannounce_"
+         gaia::LabelRule $parent.element1 -text "$elementannounce_"
       }
       pack $itk_component(element1) -fill x -ipadx 1m
       foreach {sname lname default} $elementattrib_ {
          set element_($this,$sname) $default
          itk_component add Element$sname {
-            StarLabelCheck $parent.$sname \
+            gaia::StarLabelCheck $parent.$sname \
                -text "$lname:" \
                -labelwidth $lwidth_ \
                -variable [scope element_($this,$sname)] \
@@ -1316,7 +1316,7 @@ itcl::class gaia::GaiaAstGrid {
    #  various elements.
    protected method add_colour_selections_ {parent} {
       itk_component add colour1 {
-         LabelRule $parent.colour1 -text "$colourannounce_"
+         gaia::LabelRule $parent.colour1 -text "$colourannounce_"
       }
       pack $itk_component(colour1) -fill x -ipadx 1m
       foreach {sname lname default} $colourattrib_ {
@@ -1358,7 +1358,7 @@ itcl::class gaia::GaiaAstGrid {
    #  various elements.
    protected method add_font_selections_ {parent} {
       itk_component add font1 {
-         LabelRule $parent.font1 -text "$fontannounce2_"
+         gaia::LabelRule $parent.font1 -text "$fontannounce2_"
       }
       pack $itk_component(font1) -fill x -ipadx 1m
       foreach {sname lname deffont defsize} $fontattrib_ {
@@ -1410,7 +1410,7 @@ itcl::class gaia::GaiaAstGrid {
       #  is appended with the string showin the actual value, when a
       #  system is selected.
       itk_component add system1 {
-         LabelRule $parent.system1 -text "$systemannounce_"
+         gaia::LabelRule $parent.system1 -text "$systemannounce_"
       }
       pack $itk_component(system1) -side top -fill x -ipadx 1m -ipady 1m
 
@@ -1431,7 +1431,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Epoch (date of observation usually).
       itk_component add Epoch {
-         LabelEntryMenu $parent.epoch \
+         gaia::LabelEntryMenu $parent.epoch \
             -text "Epoch:" \
             -labelwidth 8
       }
@@ -1446,7 +1446,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add Equinox {
-         LabelEntryMenu $parent.equinox \
+         gaia::LabelEntryMenu $parent.equinox \
             -text "Equinox:" \
             -labelwidth 8
       }
@@ -1509,7 +1509,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Text content.
       itk_component add label1 {
-         LabelRule $parent.label1 -text "$labelannounce_"
+         gaia::LabelRule $parent.label1 -text "$labelannounce_"
       }
       pack $itk_component(label1) -side top -fill x -ipadx 1m -ipady 1m
 
@@ -1540,7 +1540,7 @@ itcl::class gaia::GaiaAstGrid {
       #  Add a toggle for controlling if the default AST format
       #  control will be used, or the format string as shown.
       itk_component add Noformat {
-         StarLabelCheck $parent.noformat \
+         gaia::StarLabelCheck $parent.noformat \
             -text "Use default formatting:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -1555,7 +1555,7 @@ itcl::class gaia::GaiaAstGrid {
 
          #  Add a label for this axis.
          itk_component add Label$axis {
-            LabelRule $parent.label$axis -text "$axis axis:" -anchor w
+            gaia::LabelRule $parent.label$axis -text "$axis axis:" -anchor w
          }
          pack $itk_component(Label$axis) -side top -fill x -ipadx 1m -ipady 1m
 
@@ -1563,7 +1563,7 @@ itcl::class gaia::GaiaAstGrid {
          foreach {lname ident} $formatattrib_ {
             set ${axis}format_($this,$ident) 0
             itk_component add Label$ident$axis {
-               StarLabelCheck $parent.$ident$axis \
+               gaia::StarLabelCheck $parent.$ident$axis \
                   -text "$lname:" \
                   -onvalue 1 \
                   -offvalue 0 \

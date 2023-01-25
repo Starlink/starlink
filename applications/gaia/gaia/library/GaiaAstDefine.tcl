@@ -162,7 +162,7 @@ itcl::class gaia::GaiaAstDefine {
 
       #  Get the date of the observations.
       itk_component add space1 {
-         LabelRule $itk_component(f1).space1 -text "Dates:"
+         gaia::LabelRule $itk_component(f1).space1 -text "Dates:"
       }
       itk_component add dateobs {
          util::LabelEntry $itk_component(f1).dateobs \
@@ -177,13 +177,13 @@ itcl::class gaia::GaiaAstDefine {
       #  CTYPE, CDELT, CROTA and CRPIX for both axes,
       #  plus LONGPOLE and LATPOLE
       itk_component add space2 {
-         LabelRule $itk_component(f1).space2 -text "Transformation:"
+         gaia::LabelRule $itk_component(f1).space2 -text "Transformation:"
       }
       set vwby2 [expr $vwidth_/2]
 
       #  X axis:
       itk_component add space3 {
-         LabelRule $itk_component(f1).space3 -text "X axis:"
+         gaia::LabelRule $itk_component(f1).space3 -text "X axis:"
       }
       itk_component add ctypelab {
 	  label $itk_component(f1).lab1 -text "Coordinate type:"
@@ -248,7 +248,7 @@ itcl::class gaia::GaiaAstDefine {
 
       # Y axis:
       itk_component add space4 {
-         LabelRule $itk_component(f1).space4 -text "Y axis:"
+         gaia::LabelRule $itk_component(f1).space4 -text "Y axis:"
       }
       itk_component add ctype2 {
          util::LabelMenu $itk_component(f1).ctype2 \
@@ -316,7 +316,7 @@ itcl::class gaia::GaiaAstDefine {
 
       #  RADECSYS and EQUINOX.
       itk_component add space5 {
-         LabelRule $itk_component(f1).space5 -text "Fundamental coordinate system:"
+         gaia::LabelRule $itk_component(f1).space5 -text "Fundamental coordinate system:"
       }
 
       #  radecsys.
@@ -337,7 +337,7 @@ itcl::class gaia::GaiaAstDefine {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add equinox {
-         LabelEntryMenu $itk_component(f1).equinox \
+         gaia::LabelEntryMenu $itk_component(f1).equinox \
             -text "Equinox:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
@@ -356,7 +356,7 @@ itcl::class gaia::GaiaAstDefine {
       #  PROJP parameters (note we don't allow ZPN as this requires
       #  another 8 PROJP's!
       itk_component add space6 {
-         LabelRule $itk_component(f1).space6 -text "Projection:"
+         gaia::LabelRule $itk_component(f1).space6 -text "Projection:"
       }
       itk_component add proj {
          util::LabelMenu $w_.proj \

@@ -199,7 +199,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  image, or as a set of fixed parameters.
       set lwidth 20
       itk_component add wcssource {
-         StarLabelCheck $position_page.wcssource \
+         gaia::StarLabelCheck $position_page.wcssource \
             -text "Initial WCS from image:" \
             -onvalue Y \
             -offvalue N \
@@ -260,7 +260,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Advanced ASTROM options.
       if { $itk_option(-expert) } {
          itk_component add telescope {
-            LabelEntryMenu $observation_page.telescope \
+            gaia::LabelEntryMenu $observation_page.telescope \
                -text "Telescope:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(telescope)]
@@ -339,7 +339,7 @@ itcl::class gaia::GaiaAutoAstrom {
       }
 
       itk_component add invert {
-         StarLabelCheck $position_page.invert \
+         gaia::StarLabelCheck $position_page.invert \
             -text "Axes are flipped:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -354,7 +354,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Whether to use match or findoff algorithms.
       if { $itk_option(-expert) } {
          itk_component add usematch  {
-            StarLabelCheck $tuning_page.usematch \
+            gaia::StarLabelCheck $tuning_page.usematch \
             -text "Use match algorithm:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -388,7 +388,7 @@ itcl::class gaia::GaiaAutoAstrom {
          }
       } else {
          itk_component add fitparams  {
-            StarLabelCheck $tuning_page.fitparams \
+            gaia::StarLabelCheck $tuning_page.fitparams \
                -text "Perform linear fit:" \
                -onvalue 6 \
                -offvalue 9 \
@@ -413,7 +413,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Whether to remove defects, and if so what parameters to use.
       if { $itk_option(-expert) } {
          itk_component add defects {
-            StarLabelCheck $tuning_page.defects \
+            gaia::StarLabelCheck $tuning_page.defects \
                -text "Remove defects:" \
                -onvalue 1 \
                -offvalue 0 \

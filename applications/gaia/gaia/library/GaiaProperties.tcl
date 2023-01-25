@@ -76,7 +76,7 @@ itcl::class gaia::GaiaProperties {
    #  ----------------------
    proc instance {} {
       if { $instance_ == {} } {
-         set instance_ [GaiaProperties ::\#auto]
+         set instance_ [gaia::GaiaProperties ::\#auto]
       }
       return $instance_
    }

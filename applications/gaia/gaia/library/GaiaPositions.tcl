@@ -343,7 +343,7 @@ itcl::class gaia::GaiaPositions {
    #  Add controls for image quality estimates.
    protected method add_image_quality_ {} {
       itk_component add rule {
-         LabelRule $w_.rule -text "Image Quality:"
+         gaia::LabelRule $w_.rule -text "Image Quality:"
       }
       pack $itk_component(rule) -side top -fill x
 

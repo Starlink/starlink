@@ -244,7 +244,7 @@ itcl::class gaia::GaiaAstReference {
       #  Add a switch for controlling if the graphics markers move
       #  one-by-one or all together.
       itk_component add coupled {
-	  StarLabelCheck $w_.coupled \
+	  gaia::StarLabelCheck $w_.coupled \
 		  -text "Move markers individually:" \
 		  -onvalue 0 \
 		  -offvalue 1 \
@@ -268,7 +268,7 @@ itcl::class gaia::GaiaAstReference {
       #  Add entry widgets that specify the coordinate types, system
       #  etc. of the table values.
       itk_component add space1 {
-         LabelRule $w_.space1 -text "Parameters for table coordinates:"
+         gaia::LabelRule $w_.space1 -text "Parameters for table coordinates:"
       }
 
       #  Coordinate type for the table data (both CTYPES).
@@ -306,7 +306,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add equinox {
-         LabelEntryMenu $w_.equinox \
+         gaia::LabelEntryMenu $w_.equinox \
             -textvariable [scope values_($this,equinox)] \
 	    -labelwidth $lwidth_ \
 	    -valuewidth $vwidth_ \
@@ -323,7 +323,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Epoch, only needed for FK4 really.
       itk_component add epoch {
-         LabelEntryMenu $w_.epoch \
+         gaia::LabelEntryMenu $w_.epoch \
             -textvariable [scope values_($this,epoch)] \
 	    -labelwidth $lwidth_ \
 	    -valuewidth $vwidth_ \
@@ -342,7 +342,7 @@ itcl::class gaia::GaiaAstReference {
       #  PROJP parameters (note we don't allow ZPN as this requires
       #  another 8 PROJP's!
       itk_component add space2 {
-         LabelRule $w_.space2 -text "Image parameters:"
+         gaia::LabelRule $w_.space2 -text "Image parameters:"
       }
       itk_component add proj {
 	  util::LabelMenu $w_.proj -relief raised \
@@ -1017,7 +1017,7 @@ itcl::class gaia::GaiaAstReference {
       bind $add_ <Control-c> [code $this hide_additional_]
 
       $add_ itk_component add space1 {
-         LabelRule $add_.space1 -text "Additional parameters:"
+         gaia::LabelRule $add_.space1 -text "Additional parameters:"
       }
       #  Reference pixels
       $add_ itk_component add crpix1 {

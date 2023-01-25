@@ -165,7 +165,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
       set i 0
       foreach item $itk_option(-options) {
          itk_component add item$i {
-            StarLabelCheck $itk_component(buts).item$i \
+            gaia::StarLabelCheck $itk_component(buts).item$i \
                                   -text "$item:" \
                                   -onvalue 1 \
                                   -offvalue 0 \

@@ -137,7 +137,7 @@ itcl::class gaia::GaiaAstSystem {
       #  is appended with the string showing the actual value, when a
       #  system is selected.
       itk_component add rule {
-         LabelRule $w_.rule -text {Image celestial coordinate system:}
+         gaia::LabelRule $w_.rule -text {Image celestial coordinate system:}
       }
 
       #  System.
@@ -160,7 +160,7 @@ itcl::class gaia::GaiaAstSystem {
 
       #  Epoch (date of observation usually).
       itk_component add Epoch {
-         LabelEntryMenu $w_.epoch \
+         gaia::LabelEntryMenu $w_.epoch \
 	       -text "Epoch:" \
 	       -labelwidth $lwidth
       }
@@ -175,7 +175,7 @@ itcl::class gaia::GaiaAstSystem {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add Equinox {
-         LabelEntryMenu $w_.equinox \
+         gaia::LabelEntryMenu $w_.equinox \
 	       -text "Equinox:" \
 	       -labelwidth $lwidth
       }
@@ -209,7 +209,7 @@ itcl::class gaia::GaiaAstSystem {
       #  Observers latitude and longitude. Use sla::obs to get known
       #  observatories.
       itk_component add ObsLon {
-         LabelEntryMenu $w_.obslon \
+         gaia::LabelEntryMenu $w_.obslon \
             -text "Obs longitude:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -258,7 +258,7 @@ itcl::class gaia::GaiaAstSystem {
       #  or to a new skyframe. This changes the meaning of "default"
       #  from what the WCS currently has to the builtin AST ones.
       itk_component add NewSystem {
-         StarLabelCheck $w_.newsystem \
+         gaia::StarLabelCheck $w_.newsystem \
             -text "New system:" \
             -onvalue 1 \
             -offvalue 0 \

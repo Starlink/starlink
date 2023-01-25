@@ -167,7 +167,7 @@ itcl::class gaia::GaiaMask {
 
       #  Or just select all non-masked values.
       itk_component add invert {
-         StarLabelCheck $w_.invert \
+         gaia::StarLabelCheck $w_.invert \
             -text "Invert:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \

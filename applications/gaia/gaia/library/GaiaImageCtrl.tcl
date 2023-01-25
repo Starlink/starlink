@@ -112,7 +112,7 @@ itcl::class gaia::GaiaImageCtrl {
       $canvas_ bind $imageId_ <Shift-2> [code eval $this zoomout]
 
       #  Create an object for handling image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
       #  Remove options we're overriding from base classes.
       itk_option remove rtd::RtdImage::show_object_menu

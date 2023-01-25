@@ -528,7 +528,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Column names header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Columns to use for:"
+	    gaia::LabelRule $w_.header1 -text "Columns to use for:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -560,7 +560,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Attributes for selected vectors...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Selected vectors:"
+	    gaia::LabelRule $w_.header2 -text "Selected vectors:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0  -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -606,7 +606,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelCheck within the above frame to control the flashing
 #  state of selected vectors.
          itk_component add sflash {
-	    StarLabelCheck $w_.sflash -text "Flashing:" \
+	    gaia::StarLabelCheck $w_.sflash -text "Flashing:" \
                                       -onvalue 1 \
                                       -offvalue 0 \
                                       -command [code $this activ] \
@@ -622,7 +622,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Attributes for unselected vectors...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "All other vectors:"
+	    gaia::LabelRule $w_.header3 -text "All other vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -668,7 +668,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelCheck within the above frame to control the flashing
 #  state of unselected vectors.
          itk_component add uflash {
-	    StarLabelCheck $w_.uflash -text "Flashing:" \
+	    gaia::StarLabelCheck $w_.uflash -text "Flashing:" \
                                       -onvalue 1 \
                                       -offvalue 0 \
                                       -command [code $this activ] \
@@ -684,7 +684,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Others header
          itk_component add header4 {
-	    LabelRule $w_.header4 -text "Misc.:"
+	    gaia::LabelRule $w_.header4 -text "Misc.:"
 	 }
          grid $itk_component(header4) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m

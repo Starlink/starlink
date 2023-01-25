@@ -360,7 +360,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 
 #  Label parameters...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Vector Selection Options:"
+	    gaia::LabelRule $w_.header1 -text "Vector Selection Options:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -436,7 +436,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelCheck to disable clicking and dragging as a means of
 #  selecting vectors.
          itk_component add freeze {
-            StarLabelCheck $w_.freeze -text "Disable mouse:" \
+            gaia::StarLabelCheck $w_.freeze -text "Disable mouse:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
                                      -labelwidth $lwidth \

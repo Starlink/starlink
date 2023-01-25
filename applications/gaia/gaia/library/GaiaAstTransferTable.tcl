@@ -117,7 +117,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Add separator for new "transfer" section.
       itk_component add sep1 {
-         LabelRule $w_.sep1 -text "Transfer:"
+         gaia::LabelRule $w_.sep1 -text "Transfer:"
       }
       pack $itk_component(sep1) -fill x -ipadx 1m
 

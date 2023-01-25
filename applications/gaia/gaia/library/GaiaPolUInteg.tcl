@@ -514,7 +514,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Items to display header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Items to display:"
+	    gaia::LabelRule $w_.header1 -text "Items to display:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -539,7 +539,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Vector parameters...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Parameters for binning:"
+	    gaia::LabelRule $w_.header2 -text "Parameters for binning:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -570,7 +570,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create a LabelCheck to set debiassing.
          itk_component add debias {
-            StarLabelCheck $w_.debias -text "Debias:" \
+            gaia::StarLabelCheck $w_.debias -text "Debias:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
                                      -labelwidth $lwidth \
@@ -608,7 +608,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Vector parameters...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "Integrated column values for currently selected vectors:"
+	    gaia::LabelRule $w_.header3 -text "Integrated column values for currently selected vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m

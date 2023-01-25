@@ -196,7 +196,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
    protected method add_att_controls_ {w} {
 
       itk_component add attrule {
-         LabelRule $w.attrule -text "Contour levels & attributes:"
+         gaia::LabelRule $w.attrule -text "Contour levels & attributes:"
       }
       pack $itk_component(attrule) -side top -fill x
 
@@ -350,7 +350,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Add section header.
       itk_component add genrule {
-         LabelRule $w.genrule -text "Contour level generation:"
+         gaia::LabelRule $w.genrule -text "Contour level generation:"
       }
       pack $itk_component(genrule) -side top -fill x
 

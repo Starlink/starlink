@@ -414,7 +414,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelCheck to enable the key.
          itk_component add enable {
-	    StarLabelCheck $w_.enable -text "Enable:" \
+	    gaia::StarLabelCheck $w_.enable -text "Enable:" \
                               -onvalue 1 \
                               -offvalue 0 \
 			      -labelwidth $lwidth \
@@ -427,7 +427,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Label parameters...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Textual Label:"
+	    gaia::LabelRule $w_.header1 -text "Textual Label:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -502,7 +502,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelCheck to set bold font.
          itk_component add fbold {
-	    StarLabelCheck $w_.fbold -text "Bold font:" \
+	    gaia::StarLabelCheck $w_.fbold -text "Bold font:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
       			             -labelwidth $lwidth \
@@ -518,7 +518,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Vector parameters...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Key Vector:"
+	    gaia::LabelRule $w_.header2 -text "Key Vector:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -580,7 +580,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Background parameters...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "Background:"
+	    gaia::LabelRule $w_.header3 -text "Background:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -628,7 +628,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Border parameters...
          itk_component add header4 {
-	    LabelRule $w_.header4 -text "Border:"
+	    gaia::LabelRule $w_.header4 -text "Border:"
 	 }
          grid $itk_component(header4) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m

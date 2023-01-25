@@ -927,7 +927,7 @@ itcl::class gaia::GaiaEsp {
 
         # Expert toggle
         itk_component add expert {
-            StarLabelCheck $parent.expert \
+            gaia::StarLabelCheck $parent.expert \
                     -text "Expert options:" \
                     -onvalue 1 -offvalue 0 \
                     -labelwidth $lwidth \

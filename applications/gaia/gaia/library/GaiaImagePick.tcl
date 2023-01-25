@@ -126,7 +126,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  Toggle to report coordinates in degrees (often useful for scripts).
       itk_component add degrees {
-         StarLabelCheck $w_.degrees \
+         gaia::StarLabelCheck $w_.degrees \
             -text "Degrees:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth 8 \

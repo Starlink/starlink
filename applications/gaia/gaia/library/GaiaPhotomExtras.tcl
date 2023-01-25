@@ -154,7 +154,7 @@ itcl::class gaia::GaiaPhotomExtras {
       #  Add widgets for accessing the values.
       #  Source of the exposure time.
       itk_component add Label1 {
-         LabelRule $w_.label1 \
+         gaia::LabelRule $w_.label1 \
             -text "Exposure time:"
       }
       itk_component add ExSource {
@@ -180,7 +180,7 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Image description parameters.
       itk_component add Label2 {
-         LabelRule $w_.label2 \
+         gaia::LabelRule $w_.label2 \
             -text "Image parameters:"
       }
       itk_component add Biaslevel {
@@ -210,11 +210,11 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Centroid parameters.
       itk_component add Label3 {
-         LabelRule $w_.label3 \
+         gaia::LabelRule $w_.label3 \
             -text "Centroid parameters:"
       }
       itk_component add Centroid {
-         StarLabelCheck $w_.cent \
+         gaia::StarLabelCheck $w_.cent \
             -text "Perform centroiding:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
@@ -256,7 +256,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Toler) \
          {Accuracy for centroid corrected position}
       itk_component add Positive {
-         StarLabelCheck $w_.positive \
+         gaia::StarLabelCheck $w_.positive \
             -text "Positive features:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
@@ -268,7 +268,7 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Measurement parameters.
       itk_component add Label4 {
-         LabelRule $w_.label4 \
+         gaia::LabelRule $w_.label4 \
             -text "Measurement parameters:"
       }
 

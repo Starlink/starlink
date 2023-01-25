@@ -711,7 +711,7 @@ public method clear {} {
 
 #  Items to display header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Items to display:"
+	    gaia::LabelRule $w_.header1 -text "Items to display:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -748,7 +748,7 @@ public method clear {} {
 
 #  Vector parameters...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Parameters for N-sigma clipping:"
+	    gaia::LabelRule $w_.header2 -text "Parameters for N-sigma clipping:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -788,7 +788,7 @@ public method clear {} {
 
 #  Vector parameters...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "Statistics for currently selected vectors:"
+	    gaia::LabelRule $w_.header3 -text "Statistics for currently selected vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m

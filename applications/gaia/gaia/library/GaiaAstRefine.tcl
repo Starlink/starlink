@@ -222,7 +222,7 @@ itcl::class gaia::GaiaAstRefine {
       #  Add a switch for controlling if the graphics markers move
       #  one-by-one or all together.
       itk_component add coupled {
-         StarLabelCheck $w_.coupled \
+         gaia::StarLabelCheck $w_.coupled \
             -text "Move markers individually:" \
             -onvalue 0 \
             -offvalue 1 \
@@ -236,7 +236,7 @@ itcl::class gaia::GaiaAstRefine {
       #  Add scales for changing the offsets, scale and rotations of
       #  the projected positions.
       itk_component add rule1 {
-         LabelRule $w_.rule1 -text "Simple transformations:"
+         gaia::LabelRule $w_.rule1 -text "Simple transformations:"
       }
       set width [$itk_option(-rtdimage) width]
       set height [$itk_option(-rtdimage) height]

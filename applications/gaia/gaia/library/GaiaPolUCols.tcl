@@ -323,7 +323,7 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Column names header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Columns to use for:"
+	    gaia::LabelRule $w_.header1 -text "Columns to use for:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m

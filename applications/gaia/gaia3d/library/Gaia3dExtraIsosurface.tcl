@@ -434,7 +434,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
 
          itk_component add attrule$i {
-            LabelRule $parent.attrule$i \
+            gaia::LabelRule $parent.attrule$i \
                -text "Cube, contour levels & attributes:"
          }
          pack $itk_component(attrule$i) -side top -fill x -expand 1

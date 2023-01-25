@@ -350,7 +350,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Vector Highlighting:"
+	    gaia::LabelRule $w_.header1 -text "Vector Highlighting:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -360,7 +360,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Create a LabelCheck to enable the highlighting of vectors.
          itk_component add enable {
-	    StarLabelCheck $w_.enable -text "Enable:" \
+	    gaia::StarLabelCheck $w_.enable -text "Enable:" \
                               -onvalue 1 \
                               -offvalue 0 \
 			      -labelwidth $lwidth \
@@ -462,7 +462,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Create a LabelCheck to set bold font.
          itk_component add fbold {
-	    StarLabelCheck $w_.fbold -text "Bold font:" \
+	    gaia::StarLabelCheck $w_.fbold -text "Bold font:" \
                               -onvalue 1 \
                               -offvalue 0 \
 			      -labelwidth $lwidth \

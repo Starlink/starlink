@@ -579,7 +579,7 @@ itcl::class gaia::GaiaContour {
 
       #  Separator.
       itk_component add namerule {
-         LabelRule $w_.namerule -text "Contour image:"
+         gaia::LabelRule $w_.namerule -text "Contour image:"
       }
       pack $itk_component(namerule) -side top -fill x
 
@@ -619,7 +619,7 @@ itcl::class gaia::GaiaContour {
    protected method add_att_controls_ {w} {
 
       itk_component add attrule {
-         LabelRule $w.attrule -text "Contour levels & attributes:"
+         gaia::LabelRule $w.attrule -text "Contour levels & attributes:"
       }
       pack $itk_component(attrule) -side top -fill x
 
@@ -1246,7 +1246,7 @@ itcl::class gaia::GaiaContour {
 
       #  Add section header.
       itk_component add genrule {
-         LabelRule $w.genrule -text "Contour level generation:"
+         gaia::LabelRule $w.genrule -text "Contour level generation:"
       }
       pack $itk_component(genrule) -side top -fill x
 
@@ -1478,13 +1478,13 @@ itcl::class gaia::GaiaContour {
 
       #  Add section header.
       itk_component add keyrule {
-         LabelRule $w.keyrule -text "Key configuration:"
+         gaia::LabelRule $w.keyrule -text "Key configuration:"
       }
       pack $itk_component(keyrule) -side top -fill x
 
       #  Whether to draw key or not.
       itk_component add drawkey {
-         StarLabelCheck $w.drawkey \
+         gaia::StarLabelCheck $w.drawkey \
             -text "Display key:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -1771,11 +1771,11 @@ itcl::class gaia::GaiaContour {
       #  Control what area the plot covers. This can be the whole just
       #  or just the part that is displayed.
       itk_component add regionrule {
-         LabelRule $w.region -text "Contour region:"
+         gaia::LabelRule $w.region -text "Contour region:"
       }
       pack $itk_component(regionrule) -fill x -ipadx 1m
       itk_component add whole {
-         StarLabelCheck $w.whole \
+         gaia::StarLabelCheck $w.whole \
             -text "Whole of image:" \
             -onvalue 1 \
             -offvalue 0 \

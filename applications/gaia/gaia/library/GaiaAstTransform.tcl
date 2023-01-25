@@ -162,7 +162,7 @@ itcl::class gaia::GaiaAstTransform {
       #  is appended with the string showing the actual value, when a
       #  system is selected.
       itk_component add rule {
-         LabelRule $w_.rule -text "Reference celestial coordinate system:"
+         gaia::LabelRule $w_.rule -text "Reference celestial coordinate system:"
       }
 
       #  System.
@@ -185,7 +185,7 @@ itcl::class gaia::GaiaAstTransform {
 
       #  Epoch (date of observation usually).
       itk_component add Epoch {
-         LabelEntryMenu $w_.epoch \
+         gaia::LabelEntryMenu $w_.epoch \
 	       -text "Epoch:" \
 	       -labelwidth 8
       }
@@ -200,7 +200,7 @@ itcl::class gaia::GaiaAstTransform {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add Equinox {
-         LabelEntryMenu $w_.equinox \
+         gaia::LabelEntryMenu $w_.equinox \
 	       -text "Equinox:" \
 	       -labelwidth 8
       }

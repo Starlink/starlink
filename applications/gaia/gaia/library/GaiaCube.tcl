@@ -240,12 +240,12 @@ itcl::class gaia::GaiaCube {
          -command [code $this show_builtin_toolbox_]
 
       #  Spectral and time coordinates handler.
-      set spec_coords_ [uplevel \#0 GaiaSpecCoords \#auto]
+      set spec_coords_ [uplevel \#0 gaia::GaiaSpecCoords \#auto]
       $spec_coords_ configure -change_cmd [code $this coords_changed_]
       $spec_coords_ add_menu $SpectralCoords
 
       #  Spectral standard-of-rest handler.
-      set spec_sor_ [uplevel \#0 GaiaSpecCoords \#auto]
+      set spec_sor_ [uplevel \#0 gaia::GaiaSpecCoords \#auto]
       $spec_sor_ configure -change_cmd [code $this coords_changed_]
 
       #  Add the "Go" menu to switch back and forth between cubes that have
@@ -314,7 +314,7 @@ itcl::class gaia::GaiaCube {
 
       #  Whether to show a label with the coordinate in the main window.
       itk_component add showcoordlabel {
-         StarLabelCheck $w_.showcoordlabel \
+         gaia::StarLabelCheck $w_.showcoordlabel \
             -text "Show coordinate label:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \
@@ -356,7 +356,7 @@ itcl::class gaia::GaiaCube {
 
       #  Spectrum section.
       itk_component add sruler {
-         LabelRule $spectrumTab.sruler -text "Spectrum controls:"
+         gaia::LabelRule $spectrumTab.sruler -text "Spectrum controls:"
       }
       pack $itk_component(sruler) -side top -fill x
 
@@ -400,7 +400,7 @@ itcl::class gaia::GaiaCube {
       #  Animation section.
 
       itk_component add aruler {
-         LabelRule $animationTab.aruler -text "Animation controls:"
+         gaia::LabelRule $animationTab.aruler -text "Animation controls:"
       }
       pack $itk_component(aruler) -side top -fill x
 
@@ -421,7 +421,7 @@ itcl::class gaia::GaiaCube {
       #  Collapse section.
 
       itk_component add cruler {
-         LabelRule $collapseTab.cruler -text "Collapse controls:"
+         gaia::LabelRule $collapseTab.cruler -text "Collapse controls:"
       }
       pack $itk_component(cruler) -side top -fill x
 
@@ -443,7 +443,7 @@ itcl::class gaia::GaiaCube {
       #  Chanmap section.
 
       itk_component add chanmapruler {
-         LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
+         gaia::LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
       }
       pack $itk_component(chanmapruler) -side top -fill x
 
@@ -465,7 +465,7 @@ itcl::class gaia::GaiaCube {
       #  Rebin section.
 
       itk_component add rebinruler {
-         LabelRule $rebinTab.rebinruler -text "Rebin cube controls:"
+         gaia::LabelRule $rebinTab.rebinruler -text "Rebin cube controls:"
       }
       pack $itk_component(rebinruler) -side top -fill x
 
@@ -481,7 +481,7 @@ itcl::class gaia::GaiaCube {
       #  Filter section.
 
       itk_component add filterruler {
-         LabelRule $filterTab.filterruler -text "Filter cube controls:"
+         gaia::LabelRule $filterTab.filterruler -text "Filter cube controls:"
       }
       pack $itk_component(filterruler) -side top -fill x
 
@@ -497,7 +497,7 @@ itcl::class gaia::GaiaCube {
       #  Baseline subtraction section. Must be the last.
 
       itk_component add baselineruler {
-         LabelRule $baselineTab.baselineruler \
+         gaia::LabelRule $baselineTab.baselineruler \
             -text "Baseline subtraction controls:"
       }
       pack $itk_component(baselineruler) -side top -fill x
@@ -636,7 +636,7 @@ itcl::class gaia::GaiaCube {
    protected method set_chosen_cube_ {{keeplimits 0}} {
 
       if { $namer_ == {} } {
-         set namer_ [GaiaImageName \#auto]
+         set namer_ [gaia::GaiaImageName \#auto]
       }
       $namer_ configure -imagename $itk_option(-cube)
 

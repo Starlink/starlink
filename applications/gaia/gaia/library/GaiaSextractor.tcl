@@ -909,7 +909,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Whether to clean detections and the efficiency.
       itk_component add detclean {
-         StarLabelCheck $parent.detclean \
+         gaia::StarLabelCheck $parent.detclean \
             -text "Clean detections:" \
             -onvalue Y \
             -offvalue N \

@@ -91,7 +91,7 @@ itcl::class gaia::GaiaCubeAnimation {
       #  Whether to show the animation limits as a range object on the
       #  spectral plot.
       itk_component add showrange {
-         StarLabelCheck $w_.showrange \
+         gaia::StarLabelCheck $w_.showrange \
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -103,7 +103,7 @@ itcl::class gaia::GaiaCubeAnimation {
          {Show extent of animation on plot with a reference range figure}
 
       itk_component add bounds {
-         GaiaSpectralPlotRange $w_.bounds \
+         gaia::GaiaSpectralPlotRange $w_.bounds \
             -gaiacube $itk_option(-gaiacube) \
             -ref_id $itk_option(-ref_id) \
             -text1 {Lower index:} \

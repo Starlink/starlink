@@ -255,7 +255,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Label parameters...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Binning Options:"
+	    gaia::LabelRule $w_.header1 -text "Binning Options:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -305,7 +305,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Create a LabelCheck to set debiassing.
          itk_component add debias {
-            StarLabelCheck $w_.debias -text "Debias:" \
+            gaia::StarLabelCheck $w_.debias -text "Debias:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
                                      -labelwidth $lwidth \

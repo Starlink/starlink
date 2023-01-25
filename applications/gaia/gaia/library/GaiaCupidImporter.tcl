@@ -157,7 +157,7 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Or use the STC shape.
       itk_component add stc {
-         StarLabelCheck $w_.stc \
+         gaia::StarLabelCheck $w_.stc \
             -text "STC shape:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth 8 \

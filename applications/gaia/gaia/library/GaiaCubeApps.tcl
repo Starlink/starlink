@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  Whether to show the various ranges as objects on the spectral plot.
       itk_component add showrange {
-         StarLabelCheck $w_.showrange \
+         gaia::StarLabelCheck $w_.showrange \
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -150,7 +150,7 @@ itcl::class gaia::GaiaCubeApps {
    #  a range, plus combination method, so that is the default.
    protected method add_controls_ {} {
       itk_component add bounds1 {
-         GaiaSpectralPlotRange $w_.bounds1 \
+         gaia::GaiaSpectralPlotRange $w_.bounds1 \
             -gaiacube $itk_option(-gaiacube) \
             -ref_id $itk_option(-ref_id) \
             -text1 {Lower index:} \

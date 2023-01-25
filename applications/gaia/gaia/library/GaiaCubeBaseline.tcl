@@ -106,7 +106,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
          set enable_range_($i) 0
          itk_component add enable$i {
-            StarLabelCheck $childsite_.enable$i \
+            gaia::StarLabelCheck $childsite_.enable$i \
                -text "Enable:" \
                -onvalue 1 -offvalue 0 \
                -labelwidth $itk_option(-labelwidth) \
@@ -117,7 +117,7 @@ itcl::class gaia::GaiaCubeBaseline {
          add_short_help $itk_component(enable$i) {Enable this range}
 
          itk_component add bounds$i {
-            GaiaSpectralPlotRange $childsite_.bounds$i \
+            gaia::GaiaSpectralPlotRange $childsite_.bounds$i \
                -gaiacube $itk_option(-gaiacube) \
                -ref_id [expr $itk_option(-ref_id) + $i]\
                -text1 {Lower index:} \

@@ -68,7 +68,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       #  Different UI layout for 1 cube.
       if { $itk_option(-maxcubes) == 1 } {
          itk_component add attrule {
-            LabelRule $w_.attrule \
+            gaia::LabelRule $w_.attrule \
                -text "Mask & attributes:"
          }
          pack $itk_component(attrule) -side top -fill x -expand 1
@@ -434,7 +434,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
          if { $itk_option(-maxcubes) != 1 } {
             itk_component add attrule$i {
-               LabelRule $parent.attrule$i \
+               gaia::LabelRule $parent.attrule$i \
                   -text "Mask & attributes:"
             }
             pack $itk_component(attrule$i) -side top -fill x -expand 1

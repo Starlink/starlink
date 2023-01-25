@@ -144,7 +144,7 @@ itcl::class gaia::GaiaPhotomDetails {
       set vwidth 5
 
       itk_component add MainLabel {
-         LabelRule $w_.label -text "Current object details"
+         gaia::LabelRule $w_.label -text "Current object details"
       }
       itk_component add Index {
          util::LabelValue $w_.index -text {Aperture index:} \
@@ -311,7 +311,7 @@ itcl::class gaia::GaiaPhotomDetails {
       set vwidth 5
 
       itk_component add MainLabel {
-         LabelRule $w_.label -text "Current object details"
+         gaia::LabelRule $w_.label -text "Current object details"
       }
       itk_component add Index {
          util::LabelValue $w_.index -text {Aperture index:} \
@@ -426,7 +426,7 @@ itcl::class gaia::GaiaPhotomDetails {
       set vwidth 5
 
       itk_component add MainLabel {
-         LabelRule $w_.label -text "PSF object details"
+         gaia::LabelRule $w_.label -text "PSF object details"
       }
 
       #  Clipping radius (masquerades as semi-major axis).
