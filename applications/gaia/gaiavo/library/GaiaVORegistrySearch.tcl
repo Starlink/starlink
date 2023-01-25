@@ -140,7 +140,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       #  XXX enumerate some column names (xpath form for ADQL query, bit much
       #  for the typical end-user).
       itk_component add column {
-         LabelEntry $w_.column \
+         util::LabelEntry $w_.column \
             -text "Column:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -152,7 +152,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       add_short_help $itk_component(column)  {Registry column to qualify query}
 
       itk_component add substring {
-         LabelEntry $w_.substring \
+         util::LabelEntry $w_.substring \
             -text "Substring:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

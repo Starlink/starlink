@@ -238,7 +238,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
          #  Entry widget for the contour values.
          itk_component add value$i {
-            LabelEntry $parent.value$i \
+            util::LabelEntry $parent.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 3 \
@@ -356,7 +356,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Number of contours to generate.
       itk_component add ncont {
-         LabelEntryScale $w.ncont \
+         util::LabelEntryScale $w.ncont \
             -text "Number:" \
             -labelwidth 14 \
             -valuewidth 3 \
@@ -395,7 +395,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Starting value.
       itk_component add start {
-         LabelEntry $w.start \
+         util::LabelEntry $w.start \
             -validate real \
             -text "Start:" \
             -labelwidth 14 \
@@ -407,7 +407,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Increment.
       itk_component add incre {
-         LabelEntry $w.incre \
+         util::LabelEntry $w.incre \
             -validate real \
             -text "Increment:" \
             -labelwidth 14 \
@@ -420,7 +420,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Percentile list.
       itk_component add percent {
-         LabelEntry $w.percent \
+         util::LabelEntry $w.percent \
             -text "Percentiles:" \
             -labelwidth 14 \
             -valuewidth 20 \

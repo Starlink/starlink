@@ -113,7 +113,7 @@ itcl::class gaia::GaiaCubeChanmap {
 
       #  The number of channels to create.
       itk_component add nchan {
-         LabelEntryScale $w_.nchan \
+         util::LabelEntryScale $w_.nchan \
             -text "Number of channels:" \
             -value 4 \
             -labelwidth $itk_option(-labelwidth) \
@@ -133,7 +133,7 @@ itcl::class gaia::GaiaCubeChanmap {
 
       #  The number of channels to create.
       itk_component add shape {
-         LabelEntryScale $w_.shape \
+         util::LabelEntryScale $w_.shape \
             -text "X-axis channels:" \
             -value 2 \
             -labelwidth $itk_option(-labelwidth) \
@@ -153,7 +153,7 @@ itcl::class gaia::GaiaCubeChanmap {
 
       #  Value of the selected channel panel.
       itk_component add selected {
-         LabelValue $w_.selected \
+         util::LabelValue $w_.selected \
             -text "Selected coord:" \
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)

@@ -130,7 +130,7 @@ itcl::class gaia::GaiaAstDomain {
 
       #  System.
       itk_component add System {
-         LabelMenu $w_.system \
+         util::LabelMenu $w_.system \
                -text "System:" \
                -relief raised \
                -labelwidth 8 \

@@ -383,7 +383,7 @@ itcl::class gaia::GaiaPolUSpec {
          itk_component add zc {
             frame $w_.zc
          }
-         LabelEntry $itk_component(zc).val -text "Z column value:" \
+         util::LabelEntry $itk_component(zc).val -text "Z column value:" \
                                            -valuewidth $vwidth \
                                            -command [code $this activ zcval] \
                                            -labelwidth $lwidth \
@@ -404,7 +404,7 @@ itcl::class gaia::GaiaPolUSpec {
          itk_component add za {
             frame $w_.za
          }
-         LabelEntry $itk_component(za).val -text "Z axis value:" \
+         util::LabelEntry $itk_component(za).val -text "Z axis value:" \
                                            -valuewidth $vwidth \
                                            -command [code $this activ zaval] \
                                            -labelwidth $lwidth \

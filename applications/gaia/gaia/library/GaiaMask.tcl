@@ -146,7 +146,7 @@ itcl::class gaia::GaiaMask {
       #  Or pick out individual values using a slider.
       if { $itk_option(-show_slider) } {
          itk_component add index {
-            LabelEntryScale $w_.index \
+            util::LabelEntryScale $w_.index \
                -text "Value:" \
                -value 0 \
                -labelwidth $lwidth \

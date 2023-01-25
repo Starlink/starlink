@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Filter method, square, rectangle, gaussian or gaussian-elliptical.
       itk_component add filter {
-         LabelMenu $w_.filter \
+         util::LabelMenu $w_.filter \
             -labelwidth $itk_option(-labelwidth) \
             -text "Filter method:" \
             -variable [scope filter_type_]
@@ -110,7 +110,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Size of smoothing rectangle or gaussian evaluation.
       itk_component add boxsize1 {
-         LabelEntryScale $w_.boxsize1 \
+         util::LabelEntryScale $w_.boxsize1 \
             -text "Box size 1:" \
             -value $boxsize1_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -129,7 +129,7 @@ itcl::class gaia::GaiaCubeFilter {
          {Size of box for block filtering or gaussian evaluation}
 
       itk_component add boxsize2 {
-         LabelEntryScale $w_.boxsize2 \
+         util::LabelEntryScale $w_.boxsize2 \
             -text "Box size 2:" \
             -value $boxsize2_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -149,7 +149,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Estimator for block filtering. Either mean or median.
       itk_component add combination {
-         LabelMenu $w_.combination \
+         util::LabelMenu $w_.combination \
             -labelwidth $itk_option(-labelwidth) \
             -text "Estimator:" \
             -variable [scope combination_type_]
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Orientation of gaussian-elliptical.
       itk_component add orient {
-         LabelEntryScale $w_.orient \
+         util::LabelEntryScale $w_.orient \
             -text "Orientation:" \
             -value $orient_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -187,7 +187,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  FWHM of gaussian types.
       itk_component add fwhm1 {
-         LabelEntryScale $w_.fwhm1 \
+         util::LabelEntryScale $w_.fwhm1 \
             -text "FWHM (major):" \
             -value $fwhm1_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -206,7 +206,7 @@ itcl::class gaia::GaiaCubeFilter {
          {FWHM of gaussian, major axis}
 
       itk_component add fwhm2 {
-         LabelEntryScale $w_.fwhm2 \
+         util::LabelEntryScale $w_.fwhm2 \
             -text "FWHM (minor):" \
             -value $fwhm2_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -226,7 +226,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCubeFilter" \
             -labelwidth $itk_option(-labelwidth) \
@@ -237,7 +237,7 @@ itcl::class gaia::GaiaCubeFilter {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \

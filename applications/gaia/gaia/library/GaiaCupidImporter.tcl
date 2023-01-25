@@ -134,7 +134,7 @@ itcl::class gaia::GaiaCupidImporter {
       #  columns to use for world coordinates etc.
       foreach {label name} $coltypes_ {
          itk_component add $name {
-            LabelMenu $w_.$name \
+            util::LabelMenu $w_.$name \
                -text "$label:" \
                -relief raised \
                -labelwidth 8 \

@@ -849,7 +849,7 @@ itcl::class gaia::GaiaEsp {
         add_common_widgets_ $parent {outtextname outstlname inardname back} ellprofou
 
         itk_component add method-ellprofou {
-            LabelMenu $parent.method \
+            util::LabelMenu $parent.method \
                     -text "Method:" \
                     -labelwidth $lwidth \
                     -variable [scope values_($this,ellprofoumethod)]
@@ -869,7 +869,7 @@ itcl::class gaia::GaiaEsp {
 
         # origin settings
         itk_component add originflag-ellprofou {
-            LabelMenu $parent.originflag \
+            util::LabelMenu $parent.originflag \
                     -text "Source:" \
                     -labelwidth $lwidth \
                     -variable [scope values_($this,ellprofouoriginflag)]
@@ -889,7 +889,7 @@ itcl::class gaia::GaiaEsp {
 
         # autolt
         itk_component add autolt {
-            LabelMenu $parent.autolt \
+            util::LabelMenu $parent.autolt \
                     -text "Auto-origin:" \
                     -labelwidth $lwidth \
                     -variable [scope values_($this,autolt)]
@@ -1044,7 +1044,7 @@ itcl::class gaia::GaiaEsp {
 
         #  Minimisation mode
         itk_component add minmod {
-            LabelMenu $parent.minmod \
+            util::LabelMenu $parent.minmod \
                     -text "Min'n mode:" \
                     -labelwidth $lwidth \
                     -variable [scope values_($this,minmod)]
@@ -1081,7 +1081,7 @@ itcl::class gaia::GaiaEsp {
 
     private method add_results_selections_ {parent} {
         itk_component add results-menu {
-            LabelMenu $parent.results-menu \
+            util::LabelMenu $parent.results-menu \
                     -text "Source:"
         }
         $itk_component(results-menu) add -label "None" -value 0
@@ -1413,7 +1413,7 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist nsigma] >= 0} {
             itk_component add nsigma-$toolname {
-                LabelEntry $parent.nsigma \
+                util::LabelEntry $parent.nsigma \
                         -text "Sig. sigma:" \
                         -labelwidth $labelwidth_ \
                         -valuewidth 2 \

@@ -121,7 +121,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
       #  Delay used in animation.
       itk_component add delay {
-         LabelEntryScale $w_.delay \
+         util::LabelEntryScale $w_.delay \
             -text {Delay (milli):} \
             -value $itk_option(-delay) \
             -labelwidth $itk_option(-labelwidth) \
@@ -141,7 +141,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
       #  Step between planes.
       itk_component add step {
-         LabelEntryScale $w_.step \
+         util::LabelEntryScale $w_.step \
             -text {Step:} \
             -value $itk_option(-step) \
             -labelwidth $itk_option(-labelwidth) \

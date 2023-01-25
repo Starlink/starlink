@@ -549,7 +549,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create a LabelMenu to control the method used for binning.
          itk_component add method {
-            LabelMenu $w_.method -text "Method:" \
+            util::LabelMenu $w_.method -text "Method:" \
                                  -variable [scope values_($this,method)] \
                                  -labelwidth $lwidth
          }
@@ -589,7 +589,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create an integer entry for the sigmas.
          itk_component add sigmas {
-            LabelEntry $w_.sigmas -text "Sigmas:" \
+            util::LabelEntry $w_.sigmas -text "Sigmas:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ sigmas] \
                                  -labelwidth $lwidth \

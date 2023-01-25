@@ -875,7 +875,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $scaleattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -899,7 +899,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $spacingattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -923,7 +923,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $minorattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -1010,7 +1010,7 @@ itcl::class gaia::GaiaAstGrid {
       }
       pack $itk_component(position3) -fill x -ipadx 1m
       itk_component add Xat {
-         LabelEntry $parent.xat \
+         util::LabelEntry $parent.xat \
             -text "X Axis (Y value):" \
             -labelwidth $lwidth_ \
             -textvariable [scope position_($this,labelat1)] \
@@ -1018,7 +1018,7 @@ itcl::class gaia::GaiaAstGrid {
       }
       pack $itk_component(Xat) -side top -fill x -ipadx 1m -ipady 1m
       itk_component add Yat {
-         LabelEntry $parent.yat \
+         util::LabelEntry $parent.yat \
             -text "Y Axis (X value):" \
             -labelwidth $lwidth_ \
             -textvariable [scope position_($this,labelat2)] \
@@ -1084,7 +1084,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname deffont defsize} $fontattrib_ {
          set size_($sname) $defsize
          itk_component add Size$sname {
-            LabelEntryScale $parent.size$sname \
+            util::LabelEntryScale $parent.size$sname \
                -text "$lname:" \
                -value $defsize \
                -labelwidth 10 \
@@ -1108,7 +1108,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $widthattrib_ {
          set width_($sname) $default
          itk_component add Width$sname {
-            LabelEntryScale $parent.width$sname \
+            util::LabelEntryScale $parent.width$sname \
                -text "$lname:" \
                -value $default \
                -labelwidth 10 \
@@ -1132,7 +1132,7 @@ itcl::class gaia::GaiaAstGrid {
       foreach {sname lname default} $lengthattrib_ {
          set size_($sname) $default
          itk_component add Length$sname {
-            LabelEntryScale $parent.width$sname \
+            util::LabelEntryScale $parent.width$sname \
                -text "$lname:" \
                -value $default \
                -labelwidth 10 \
@@ -1170,7 +1170,7 @@ itcl::class gaia::GaiaAstGrid {
       #  relevant if not drawing over the whole image.
       set gridsize_($this,xfrac) 0.8
       itk_component add Xfrac {
-         LabelEntryScale $parent.xfrac \
+         util::LabelEntryScale $parent.xfrac \
             -text "X display fraction:" \
             -labelwidth 15 \
             -valuewidth $vwidth_ \
@@ -1187,7 +1187,7 @@ itcl::class gaia::GaiaAstGrid {
 
       set gridsize_($this,yfrac) 0.8
       itk_component add Yfrac {
-         LabelEntryScale $parent.yfrac \
+         util::LabelEntryScale $parent.yfrac \
             -text "Y display fraction:" \
             -labelwidth 15 \
             -valuewidth $vwidth_ \
@@ -1517,7 +1517,7 @@ itcl::class gaia::GaiaAstGrid {
 
       foreach {sname lname} $labelattrib_ {
          itk_component add Label$sname {
-            LabelEntry $parent.label$sname \
+            util::LabelEntry $parent.label$sname \
                -text "$lname:" \
                -labelwidth 8 \
                -textvariable "::gaia::GaiaAstGrid::label_($this,$sname)" \
@@ -1595,7 +1595,7 @@ itcl::class gaia::GaiaAstGrid {
 
          #  Add a scale to select the number of digits.
          itk_component add Digit$axis {
-            LabelEntryScale $parent.digit$axis \
+            util::LabelEntryScale $parent.digit$axis \
                -text "Digits:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \

@@ -379,7 +379,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Create a LabelMenu to control the colour of the highlighted vector.
          itk_component add clr {
-	    LabelMenu $w_.clr -text "Colour:" \
+	    util::LabelMenu $w_.clr -text "Colour:" \
 			      -labelwidth $lwidth \
 	    	              -variable [scope values_($this,clr)]
 	 }
@@ -403,7 +403,7 @@ itcl::class gaia::GaiaPolUHigh {
 #  Create a LabelEntry to control the format string to use when formatting
 #  the vector length to create the highlight label.
          itk_component add fmt {
-	    LabelEntry $w_.fmt -text "Format string:" \
+	    util::LabelEntry $w_.fmt -text "Format string:" \
 	                       -labelwidth $lwidth \
                                -textvariable [scope values_($this,fmt)] \
                                -valuewidth 20 \
@@ -421,7 +421,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Create a LabelMenu to control the font family.
          itk_component add ffam {
-	    LabelMenu $w_.ffam -text "Font family:" \
+	    util::LabelMenu $w_.ffam -text "Font family:" \
 			       -labelwidth $lwidth \
 	                       -variable [scope values_($this,ffam)]
 	 }
@@ -443,7 +443,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Create a LabelEntry to set the font size.
          itk_component add fsize {
-	    LabelEntry $w_.fsize -text "Font size:" \
+	    util::LabelEntry $w_.fsize -text "Font size:" \
                               -valuewidth $vwidth \
                               -command [code $this newFont fsize] \
 			      -labelwidth $lwidth \

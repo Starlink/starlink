@@ -585,7 +585,7 @@ itcl::class gaia::GaiaContour {
 
       #  Menu button for selection from displayed images.
       itk_component add targets {
-         LabelMenu $w_.targets \
+         util::LabelMenu $w_.targets \
             -labelwidth 14 \
             -valuewidth 20 \
             -valueanchor e \
@@ -659,7 +659,7 @@ itcl::class gaia::GaiaContour {
 
          #  Entry widget for the contour values.
          itk_component add value$i {
-            LabelEntry $parent.value$i \
+            util::LabelEntry $parent.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 3 \
@@ -1252,7 +1252,7 @@ itcl::class gaia::GaiaContour {
 
       #  Number of contours to generate.
       itk_component add ncont {
-         LabelEntryScale $w.ncont \
+         util::LabelEntryScale $w.ncont \
             -text "Number:" \
             -labelwidth 14 \
             -valuewidth 3 \
@@ -1291,7 +1291,7 @@ itcl::class gaia::GaiaContour {
 
       #  Starting value.
       itk_component add start {
-         LabelEntry $w.start \
+         util::LabelEntry $w.start \
             -validate real \
             -text "Start:" \
             -labelwidth 14 \
@@ -1303,7 +1303,7 @@ itcl::class gaia::GaiaContour {
 
       #  Increment.
       itk_component add incre {
-         LabelEntry $w.incre \
+         util::LabelEntry $w.incre \
             -validate real \
             -text "Increment:" \
             -labelwidth 14 \
@@ -1316,7 +1316,7 @@ itcl::class gaia::GaiaContour {
 
       #  Percentile list.
       itk_component add percent {
-         LabelEntry $w.percent \
+         util::LabelEntry $w.percent \
             -text "Percentiles:" \
             -labelwidth 14 \
             -valuewidth 20 \
@@ -1498,7 +1498,7 @@ itcl::class gaia::GaiaContour {
 
       #  Title for key.
       itk_component add keytitle {
-         LabelEntry $w.keytitle \
+         util::LabelEntry $w.keytitle \
             -text "Title:" \
             -labelwidth 15 \
             -value "Contour key" \
@@ -1510,7 +1510,7 @@ itcl::class gaia::GaiaContour {
 
       #  Position of key relative to top right hand corner.
       itk_component add xkeypos {
-         LabelEntryScale $w.xkeypos \
+         util::LabelEntryScale $w.xkeypos \
             -text "X offset:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1528,7 +1528,7 @@ itcl::class gaia::GaiaContour {
          {X offset of key from top right hand corner}
 
       itk_component add ykeypos {
-         LabelEntryScale $w.ykeypos \
+         util::LabelEntryScale $w.ykeypos \
             -text "Y offset:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1587,7 +1587,7 @@ itcl::class gaia::GaiaContour {
 
       #  Key line lengths.
       itk_component add keylength {
-         LabelEntryScale $w.keylength \
+         util::LabelEntryScale $w.keylength \
             -text "Bar length:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1606,7 +1606,7 @@ itcl::class gaia::GaiaContour {
 
       #  Surround box line width.
       itk_component add keywidth {
-         LabelEntryScale $w.keywidth \
+         util::LabelEntryScale $w.keywidth \
             -text "Surround width:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1792,7 +1792,7 @@ itcl::class gaia::GaiaContour {
       #  covers.
       set xfrac_ 0.7
       itk_component add xfrac {
-         LabelEntryScale $w.xfrac \
+         util::LabelEntryScale $w.xfrac \
             -text "X display fraction:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1811,7 +1811,7 @@ itcl::class gaia::GaiaContour {
 
       set yfrac_ 0.7
       itk_component add yfrac {
-         LabelEntryScale $w.yfrac \
+         util::LabelEntryScale $w.yfrac \
             -text "Y display fraction:" \
             -labelwidth 15 \
             -valuewidth 5 \

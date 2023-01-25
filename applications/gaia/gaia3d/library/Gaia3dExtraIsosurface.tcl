@@ -537,7 +537,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
          #  Entry widget for the contour values.
          itk_component add value$index$i {
-            LabelEntry $w.value$i \
+            util::LabelEntry $w.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 5

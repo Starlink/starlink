@@ -437,7 +437,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelMenu to control the colour of the label.
          itk_component add lclr {
-	    LabelMenu $w_.lclr -text "Colour:" \
+	    util::LabelMenu $w_.lclr -text "Colour:" \
 			       -labelwidth $lwidth \
  	    	               -variable [scope values_($this,lclr)]
 	 }
@@ -455,7 +455,7 @@ itcl::class gaia::GaiaPolUKey {
 #  Create a LabelEntry to control the format string to use when formatting
 #  the textual label.
          itk_component add lfmt {
-	    LabelEntry $w_.lfmt -text "Format string:" \
+	    util::LabelEntry $w_.lfmt -text "Format string:" \
 	                        -labelwidth $lwidth \
                                 -textvariable [scope values_($this,lfmt)] \
                                 -valuewidth 20 \
@@ -473,7 +473,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelMenu to control the font family.
          itk_component add ffam {
-	    LabelMenu $w_.ffam -text "Font family:" \
+	    util::LabelMenu $w_.ffam -text "Font family:" \
 			       -labelwidth $lwidth \
 	                       -variable [scope values_($this,ffam)]
 	 }
@@ -489,7 +489,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelEntry to set the font size.
          itk_component add fsize {
-	    LabelEntry $w_.fsize -text "Font size:" \
+	    util::LabelEntry $w_.fsize -text "Font size:" \
                                  -valuewidth $vwidth \
                                  -command [code $this newFont fsize] \
      			         -labelwidth $lwidth \
@@ -528,7 +528,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelEntry to set the vector value.
          itk_component add vval {
-	    LabelEntry $w_.vval -text "Value:" \
+	    util::LabelEntry $w_.vval -text "Value:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ vval] \
   			        -labelwidth $lwidth \
@@ -541,7 +541,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelMenu to control the colour of the vector.
          itk_component add vclr {
-	    LabelMenu $w_.vclr -text "Colour:" \
+	    util::LabelMenu $w_.vclr -text "Colour:" \
 			       -labelwidth $lwidth \
  	    	               -variable [scope values_($this,vclr)]
 	 }
@@ -564,7 +564,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelEntry to control the width of the vector.
          itk_component add vwid {
-            LabelEntry $w_.vwid -text "Thickness:" \
+            util::LabelEntry $w_.vwid -text "Thickness:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ vwid] \
                                 -labelwidth $lwidth \
@@ -590,7 +590,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelMenu to control the colour of the background.
          itk_component add bgclr {
-	    LabelMenu $w_.bgclr -text "Colour:" \
+	    util::LabelMenu $w_.bgclr -text "Colour:" \
 			        -labelwidth $lwidth \
  	    	                -variable [scope values_($this,bgclr)]
 	 }
@@ -612,7 +612,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelEntry to control the width of the margin.
          itk_component add pad {
-            LabelEntry $w_.pad -text "Margin:" \
+            util::LabelEntry $w_.pad -text "Margin:" \
                                -valuewidth $vwidth \
                                -command [code $this activ pad] \
                                -labelwidth $lwidth \
@@ -638,7 +638,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelMenu to control the colour of the border.
          itk_component add bdclr {
-	    LabelMenu $w_.bdclr -text "Colour:" \
+	    util::LabelMenu $w_.bdclr -text "Colour:" \
 			        -labelwidth $lwidth \
  	    	                -variable [scope values_($this,bdclr)]
 	 }
@@ -660,7 +660,7 @@ itcl::class gaia::GaiaPolUKey {
 
 #  Create a LabelEntry to control the thickness of the border
          itk_component add bdwid {
-            LabelEntry $w_.bdwid -text "Width:" \
+            util::LabelEntry $w_.bdwid -text "Width:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ bdwid] \
                                  -labelwidth $lwidth \

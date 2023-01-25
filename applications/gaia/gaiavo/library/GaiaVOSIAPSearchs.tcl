@@ -85,7 +85,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
       #  Get the position from an object name lookup.
       itk_component add object {
-         LabelEntry $w_.object \
+         util::LabelEntry $w_.object \
             -text "Object name:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -97,7 +97,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
       #  Get the position on the sky, an RA and a Dec.
       itk_component add ra {
-         LabelEntry $w_.ra \
+         util::LabelEntry $w_.ra \
             -text "RA:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -108,7 +108,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       add_short_help $itk_component(ra) {RA centre of images, degrees or HH:MM:SS}
 
       itk_component add dec {
-         LabelEntry $w_.dec \
+         util::LabelEntry $w_.dec \
             -text "Dec:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -119,7 +119,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       add_short_help $itk_component(dec) {Dec centre of images, degrees or DD:MM:SS}
 
       itk_component add size1 {
-         LabelEntry $w_.size1 \
+         util::LabelEntry $w_.size1 \
             -text "Width:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -130,7 +130,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
       add_short_help $itk_component(size1) {Width of images, arcminutes}
 
       itk_component add size2 {
-         LabelEntry $w_.size2 \
+         util::LabelEntry $w_.size2 \
             -text "Height:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

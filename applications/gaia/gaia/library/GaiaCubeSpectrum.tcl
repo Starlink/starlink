@@ -166,7 +166,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  range is, so these are just free format fields, expecting a floating
       #  point value.
       itk_component add datalow {
-         LabelEntry $w_.datalow \
+         util::LabelEntry $w_.datalow \
             -text "Lower data limit:" \
             -value 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -180,7 +180,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          {Lower data limit for spectral plot, press return to apply}
 
       itk_component add datahigh {
-         LabelEntry $w_.datahigh \
+         util::LabelEntry $w_.datahigh \
             -text "Upper data limit:" \
             -value 1 \
             -labelwidth $itk_option(-labelwidth) \
@@ -978,7 +978,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Choice of combination method.
       itk_component add combination {
-         LabelMenu $w_.combination \
+         util::LabelMenu $w_.combination \
             -labelwidth $itk_option(-labelwidth) \
             -text "Combination method:" \
             -variable [scope combination_type_]

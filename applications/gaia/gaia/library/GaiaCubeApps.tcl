@@ -167,7 +167,7 @@ itcl::class gaia::GaiaCubeApps {
       if { $itk_option(-show_combination) } {
          #  Method used for combination
          itk_component add combination {
-            LabelMenu $w_.cattype \
+            util::LabelMenu $w_.cattype \
                -labelwidth $itk_option(-labelwidth) \
                -text "Combination method:" \
                -variable [scope combination_type_]

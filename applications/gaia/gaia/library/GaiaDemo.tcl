@@ -148,7 +148,7 @@ itcl::class gaia::GaiaDemo {
       #  Add sliders to control the reading interval and
       #  general speed.
       itk_component add readtime {
-	 LabelEntryScale $itk_component(sliders).readtime \
+	 util::LabelEntryScale $itk_component(sliders).readtime \
 	       -text {Reading interval (secs):} \
 	       -valuewidth 10 \
 	       -labelwidth 20 \
@@ -162,7 +162,7 @@ itcl::class gaia::GaiaDemo {
 	       -command [code $this set_time_ read]
       }
       itk_component add pausetime {
-	 LabelEntryScale $itk_component(sliders).pausetime \
+	 util::LabelEntryScale $itk_component(sliders).pausetime \
 	       -text {Pause interval (secs):} \
 	       -valuewidth 10 \
 	       -labelwidth 20 \

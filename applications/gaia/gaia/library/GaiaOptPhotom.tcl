@@ -379,7 +379,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Sky zero point and frame exposure time.
       if { $usemags_ } {
          itk_component add Skymag {
-            LabelEntry $w_.skymag \
+            util::LabelEntry $w_.skymag \
                -text {Frame zero point (mags) :} \
                -value $skymag_ \
                -labelwidth 25 \

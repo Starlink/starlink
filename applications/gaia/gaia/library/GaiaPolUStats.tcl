@@ -758,7 +758,7 @@ public method clear {} {
 
 #  Create a LabelEntry to set the number of iterations for N-sigma clipping
          itk_component add niter {
-	    LabelEntry $w_.niter -text "Iterations:" \
+	    util::LabelEntry $w_.niter -text "Iterations:" \
                               -valuewidth $vwidth \
 			      -labelwidth $lwidth \
                               -anchor nw \
@@ -772,7 +772,7 @@ public method clear {} {
 #  Create a LabelEntry to set the number of standard deviations for N-sigma
 #  clipping
          itk_component add nsigma {
-	    LabelEntry $w_.nsigma -text "N-Sigma:" \
+	    util::LabelEntry $w_.nsigma -text "N-Sigma:" \
                               -valuewidth $vwidth \
 			      -labelwidth $lwidth \
                               -anchor nw \

@@ -538,7 +538,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Create a LabelMenu to control the vector lengths within the above frame.
          itk_component add lencol {
-	    LabelMenu $w_.lencol -text "Vector length:" -labelwidth $lwidth1 \
+	    util::LabelMenu $w_.lencol -text "Vector length:" -labelwidth $lwidth1 \
                                  -variable [scope values_($this,lencol)]
 	 }
          grid $itk_component(lencol) -row $r -column 0 -sticky nw -padx $px
@@ -546,7 +546,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Create a LabelMenu to control the vector angles within the above frame.
          itk_component add angcol {
-	    LabelMenu $w_.angcol -text "Vector angles:" -labelwidth $lwidth1 \
+	    util::LabelMenu $w_.angcol -text "Vector angles:" -labelwidth $lwidth1 \
                                        -variable [scope values_($this,angcol)]
 	 }
          grid $itk_component(angcol) -row $r -column 1 -columnspan 2 -sticky nw -padx $px
@@ -571,7 +571,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelMenu within the above frame to control the colour for
 #  selected vectors.
          itk_component add sclr {
-	    LabelMenu $w_.sclr -text "Colour:" -labelwidth $lwidth1 \
+	    util::LabelMenu $w_.sclr -text "Colour:" -labelwidth $lwidth1 \
                                -variable [scope values_($this,sclr)]
          }
          grid $itk_component(sclr) -row $r -column 0 -sticky nw -padx $px
@@ -593,7 +593,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelEntry within the above frame to control the width for
 #  selected vectors.
          itk_component add swid {
-	    LabelEntry $w_.swid -text "Thickness:" \
+	    util::LabelEntry $w_.swid -text "Thickness:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -anchor nw \
@@ -633,7 +633,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelMenu within the above frame to control the colour for
 #  unselected vectors.
          itk_component add uclr {
-	    LabelMenu $w_.uclr -text "Colour:" -labelwidth $lwidth1 \
+	    util::LabelMenu $w_.uclr -text "Colour:" -labelwidth $lwidth1 \
                                -variable [scope values_($this,uclr)]
 	 }
          grid $itk_component(uclr) -row $r -column 0 -sticky nw -padx $px
@@ -655,7 +655,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelEntry within the above frame to control the width for
 #  unselected vectors.
          itk_component add uwid {
-	    LabelEntry $w_.uwid -text "Thickness:" \
+	    util::LabelEntry $w_.uwid -text "Thickness:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \
@@ -694,7 +694,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Vector scale
          itk_component add mag {
-	    LabelEntry $w_.mag -text "Vector scale:" \
+	    util::LabelEntry $w_.mag -text "Vector scale:" \
                                -valuewidth $vwidth \
                                -command [code $this activ] \
                                -labelwidth $lwidth1 \
@@ -707,7 +707,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Angle rotation
          itk_component add arot {
-	    LabelEntry $w_.arot -text "Rotation:" \
+	    util::LabelEntry $w_.arot -text "Rotation:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \
@@ -719,7 +719,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Number of vectors
          itk_component add nvec {
-	    LabelEntry $w_.nvec -text "Max. vectors:" \
+	    util::LabelEntry $w_.nvec -text "Max. vectors:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \

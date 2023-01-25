@@ -368,7 +368,7 @@ itcl::class gaia::GaiaPositions {
 
       #  Add fields for showing values.
       itk_component add fwhmx {
-         LabelValue $w_.fwhmx -text {FwhmX:} \
+         util::LabelValue $w_.fwhmx -text {FwhmX:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -377,7 +377,7 @@ itcl::class gaia::GaiaPositions {
          {Mean FWHM in X direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add fwhmy {
-         LabelValue $w_.fwhmy -text {FwhmY:} \
+         util::LabelValue $w_.fwhmy -text {FwhmY:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -386,7 +386,7 @@ itcl::class gaia::GaiaPositions {
          {Mean FWHM in Y direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add angle {
-         LabelValue $w_.angle -text {Angle:} \
+         util::LabelValue $w_.angle -text {Angle:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaPositions {
          {Mean position angle of major axis (degrees)}
 
       itk_component add peak {
-         LabelValue $w_.peak -text {Peak:} \
+         util::LabelValue $w_.peak -text {Peak:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -404,7 +404,7 @@ itcl::class gaia::GaiaPositions {
          {Mean peak value of objects}
 
       itk_component add back {
-         LabelValue $w_.back -text {Background:} \
+         util::LabelValue $w_.back -text {Background:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -413,7 +413,7 @@ itcl::class gaia::GaiaPositions {
          {Mean background level of all objects}
 
       itk_component add nused {
-         LabelValue $w_.nused -text {Number used:} \
+         util::LabelValue $w_.nused -text {Number used:} \
             -value 0 \
             -labelwidth $lwidth
       }

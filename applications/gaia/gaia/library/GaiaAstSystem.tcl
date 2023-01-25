@@ -142,7 +142,7 @@ itcl::class gaia::GaiaAstSystem {
 
       #  System.
       itk_component add System {
-         LabelMenu $w_.system \
+         util::LabelMenu $w_.system \
 	       -text "System:" \
 	       -relief raised \
 	       -labelwidth $lwidth \
@@ -190,7 +190,7 @@ itcl::class gaia::GaiaAstSystem {
 
       #  Sky reference type for offset coordinate systems.
       itk_component add SkyRefIs {
-         LabelMenu $w_.skyrefis \
+         util::LabelMenu $w_.skyrefis \
 	       -text "Ref point:" \
 	       -relief raised \
 	       -labelwidth $lwidth \
@@ -245,7 +245,7 @@ itcl::class gaia::GaiaAstSystem {
       }
 
       itk_component add ObsLat {
-         LabelEntry $w_.obslat \
+         util::LabelEntry $w_.obslat \
             -text "Obs latitude:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

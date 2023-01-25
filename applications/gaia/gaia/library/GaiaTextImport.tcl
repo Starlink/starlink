@@ -155,7 +155,7 @@ itcl::class gaia::GaiaTextImport {
       if { $itk_option(-format) == "tab" } {
 
          itk_component add system {
-            LabelMenu $w_.system \
+            util::LabelMenu $w_.system \
                -text "System:" \
                -relief raised \
                -labelwidth 9
@@ -325,7 +325,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Set the delimiter.
       itk_component add delimiter {
-         LabelMenu $parent.delimiter \
+         util::LabelMenu $parent.delimiter \
             -labelwidth $lwidth \
             -text "Delimiter:" \
             -variable [scope values_($this,delimiter)]
@@ -343,7 +343,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Comment delimiter.
       itk_component add comment {
-         LabelEntry $parent.comment \
+         util::LabelEntry $parent.comment \
             -labelwidth $lwidth \
             -text "Comment:" \
             -textvariable [scope values_($this,comment)] \
@@ -355,7 +355,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Number of lines to skip at beginning of file.
       itk_component add skip {
-         LabelEntry $parent.skip \
+         util::LabelEntry $parent.skip \
             -labelwidth $lwidth \
             -text "Header lines:" \
             -textvariable [scope values_($this,skip)] \
@@ -368,7 +368,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Fixed width control.
       itk_component add fixwidths {
-         LabelEntry $parent.fixwidths \
+         util::LabelEntry $parent.fixwidths \
             -labelwidth $lwidth \
             -text "Field positions:" \
             -textvariable [scope values_($this,fixwidths)] \
@@ -475,7 +475,7 @@ itcl::class gaia::GaiaTextImport {
             set values_($this,heading$i) "Col$i"
          }
          itk_component add col$i {
-            LabelEntry $parent.col$i \
+            util::LabelEntry $parent.col$i \
                -labelwidth 2 \
                -text "$i:" \
                -textvariable [scope values_($this,heading$i)] \

@@ -87,7 +87,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Image scale, allow values 1 through 20.
       itk_component add scale {
-         LabelEntryScale $w_.scale \
+         util::LabelEntryScale $w_.scale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

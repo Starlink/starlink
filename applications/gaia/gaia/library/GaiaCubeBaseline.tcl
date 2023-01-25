@@ -140,7 +140,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  No default controls.
       itk_component add order {
-         LabelEntryScale $w_.order \
+         util::LabelEntryScale $w_.order \
             -text "Order of fits:" \
             -value 1 \
             -labelwidth $itk_option(-labelwidth) \
@@ -160,7 +160,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCube" \
             -labelwidth $itk_option(-labelwidth) \
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaCubeBaseline {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \

@@ -165,7 +165,7 @@ itcl::class gaia::GaiaAstDefine {
          LabelRule $itk_component(f1).space1 -text "Dates:"
       }
       itk_component add dateobs {
-         LabelEntry $itk_component(f1).dateobs \
+         util::LabelEntry $itk_component(f1).dateobs \
             -text "Date of observation:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
@@ -189,7 +189,7 @@ itcl::class gaia::GaiaAstDefine {
 	  label $itk_component(f1).lab1 -text "Coordinate type:"
       }
       itk_component add ctype1 {
-         LabelMenu $itk_component(f1).ctype1 \
+         util::LabelMenu $itk_component(f1).ctype1 \
             -relief raised \
             -valuewidth $vwby2
       }
@@ -205,7 +205,7 @@ itcl::class gaia::GaiaAstDefine {
 	  label $itk_component(f1).lab2 -text "Reference pixel:"
       }
       itk_component add crpix1 {
-         LabelEntry $itk_component(f1).crpix1 \
+         util::LabelEntry $itk_component(f1).crpix1 \
             -textvariable [scope values_($this,crpix1)]
       }
       add_short_help $itk_component(crpix1) \
@@ -214,7 +214,7 @@ itcl::class gaia::GaiaAstDefine {
 	  label $itk_component(f1).lab3 -text "Reference coordinate:"
       }
       itk_component add crval1 {
-         LabelEntry $itk_component(f1).crval1 \
+         util::LabelEntry $itk_component(f1).crval1 \
             -textvariable [scope values_($this,crval1)]
       }
       add_short_help $itk_component(crval1) \
@@ -223,7 +223,7 @@ itcl::class gaia::GaiaAstDefine {
 	  label $itk_component(f1).lab4 -text "Reference increment:"
       }
       itk_component add cdelt1 {
-         LabelEntry $itk_component(f1).cdelt1 \
+         util::LabelEntry $itk_component(f1).cdelt1 \
             -textvariable [scope values_($this,cdelt1)]
       }
       add_short_help $itk_component(cdelt1) \
@@ -232,7 +232,7 @@ itcl::class gaia::GaiaAstDefine {
 	  label $itk_component(f1).lab5 -text "Angle:"
       }
       itk_component add crota1 {
-         LabelEntryScale $itk_component(f1).crota1 \
+         util::LabelEntryScale $itk_component(f1).crota1 \
             -valuewidth $vwby2 \
             -increment 0.1  \
             -resolution 0.1 \
@@ -251,7 +251,7 @@ itcl::class gaia::GaiaAstDefine {
          LabelRule $itk_component(f1).space4 -text "Y axis:"
       }
       itk_component add ctype2 {
-         LabelMenu $itk_component(f1).ctype2 \
+         util::LabelMenu $itk_component(f1).ctype2 \
             -relief raised \
             -valuewidth $vwby2
       }
@@ -264,25 +264,25 @@ itcl::class gaia::GaiaAstDefine {
             -command [code $this set_ctype_ 2 $value]
       }
       itk_component add crpix2 {
-         LabelEntry $itk_component(f1).crpix2 \
+         util::LabelEntry $itk_component(f1).crpix2 \
             -textvariable [scope values_($this,crpix2)]
       }
       add_short_help $itk_component(crpix2) \
          {Y coordinate of reference pixel (1,1 is centre of first pixel)}
       itk_component add crval2 {
-         LabelEntry $itk_component(f1).crval2 \
+         util::LabelEntry $itk_component(f1).crval2 \
             -textvariable [scope values_($this,crval2)]
       }
       add_short_help $itk_component(crval2) \
          {World coordinate of reference pixel (hh/dd:mm:ss or degrees)}
       itk_component add cdelt2 {
-         LabelEntry $itk_component(f1).cdelt2 \
+         util::LabelEntry $itk_component(f1).cdelt2 \
             -textvariable [scope values_($this,cdelt2)]
       }
       add_short_help $itk_component(cdelt2) \
          {World coordinate increment at reference pixel (arcsecs)}
       itk_component add crota2 {
-         LabelEntryScale $itk_component(f1).crota2 \
+         util::LabelEntryScale $itk_component(f1).crota2 \
             -valuewidth $vwby2 \
             -increment 0.1  \
             -resolution 0.1 \
@@ -298,7 +298,7 @@ itcl::class gaia::GaiaAstDefine {
 
       # LONGPOLE and LATPOLE
       itk_component add longpole {
-         LabelEntry $itk_component(f1).longpole \
+         util::LabelEntry $itk_component(f1).longpole \
             -text "Longpole:" \
             -labelwidth $lwidth_ \
             -textvariable [scope values_($this,longpole)]
@@ -306,7 +306,7 @@ itcl::class gaia::GaiaAstDefine {
       add_short_help $itk_component(longpole) \
          {Longitude of system northpole}
       itk_component add latpole {
-         LabelEntry $itk_component(f1).latpole \
+         util::LabelEntry $itk_component(f1).latpole \
             -text "Latpole:" \
             -labelwidth $lwidth_ \
             -textvariable [scope values_($this,latpole)]
@@ -359,7 +359,7 @@ itcl::class gaia::GaiaAstDefine {
          LabelRule $itk_component(f1).space6 -text "Projection:"
       }
       itk_component add proj {
-         LabelMenu $w_.proj \
+         util::LabelMenu $w_.proj \
             -text "Type:" \
             -relief raised \
             -labelwidth $lwidth_ \
@@ -374,7 +374,7 @@ itcl::class gaia::GaiaAstDefine {
       }
 
       itk_component add projp1 {
-         LabelEntry $itk_component(f1).projp1 \
+         util::LabelEntry $itk_component(f1).projp1 \
             -text "projp1:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
@@ -384,7 +384,7 @@ itcl::class gaia::GaiaAstDefine {
          {First projection parameter (PROJP1)}
 
       itk_component add projp2 {
-         LabelEntry $itk_component(f1).projp2 \
+         util::LabelEntry $itk_component(f1).projp2 \
             -text "projp2:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \

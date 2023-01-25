@@ -341,7 +341,7 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Create a LabelMenu to select the column name for this quantity.
             itk_component add $lq {
-	       LabelMenu $w_.$lq -text "$q:" \
+	       util::LabelMenu $w_.$lq -text "$q:" \
                                 -labelwidth $lwidth \
                                 -variable [scope mvalues_($this,$q)]
             }

@@ -276,7 +276,7 @@ itcl::class gaia::GaiaCube {
 
       #  Control for selecting the axis we move along.
       itk_component add axis {
-         LabelMenu $w_.axis \
+         util::LabelMenu $w_.axis \
             -text "Axis:" \
             -labelwidth $lwidth
       }

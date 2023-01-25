@@ -317,7 +317,7 @@ itcl::class gaia::GaiaXYHistogram {
 
       #  Binning factor.
       itk_component add factor {
-         LabelEntryScale $w_.factor \
+         util::LabelEntryScale $w_.factor \
             -text "Binning factor:" \
             -labelwidth $lwidth \
             -from 0.0 \

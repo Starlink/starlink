@@ -396,7 +396,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelMenu to control whether chosen vectors are selected or
 #  deselected.
          itk_component add select {
-            LabelMenu $w_.select -text "Operation:" \
+            util::LabelMenu $w_.select -text "Operation:" \
                                  -variable [scope values_($this,select)] \
                                  -labelwidth $lwidth
          }
@@ -416,7 +416,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelMenu to control whether cursor selection uses a
 #  rectangle or a circle.
          itk_component add shape {
-            LabelMenu $w_.shape -text "Region shape:" \
+            util::LabelMenu $w_.shape -text "Region shape:" \
                               -variable [scope values_($this,shape)] \
                               -labelwidth $lwidth
          }

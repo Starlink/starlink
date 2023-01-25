@@ -92,7 +92,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
 
       #  Slider that controls the position along a spectral axis.
       itk_component add index {
-         LabelEntryScale $w_.index \
+         util::LabelEntryScale $w_.index \
             -text "$itk_option(-text)" \
             -value $itk_option(-value) \
             -labelwidth $itk_option(-labelwidth) \
@@ -118,7 +118,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
 
       #  Index coordinate.
       itk_component add indexcoord {
-         LabelValue $w_.indexcoord \
+         util::LabelValue $w_.indexcoord \
             -text "$itk_option(-coordtext)" \
             -labelwidth $itk_option(-labelwidth)
       }
@@ -127,7 +127,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
       #  Index coordinate type.
       if { $itk_option(-show_type) } {
          itk_component add indextype {
-            LabelValue $w_.indextype \
+            util::LabelValue $w_.indextype \
                -text "$itk_option(-coordtypetext)" \
                -labelwidth $itk_option(-labelwidth)
          }
@@ -137,7 +137,7 @@ itcl::class gaia::GaiaSpectralPlotLine {
       #  Increment of arrows.
       if { $itk_option(-show_increment) } {
          itk_component add increment {
-            LabelEntryScale $w_.increment \
+            util::LabelEntryScale $w_.increment \
                -text {Increment:} \
                -value 1 \
                -labelwidth $itk_option(-labelwidth) \

@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeRebin {
 
       #  Average or sum.
       itk_component add combination {
-         LabelMenu $w_.combination \
+         util::LabelMenu $w_.combination \
             -labelwidth $itk_option(-labelwidth) \
             -text "Combination method:" \
             -variable [scope combination_type_]
@@ -111,7 +111,7 @@ itcl::class gaia::GaiaCubeRebin {
       #  Rebinning factors for each dimension.
       foreach n {1 2 3} {
          itk_component add bin$n {
-            LabelEntryScale $w_.bin$n \
+            util::LabelEntryScale $w_.bin$n \
                -text "Bin factor, axis $n:" \
                -value [set bin${n}_] \
                -labelwidth $itk_option(-labelwidth) \
@@ -132,7 +132,7 @@ itcl::class gaia::GaiaCubeRebin {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCubeRebin" \
             -labelwidth $itk_option(-labelwidth) \
@@ -143,7 +143,7 @@ itcl::class gaia::GaiaCubeRebin {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \

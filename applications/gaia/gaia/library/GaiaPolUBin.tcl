@@ -265,7 +265,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Create an integer entry for the box size.
          itk_component add box {
-            LabelEntry $w_.box -text "Box size:" \
+            util::LabelEntry $w_.box -text "Box size:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ box] \
                                  -labelwidth $lwidth \
@@ -284,7 +284,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Create a LabelMenu to control the method used for binnin.
          itk_component add method {
-            LabelMenu $w_.method -text "Method:" \
+            util::LabelMenu $w_.method -text "Method:" \
                                  -variable [scope values_($this,method)] \
                                  -labelwidth $lwidth
          }
@@ -324,7 +324,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Create an integer entry for the min. no. of values in a bin
          itk_component add minval {
-            LabelEntry $w_.minval -text "Min. values:" \
+            util::LabelEntry $w_.minval -text "Min. values:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ minval] \
                                  -labelwidth $lwidth \
@@ -343,7 +343,7 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Create an integer entry for the sigmas.
          itk_component add sigmas {
-            LabelEntry $w_.sigmas -text "Sigmas:" \
+            util::LabelEntry $w_.sigmas -text "Sigmas:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ sigmas] \
                                  -labelwidth $lwidth \

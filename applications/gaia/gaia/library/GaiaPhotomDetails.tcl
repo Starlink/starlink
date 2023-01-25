@@ -147,14 +147,14 @@ itcl::class gaia::GaiaPhotomDetails {
          LabelRule $w_.label -text "Current object details"
       }
       itk_component add Index {
-         LabelValue $w_.index -text {Aperture index:} \
+         util::LabelValue $w_.index -text {Aperture index:} \
             -value 0 \
             -labelwidth $lwidth
       }
 
       #  Semimajor axis.
       itk_component add Semimajor {
-         LabelEntryScale $w_.semimajor \
+         util::LabelEntryScale $w_.semimajor \
             -text {Semimajor axis:} \
             -value $itk_option(-semimajor) \
             -labelwidth $lwidth \
@@ -170,7 +170,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Eccentricity (0 for circles).
       itk_component add Eccen {
-         LabelEntryScale $w_.eccen \
+         util::LabelEntryScale $w_.eccen \
             -text {Eccentricity:} \
             -value $itk_option(-eccentricity) \
             -labelwidth $lwidth \
@@ -186,7 +186,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Position angle (0 for circles).
       itk_component add Angle {
-         LabelEntryScale $w_.angle \
+         util::LabelEntryScale $w_.angle \
             -text {Position angle:} \
             -value $itk_option(-angle) \
             -labelwidth $lwidth \
@@ -202,7 +202,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Inner scale factor.
       itk_component add InnerScale {
-         LabelEntryScale $w_.inner \
+         util::LabelEntryScale $w_.inner \
             -text {Annulus inner scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -218,7 +218,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Outer scale factor.
       itk_component add OuterScale {
-         LabelEntryScale $w_.outer \
+         util::LabelEntryScale $w_.outer \
             -text {Annulus outer scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -237,12 +237,12 @@ itcl::class gaia::GaiaPhotomDetails {
          frame $w_.sep1 -height 3
       }
       itk_component add X {
-         LabelValue $w_.x -text {X position:} \
+         util::LabelValue $w_.x -text {X position:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Y {
-         LabelValue $w_.y -text {Y position:} \
+         util::LabelValue $w_.y -text {Y position:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -252,7 +252,7 @@ itcl::class gaia::GaiaPhotomDetails {
          set label {Mean count:}
       }
       itk_component add Mag {
-         LabelValue $w_.mag -text "$label" \
+         util::LabelValue $w_.mag -text "$label" \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -263,22 +263,22 @@ itcl::class gaia::GaiaPhotomDetails {
          set label {Error in count:}
       }
       itk_component add MagErr {
-         LabelValue $w_.magerr -text $label \
+         util::LabelValue $w_.magerr -text $label \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Sky {
-         LabelValue $w_.sky -text {Sky value:} \
+         util::LabelValue $w_.sky -text {Sky value:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Signal {
-         LabelValue $w_.signal -text {Sum in aperture:} \
+         util::LabelValue $w_.signal -text {Sum in aperture:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Code {
-         LabelValue $w_.code -text {Error code:} \
+         util::LabelValue $w_.code -text {Error code:} \
             -value OK \
             -labelwidth $lwidth
       }
@@ -314,14 +314,14 @@ itcl::class gaia::GaiaPhotomDetails {
          LabelRule $w_.label -text "Current object details"
       }
       itk_component add Index {
-         LabelValue $w_.index -text {Aperture index:} \
+         util::LabelValue $w_.index -text {Aperture index:} \
             -value 0 \
             -labelwidth $lwidth
       }
 
       #  Inner scale factor.
       itk_component add InnerScale {
-         LabelEntryScale $w_.inner \
+         util::LabelEntryScale $w_.inner \
             -text {Annulus inner scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -337,7 +337,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Outer scale factor.
       itk_component add OuterScale {
-         LabelEntryScale $w_.outer \
+         util::LabelEntryScale $w_.outer \
             -text {Annulus outer scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -356,12 +356,12 @@ itcl::class gaia::GaiaPhotomDetails {
          frame $w_.sep1 -height 3
       }
       itk_component add X {
-         LabelValue $w_.x -text {X position:} \
+         util::LabelValue $w_.x -text {X position:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Y {
-         LabelValue $w_.y -text {Y position:} \
+         util::LabelValue $w_.y -text {Y position:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -371,7 +371,7 @@ itcl::class gaia::GaiaPhotomDetails {
          set label {Mean count:}
       }
       itk_component add Mag {
-         LabelValue $w_.mag -text "$label" \
+         util::LabelValue $w_.mag -text "$label" \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -382,22 +382,22 @@ itcl::class gaia::GaiaPhotomDetails {
          set label {Error in count:}
       }
       itk_component add MagErr {
-         LabelValue $w_.magerr -text $label \
+         util::LabelValue $w_.magerr -text $label \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Sky {
-         LabelValue $w_.sky -text {Sky value:} \
+         util::LabelValue $w_.sky -text {Sky value:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Signal {
-         LabelValue $w_.signal -text {Sum in aperture:} \
+         util::LabelValue $w_.signal -text {Sum in aperture:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Code {
-         LabelValue $w_.code -text {Error code:} \
+         util::LabelValue $w_.code -text {Error code:} \
             -value OK \
             -labelwidth $lwidth
       }
@@ -431,7 +431,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Clipping radius (masquerades as semi-major axis).
       itk_component add Clip {
-         LabelEntryScale $w_.clip \
+         util::LabelEntryScale $w_.clip \
             -text {Clipping radius:} \
             -value $itk_option(-semimajor) \
             -labelwidth $lwidth \
@@ -447,7 +447,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Seeing estimate.
       itk_component add Seeing {
-         LabelEntryScale $w_.seeing \
+         util::LabelEntryScale $w_.seeing \
             -text {Seeing estimate:} \
             -value $itk_option(-seeing) \
             -labelwidth $lwidth \
@@ -463,7 +463,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Inner scale factor.
       itk_component add InnerScale {
-         LabelEntryScale $w_.inner \
+         util::LabelEntryScale $w_.inner \
             -text {Annulus inner scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -479,7 +479,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
       #  Outer scale factor.
       itk_component add OuterScale {
-         LabelEntryScale $w_.outer \
+         util::LabelEntryScale $w_.outer \
             -text {Annulus outer scale:} \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -498,40 +498,40 @@ itcl::class gaia::GaiaPhotomDetails {
          frame $w_.sep1 -height 3
       }
       itk_component add X {
-         LabelValue $w_.x -text {X position:} \
+         util::LabelValue $w_.x -text {X position:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Y {
-         LabelValue $w_.y -text {Y position:} \
+         util::LabelValue $w_.y -text {Y position:} \
             -value 0 \
             -labelwidth $lwidth
       }
 
       itk_component add Fwhm1 {
-         LabelValue $w_.fwhm1 -text {Fwhm X:} \
+         util::LabelValue $w_.fwhm1 -text {Fwhm X:} \
             -value 0 \
             -labelwidth $lwidth
       }
 
       itk_component add Fwhm2 {
-         LabelValue $w_.fwhm2 -text {Fwhm Y:} \
+         util::LabelValue $w_.fwhm2 -text {Fwhm Y:} \
             -value 0 \
             -labelwidth $lwidth
       }
 
 #      itk_component add Sky {
-#         LabelValue $w_.sky -text {Sky value:} \
+#         util::LabelValue $w_.sky -text {Sky value:} \
 #            -value 0 \
 #            -labelwidth $lwidth
 #      }
       itk_component add Angle {
-         LabelValue $w_.angle -text {Rotation:} \
+         util::LabelValue $w_.angle -text {Rotation:} \
             -value 0 \
             -labelwidth $lwidth
       }
       itk_component add Code {
-         LabelValue $w_.code -text {Error code:} \
+         util::LabelValue $w_.code -text {Error code:} \
             -value OK \
             -labelwidth $lwidth
       }

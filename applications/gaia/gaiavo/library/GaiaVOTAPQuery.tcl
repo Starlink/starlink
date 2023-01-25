@@ -107,7 +107,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       add_short_help $itk_component(servicename) "The TAP service name"
 
       itk_component add serviceurl {
-         LabelEntry $itk_component(actionframe).serviceurl \
+         util::LabelEntry $itk_component(actionframe).serviceurl \
             -text "        " \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

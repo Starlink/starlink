@@ -232,12 +232,12 @@ itcl::class gaia::StarBlink {
 
       #  Offset of clone's lower corner.
       itk_component add Xlow {
-         LabelEntry $itk_component(Iframe).xlow \
+         util::LabelEntry $itk_component(Iframe).xlow \
             -text {X offset:} -command [code $this place_image_ x] \
             -value 1
       }
       itk_component add Ylow {
-         LabelEntry $itk_component(Iframe).ylow \
+         util::LabelEntry $itk_component(Iframe).ylow \
             -text {Y offset:} -command [code $this place_image_ y] \
             -value 1
       }

@@ -403,7 +403,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  Number of objects downloaded from reference catalogue.
       itk_component add maxobj {
-         LabelEntry $tuning_page.maxobj \
+         util::LabelEntry $tuning_page.maxobj \
             -text "Max catalogue objects:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(maxobj)]
@@ -427,7 +427,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  The "badness" of objects.
          itk_component add badness {
-            LabelEntry $tuning_page.badness \
+            util::LabelEntry $tuning_page.badness \
                -text "Badness factor:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(badness)]
@@ -437,7 +437,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Timeout for tasks
          itk_component add timeout {
-            LabelEntry $tuning_page.timeout \
+            util::LabelEntry $tuning_page.timeout \
                -text "Timeout (secs):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(timeout)]

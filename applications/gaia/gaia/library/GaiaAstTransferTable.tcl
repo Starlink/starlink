@@ -257,7 +257,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Menu button for selection.
       itk_component add targets {
-         LabelMenu $w_.targets \
+         util::LabelMenu $w_.targets \
             -labelwidth 12 \
             -valuewidth 20 \
             -valueanchor e \

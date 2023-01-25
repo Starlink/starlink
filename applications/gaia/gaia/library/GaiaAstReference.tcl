@@ -273,7 +273,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Coordinate type for the table data (both CTYPES).
       itk_component add ctype {
-         LabelMenu $w_.ctype -relief raised \
+         util::LabelMenu $w_.ctype -relief raised \
 	    -valuewidth $vwidth_ \
 	    -labelwidth $lwidth_ \
 	    -text "Coordinate type:"
@@ -345,7 +345,7 @@ itcl::class gaia::GaiaAstReference {
          LabelRule $w_.space2 -text "Image parameters:"
       }
       itk_component add proj {
-	  LabelMenu $w_.proj -relief raised \
+	  util::LabelMenu $w_.proj -relief raised \
 		  -labelwidth $lwidth_ \
 		  -valuewidth 40 \
 		  -text "Projection type:"
@@ -359,7 +359,7 @@ itcl::class gaia::GaiaAstReference {
 		  -command [code $this set_proj_ $value]
       }
       itk_component add projp1 {
-         LabelEntry $w_.projp1 \
+         util::LabelEntry $w_.projp1 \
 		 -textvariable [scope values_($this,projp1)] \
 		 -labelwidth $lwidth_ \
 		 -valuewidth $vwidth_ \
@@ -369,7 +369,7 @@ itcl::class gaia::GaiaAstReference {
 	      {First projection parameter (PROJP1)}
 
       itk_component add projp2 {
-	  LabelEntry $w_.projp2 \
+	  util::LabelEntry $w_.projp2 \
 		  -textvariable [scope values_($this,projp2)] \
 		  -labelwidth $lwidth_ \
 		  -valuewidth $vwidth_ \
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaAstReference {
       #  Check if X axes is to be associated with longitude or
       #  latitude axis.
       itk_component add xislong {
-         LabelMenu $w_.xislong -relief raised \
+         util::LabelMenu $w_.xislong -relief raised \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
             -text "X coordinate type:"
@@ -1021,7 +1021,7 @@ itcl::class gaia::GaiaAstReference {
       }
       #  Reference pixels
       $add_ itk_component add crpix1 {
-         LabelEntry $add_.crpix1 \
+         util::LabelEntry $add_.crpix1 \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
             -text "X Reference pixel:" \
@@ -1031,7 +1031,7 @@ itcl::class gaia::GaiaAstReference {
          {Estimated X coordinate of image reference pixel (1,1 is centre of first pixel)}
 
       $add_ itk_component add crpix2 {
-         LabelEntry $add_.crpix2 \
+         util::LabelEntry $add_.crpix2 \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
             -text "Y Reference pixel:" \
@@ -1042,7 +1042,7 @@ itcl::class gaia::GaiaAstReference {
 
       # Longpole AND latpole.
       $add_ itk_component add longpole {
-         LabelEntry $add_.longpole \
+         util::LabelEntry $add_.longpole \
             -text "Longpole:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
@@ -1051,7 +1051,7 @@ itcl::class gaia::GaiaAstReference {
       $add_ add_short_help $add_.longpole \
          {Longitude of table system northpole}
       $add_ itk_component add latpole {
-         LabelEntry $add_.latpole \
+         util::LabelEntry $add_.latpole \
             -text "Latpole:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \

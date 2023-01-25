@@ -810,7 +810,7 @@ itcl::class gaia::GaiaXYProfile {
 
          #  And the comment field.
          itk_component add comment {
-            LabelEntry $itk_component(lframe).comment \
+            util::LabelEntry $itk_component(lframe).comment \
                -labelwidth $lwidth \
                -text "Comment:" \
                -anchor e \

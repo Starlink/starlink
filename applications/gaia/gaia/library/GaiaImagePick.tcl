@@ -115,7 +115,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  And the comment field.
       itk_component add comment {
-         LabelEntry $w_.comment \
+         util::LabelEntry $w_.comment \
             -labelwidth 8 \
             -text "Comment:"
       }
