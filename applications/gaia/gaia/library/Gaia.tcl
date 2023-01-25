@@ -2430,9 +2430,9 @@ window gives you access to this."
          set meta(samp.icon.url) \
                 "http://astro.dur.ac.uk/~pdraper/gaia/gaiaicon.gif"
          set samp_agent_ [gaia::GaiaSampAgent \#auto]
-         lappend agents [itcl::code $samp_agent_]
-         lappend agents [itcl::code [samp::UtilAgent \#auto]]
-       # lappend agents [itcl::code [samp::TestAgent \#auto]]
+         lappend agents [code $samp_agent_]
+         lappend agents [code [samp::UtilAgent \#auto]]
+       # lappend agents [code [samp::TestAgent \#auto]]
          set client [samp::SampClient \#auto -agents $agents \
                                              -metadata [array get meta]]
 
