@@ -608,7 +608,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Choose PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Choose PHOTOM file"]
          if {[$w activate]} {
             $object_list_ read_file [$w get] $update
          }
@@ -621,7 +621,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Read positions from a positions file.
    method read_positions {{filename ""} {update 0}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Choose positions file"]
+         set w [util::FileSelect .\#auto -title "Choose positions file"]
          if {[$w activate]} {
             $object_list_ read_positions_file [$w get] $update
          }
@@ -710,7 +710,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Save the measurements to a file.
    method save_objects {{filename ""}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
          if {[$w activate]} {
             $object_list_ write_file [$w get]
          }
@@ -725,7 +725,7 @@ itcl::class gaia::GaiaApPhotom {
    method append_objects {{filename ""}} {
      set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
          if {[$w activate]} {
             $object_list_ append_file $comment [$w get]
          }

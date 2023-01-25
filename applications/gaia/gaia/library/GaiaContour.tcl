@@ -374,7 +374,7 @@ itcl::class gaia::GaiaContour {
 
    #  Save the current configuration to a file.
    public method write_config_file {} {
-      set w [FileSelect .\#auto -title "Save configuration to a file"]
+      set w [util::FileSelect .\#auto -title "Save configuration to a file"]
       if {[$w activate]} {
          save_config [$w get]
       }
@@ -383,7 +383,7 @@ itcl::class gaia::GaiaContour {
 
    #  Restore configuration from a file.
    public method read_config_file {} {
-      set w [FileSelect .\#auto -title "Read configuration from a file"]
+      set w [util::FileSelect .\#auto -title "Read configuration from a file"]
       if {[$w activate]} {
          read_config [$w get]
       }

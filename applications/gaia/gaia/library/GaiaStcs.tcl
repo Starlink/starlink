@@ -250,7 +250,7 @@ itcl::class gaia::GaiaStcs {
 
    #  Save the current description to a file.
    public method write_file {} {
-      set w [FileSelect .\#auto -title "Save description to a file"]
+      set w [util::FileSelect .\#auto -title "Save description to a file"]
       if {[$w activate]} {
          save_description [$w get]
       }
@@ -259,7 +259,7 @@ itcl::class gaia::GaiaStcs {
 
    #  Read description from a file.
    public method read_file {} {
-      set w [FileSelect .\#auto -title "Read description from a file"]
+      set w [util::FileSelect .\#auto -title "Read description from a file"]
       if {[$w activate]} {
          read_description [$w get]
       }

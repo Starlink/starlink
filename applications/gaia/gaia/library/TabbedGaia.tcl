@@ -410,7 +410,7 @@ itcl::class gaia::TabbedGaia {
    #  retains the current name and filters when repeatably accessed.
    protected method get_file_ {dir pattern types} {
       if { ! [winfo exists $fileselect_] } {
-         set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
+         set fileselect_ [util::FileSelect $w_.select -dir $dir -filter $pattern \
                              -transient 1 -withdraw 1 -filter_types $types]
          wm transient $fileselect_ [winfo toplevel $w_]
       } else {

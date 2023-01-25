@@ -260,7 +260,7 @@ itcl::class gaia::GaiaPolarimetry {
 
 #  Create a progress bar.
       set pbar_ $w_.progress
-      itk_component add progress {ProgressBar $pbar_}
+      itk_component add progress {util::ProgressBar $pbar_}
 
 #  Create the tab notebook for containing each page of options.
       itk_component add notebook {
@@ -1320,7 +1320,7 @@ itcl::class gaia::GaiaPolarimetry {
 #  -----------------------------------------------------------------
    protected method get_file {dir pattern types} {
        if { ! [winfo exists $fileselect_] } {
-           set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
+           set fileselect_ [util::FileSelect $w_.select -dir $dir -filter $pattern \
                              -transient 1 -withdraw 1 -filter_types $types]
            wm transient $fileselect_ [winfo toplevel $w_]
        } else {

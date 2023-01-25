@@ -220,7 +220,7 @@ itcl::class gaia::StarArdTool {
 
    #  Choose an ARD file and read in its description.
    method read_file {} {
-      set w [FileSelect .\#auto -title "Choose ARD file"]
+      set w [util::FileSelect .\#auto -title "Choose ARD file"]
       if {[$w activate]} {
          read_description [$w get]
       }
@@ -277,7 +277,7 @@ itcl::class gaia::StarArdTool {
 
    #  Select a file to save the current ARD description.
    method save_file {} {
-      set w [FileSelect .\#auto -title "Write ARD description to file"]
+      set w [util::FileSelect .\#auto -title "Write ARD description to file"]
       if {[$w activate]} {
          save_description [$w get]
       }
@@ -447,7 +447,7 @@ itcl::class gaia::StarArdTool {
    #  Save the ARD description to a FITS MOC.
    public method save_moc {} {
       if { $routine_prefix == "StarArd" } {
-         set w [FileSelect .\#auto -title "Save MOC"]
+         set w [util::FileSelect .\#auto -title "Save MOC"]
          if {[$w activate]} {
             save_fitsmoc [$w get]
          }

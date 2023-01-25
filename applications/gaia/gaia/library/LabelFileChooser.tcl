@@ -122,9 +122,9 @@ itcl::class gaia::LabelFileChooser {
       if { $file_chooser_ == {} } {
          if { $itk_option(-filter_types) == {} } {
             set file_chooser_ \
-               [FileSelect .\#auto -title $itk_option(-chooser_title)]
+               [util::FileSelect .\#auto -title $itk_option(-chooser_title)]
          } else {
-            set file_chooser_ [FileSelect .\#auto \
+            set file_chooser_ [util::FileSelect .\#auto \
                                   -title $itk_option(-chooser_title) \
                                   -filter_types $itk_option(-filter_types) \
                                   -button_4 "Browse" \

@@ -205,7 +205,7 @@ itcl::class gaiavo::GaiaVOCats {
 
       #  Add the ProgressBar, looks busy during query.
       itk_component add progressbar {
-         ProgressBar $w_.progress
+         util::ProgressBar $w_.progress
       }
       pack $itk_component(progressbar) -side top -fill x
       add_short_help itk_component(progressbar) \

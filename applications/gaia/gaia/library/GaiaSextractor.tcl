@@ -530,7 +530,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Save the current config parameters to a file.
    public method write_conpar_file {} {
-      set w [FileSelect .\#auto -title "Save config parameters to a file"]
+      set w [util::FileSelect .\#auto -title "Save config parameters to a file"]
       if {[$w activate]} {
          save_conpars [$w get]
       }
@@ -539,7 +539,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Restore config parameters from a file.
    public method read_conpar_file {} {
-      set w [FileSelect .\#auto -title "Read config parameters from a file"]
+      set w [util::FileSelect .\#auto -title "Read config parameters from a file"]
       if {[$w activate]} {
          read_conpars [$w get]
       }
@@ -548,7 +548,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Save the catalogue parameters to a file.
    public method write_catpar_file {} {
-      set w [FileSelect .\#auto -title "Save catalogue parameters to a file"]
+      set w [util::FileSelect .\#auto -title "Save catalogue parameters to a file"]
       if {[$w activate]} {
          save_catpars [$w get]
       }
@@ -557,7 +557,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Read columns from a file.
    public method read_catpar_file {} {
-      set w [FileSelect .\#auto -title "Read catalogue parameters from a file"]
+      set w [util::FileSelect .\#auto -title "Read catalogue parameters from a file"]
       if {[$w activate]} {
          read_catpars [$w get]
       }
@@ -2468,7 +2468,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Restore an old catalogue, displaying the detection ellipses.
    public method read_old_catalogue {} {
-      set w [FileSelect .\#auto -title "Read existing compatible catalogue"]
+      set w [util::FileSelect .\#auto -title "Read existing compatible catalogue"]
       if {[$w activate]} {
          set catalogue [$w get]
          if { ! [file readable $catalogue] } {

@@ -269,7 +269,7 @@ itcl::class gaia::GaiaBlink {
          frame $itk_component(ControlsFrame).sframe
       }
       itk_component add Speed {
-         LabelNumber $itk_component(Sframe).speed \
+         util::LabelNumber $itk_component(Sframe).speed \
             -text {Speed factor:} \
             -command [code $this change_speed] \
             -value 24 \

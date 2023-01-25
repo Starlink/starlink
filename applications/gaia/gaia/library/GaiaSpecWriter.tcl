@@ -131,7 +131,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to a text file.
    public method save_as_text {} {
-      set w [FileSelect .\#auto -title "Save spectrum to text file"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to text file"]
       if { [$w activate] } {
          if { [catch {write_as_text [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"
@@ -214,7 +214,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to an NDF.
    public method save_as_ndf {} {
-      set w [FileSelect .\#auto -title "Save spectrum to an NDF"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to an NDF"]
       if { [$w activate] } {
          if { [catch {write_as_ndf [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"
@@ -287,7 +287,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to a FITS file.
    public method save_as_fits {} {
-      set w [FileSelect .\#auto -title "Save spectrum to FITS"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to FITS"]
       if { [$w activate] } {
          if { [catch {write_as_fits [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"

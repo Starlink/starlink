@@ -196,7 +196,7 @@ itcl::class gaia::StarBlink {
 	  frame $w_.sframe
       }
       itk_component add Speed {
-	  LabelNumber $itk_component(Sframe).speed \
+	  util::LabelNumber $itk_component(Sframe).speed \
 		  -text {Speed factor:} \
 		  -command [code $this change_speed] \
 		  -value 8 \

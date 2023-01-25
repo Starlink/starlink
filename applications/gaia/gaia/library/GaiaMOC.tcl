@@ -229,7 +229,7 @@ itcl::class gaia::GaiaMOC {
 
    #  Save the current description to a file. XXX not used.
    public method write_file {} {
-      set w [FileSelect .\#auto -title "Save description to a file"]
+      set w [util::FileSelect .\#auto -title "Save description to a file"]
       if {[$w activate]} {
          save_description [$w get]
       }
@@ -238,7 +238,7 @@ itcl::class gaia::GaiaMOC {
 
    #  Read MOC from a FITS file.
    public method read_file {} {
-      set w [FileSelect .\#auto -title "Read MOC from a FITS file"]
+      set w [util::FileSelect .\#auto -title "Read MOC from a FITS file"]
       if {[$w activate]} {
          add_file [$w get]
       }

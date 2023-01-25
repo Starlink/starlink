@@ -1100,7 +1100,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Write a copy of the table to an ordinary file.
    public method write_to_file {} {
-      set w [FileSelect .\#auto -title "Write positions to file"]
+      set w [util::FileSelect .\#auto -title "Write positions to file"]
       if {[$w activate]} {
          set filename [$w get]
          if { [file exists $filename] } {
@@ -1128,7 +1128,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Read positions from a text file.
    public method read_from_file {} {
-      set w [FileSelect .\#auto -title "Read positions from file"]
+      set w [util::FileSelect .\#auto -title "Read positions from file"]
       if {[$w activate]} {
          read_positions [$w get]
       }

@@ -631,7 +631,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Choose PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Choose PHOTOM file"]
 	 if {[$w activate]} {
             set filename [$w get]
 	    $psf_list_ read_file $filename $update
@@ -729,7 +729,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  Save the measurements to a file.
    method save_objects {{filename ""}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
             set filename [$w get]
 	    $psf_list_ write_file $filename
@@ -747,7 +747,7 @@ itcl::class gaia::GaiaOptPhotom {
    method append_objects {{filename ""}} {
      set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
 	    $psf_list_ append_file $comment [$w get]
 	    $object_list_ append_file "" [$w get]

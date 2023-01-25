@@ -837,7 +837,7 @@ itcl::class gaia::GaiaXYHistogram {
 
    #  Save histogram as a text file.
    protected method save_as_ {} {
-      set w [FileSelect .\#auto -title "Save histogram to text file"]
+      set w [util::FileSelect .\#auto -title "Save histogram to text file"]
       if { [$w activate] } {
          if { [catch {write_to_file_ [$w get]} msg] } {
             error_dialog "Failed to write histogram: $msg"

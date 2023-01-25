@@ -666,7 +666,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Save the current options to a file.
    public method write_file {} {
-      set w [FileSelect .\#auto -title "Save options to a file"]
+      set w [util::FileSelect .\#auto -title "Save options to a file"]
       if {[$w activate]} {
          save_options [$w get]
       }
@@ -675,7 +675,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Restore options from a file.
    public method read_file {} {
-      set w [FileSelect .\#auto -title "Read options from a file"]
+      set w [util::FileSelect .\#auto -title "Read options from a file"]
       if {[$w activate]} {
          read_options [$w get]
       }
