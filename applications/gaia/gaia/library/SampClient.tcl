@@ -125,6 +125,7 @@ itcl::class samp::SampClient {
    #  Constructor:
    #  ------------
    constructor {args} {
+      set client_tracker [code [samp::ClientTracker #auto]]
       eval configure $args
    }
 
@@ -540,7 +541,7 @@ itcl::class samp::SampClient {
 
    #  Public variables:
    #  ----------------
-   public variable client_tracker [code [samp::ClientTracker #auto]] {
+   public variable client_tracker {} {
       $client_tracker configure -self_id $self_id_ \
                                 -private_key $private_key_
       $client_tracker configure -hub [code $hub_]
