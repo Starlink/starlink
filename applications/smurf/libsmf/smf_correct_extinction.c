@@ -574,7 +574,7 @@ int smf_correct_extinction(ThrWorkForce *wf, smfData *data, smf_tausrc *thetausr
                           "WVM data unexpectedly rejected." ))));
 
         errRep("", "Unable to determine opacity data for this observation. "
-               "^SUGGN ^PCGFIN of WMV data are present (^PCGPDS before despiking).",
+               "^SUGGN ^PCGFIN of WVM data are present (^PCGPDS before despiking).",
                status );
       }
     }
