@@ -14,7 +14,7 @@
 # 17th Feb: not extensively tested, use at own risk.
 
 # Define a function that returns the relative path between two files.
-function relpath(){ python -c "import os.path; print os.path.relpath('$1','${2:-$PWD}')" ; }
+function relpath(){ python3 -c "import os.path; print(os.path.relpath('$1','${2:-$PWD}'))" ; }
 
 
 
