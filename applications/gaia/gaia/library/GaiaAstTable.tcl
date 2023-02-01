@@ -145,7 +145,7 @@ itcl::class gaia::GaiaAstTable {
        #  Add the table for displaying the reference positions (note
        #  fixed headings).
        itk_component add table {
-          TableList $w_.table \
+          util::TableList $w_.table \
              -title $itk_option(-title) \
              -hscroll 1 \
              -selectmode $selectmode_ \

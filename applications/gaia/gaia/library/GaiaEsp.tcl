@@ -364,7 +364,7 @@ itcl::class gaia::GaiaEsp {
             # output.  Omit the warning if -warn-if-overwrite is false.
             if {$fileexists != ""} {
                 if {$itk_option(-warn-if-overwrite)} {
-                    set w [DialogWidget $w_.dialog \
+                    set w [util::DialogWidget $w_.dialog \
                             -text [format "I'll overwrite output files\n%s.\nIs that OK?" $fileexists] \
                             -bitmap warning \
                             -buttons {OK Cancel} \
@@ -709,7 +709,7 @@ itcl::class gaia::GaiaEsp {
             if {$itk_option(-auto-fit-background)} {
                 set answer 0
             } else {
-                set w [DialogWidget $w_.dialog \
+                set w [util::DialogWidget $w_.dialog \
                         -text "No background or standard deviation\nspecified.  Should I estimate them?" \
                         -bitmap warning \
                         -buttons {OK Cancel} \
@@ -725,7 +725,7 @@ itcl::class gaia::GaiaEsp {
         }
         if {$values_($this,back) <= 0} {
             # Zero background is legitimate but worth warning about.
-            set w [DialogWidget $w_.dialog \
+            set w [util::DialogWidget $w_.dialog \
                     -text "Zero background.  Is that OK?" \
                     -bitmap warning \
                     -buttons {OK Cancel} \
@@ -1088,7 +1088,7 @@ itcl::class gaia::GaiaEsp {
         pack $itk_component(results-menu) -side top
 
         itk_component add results {
-            TableList $parent.results \
+            util::TableList $parent.results \
                     -title "Results" \
                     -hscroll 1 -vscroll 1 \
                     -headings {SourceN X Y SemiMajor Count PA Ellipt} \

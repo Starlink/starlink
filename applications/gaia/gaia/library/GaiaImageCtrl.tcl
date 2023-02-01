@@ -1035,7 +1035,7 @@ itcl::class gaia::GaiaImageCtrl {
          if { [only_user_] } {
             raise $w_
             regsub {\.gaia} $top_ {} clone
-            set d [DialogWidget .#auto \
+            set d [util::DialogWidget .#auto \
                       -title {Temporary image} \
                       -text "The image ($last_file_) that was displayed in \
                              window $itk_option(-appname): ($clone) is marked \
@@ -1070,7 +1070,7 @@ itcl::class gaia::GaiaImageCtrl {
       set gaia_logo [image create photo -file $gaia_library/gaia_logo.xpm]
       set lines [split $about_skycat "\n"]
       set max_lines [llength $lines]
-      DialogWidget $w_.about \
+      util::DialogWidget $w_.about \
          -image $gaia_logo \
          -messagewidth 5i \
          -justify center \

@@ -140,7 +140,7 @@ itcl::class gaia::GaiaMOC {
       
       #  Table for MOCs.
       itk_component add moctable {
-         TableList $w_.moctable \
+         util::TableList $w_.moctable \
             -title "List of MOCs" \
             -hscroll 1 \
             -vscroll 1 \

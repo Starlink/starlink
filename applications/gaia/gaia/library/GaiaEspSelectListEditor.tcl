@@ -86,7 +86,7 @@ itcl::class gaia::GaiaEspSelectListEditor {
 	eval itk_initialize $args
 
 	itk_component add objlist {
-	    TableList $itk_interior.objlist \
+	    util::TableList $itk_interior.objlist \
 		    -title "Selected objects" \
 		    -headings {X Y Size canvasid} \
 		    -sizes {10 10 10 10}

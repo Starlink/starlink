@@ -120,7 +120,7 @@ itcl::class gaiavo::GaiaVOTableSet {
 
       #  Add the table for displaying all the tables.
       itk_component add tables {
-         TableList $w_.tables \
+         util::TableList $w_.tables \
             -title "Tables" \
             -hscroll 1 \
             -selectmode $selectmode_ \
@@ -138,7 +138,7 @@ itcl::class gaiavo::GaiaVOTableSet {
 
       #  Add the table for displaying the current table.
       itk_component add table {
-         TableList $w_.table \
+         util::TableList $w_.table \
             -title "Current table" \
             -hscroll 1 \
             -selectmode $selectmode_ \

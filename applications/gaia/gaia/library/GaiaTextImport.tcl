@@ -535,7 +535,7 @@ itcl::class gaia::GaiaTextImport {
    #  Add a TableList object to display the decoded text file.
    protected method add_table_controls_ {parent} {
       itk_component add table {
-         TableList $parent.table \
+         util::TableList $parent.table \
             -title "Input file data" \
             -hscroll 1
       }

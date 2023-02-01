@@ -127,7 +127,7 @@ itcl::class gaia::GaiaAstTransform {
       #  are not modified and are transformed to show in the second
       #  table. Note we only use id, ra and dec.
       itk_component add reftable {
-         TableList $w_.reftable \
+         util::TableList $w_.reftable \
             -title "Reference positions (table coordinates)" \
              -hscroll 1 \
              -selectmode extended \

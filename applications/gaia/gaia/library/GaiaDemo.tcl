@@ -241,7 +241,7 @@ itcl::class gaia::GaiaDemo {
          after 0 "destroy $w_"
          return
       } else {
-         set d [DialogWidget .#auto \
+         set d [util::DialogWidget .#auto \
                    -title {Unpacking demo data} \
                    -text "The demonstration data files will be \
                           unpacked into the current directory \
