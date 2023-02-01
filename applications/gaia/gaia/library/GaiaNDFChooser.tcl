@@ -386,7 +386,7 @@ itcl::class gaia::GaiaNDFChooser {
       set w $imagetab_
       for {set i 0} {$i < $num_images_} {incr i} {
          set f [frame $w.f$i -borderwidth 2 -relief raised]
-         set im [RtdImage $f.im \
+         set im [rtd::RtdImage $f.im \
                     -graphics 0 \
                     -displaymode 0 \
                     -canvaswidth 100 \
