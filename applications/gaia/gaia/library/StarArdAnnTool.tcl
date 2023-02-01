@@ -102,7 +102,7 @@ itcl::class gaia::StarArdAnnTool {
    public method save_annuli_description {filename} {
       if { $filename != {} } {
          set fid [open $filename w]
-         set ok [$object_list_ save_annuli_description $fid]
+         set ok [{*}$object_list_ save_annuli_description $fid]
          ::close $fid
       }
       return $ok
@@ -111,7 +111,7 @@ itcl::class gaia::StarArdAnnTool {
    #  Derive the bounding box the annuli.
    public method bbox_annuli {} {
       if { $object_list_ != {} } {
-         return [$object_list_ bbox_annuli]
+         return [{*}$object_list_ bbox_annuli]
       }
    }
 
@@ -123,14 +123,14 @@ itcl::class gaia::StarArdAnnTool {
    #  Whether annuli are displayed or not.
    public variable show_annuli {1} {
       if { $object_list_ != {} } {
-         $object_list_ configure -show_annuli $show_annuli
+         {*}$object_list_ configure -show_annuli $show_annuli
       }
    }
 
    #  Scale factor for annuli.
    public variable scale {1.5} {
       if { $object_list_ != {} } {
-         $object_list_ configure -scale $scale
+         {*}$object_list_ configure -scale $scale
       }
    }
 

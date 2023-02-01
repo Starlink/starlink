@@ -269,14 +269,14 @@ itcl::class gaia::GaiaCubeApps {
       #  One twist is that the coordinate system should match that of the
       #  disk-resident cube, so check that the coordinate system hasn't been
       #  changed, if so switch back to the default system (temporarily).
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system "default" "default" 1
+         ${*}itk_option(-spec_coords) set_system "default" "default" 1
       }
       set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
       set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system $system $units 1
+         ${*}itk_option(-spec_coords) set_system $system $units 1
       }
 
       set set_current_domain_ 0

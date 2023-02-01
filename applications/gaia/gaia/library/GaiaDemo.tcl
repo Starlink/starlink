@@ -339,7 +339,7 @@ itcl::class gaia::GaiaDemo {
 
    #  Display text in the short help window of the main widget.
    method short_display {text} {
-      $itk_option(-gaiamain) short_help $text
+      {*}$itk_option(-gaiamain) short_help $text
    }
 
    #  Set the font of main text.
@@ -467,7 +467,7 @@ itcl::class gaia::GaiaDemo {
 
    #  Display an image in the main window.
    protected method show_image_ {file perc zoom} {
-      $itk_option(-gaiamain) open $demo_dir_/$file
+      {*}$itk_option(-gaiamain) open $demo_dir_/$file
       $itk_option(-rtdimage) autocut -percent $perc
       $itk_option(-gaiactrl) scale $zoom $zoom
       $itk_option(-imagetrans) update_trans
@@ -763,9 +763,9 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating photometry toolbox...}
-      $itk_option(-gaiamain) make_toolbox magphotom
+      {*}$itk_option(-gaiamain) make_toolbox magphotom
       short_display {Opening file of aperture positions}
-      set toolbox [$itk_option(-gaiamain) component magphotom]
+      set toolbox [{*}$itk_option(-gaiamain) component magphotom]
       $toolbox read_file $demo_dir_/plainphotom.dat
       refresh_
       move_to_side_ $toolbox
@@ -812,9 +812,9 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating regions toolbox...}
-      $itk_option(-gaiamain) make_toolbox ard
+      {*}$itk_option(-gaiamain) make_toolbox ard
       short_display {Opening file of region descriptions}
-      set toolbox [$itk_option(-gaiamain) component ard]
+      set toolbox [{*}$itk_option(-gaiamain) component ard]
       $toolbox read_file $demo_dir_/regions.dat
       refresh_
       move_to_side_ $toolbox
@@ -829,7 +829,7 @@ itcl::class gaia::GaiaDemo {
       vwait [scope continue_($this)]
       wait_ $readtime_
       $itk_option(-rtdimage) autocut -percent 70
-      $itk_option(-gaiamain) configure -temporary 0
+      {*}$itk_option(-gaiamain) configure -temporary 0
       wait_ $readtime_
       update idletasks
       $toolbox close
@@ -854,9 +854,9 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating patch toolbox...}
-      $itk_option(-gaiamain) make_toolbox patch
+      {*}$itk_option(-gaiamain) make_toolbox patch
       short_display {Opening region description}
-      set toolbox [$itk_option(-gaiamain) component patch]
+      set toolbox [{*}$itk_option(-gaiamain) component patch]
       $toolbox read_file repl $demo_dir_/patch.dat
       refresh_
       move_to_side_ $toolbox
@@ -899,8 +899,8 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating contour toolbox...}
-      $itk_option(-gaiamain) make_toolbox contour
-      set toolbox [$itk_option(-gaiamain) component contour]
+      {*}$itk_option(-gaiamain) make_toolbox contour
+      set toolbox [{*}$itk_option(-gaiamain) component contour]
       $toolbox read_config $demo_dir_/m51_opt.cont
       refresh_
       move_to_side_ $toolbox
@@ -938,8 +938,8 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Activating SExtractor toolbox...}
-      $itk_option(-gaiamain) make_toolbox sextractor
-      set toolbox [$itk_option(-gaiamain) component sextractor]
+      {*}$itk_option(-gaiamain) make_toolbox sextractor
+      set toolbox [{*}$itk_option(-gaiamain) component sextractor]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -968,7 +968,7 @@ itcl::class gaia::GaiaDemo {
  other.
       }
       show_image_ frame.sdf 90 1
-      set clone [$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
+      set clone [{*}$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
       set cloneimg [[$clone get_image] get_image]
       update
       $clone make_toolbox blink
@@ -1006,8 +1006,8 @@ itcl::class gaia::GaiaDemo {
       $itk_option(-gaiactrl) cmap file real.lasc
       refresh_
       short_display {Drawing grid...}
-      $itk_option(-gaiamain) make_toolbox astgrid
-      set toolbox [$itk_option(-gaiamain) component astgrid]
+      {*}$itk_option(-gaiamain) make_toolbox astgrid
+      set toolbox [{*}$itk_option(-gaiamain) component astgrid]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1084,8 +1084,8 @@ itcl::class gaia::GaiaDemo {
  fields in the main control panel during the following scan.
       }
       scroll_ 1
-      $itk_option(-gaiamain) make_toolbox astdefine
-      set toolbox [$itk_option(-gaiamain) component astdefine]
+      {*}$itk_option(-gaiamain) make_toolbox astdefine
+      set toolbox [{*}$itk_option(-gaiamain) component astdefine]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1105,8 +1105,8 @@ itcl::class gaia::GaiaDemo {
       }
       $toolbox test
       refresh_
-      $itk_option(-gaiamain) make_toolbox astgrid
-      set plotbox [$itk_option(-gaiamain) component astgrid]
+      {*}$itk_option(-gaiamain) make_toolbox astgrid
+      set plotbox [{*}$itk_option(-gaiamain) component astgrid]
       refresh_
       move_to_side_ $plotbox
       refresh_
@@ -1134,8 +1134,8 @@ itcl::class gaia::GaiaDemo {
       }
       short_display {Displaying an image without any astrometry...}
       show_image_ ngc1275_nowcs.fits 95 2
-      $itk_option(-gaiamain) make_toolbox astreference
-      set toolbox [$itk_option(-gaiamain) component astreference]
+      {*}$itk_option(-gaiamain) make_toolbox astreference
+      set toolbox [{*}$itk_option(-gaiamain) component astreference]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1154,8 +1154,8 @@ itcl::class gaia::GaiaDemo {
       $table centroid
       $toolbox test
       refresh_
-      $itk_option(-gaiamain) make_toolbox astgrid
-      set plotbox [$itk_option(-gaiamain) component astgrid]
+      {*}$itk_option(-gaiamain) make_toolbox astgrid
+      set plotbox [{*}$itk_option(-gaiamain) component astgrid]
       refresh_
       $plotbox close
       $plotbox read_options $demo_dir_/default.opt
@@ -1188,8 +1188,8 @@ itcl::class gaia::GaiaDemo {
       }
       short_display {Displaying an image without any astrometry...}
       show_image_ ngc1275_nowcs.fits 95 3
-      $itk_option(-gaiamain) make_toolbox astdefine
-      set toolbox [$itk_option(-gaiamain) component astdefine]
+      {*}$itk_option(-gaiamain) make_toolbox astdefine
+      set toolbox [{*}$itk_option(-gaiamain) component astdefine]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1203,8 +1203,8 @@ itcl::class gaia::GaiaDemo {
       short_display {Setting an approximate astrometric solution...}
       refresh_
       $toolbox accept
-      $itk_option(-gaiamain) make_toolbox astgrid
-      set plotbox [$itk_option(-gaiamain) component astgrid]
+      {*}$itk_option(-gaiamain) make_toolbox astgrid
+      set plotbox [{*}$itk_option(-gaiamain) component astgrid]
       refresh_
       $plotbox close
       $plotbox read_options $demo_dir_/default.opt
@@ -1217,8 +1217,8 @@ itcl::class gaia::GaiaDemo {
  an on-line catalogue at this stage). Note that a slight offset
  and rotation are required.
       }
-      $itk_option(-gaiamain) make_toolbox astrefine
-      set toolbox [$itk_option(-gaiamain) component astrefine]
+      {*}$itk_option(-gaiamain) make_toolbox astrefine
+      set toolbox [{*}$itk_option(-gaiamain) component astrefine]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1267,8 +1267,8 @@ itcl::class gaia::GaiaDemo {
       show_image_ ngc1275_nowcs.fits 95 3
       scroll_ 1
       short_display {Copying solution from similar image...}
-      $itk_option(-gaiamain) make_toolbox astcopy
-      set toolbox [$itk_option(-gaiamain) component astcopy]
+      {*}$itk_option(-gaiamain) make_toolbox astcopy
+      set toolbox [{*}$itk_option(-gaiamain) component astcopy]
       refresh_
       move_to_side_ $toolbox
       refresh_
@@ -1431,8 +1431,8 @@ $catlist
       }
       show_image_ preview.sdf 95 -2
 
-      $itk_option(-gaiamain) make_toolbox astgrid
-      set plotbox [$itk_option(-gaiamain) component astgrid]
+      {*}$itk_option(-gaiamain) make_toolbox astgrid
+      set plotbox [{*}$itk_option(-gaiamain) component astgrid]
       refresh_
       $plotbox close
       $plotbox read_options $demo_dir_/default.opt

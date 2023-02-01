@@ -259,11 +259,11 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  Need to determine ranges. Note handle case when coordinate system
       #  doesn't match the disk-file.
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
          set keep_units_ "$units"
-         $itk_option(-spec_coords) set_system "default" "default" 1
+         {*}$itk_option(-spec_coords) set_system "default" "default" 1
       } else {
          set keep_system_ {}
          set keep_units_ {}
@@ -279,7 +279,7 @@ itcl::class gaia::GaiaCubeBaseline {
          }
       }
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system $system $units 1
+         {*}$itk_option(-spec_coords) set_system $system $units 1
       }
 
       if { $ranges != {} } {
@@ -311,7 +311,7 @@ itcl::class gaia::GaiaCubeBaseline {
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
          if { $keep_system_ != {} } {
-            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+            {*}$itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
 
          #  Show name of results.

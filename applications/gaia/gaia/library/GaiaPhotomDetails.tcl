@@ -568,7 +568,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
    #  Update values of aperture photometry object.
    protected method update_ap_ {object} {
-      lassign [$object object_details] index x y mag magerr sky \
+      lassign [{*}$object object_details] index x y mag magerr sky \
          signal code itk_option(-semimajor) itk_option(-eccentricity)\
          itk_option(-angle) positions itk_option(-innerscale) \
 	 itk_option(-outerscale)
@@ -597,7 +597,7 @@ itcl::class gaia::GaiaPhotomDetails {
       }
 
       #  If annulus is a circle then switch off ellipticity.
-      if { [$object cget -shape] == "circle" } {
+      if { [{*}$object cget -shape] == "circle" } {
          set_for_circles 1
       } else {
          set_for_circles 0
@@ -606,7 +606,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
    #  Update values of optimal photometry object.
    protected method update_opt_ {object} {
-      lassign [$object object_details] index x y mag magerr sky \
+      lassign [{*}$object object_details] index x y mag magerr sky \
          signal code positions itk_option(-innerscale) \
 	 itk_option(-outerscale)
 
@@ -633,7 +633,7 @@ itcl::class gaia::GaiaPhotomDetails {
 
    #  Update values of PSF photometry object.
    protected method update_psf_ {object} {
-      lassign [$object object_details] index x y fwhm1 fwhm2 \
+      lassign [{*}$object object_details] index x y fwhm1 fwhm2 \
          itk_option(-angle) code itk_option(-semimajor) \
          itk_option(-seeing) positions itk_option(-innerscale) \
 	 itk_option(-outerscale)
@@ -740,15 +740,15 @@ itcl::class gaia::GaiaPhotomDetails {
    #  require updating.
    itk_option define -object_list object_list Object_list {} {
       if { $itk_option(-object_list) != {} } {
-         set phottype_ [$itk_option(-object_list) cget -phottype]
-         set psf_ [$itk_option(-object_list) cget -psf]
+         set phottype_ [{*}$itk_option(-object_list) cget -phottype]
+         set psf_ [{*}$itk_option(-object_list) cget -psf]
       }
    }
 
    #  Current semimajor axes of apertures (== radius for circles).
    itk_option define -semimajor semimajor SemiMajor {5} {
       if { $itk_option(-object_list) != {} } {
-         $itk_option(-object_list) configure -semimajor $itk_option(-semimajor)
+         {*}$itk_option(-object_list) configure -semimajor $itk_option(-semimajor)
       }
    }
 
@@ -761,7 +761,7 @@ itcl::class gaia::GaiaPhotomDetails {
             $itk_component(OuterScale) configure \
                -from [expr $itk_option(-innerscale)*1.001]
          }
-         $itk_option(-object_list) configure -innerscale $itk_option(-innerscale)
+         {*}$itk_option(-object_list) configure -innerscale $itk_option(-innerscale)
       }
    }
 
@@ -774,14 +774,14 @@ itcl::class gaia::GaiaPhotomDetails {
             $itk_component(OuterScale) configure \
                -from [expr $itk_option(-innerscale)*1.001]
          }
-         $itk_option(-object_list) configure -outerscale $itk_option(-outerscale)
+         {*}$itk_option(-object_list) configure -outerscale $itk_option(-outerscale)
       }
    }
 
    #  Current eccentricity (constrained to line in range 0-1 by scale).
    itk_option define -eccentricity eccentricity Eccentricity {0.0} {
       if { $itk_option(-object_list) != {} } {
-         $itk_option(-object_list) configure -eccentricity $itk_option(-eccentricity)
+         {*}$itk_option(-object_list) configure -eccentricity $itk_option(-eccentricity)
       }
    }
 
@@ -789,7 +789,7 @@ itcl::class gaia::GaiaPhotomDetails {
    #  by scale).
    itk_option define -angle angle Angle {0.0} {
       if { $itk_option(-object_list) != {} } {
-         $itk_option(-object_list) configure -angle $itk_option(-angle)
+         {*}$itk_option(-object_list) configure -angle $itk_option(-angle)
       }
    }
 
@@ -809,7 +809,7 @@ itcl::class gaia::GaiaPhotomDetails {
    #  Optimal photometry parameters (clip is semimajor axis).
    itk_option define -seeing seeing Seeing 2.0 {
       if { $itk_option(-object_list) != {} } {
-         $itk_option(-object_list) configure -seeing $itk_option(-seeing)
+         {*}$itk_option(-object_list) configure -seeing $itk_option(-seeing)
       }
    }
 
