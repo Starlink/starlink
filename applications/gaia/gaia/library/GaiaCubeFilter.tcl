@@ -366,13 +366,13 @@ itcl::class gaia::GaiaCubeFilter {
       #  Start up the task we require.
       if { $filter_type_ == "square" || $filter_type_ == "rectangle" } {
          if { $blocktask_ == {} } {
-            set blocktask_ [GaiaApp \#auto -application \
+            set blocktask_ [gaia::GaiaApp \#auto -application \
                                $::env(KAPPA_DIR)/block \
                                -notify [code $this app_completed_]]
          }
       } else {
          if { $gausstask_ == {} } {
-            set gausstask_ [GaiaApp \#auto -application \
+            set gausstask_ [gaia::GaiaApp \#auto -application \
                                $::env(KAPPA_DIR)/gausmooth \
                                -notify [code $this app_completed_]]
          }

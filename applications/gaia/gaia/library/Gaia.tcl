@@ -1046,7 +1046,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom $w_.\#auto 1 \
+         gaia::GaiaApPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1060,7 +1060,7 @@ itcl::class gaia::Gaia {
    #  Make a counts aperture photometry toolbox.
    public method make_countphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom $w_.\#auto 0 \
+         gaia::GaiaApPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1074,7 +1074,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude optimal photometry toolbox.
    public method make_magoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom $w_.\#auto 1 \
+         gaia::GaiaOptPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1088,7 +1088,7 @@ itcl::class gaia::Gaia {
    #  Make a counts optimal photometry toolbox.
    public method make_countoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom $w_.\#auto 0 \
+         gaia::GaiaOptPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1102,7 +1102,7 @@ itcl::class gaia::Gaia {
    #  Make an ARD toolbox.
    public method make_ard_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaArd $w_.\#auto \
+         gaia::GaiaArd $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1322,7 +1322,7 @@ itcl::class gaia::Gaia {
    #  Make a SExtractor toolbox.
    public method make_sextractor_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaSextractor $w_.\#auto \
+         gaia::GaiaSextractor $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1560,7 +1560,7 @@ itcl::class gaia::Gaia {
 
          busy {
             itk_component add opencube {
-               GaiaCube $w_.\#auto \
+               gaia::GaiaCube $w_.\#auto \
                   -gaia $w_ \
                   -canvas [$image_ get_canvas] \
                   -rtdimage [$image_ get_image] \

@@ -253,7 +253,7 @@ itcl::class gaia::GaiaCube {
       set GoMenu [add_menubutton "Go" \
                   "Go: menu with shortcuts to view cubes previously viewed"]
       configure_menubutton "Go" -underline 0
-      set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
+      set history_ [gaia::GaiaCubeHistory \#auto -gaia_cube $this]
       $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
 
       #  Add window help.
@@ -294,7 +294,7 @@ itcl::class gaia::GaiaCube {
 
       #  Slider that moves along the chosen axis.
       itk_component add index {
-         GaiaSpectralPlotLine $w_.index \
+         gaia::GaiaSpectralPlotLine $w_.index \
             -gaiacube [code $this] \
             -ref_id 1 \
             -text {Index of plane:} \
@@ -377,7 +377,7 @@ itcl::class gaia::GaiaCube {
 
       set ref_ids 1
       itk_component add spectrum {
-         GaiaCubeSpectrum $sf1win.spectrum \
+         gaia::GaiaCubeSpectrum $sf1win.spectrum \
             -gaiacube [code $this] \
             -gaia $itk_option(-gaia) \
             -ref_id $ref_ids \
@@ -406,7 +406,7 @@ itcl::class gaia::GaiaCube {
 
       incr ref_ids
       itk_component add animation {
-         GaiaCubeAnimation $animationTab.animation \
+         gaia::GaiaCubeAnimation $animationTab.animation \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -427,7 +427,7 @@ itcl::class gaia::GaiaCube {
 
       incr ref_ids
       itk_component add collapse {
-         GaiaCubeCollapse $collapseTab.collapse \
+         gaia::GaiaCubeCollapse $collapseTab.collapse \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -449,7 +449,7 @@ itcl::class gaia::GaiaCube {
 
       incr ref_ids
       itk_component add chanmap {
-         GaiaCubeChanmap $chanmapTab.chanmap \
+         gaia::GaiaCubeChanmap $chanmapTab.chanmap \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -470,7 +470,7 @@ itcl::class gaia::GaiaCube {
       pack $itk_component(rebinruler) -side top -fill x
 
       itk_component add rebin {
-         GaiaCubeRebin $rebinTab.rebin \
+         gaia::GaiaCubeRebin $rebinTab.rebin \
             -gaiacube [code $this] \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -486,7 +486,7 @@ itcl::class gaia::GaiaCube {
       pack $itk_component(filterruler) -side top -fill x
 
       itk_component add filter {
-         GaiaCubeFilter $filterTab.filter \
+         gaia::GaiaCubeFilter $filterTab.filter \
             -gaiacube [code $this] \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -504,7 +504,7 @@ itcl::class gaia::GaiaCube {
 
       set baseline_id_ [incr ref_ids]
       itk_component add baseline {
-         GaiaCubeBaseline $baselineTab.baseline \
+         gaia::GaiaCubeBaseline $baselineTab.baseline \
             -gaiacube [code $this] \
             -ref_id $baseline_id_ \
             -lower_limit $plane_ \

@@ -90,7 +90,7 @@ itcl::class gaia3d::LabelCubeFileChooser {
       #  requires some methods of the GaiaCube and GaiaSpecCoords classes are
       #  implemented as dummies to honour the interfaces. Also need a
       #  cubeaccessor so that cube size can be stored with history.
-      set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
+      set history_ [gaia::GaiaCubeHistory \#auto -gaia_cube $this]
 
       #  Add a menu button to the widget.
       set menu $itk_component(eframe).go.m

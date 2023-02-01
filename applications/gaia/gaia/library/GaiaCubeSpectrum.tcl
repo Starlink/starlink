@@ -283,7 +283,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       #  Create an instance of GaiaSpecWriter. This is shared with the
       #  plot.
-      set spec_writer_ [GaiaSpecWriter \#auto \
+      set spec_writer_ [gaia::GaiaSpecWriter \#auto \
                            -cubespectrum [code $this] \
                            -gaiacube $itk_option(-gaiacube)]
    }
@@ -945,7 +945,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Add controls for choosing a region shape.
    protected method add_region_controls_ {} {
-      set toolbox_ [StarArdTool \#auto \
+      set toolbox_ [gaia::StarArdTool \#auto \
                        -rtdimage $rtdimage_ \
                        -canvasdraw $canvasdraw_ \
                        -canvas $canvas_ \

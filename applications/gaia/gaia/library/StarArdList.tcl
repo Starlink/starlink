@@ -310,7 +310,7 @@ itcl::class gaia::StarArdList {
       if { [string first $type $known_types_] != -1 } {
          set selected_ [incr highest_index_]
          set objects_($selected_) \
-            [$routine_prefix$type \#auto \
+            [gaia::$routine_prefix$type \#auto \
                 -selected_colour $selected_colour \
                 -deselected_colour $deselected_colour \
                 -notify_delete_cmd [code $this deleted_object_ $selected_] \

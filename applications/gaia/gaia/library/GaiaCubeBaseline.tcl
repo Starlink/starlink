@@ -246,7 +246,7 @@ itcl::class gaia::GaiaCubeBaseline {
       #  Now startup the MFITTREND application.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                             $env(KAPPA_DIR)/mfittrend \
                             -notify [code $this app_completed_]]
       }

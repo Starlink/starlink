@@ -538,7 +538,7 @@ itcl::class gaia::StarBlink {
          #  Startup KAPPA:SLIDE if needed.
          if { $slide_ == {} } {
             global env
-            set slide_ [GaiaApp \#auto -application \
+            set slide_ [gaia::GaiaApp \#auto -application \
                            $env(KAPPA_DIR)/slide \
                            -notify [code $this slide_complete_]]
          }
@@ -572,7 +572,7 @@ itcl::class gaia::StarBlink {
          #  Proceed with combining images. Startup MAKEMOS if needed.
          if { $makemos_ == {} } {
             global env
-            set makemos_ [GaiaApp \#auto -application \
+            set makemos_ [gaia::GaiaApp \#auto -application \
                              $env(CCDPACK_DIR)/makemos \
                              -notify [code $this finished_combine_]]
          }

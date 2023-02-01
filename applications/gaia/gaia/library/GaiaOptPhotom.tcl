@@ -237,7 +237,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Create a GaiaPhotomList object to deal with the PSF
       #  object details (actually there is only one of these).
-      set psf_list_ [GaiaPhotomList \#auto \
+      set psf_list_ [gaia::GaiaPhotomList \#auto \
                         -show_list 0 \
                         -details $child_(psf).psfdetails \
                         -canvasdraw $itk_option(-canvasdraw) \
@@ -256,7 +256,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
-      set object_list_ [GaiaPhotomList \#auto \
+      set object_list_ [gaia::GaiaPhotomList \#auto \
                            -scrollbox $child_(results).box \
                            -details $child_(details).details \
                            -canvasdraw $itk_option(-canvasdraw) \
@@ -275,7 +275,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the PSF object.
       itk_component add PSFDetails {
-         GaiaPhotomDetails $child_(psf).psfdetails \
+         gaia::GaiaPhotomDetails $child_(psf).psfdetails \
             -positions_cmd [code $this sky_method_changed psf] \
             -usemags $usemags_ \
             -object_list [code $psf_list_]
@@ -285,7 +285,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the selected object.
       itk_component add ObjectDetails {
-         GaiaPhotomDetails $child_(details).details \
+         gaia::GaiaPhotomDetails $child_(details).details \
             -positions_cmd [code $this sky_method_changed object] \
             -usemags $usemags_ \
             -object_list [code $object_list_]
@@ -296,7 +296,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomExtras object to deal with any additional
       #  parameters for AUTOPHOTOM.
       itk_component add Extras {
-         GaiaPhotomExtras $child_(params).extras -phottype optimal
+         gaia::GaiaPhotomExtras $child_(params).extras -phottype optimal
       }
 
       #  Add an options menu for setting options that should probably
@@ -654,7 +654,7 @@ itcl::class gaia::GaiaOptPhotom {
             if { $autophotom_ == {} } {
                #  Start autophotom application.
                global env
-               set autophotom_ [GaiaApp \#auto -application \
+               set autophotom_ [gaia::GaiaApp \#auto -application \
                                    $env(PHOTOM_DIR)/autophotom \
                                    -notify [code $this measured_objects]]
             }

@@ -1007,7 +1007,7 @@ itcl::class gaia::GaiaPhotomList {
    public variable show_list 0 {
       if { $show_list } {
          if { ![winfo exists $scrollbox] } {
-            Scrollbox $scrollbox
+            gaia::Scrollbox $scrollbox
             pack $scrollbox -fill both -expand true
 
             #  Add bindings to change the currently selected object to

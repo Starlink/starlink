@@ -434,7 +434,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Add a scrollbox to display results of fit.
       itk_component add results {
-         Scrollbox $w_.results -height 3 -singleselect 0
+         gaia::Scrollbox $w_.results -height 3 -singleselect 0
       }
       add_short_help $itk_component(results) {Results of fit}
 

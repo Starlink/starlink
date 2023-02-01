@@ -202,14 +202,14 @@ itcl::class gaia::GaiaCubeRebin {
       #  Start up the task we require.
       if { $combination_type_ == "mean" } {
          if { $compavetask_ == {} } {
-            set compavetask_ [GaiaApp \#auto -application \
+            set compavetask_ [gaia::GaiaApp \#auto -application \
                                  $::env(KAPPA_DIR)/compave \
                                  -notify [code $this app_completed_]]
          }
          set task $compavetask_
       } else {
          if { $compaddtask_ == {} } {
-            set compaddtask_ [GaiaApp \#auto -application \
+            set compaddtask_ [gaia::GaiaApp \#auto -application \
                                  $::env(KAPPA_DIR)/compadd \
                                  -notify [code $this app_completed_]]
          }

@@ -423,7 +423,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Add a status area for monitoring the output of the program.
       itk_component add status {
-         Scrollbox $w_.status
+         gaia::Scrollbox $w_.status
       }
       $w_.status configure -height 5
       add_short_help $itk_component(status) \
@@ -813,7 +813,7 @@ itcl::class gaia::GaiaSextractor {
       #  The detection threshold. Either a number of standard
       #  deviations, or a surface brightness and zero point.
       itk_component add detthresh {
-         ManyLabelEntry $parent.detthresh \
+         gaia::ManyLabelEntry $parent.detthresh \
             -nentry 2 \
             -text "Detection threshold:" \
             -labelwidth $lwidth \
@@ -828,7 +828,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Analysis threshold.
       itk_component add analthresh {
-         ManyLabelEntry $parent.analthresh \
+         gaia::ManyLabelEntry $parent.analthresh \
             -nentry 2 \
             -text "Analysis threshold:" \
             -labelwidth $lwidth \
@@ -1149,7 +1149,7 @@ itcl::class gaia::GaiaSextractor {
          {Number of fixed sized apertures to use (1 to 32)}
 
       itk_component add photapps {
-         ManyLabelEntry $childsite.photapp \
+         gaia::ManyLabelEntry $childsite.photapp \
             -text "Aperture size:" \
             -labelwidth $lwidth \
             -nentry $values_(photnum) \
@@ -1587,7 +1587,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Values that determine the thresholds used.
       itk_component add radthresh {
-         ManyLabelEntry $parent.radthresh \
+         gaia::ManyLabelEntry $parent.radthresh \
             -nentry 3 \
             -text "Threshold parameters:" \
             -labelwidth $lwidth \
@@ -1722,7 +1722,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Background mesh size.
       itk_component add backmesh {
-         ManyLabelEntry $parent.backmesh \
+         gaia::ManyLabelEntry $parent.backmesh \
             -nentry 2 \
             -text "Mesh size:" \
             -labelwidth $lwidth \
@@ -1739,7 +1739,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Background filter size.
       itk_component add backfilter {
-         ManyLabelEntry $parent.backfilter \
+         gaia::ManyLabelEntry $parent.backfilter \
             -nentry 2 \
             -text "Filter size:" \
             -labelwidth $lwidth \
@@ -2401,7 +2401,7 @@ itcl::class gaia::GaiaSextractor {
                #  Establish a control object for this task,if not already done.
                blt::busy hold $w_
                if { $star_sex_ == {} } {
-                  set star_sex_ [GaiaApp \#auto \
+                  set star_sex_ [gaia::GaiaApp \#auto \
                                     -show_output $itk_component(status) \
                                     -notify [code $this completed_] \
                                     -see_end 1 \

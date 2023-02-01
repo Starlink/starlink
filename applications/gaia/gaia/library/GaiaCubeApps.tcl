@@ -289,13 +289,13 @@ itcl::class gaia::GaiaCubeApps {
          set ub [expr $ubp - 0.5]
          if { $wcsframe_ == {} } {
             global env
-            set wcsframe_ [GaiaApp \#auto -application \
+            set wcsframe_ [gaia::GaiaApp \#auto -application \
                               $env(KAPPA_DIR)/wcsframe \
                               -notify [code $this wcsframe_completed_]]
          }
          if { $getwcsattrib_ == {} } {
             global env
-            set getwcsattrib_ [GaiaApp \#auto -application \
+            set getwcsattrib_ [gaia::GaiaApp \#auto -application \
                                   $env(KAPPA_DIR)/wcsattrib \
                                   -notify [code $this wcsattrib_completed_] \
                                   -parnotify [code $this wcsattrib_gotparam_]]
@@ -325,7 +325,7 @@ itcl::class gaia::GaiaCubeApps {
    #  Start up the main application and run on the given ndf with the selected
    #  axis. Arrange to run the app_completed_ method as the -notify option cf.:
    #
-   #    set maintask_ [GaiaApp #auto -application $env(KAPPA_DIR)/collapse \
+   #    set maintask_ [gaia::GaiaApp #auto -application $env(KAPPA_DIR)/collapse \
    #                           -notify [code $this app_completed_]]
    #
    protected method run_main_app_ { ndfname axis } {
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaCubeApps {
    protected method set_coordinate_system_ {file system units} {
       if { $setwcsattrib_ == {} } {
          global env
-         set setwcsattrib_ [GaiaApp \#auto -application \
+         set setwcsattrib_ [gaia::GaiaApp \#auto -application \
                                $env(KAPPA_DIR)/wcsattrib \
                                -notify [code $this wcsattrib_set_]]
       }

@@ -234,7 +234,7 @@ itcl::class gaia::GaiaEsp {
 
         #  Add a status area for monitoring the output of the program
         itk_component add status {
-            Scrollbox $w_.status
+            gaia::Scrollbox $w_.status
         }
         $w_.status configure -height 5
         add_short_help $itk_component(status) \
@@ -441,7 +441,7 @@ itcl::class gaia::GaiaEsp {
                 blt::busy hold $w_
 
                 if {$star_app_ == {} || $star_app_name_ != $invoke_cmd} {
-                    set star_app_ [GaiaApp #auto \
+                    set star_app_ [gaia::GaiaApp #auto \
                             -show_output $itk_component(status) \
                             -notify [code $this completed_${whichpage}_] \
                             -application $invoke_cmd
@@ -1275,7 +1275,7 @@ itcl::class gaia::GaiaEsp {
         # Establish a control object for this task, if not already done
         blt::busy hold $w_
 
-        set hsub_star_app_ [GaiaApp #auto \
+        set hsub_star_app_ [gaia::GaiaApp #auto \
                 -show_output $itk_component(status) \
                 -notify [code $this completed_bg_from_hsub_] \
                 -application $invoke_cmd

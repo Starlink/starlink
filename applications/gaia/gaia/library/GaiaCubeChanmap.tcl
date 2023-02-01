@@ -191,7 +191,7 @@ itcl::class gaia::GaiaCubeChanmap {
       #  Start up the CHANMAP application, if not done.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                             $env(KAPPA_DIR)/chanmap \
                             -notify [code $this app_completed_]]
       }

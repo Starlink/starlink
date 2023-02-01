@@ -262,7 +262,7 @@ itcl::class gaia::GaiaApPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the selected object.
       itk_component add ObjectDetails {
-         GaiaPhotomDetails $child_(details).details \
+         gaia::GaiaPhotomDetails $child_(details).details \
             -positions_cmd [code $this sky_method_changed] \
             -usemags $usemags_
       }
@@ -271,7 +271,7 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
-      set object_list_ [GaiaPhotomList \#auto \
+      set object_list_ [gaia::GaiaPhotomList \#auto \
                            -scrollbox $child_(results).box \
                            -details $itk_component(ObjectDetails) \
                            -canvasdraw $itk_option(-canvasdraw) \
@@ -293,11 +293,11 @@ itcl::class gaia::GaiaApPhotom {
       #  parameters for autophotom.
       itk_component add Extras {
          if { $usemags_ } {
-            GaiaPhotomExtras $child_(params).extras
+            gaia::GaiaPhotomExtras $child_(params).extras
          } else {
             # For counts we assume gaussian sky is more plausible than
             # photon statistics
-            GaiaPhotomExtras $child_(params).extras -photon_errors "gaussian sky"
+            gaia::GaiaPhotomExtras $child_(params).extras -photon_errors "gaussian sky"
          }
       }
 
@@ -637,7 +637,7 @@ itcl::class gaia::GaiaApPhotom {
          if { $autophotom_ == {} } {
             #  Start autophotom application.
             global env
-            set autophotom_ [GaiaApp \#auto -application \
+            set autophotom_ [gaia::GaiaApp \#auto -application \
                                 $env(PHOTOM_DIR)/autophotom \
                                 -notify [code $this measured_objects]]
          }

@@ -487,7 +487,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  Region for showing the output from AUTOASTROM.
       itk_component add status {
-         Scrollbox $w_.status -singleselect 0 -exportselection 1
+         gaia::Scrollbox $w_.status -singleselect 0 -exportselection 1
       }
       $w_.status configure -height 5
       add_short_help $itk_component(status) \

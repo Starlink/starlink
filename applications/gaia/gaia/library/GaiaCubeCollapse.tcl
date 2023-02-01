@@ -105,7 +105,7 @@ itcl::class gaia::GaiaCubeCollapse {
       #  Start up the COLLAPSE application, if not already done.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                            $env(KAPPA_DIR)/collapse \
                            -notify [code $this app_completed_]]
       }
