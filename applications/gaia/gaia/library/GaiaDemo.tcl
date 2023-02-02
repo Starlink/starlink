@@ -462,7 +462,7 @@ itcl::class gaia::GaiaDemo {
 
    #  Set the continue_ variable to proceed after a while.
    protected method set_continue_ {} {
-      set continue_($this) 1
+      set [scope continue_($this)] 1
    }
 
    #  Display an image in the main window.
