@@ -560,7 +560,7 @@ itcl::class gaia::GaiaAstDefine {
       $itk_component(latpole) configure -value {}
 
       #  The date defaults.
-      set values_($this,date) {}
+      set values_($this,dateobs) {}
 
       #  Restore WCS system to the original (if available).
       if { $itk_option(-rtdimage) != {} } {
