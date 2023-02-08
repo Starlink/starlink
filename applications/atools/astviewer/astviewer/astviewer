@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 #  To run the app under the pdb debugger and break at a given line,
 #  copy the following line to the place where the break point is
