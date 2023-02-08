@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #
 # !!begin
@@ -29,20 +29,23 @@
 #
 # !!end
 
-import pyfits
+try:
+    import pyfits
+except ImportError:
+    import astropy.io.fits as pyfits
 import sys
 import os
 
 # get file name
 if len(sys.argv) < 3:
-    print 'usage: night file1 file2 ...'
+    print('usage: night file1 file2 ...')
     exit(1)
 
 # strip off script name, store night number
 sys.argv.pop(0)
 night = sys.argv.pop(0)
 if int(night) < 1 or int(night) > 50:
-    print 'Night number must lie from 1 to 50'
+    print('Night number must lie from 1 to 50')
     exit(1)
 
 for fname in sys.argv:
@@ -52,7 +55,7 @@ for fname in sys.argv:
     if prihdr['INSTRUME'] == 'Cass. aux. port':
         pathname = os.path.join('aux', 'night' + night)
         if not os.path.isdir(pathname):
-            print 'Making ',pathname
+            print('Making ',pathname)
             os.makedirs(pathname)
         os.rename(fname, os.path.join(pathname, fname))
                        
