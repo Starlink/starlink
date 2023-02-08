@@ -298,23 +298,23 @@ try:
 
 #  Get a list of the tiles that overlap the current NDF, and loop round
 #  each one.
-      invoke("$SMURF_DIR/tilelist region={0} instrument={1}".format(ndf,instrument) )
-      for itile in starutil.get_task_par( "tiles", "tilelist" ):
+      invoke("$SMURF_DIR/jsatilelist in={0} instrument={1}".format(ndf,instrument) )
+      for itile in starutil.get_task_par( "tiles", "jsatilelist" ):
 
 #  Get the information about the tile. Ensure the directory and tile exist.
-         invoke("$SMURF_DIR/tileinfo itile={0} instrument={1} "
+         invoke("$SMURF_DIR/jsatileinfo itile={0} instrument={1} "
                 "create=yes".format(itile,instrument) )
 
 #  Get the path to the tile's master NDF.
-         tilendf = starutil.get_task_par( "tilendf", "tileinfo" )
+         tilendf = starutil.get_task_par( "tilendf", "jsatileinfo" )
 
 #  Get a flag indicating if the tile's master NDF existed before the
-#  above invocation of "tileinfo".
-         existed = starutil.get_task_par( "exists", "tileinfo" )
+#  above invocation of "jsatileinfo".
+         existed = starutil.get_task_par( "exists", "jsatileinfo" )
 
 #  Get the 2D spatial pixel index bounds of the master tile.
-         tlbnd = starutil.get_task_par( "lbnd", "tileinfo" )
-         tubnd = starutil.get_task_par( "ubnd", "tileinfo" )
+         tlbnd = starutil.get_task_par( "lbnd", "jsatileinfo" )
+         tubnd = starutil.get_task_par( "ubnd", "jsatileinfo" )
 
 #  If the NDFs are not gridded using the JSA all-sky grid appropriate to
 #  the specified instrument, then we need to resample them onto that grid

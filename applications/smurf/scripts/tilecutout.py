@@ -211,24 +211,24 @@ try:
 
 #  Identify the tiles that overlap the specified region, and loop round
 #  them.
-   invoke("$SMURF_DIR/tilelist region={0} instrument={1}".format(region,instrument) )
-   for itile in starutil.get_task_par( "tiles", "tilelist" ):
+   invoke("$SMURF_DIR/jsatilelist in={0} instrument={1}".format(region,instrument) )
+   for itile in starutil.get_task_par( "tiles", "jsatilelist" ):
 
 #  Get information about the tile, including the 2D spatial pixel index
 #  bounds of its overlap with the required Region.
-      invoke("$SMURF_DIR/tileinfo itile={0} instrument={1} "
+      invoke("$SMURF_DIR/jsatileinfo itile={0} instrument={1} "
              "target={2}".format(itile,instrument,region) )
 
 #  Skip this tile if it does not exist (i.e. is empty).
-      if starutil.get_task_par( "exists", "tileinfo" ):
+      if starutil.get_task_par( "exists", "jsatileinfo" ):
 
 #  Get the 2D spatial pixel index bounds of the part of the master tile that
 #  overlaps the required region.
-         tlbnd = starutil.get_task_par( "tlbnd", "tileinfo" )
-         tubnd = starutil.get_task_par( "tubnd", "tileinfo" )
+         tlbnd = starutil.get_task_par( "tlbnd", "jsatileinfo" )
+         tubnd = starutil.get_task_par( "tubnd", "jsatileinfo" )
 
 #  Get the path to the tile's master NDF.
-         tndf = starutil.get_task_par( "tilendf", "tileinfo" )
+         tndf = starutil.get_task_par( "tilendf", "jsatileinfo" )
 
 #  Add on the section specifier for the overlap region.
          sec = "{0}({1}:{2},{3}:{4},)".format(tndf,tlbnd[0],tubnd[0],tlbnd[1],tubnd[1])
