@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 *+
@@ -71,13 +71,13 @@ from starutil import msg_out
 
 
 if len(sys.argv) < 2:
-    print "Usage: fts2gaia <NDF_file>"
+    print("Usage: fts2gaia <NDF_file>")
     sys.exit(0)
 
 indata = sys.argv[1]
 # print "indata="+indata
-if os.path.exists(indata) == False:
-    print indata + "file not found!"
+if not os.path.exists(indata):
+    print(indata + "file not found!")
     sys.exit(0)
 
 # Determine the band to process the spectrum in
@@ -86,11 +86,11 @@ if os.path.exists(indata) == False:
 # else default to 850 band
 band = os.getenv('ORAC_INSTRUMENT')
 if band is None:
-    print "ORAC_INSTRUMENT environment variable not set!"
-    print "This program expects to be run from a shell"
-    print "prepared with the command: oracdr_scuba2_<band> <observation-date>"
-    print "where band is: 450 or 850"
-    print "and observation-date has the form: YYYYMMDD"
+    print("ORAC_INSTRUMENT environment variable not set!")
+    print("This program expects to be run from a shell")
+    print("prepared with the command: oracdr_scuba2_<band> <observation-date>")
+    print("where band is: 450 or 850")
+    print("and observation-date has the form: YYYYMMDD")
     sys.exit(0)
 
 

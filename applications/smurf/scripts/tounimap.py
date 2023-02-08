@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 *+
@@ -105,7 +105,10 @@
 '''
 
 import numpy
-import pyfits
+try:
+    import pyfits
+except ImportError:
+    import astropy.io.fits as pyfits
 import glob
 import os
 import re
@@ -136,7 +139,8 @@ def cleanup():
 #  Function to strip unwanted keywords from a FITS HDU.
 def striphdr( hdu ):
    for kwd in ("HDUCLAS1","HDUCLAS2","HDSTYPE","BLANK","BZERO","BSCALE","LBOUND1","LBOUND2"):
-      del hdu.header[kwd]
+      if kwd in hdu.header:
+         del hdu.header[kwd]
 
 #  Function to check a file exists and remove it if it does.
 def myremove( path ):
@@ -207,7 +211,7 @@ try:
    fd.write("noisecliphigh=0\n")
    fd.write("order=0\n")
    fd.write("downsampscale=0\n")
-   if fakemap != None:
+   if fakemap is not None:
       fd.write("fakemap={0}\n".format(fakemap) )
    fd.close()
 

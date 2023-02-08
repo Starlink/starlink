@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 import starlink.Ast as Ast
 
 bmask = open( "bmask.log", "r" )

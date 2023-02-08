@@ -1,11 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import sys
-import pyfits
+try:
+    import pyfits
+except ImportError:
+    import astropy.io.fits as pyfits
 import numpy
 
 container = pyfits.open(sys.argv[1], mode="update")
 for v in container:
-   v.header.update("extname", v.header["hdsname"] )
+   v.header["extname"] = v.header["hdsname"]
 
 container.close()
 
@@ -30,8 +33,8 @@ bolomask.close()
 
 
 c1 = pyfits.Column( name='name', format='15A', array=numpy.array(names))
-tabhdu = pyfits.new_table([c1])
-tabhdu.header.update("extname", "channels" )
+tabhdu = pyfits.BinTableHDU(pyfits.FITS_rec.from_columns([c1]))
+tabhdu.header["extname"] = "channels"
 
 container.append(tabhdu)
 container.close()

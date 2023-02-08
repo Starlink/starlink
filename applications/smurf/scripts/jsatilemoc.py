@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 *+
@@ -50,6 +50,7 @@
 *-
 '''
 
+from codecs import ascii_decode
 from math import log
 import re
 
@@ -151,7 +152,8 @@ def read_jsa_tile_sdf(filename):
     from starlink.ndfpack import Ndf
 
     ndf = Ndf(filename)
-    header = fits.Header.fromstring(''.join(ndf.head['FITS']))
+    header = fits.Header.fromstring(''.join(
+        ascii_decode(x)[0] for x in ndf.head['FITS']))
     data = np.squeeze(ndf.data)
     wcs = ndf.wcs
 

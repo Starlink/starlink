@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 *+
@@ -1191,7 +1191,7 @@ try:
          invoke("$KAPPA_DIR/setbb ndf={0} bb=0".format(newmap) )
          invoke("$KAPPA_DIR/stats ndf={0} clip=\\[3,3,3\\] quiet".format(mapchange))
          meanchange = starutil.get_task_par( "mean", "stats" )
-         if maptol > 0.0 and converged == False:
+         if maptol > 0.0 and not converged:
             msg_out( "Normalised mean change in map = {0} (maptol="
                      "{1})".format(meanchange,maptol) )
             if meanchange <= maptol:
