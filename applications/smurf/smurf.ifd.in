@@ -6646,79 +6646,79 @@ package @PACKAGE@ {
     }
 
     command pol2cat {
-        obey {python $SMURF_DIR/pol2cat.py}
+        obey {python3 $SMURF_DIR/pol2cat.py}
     }
 
     command pol2ip {
-        obey {python $SMURF_DIR/pol2ip.py}
+        obey {python3 $SMURF_DIR/pol2ip.py}
     }
 
     command pol2scan {
-        obey {python $SMURF_DIR/pol2scan.py}
+        obey {python3 $SMURF_DIR/pol2scan.py}
     }
 
     command pol2map {
-        obey {python $SMURF_DIR/pol2map.py}
+        obey {python3 $SMURF_DIR/pol2map.py}
     }
 
     command pol2noise {
-        obey {python $SMURF_DIR/pol2noise.py}
+        obey {python3 $SMURF_DIR/pol2noise.py}
     }
 
     command pol2sim {
-        obey {python $SMURF_DIR/pol2sim.py}
+        obey {python3 $SMURF_DIR/pol2sim.py}
     }
 
     command pol2stack {
-        obey {python $SMURF_DIR/pol2stack.py}
+        obey {python3 $SMURF_DIR/pol2stack.py}
     }
 
     command skyloop {
-        obey {python $SMURF_DIR/skyloop.py}
+        obey {python3 $SMURF_DIR/skyloop.py}
     }
 
     command configmeld {
-        obey {python $SMURF_DIR/configmeld.py}
+        obey {python3 $SMURF_DIR/configmeld.py}
     }
 
     command fts2gaia {
-        obey {python $SMURF_DIR/fts2gaia.py}
+        obey {python3 $SMURF_DIR/fts2gaia.py}
     }
 
     command tilepaste {
-        obey {python $SMURF_DIR/tilepaste.py}
+        obey {python3 $SMURF_DIR/tilepaste.py}
     }
 
     command tilecutout {
-        obey {python $SMURF_DIR/tilecutout.py}
+        obey {python3 $SMURF_DIR/tilecutout.py}
     }
 
     command jsajoin {
-        obey {python $SMURF_DIR/jsajoin.py}
+        obey {python3 $SMURF_DIR/jsajoin.py}
     }
 
     command jsasplit {
-        obey {python $SMURF_DIR/jsasplit.py}
+        obey {python3 $SMURF_DIR/jsasplit.py}
     }
 
     command jsatilemoc {
-        obey {python $SMURF_DIR/jsatilemoc.py}
+        obey {python3 $SMURF_DIR/jsatilemoc.py}
     }
 
     command rawregion {
-        obey {python $SMURF_DIR/rawregion.py}
+        obey {python3 $SMURF_DIR/rawregion.py}
     }
 
     command sc2compare {
-        obey {python $SMURF_DIR/sc2compare.py}
+        obey {python3 $SMURF_DIR/sc2compare.py}
     }
 
     command startester {
-        obey {python $SMURF_DIR/startester.py}
+        obey {python3 $SMURF_DIR/startester.py}
     }
 
     command matchbeam {
-        obey {python $SMURF_DIR/matchbeam.py}
+        obey {python3 $SMURF_DIR/matchbeam.py}
     }
 
     icl {defhelp @PACKAGE@ $@PACKAGE_UPCASE@_HELP 0}
