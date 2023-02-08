@@ -31,7 +31,7 @@ rm -f cont.sdf >& /dev/null
 rm -f bmask.log >& /dev/null
 
 #  Get the required time series NDFs by running makemap.
-$SMURF_DIR/makemap $full method=iter out=map msg_filter=debug config=^/star/share/smurf/dimmconfig_export.lis | tee makemap.log
+$SMURF_DIR/makemap $full method=iter out=map msg_filter=debug config=^${STARLINK_DIR}/share/smurf/experimental/dimmconfig_export.lis | tee makemap.log
 
 #  Create an HDS container containing a dummy 1 pixel NDF (since ndf2fits
 #  container=yes seems to put the first NDF it finds into the primary
