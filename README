@@ -278,7 +278,7 @@ specific component, the instructions are slightly different.
    you are building from a subversion checkout)
 
       % ./bootstrap
-      % ./configure -C
+      % ./configure
       % make
       % make install
 
