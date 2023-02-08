@@ -115,6 +115,8 @@
 #        illegally formatted END lines.
 #     2022 June 13 (GSB):
 #        Convert to sh.
+#     2023 February 8 (GSB):
+#        Add dd status=none option to suppress additional output.
 #     {enter_further_changes_here}
 
 #-
@@ -140,7 +142,7 @@ sedext='/^XTENSION= /,/^END$/p'
 #   80-character lines.
 #
 if [ "$#" -eq 0 ]; then
-   dd cbs=80 conv=unblock | LC_ALL=C sed -n -e "$sedsim" -e "$sedext"
+   dd cbs=80 conv=unblock status=none | LC_ALL=C sed -n -e "$sedsim" -e "$sedext"
    exit
 fi
 #
@@ -600,7 +602,7 @@ if [ -n "$tape" ]; then
 #
 #   List the headers for the current file on the tape.
 #
-      dd ibs=$block if="$1" cbs=80 conv=unblock | \
+      dd ibs=$block if="$1" cbs=80 conv=unblock status=none | \
          LC_ALL=C sed -n -e "$sedsim" -e "$sedext"
 #
 #   The most-likely error is for the EOT to be found, so there is no
@@ -632,7 +634,7 @@ else
 #
 #   List the headers for the current file.
 #
-      dd cbs=80 bs=80 conv=unblock if="$file" | \
+      dd cbs=80 bs=80 conv=unblock if="$file" status=none | \
          LC_ALL=C sed -n -e "$sedsim" -e "$sedext"
    done
 fi
