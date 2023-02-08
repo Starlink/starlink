@@ -36,7 +36,7 @@ document are at the end of this README.
 This procedure will not build the Starlink _Java_ applications.  They are
 built separately, using the procedure described in Java README
 (currently these are available from the git repository at
-git://github.com/Starlink/starjava.git). You do not need to build any of
+https://github.com/Starlink/starjava.git). You do not need to build any of
 the Starlink classic applications to build the Java ones, unless you need to
 rebuild the native parts of JNIAST, JNIHDS or SPLAT. To build the documents
 for the Starjava applications FROG and SPLAT you will need the Starlink
@@ -275,7 +275,7 @@ specific component, the instructions are slightly different.
 
  - Now you can go into a specific directory and build the library or
    application as normal (a bootstrap is required in the directory if
-   you are building from a subversion checkout)
+   you are building from a git checkout)
 
       % ./bootstrap
       % ./configure
@@ -374,9 +374,9 @@ Platform specific build notes
   reinstalling them again afterwards if necessary..
 
 
-  - OS X
+  - macOS
 
-  The build situation under OS X follows much like that of GNU/Linux,
+  The build situation under macOS follows much like that of GNU/Linux,
   but you'll need to install your own Fortran compiler. In 10.3
   the "g77" compiler from "Fink" or "MacPorts" has been used successfully,
   in 10.4 you'll need a copy of "g95". For 10.5 or later you can use
@@ -385,7 +385,7 @@ Platform specific build notes
 
   Note you'll also need to install X11 (see http://xquartz.macosforge.org),
   and a functioning TeX and Ghostscript if you want to build the
-  documents. The build on Mac OSX is not relocatable.
+  documents. The build on macOS is not relocatable.
 
   - Solaris
 
@@ -571,7 +571,6 @@ Arch Linux:
    tcsh
    texlive-most
 
-
 CentOS 7:
    libXext-devel
    libXau-devel
@@ -581,9 +580,7 @@ CentOS 7:
    ncurses-devel
    texlive-multirow
 
-
-MacOSX:
+macOS:
     gfortran
     XCode
     xcode commandline tools
-
