@@ -369,7 +369,9 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/blt \
+		$(MANIFESTS)/cat \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
@@ -379,6 +381,7 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
@@ -389,8 +392,11 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/ifd \
 		$(MANIFESTS)/img \
 		$(MANIFESTS)/itcl \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mers \
 		$(MANIFESTS)/messgen \
+		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
@@ -406,12 +412,14 @@ $(MANIFESTS)/ccdpack: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/startcl \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/ccdpack \
