@@ -2198,6 +2198,8 @@ $(MANIFESTS)/pal: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/pamela: \
+		$(MANIFESTS)/ary \
+		$(MANIFESTS)/ast \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
@@ -2209,6 +2211,7 @@ $(MANIFESTS)/pamela: \
 		$(MANIFESTS)/hds-v5 \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \

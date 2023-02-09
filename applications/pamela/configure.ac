@@ -29,7 +29,7 @@ STAR_CHECK_PROGS(ifd2star)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [fio generic prm par sae hds], [link])
+STAR_DECLARE_DEPENDENCIES([build], [fio generic prm par sae hds ndf], [link])
 dnl    No use dependencies
 
 dnl    Need "hlib" command to build the help library.

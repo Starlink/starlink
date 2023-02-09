@@ -1420,7 +1420,7 @@ reduction program.
     version for spectra with significant tilts or curvature.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>fio</build><build option='link'>generic</build><build option='link'>prm</build><build option='link'>par</build><build option='link'>sae</build><build option='link'>hds</build>
+    <build>pcs</build><build option='link'>fio</build><build option='link'>generic</build><build option='link'>prm</build><build option='link'>par</build><build option='link'>sae</build><build option='link'>hds</build><build option='link'>ndf</build>
   </dependencies>
   <developers>
     <person>
