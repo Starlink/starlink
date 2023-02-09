@@ -24,7 +24,7 @@ STAR_CHECK_PROGS( hlib )
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build],
-   [agi ast ard cat chr fio grp hds ndf mers par pcs pda prm psx sae shl sgs],
+   [agi ast ard cat chr fio grp hds kaplibs ndf mers par pcs pda prm psx sae shl sgs],
    [link])
 
 STAR_LATEX_DOCUMENTATION(sun180)

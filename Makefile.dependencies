@@ -956,10 +956,12 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/ard \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
 		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ctg \
 		$(MANIFESTS)/ems \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
@@ -967,6 +969,7 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hdf5 \
 		$(MANIFESTS)/hds \
@@ -974,8 +977,13 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/hds-v5 \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
+		$(MANIFESTS)/irq \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
@@ -989,11 +997,13 @@ $(MANIFESTS)/esp: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
+		$(MANIFESTS)/thr \
 		$(MANIFESTS)/tk \
 		$(MANIFESTS)/trn
 	cd applications/esp \
