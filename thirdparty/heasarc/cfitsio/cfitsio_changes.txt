@@ -1,5 +1,142 @@
                    Log of Changes Made to CFITSIO
 
+Version 4.2.0 - Nov 2022
+  
+  - This release includes patches to security vulnerabilities.  We
+    strongly encourage this upgrade, particularly for those running 
+    CFITSIO in web accessible applications.
+    
+  - Fix to fits_read_key function, which was failing to properly read
+    keywords declared type TUINT on compilers where sizeof(int) =
+    sizeof(long).
+
+  - Added new functions fits_read_cols and fits_write_cols to efficiently 
+    read or write multiple columns in a single function call
+
+  - Added new function fits_copy_selrows to copy only selected rows, such
+    as the selected rows returned by fits_find_rows
+
+  - Added new calculator functions ERF(X), ERFC(X) and GAMMA(X), which are
+    mathematical special functions of the same name
+
+  - Added new calculator function GTIFIND() which reports which GTI row
+    brackets a given time sample
+
+  - Added new calculator functions which operate upon vector table
+    values NAXIS(V), NAXES(V,n), ELEMENTNUM(V) and AXISELEM(V,n),
+    and ARRAY(X,d) which promotes scalar X to a vector or array
+    with given dimensions.
+
+  - The CFITSIO histogramming code now handles binning by any
+    arbitrary calculator expression rather than just a column name.
+    Both the binned columns as well as the optional weights may be
+    calculator expressions, enclosed in parentheses.  
+
+  - Binning of vector columns or expressions is now supported, as long
+    as all binned inputs (as well as the optional weighting) have the
+    same vector dimensions.  Binning of variable-length columns remains
+    unsupported.
+
+  - A bug that caused histogram weights from columns that are null values
+    to be tallied along with non-null values has been fixed.
+
+  - The CFITSIO calculator and histogramming functionality is now
+    fully reentrant and does not require multithreading interlocks.
+
+  - A long-standing segmentation fault bug in the histogramming code
+    related to binning any value using the "reciprocal" /XXXX notation
+    has been fixed.
+    
+  - Added mutex locks for thread safety in ftgiou and ftfiou.
+  
+  - Added several Fortran wrappers to support image read/write when
+    'fpixel' and 'nelements' are 8-byte integers.
+    
+  - Fixed bug which was adding spaces to some cases of long string key
+    value output.
+
+Version 4.1.0 - Feb 2022
+                   
+  - Calls to the zlib inflate() function in zcompress.c now handle
+    the Z_BUF_ERROR return value rather than exiting.
+
+  - The SUBTRACTIVE_DITHER_2 option has been removed when using the
+    HCOMPRESS algorithm.  
+    
+  - Updated fits_get_version function to return a float calculated
+    from 3 version fields.
+                       
+  - Added handling of SBYTE_IMG and ULONGLONG_IMG types to the
+    fits_resize_img function.
+    
+  - Updates made to C/Fortran interfacing in cfortran.h and f77_wrap.h
+    specifically driven by new Mac/ARM architecture.
+    
+  - Fix to the fits_insert_col functions to handle columns with
+    TULONGLONG data.
+                   
+Version 4.0.0 - May 2021                   
+
+  - Removed separate directory for zlib/gzip code, and updated
+    configuration to check for zlib on the user's system (required).
+    When use of cURL is enabled, it may also pull in zlib such
+    that user applications may not need to link with it separately.
+
+  - Changed version numbering to 3-field format.
+      
+  - Added new calculator functions SETNULL(x,y) to allow substitution of
+    NULL values into tables, and GTIOVERLAP() for calculating the amount
+    of GTI overlap exposure for a time bin.
+    
+  - Fix added for proper handling of string columns with zero repeat
+    count.
+    
+  - Fix to column filtering expressions which write #NULL values to
+    columns of type (J) format.
+    
+  - Fix to memory clearing when using polygon shapes in region files.
+     
+  - Fix to fits_str2time function so that it now flags a particular case
+    of bad syntax which was previously getting through.
+    
+  - In ffgclb and ffpclb (read/write byte columns), the "undocumented"
+    feature of being able to transfer columns 'A' string columnss as
+    byte arrays is now handled correctly, with improved error checking
+    via updates to ffgcprll.  More documentation on string handling is
+    in cfitsio.tex.
+
+  - Fix bug in 'colfilter' functionality.  When performing a
+    column deletion of the form -COLNAM*, and multiple matches
+    existed, then none of the matches got deleted.  Now the
+    first is deleted as expected.
+    
+  - Improved handling of corner case in ffpkn functions.
+
+  - In ffgky, modified TULONG case to allow it to read unsigned
+    values greater than the 8-byte signed limit.
+    
+  - Fix to parsing of corner case of extended file syntax.
+
+  - Major updates to CMake configuration.
+		   
+Version 3.49 - Aug 2020
+
+  - Fix to imcompress.c.  It now turns off quantization if ZSCALE
+    and ZZERO columns are missing.  Treatment will be the same as
+    if ZQUANTIZ were set to 'NONE', even if ZQUANTIZ is present
+    and set to something else.
+
+  - Added mutex to fits_execute_template() function so that the
+    creation of files using ASCII templates will be thread safe.
+    		   
+  - In fpack when using -table flag, replaced warning message with a
+    more detailed description mentioning FITS format update.
+		   
+  - Added flag to CMake builds to disable curl dependency.  Also
+    only add CURL_LIBRARIES to CMake link target if curl is found.
+		   
+  - Minor adjustment to download progress output.
+                   
 Version 3.48 - Mar 2020
 
   - Now can handle parentheses in path names rather than automatically
