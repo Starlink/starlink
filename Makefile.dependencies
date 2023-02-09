@@ -3171,15 +3171,20 @@ $(MANIFESTS)/sun270: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/surf: \
+		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
+		$(MANIFESTS)/cat \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/graphpar \
+		$(MANIFESTS)/grp \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hdf5 \
@@ -3187,8 +3192,13 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/hds-v4 \
 		$(MANIFESTS)/hds-v5 \
 		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/idi \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/lpg \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
+		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
@@ -3199,12 +3209,15 @@ $(MANIFESTS)/surf: \
 		$(MANIFESTS)/ref \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
+		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil \
 		$(MANIFESTS)/starx \
 		$(MANIFESTS)/tcl \
-		$(MANIFESTS)/tk
+		$(MANIFESTS)/thr \
+		$(MANIFESTS)/tk \
+		$(MANIFESTS)/trn
 	cd applications/surf \
 	  && $(MAKE_CPT)
 
