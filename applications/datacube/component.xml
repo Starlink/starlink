@@ -11,7 +11,7 @@ okbook (SC/16), a small number of applications used for AXIS and  WCS
 manipulation, and a collection of example shell and IDL scripts for IFS data
 cube manipulation. </p></abstract>
   <dependencies >
-    <build>pcs</build><build option='link'>shl</build><build option='link'>pcs</build><use>kappa</use><use>figaro</use><use>convert</use><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>shl</build><build option='link'>pcs</build><sourceset>sst</sourceset><use>kappa</use><use>figaro</use><use>convert</use><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

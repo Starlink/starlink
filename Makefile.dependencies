@@ -795,6 +795,7 @@ $(MANIFESTS)/datacube: \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/shl \
+		$(MANIFESTS)/sst \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starutil
