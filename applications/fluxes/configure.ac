@@ -25,8 +25,8 @@ STAR_CHECK_PROGS(sh)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae;
 dnl    links to: chr, mers, fio, psx, task jpl.
-STAR_DECLARE_DEPENDENCIES([build], [sae mers fio par sla])
-STAR_DECLARE_DEPENDENCIES([link], [fio sla mers grp kaplibs])
+STAR_DECLARE_DEPENDENCIES([build], [sae mers fio par sla grp kaplibs ast ndf])
+STAR_DECLARE_DEPENDENCIES([link], [fio sla mers])
 
 dnl    No use dependencies
 

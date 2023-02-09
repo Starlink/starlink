@@ -14,7 +14,7 @@ beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><link>fio</link><link>sla</link><link>mers</link><link>grp</link><link>kaplibs</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><build>grp</build><build>kaplibs</build><build>ast</build><build>ndf</build><link>fio</link><link>sla</link><link>mers</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
