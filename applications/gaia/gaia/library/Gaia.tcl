@@ -2120,7 +2120,7 @@ itcl::class gaia::Gaia {
 
       #  Attempt to get the default config file using a batch process
       #  to avoid nasty blocking.
-      Batch $w_.bg_proc -command [code $this loaded_eso_config_]
+      util::Batch $w_.bg_proc -command [code $this loaded_eso_config_]
       blt::busy hold $w_
       $w_.bg_proc bg_eval [code $this get_eso_config_]
 

@@ -91,7 +91,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
          set name $itk_option(-accessURL)
       }
       itk_component add server {
-         LabelValue $w_.server \
+         util::LabelValue $w_.server \
             -text "Server:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -150,7 +150,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
       #  Verbosity. Controls number of columns returned for some services.
       itk_component add verb {
-         LabelMenu $w_.verb \
+         util::LabelMenu $w_.verb \
             -text "Columns:" \
             -labelwidth $lwidth
       }
@@ -323,7 +323,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
       set name [$itk_component(object) get]
       if { $name != {} } {
          if { $batch_ == {} } {
-            set batch_ [Batch $w_.batch \
+            set batch_ [util::Batch $w_.batch \
                            -command [code $this name_query_done_]]
          }
          blt::busy hold $w_

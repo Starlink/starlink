@@ -97,7 +97,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       pack $itk_component(actionframe) -side top -fill x -ipadx 1m -ipady 1m
 
       itk_component add servicename {
-         LabelValue $itk_component(actionframe).servicename \
+         util::LabelValue $itk_component(actionframe).servicename \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

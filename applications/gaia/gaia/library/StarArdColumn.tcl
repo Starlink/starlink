@@ -162,7 +162,7 @@ itcl::class gaia::StarArdColumn {
       if { ! [create_properties_window $name] } {
 
          #  Now add the buttons for the description.
-         set X_ [LabelEntry $Frame_.x \
+         set X_ [util::LabelEntry $Frame_.x \
                     -text {Column:} \
                     -command [code $this configure -x]]
          pack $X_ -side top -fill x

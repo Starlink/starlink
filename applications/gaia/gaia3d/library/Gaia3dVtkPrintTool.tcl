@@ -70,7 +70,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Choice of graphics format.
       itk_component add format {
-         LabelMenu $w_.format \
+         util::LabelMenu $w_.format \
             -labelwidth $lwidth \
             -text "Graphic format:" \
             -variable [scope format_]

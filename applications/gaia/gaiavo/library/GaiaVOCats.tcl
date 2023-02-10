@@ -167,7 +167,7 @@ itcl::class gaiavo::GaiaVOCats {
       #  notebook. We do not use a tabnotebook as that is limited to one
       #  row of tabs.
       itk_component add bookmenu {
-         LabelMenu $w_.bookmenu \
+         util::LabelMenu $w_.bookmenu \
             -text "SIAP server results:" \
             -labelwidth 18 \
             -valuewidth 30 \

@@ -313,7 +313,7 @@ itcl::class gaia::GaiaAstCopy {
 	       catch {destroy $fs(filter_types)}
 	   }
 	   if { $itk_option(-filter_types) != {} } {
-	       set fs(filter_types) [LabelMenu $fs(filterf).types \
+	       set fs(filter_types) [util::LabelMenu $fs(filterf).types \
 		       -text {Type Filter:}]
 	       foreach pair "$itk_option(-filter_types)" {
 		   set name [lindex $pair 0]

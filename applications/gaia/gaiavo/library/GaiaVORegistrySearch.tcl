@@ -98,7 +98,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       set lwidth 10
       set vwidth 50
       itk_component add registry {
-         LabelMenu $itk_component(regframe).registry \
+         util::LabelMenu $itk_component(regframe).registry \
             -text "Registry:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth
@@ -107,7 +107,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
       add_short_help $itk_component(registry) {VO registry}
 
       itk_component add regtype {
-         LabelMenu $itk_component(regframe).regtype \
+         util::LabelMenu $itk_component(regframe).regtype \
             -labelwidth 0 \
             -valuewidth 6
       }
@@ -127,7 +127,7 @@ itcl::class gaiavo::GaiaVORegistrySearch {
 
       #  Display the type of service. This is fixed.
       itk_component add service {
-         LabelValue $w_.service \
+         util::LabelValue $w_.service \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \

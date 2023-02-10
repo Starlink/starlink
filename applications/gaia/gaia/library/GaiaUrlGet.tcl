@@ -125,7 +125,7 @@ itcl::class gaia::GaiaUrlGet {
       }
 
       #  Create an object for running interruptable batch queries.
-      Batch $w_.batch \
+      util::Batch $w_.batch \
          -command [code $this download_done] -debug $itk_option(-debug)
 
    }

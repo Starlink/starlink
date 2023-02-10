@@ -342,7 +342,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Panel orientation.
       itk_component add panelorient {
-         LabelMenu $parent.panelorient -text "Panel orientation:" \
+         util::LabelMenu $parent.panelorient -text "Panel orientation:" \
             -labelwidth $lwidth_ \
             -variable [scope values_($this,panel_orient)]
       }
@@ -428,7 +428,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Minimum zoom scale.
       itk_component add minscale {
-         LabelEntryScale $parent.minscale \
+         util::LabelEntryScale $parent.minscale \
             -text {Minimum zoom:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -447,7 +447,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Maximum zoom scale.
       itk_component add maxscale {
-         LabelEntryScale $parent.maxscale \
+         util::LabelEntryScale $parent.maxscale \
             -text {Maximum zoom:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -614,7 +614,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Zoom factor used in zoom window.
       itk_component add zoomfactor {
-         LabelEntryScale $parent.zoomfactor \
+         util::LabelEntryScale $parent.zoomfactor \
             -text {Zoom factor:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -633,7 +633,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Zoom factor used in pick window.
       itk_component add pickzoomfactor {
-         LabelEntryScale $parent.pickzoomfactor \
+         util::LabelEntryScale $parent.pickzoomfactor \
             -text {Pick zoom factor:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -652,7 +652,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Default percentage cut used for new files.
       itk_component add defaultcut {
-         LabelEntryScale $parent.defaultcut \
+         util::LabelEntryScale $parent.defaultcut \
             -text {Default cut:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -671,7 +671,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Search box size used for centroiding.
       itk_component add isize {
-         LabelEntryScale $parent.isize \
+         util::LabelEntryScale $parent.isize \
             -text {Centroid search box:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -690,7 +690,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Maximum shift allowed when centroiding.
       itk_component add maxshift {
-         LabelEntryScale $parent.maxshift \
+         util::LabelEntryScale $parent.maxshift \
             -text {Centroid max shift:} \
             -labelwidth $lwidth_ \
             -valuewidth 4 \
@@ -713,7 +713,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Default colormap
       itk_component add defaultcmap {
-         LabelMenu $parent.cmap -text "Default colormap:" \
+         util::LabelMenu $parent.cmap -text "Default colormap:" \
             -labelwidth $lwidth_ \
             -variable [scope values_($this,default_cmap)]
       }
@@ -729,7 +729,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Blank pixel colour.
       itk_component add blankcolour {
-         LabelMenu $parent.blankcolour \
+         util::LabelMenu $parent.blankcolour \
             -text "Blank colour:" \
             -labelwidth $lwidth_ \
             -variable [scope values_($this,blank_color)]
@@ -748,7 +748,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Image background colour.
       itk_component add backgroundcolour {
-         LabelMenu $parent.backgroundcolour \
+         util::LabelMenu $parent.backgroundcolour \
             -text "Background colour:" \
             -labelwidth $lwidth_ \
             -variable [scope values_($this,image_background)]
@@ -799,7 +799,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Font scale. Only scales non-pixel fonts, but adjusts padding anyway.
       itk_component add fontscale {
-         LabelEntryScale $parent.fontscale \
+         util::LabelEntryScale $parent.fontscale \
             -text {Font scale:} \
             -labelwidth 10 \
             -valuewidth 4 \
