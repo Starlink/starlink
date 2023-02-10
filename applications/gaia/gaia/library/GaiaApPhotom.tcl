@@ -762,7 +762,7 @@ itcl::class gaia::GaiaApPhotom {
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }

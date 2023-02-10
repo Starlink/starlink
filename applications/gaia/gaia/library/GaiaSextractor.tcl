@@ -2688,7 +2688,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Issue the measurements available command if needed.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }

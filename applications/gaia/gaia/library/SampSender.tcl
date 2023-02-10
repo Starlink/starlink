@@ -86,7 +86,7 @@ itcl::class gaia::SampSender {
          if { [catch {
             set url [get_file_url_ $file]
             set params(url) $url
-            $samp_client call $mtype [array get params] $recipient_id
+            {*}$samp_client call $mtype [array get params] $recipient_id
          } msg]} {
             error "error in FITS send: $msg"
          }
@@ -114,7 +114,7 @@ itcl::class gaia::SampSender {
             $image dump $tmpfile FITS-WCS
             set url [get_file_url_ $tmpfile]
             set params(url) $url
-            $samp_client call $mtype [array get params] $recipient_id $tidy_code
+            {*}$samp_client call $mtype [array get params] $recipient_id $tidy_code
          } msg] } {
             eval $tidy_code
             error "error in image send: $::errorInfo"
@@ -143,7 +143,7 @@ itcl::class gaia::SampSender {
          }
          set params(url) $url
          set params(meta) [rpcvar struct [array get ssameta]]
-         $samp_client call $mtype [array get params] $recipient_id
+         {*}$samp_client call $mtype [array get params] $recipient_id
       } msg] } {
          error "error in spectrum send: $::errorInfo"
       }
@@ -162,7 +162,7 @@ itcl::class gaia::SampSender {
          }
          set params(ra) $ra
          set params(dec) $dec
-         $samp_client notify $mtype [array get params] $recipient_id
+         {*}$samp_client notify $mtype [array get params] $recipient_id
       }
    }
 
@@ -174,7 +174,7 @@ itcl::class gaia::SampSender {
       set params(table-id) $table_id
       set params(row) $idx
       catch {
-         $samp_client notify $mtype [array get params] $recipient_id
+         {*}$samp_client notify $mtype [array get params] $recipient_id
       }
    }
 
@@ -189,7 +189,7 @@ itcl::class gaia::SampSender {
          set params(table-id) $table_id
          set params(row-list) [rpcvar array $idx_list]
          catch {
-            $samp_client notify $mtype [array get params] $recipient_id
+            {*}$samp_client notify $mtype [array get params] $recipient_id
          }
       }
    }
@@ -199,7 +199,7 @@ itcl::class gaia::SampSender {
    private method check_client_ {} {
       if {$samp_client == ""} {
          error "No SampClient"
-      } elseif {! [$samp_client is_registered]} {
+      } elseif {! [{*}$samp_client is_registered]} {
          error "Not registered"
       }
    }

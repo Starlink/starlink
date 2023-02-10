@@ -329,11 +329,11 @@ itcl::class gaia::GaiaDemo {
    #  then proceed.
    method display {text} {
       wm deiconify $w_
-      $itk_component(text) clear all
-      $itk_component(text) insert 0.0 $text
+      {*}$itk_component(text) clear all
+      {*}$itk_component(text) insert 0.0 $text
       update idletasks
       wait_ $readtime_
-      $itk_component(text) clear all
+      {*}$itk_component(text) clear all
       wm withdraw $w_
    }
 

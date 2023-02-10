@@ -621,7 +621,7 @@ itcl::class gaia::GaiaArd {
 
       #  If necessary do the completion command.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }
@@ -855,7 +855,7 @@ itcl::class gaia::GaiaArd {
 
       #  If given do the completed command.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
       blt::busy release $w_

@@ -664,7 +664,7 @@ itcl::class gaia::GaiaSearch {
 
       set notset 0
       set catalog $history_catalog_
-      set image [$skycat get_image]
+      set image [{*}$skycat get_image]
       if {[catch {$astrocat_ open $catalog}]} {
          # no catalog yet
          set notset 1

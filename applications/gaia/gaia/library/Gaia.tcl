@@ -2407,7 +2407,7 @@ window gives you access to this."
    #  clients.  If no recipient is specified, it will be broadcast to all.
    public method samp_send_image_ {recipient_id} {
       if {[catch {
-         $samp_sender_ send_image $image_ $recipient_id
+         {*}$samp_sender_ send_image $image_ $recipient_id
       } msg]} {
          error_dialog "$msg"
       }
@@ -2499,8 +2499,8 @@ window gives you access to this."
       if {[$samp_client_ is_registered]} {
          set send_mtype "image.load.fits"
          set tracker [$samp_client_ cget -client_tracker]
-         foreach client_id [$tracker get_subscribed_clients $send_mtype] {
-            set client_name [$tracker get_name $client_id]
+         foreach client_id [{*}$tracker get_subscribed_clients $send_mtype] {
+            set client_name [{*}$tracker get_name $client_id]
             add_menuitem $m command "Send to $client_name" \
                "Send the current image to $client_id" \
                -command "$this samp_send_image_ $client_id"

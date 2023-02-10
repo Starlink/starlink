@@ -182,7 +182,7 @@ itcl::class samp::SampClient {
 
       #  Register for communication with the remote hub.
       foreach agent [get_all_agents_] {
-         foreach mtype [$agent get_subscribed_mtypes] {
+         foreach mtype [{*}$agent get_subscribed_mtypes] {
             set subscriptions($mtype) [rpcvar struct {}]
          }
       }
@@ -231,7 +231,7 @@ itcl::class samp::SampClient {
          #  the MType in question and if so execute that with
          #  appropriate arguments.
          foreach agent [get_all_agents_] {
-            if {[lsearch [$agent get_subscribed_mtypes] $mtype] >= 0} {
+            if {[lsearch [{*}$agent get_subscribed_mtypes] $mtype] >= 0} {
                return [eval [list $agent $mtype $sender_id $params]]
             }
          }
@@ -268,7 +268,7 @@ itcl::class samp::SampClient {
    #  response to a call which was dispatched asynchronously.
    public method client_receive_response {responder_id msg_tag response_list} {
       array set response $response_list
-      set responder_name [$client_tracker get_name $responder_id]
+      set responder_name [{*}$client_tracker get_name $responder_id]
       set status $response(samp.status)
 
       #  Log response status if required.
@@ -542,9 +542,9 @@ itcl::class samp::SampClient {
    #  Public variables:
    #  ----------------
    public variable client_tracker {} {
-      $client_tracker configure -self_id $self_id_ \
+      {*}$client_tracker configure -self_id $self_id_ \
                                 -private_key $private_key_
-      $client_tracker configure -hub [code $hub_]
+      {*}$client_tracker configure -hub [code $hub_]
    }
    public variable metadata {samp.name gaia_app} {
       update_metadata_

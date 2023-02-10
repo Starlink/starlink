@@ -112,12 +112,12 @@ itcl::class gaia::GaiaQuery {
    #  image by default, rather than just a center part (i.e. return
    #  diagonal). Also need to add in NDF origins.
    public method set_from_image {} {
-      set iswcs [$astrocat iswcs]
+      set iswcs [{*}$astrocat iswcs]
       if {$iscat_} {
          if { $iswcs } {
             set_pos_radius [get_image_center_radius $iswcs]
          } else {
-            lassign [$astrocat origin] xo yo
+            lassign [{*}$astrocat origin] xo yo
             lassign [get_image_center_radius $iswcs] x y rad
             set_pos_radius [list [expr $x+$xo] [expr $y+$yo] $rad]
          }
@@ -125,7 +125,7 @@ itcl::class gaia::GaiaQuery {
          if { $iswcs } {
             set_pos_width_height [get_image_center_width_height $iswcs]
          } else {
-            lassign [$astrocat origin] xo yo
+            lassign [{*}$astrocat origin] xo yo
             lassign [get_image_center_width_height $iswcs] x y w h
             set_pos_width_height [list [expr $x+$xo] [expr $y+$yo] $w $h]
          }
@@ -159,12 +159,12 @@ itcl::class gaia::GaiaQuery {
    #  Override the select image area method so that we can adjust for
    #  the NDF origin information is needed.
    public method select_area {} {
-      set iswcs [$astrocat iswcs]
+      set iswcs [{*}$astrocat iswcs]
       if {$iscat_} {
          if { $iswcs } {
             set_pos_radius [select_image_area $iswcs]
          } else {
-            lassign [$astrocat origin] xo yo
+            lassign [{*}$astrocat origin] xo yo
             lassign [select_image_area $iswcs] x y rad
             set_pos_radius [list [expr $x+$xo] [expr $y+$yo] $rad]
          }
@@ -172,7 +172,7 @@ itcl::class gaia::GaiaQuery {
          if { $iswcs } {
             set_pos_width_height [select_image_area $iswcs]
          } else {
-            lassign [$astrocat origin] xo yo
+            lassign [{*}$astrocat origin] xo yo
             lassign [select_image_area $iswcs] x y w h
             set_pos_width_height [list [expr $x+$xo] [expr $y+$yo] $w $h]
          }
@@ -191,14 +191,14 @@ itcl::class gaia::GaiaQuery {
       } else {
          set cmd "$astrocat getimage"
       }
-      if {[$astrocat iswcs] || [$astrocat ispix]} {
+      if {[{*}$astrocat iswcs] || [{*}$astrocat ispix]} {
          set equinox ""
-         if {[$astrocat iswcs]} {
+         if {[{*}$astrocat iswcs]} {
             set name [$name_ get]
             set x [$ra_ get]
             set y [$dec_ get]
             set equinox [$equinox_ get]
-         } elseif {[$astrocat ispix]} {
+         } elseif {[{*}$astrocat ispix]} {
             set name ""
             set x [$x_ get]
             set y [$y_ get]
@@ -231,8 +231,8 @@ itcl::class gaia::GaiaQuery {
             if {"$maxnum" != ""} {
                lappend cmd "-nrows" $maxnum
             }
-            if {"[set sort_cols [$astrocat sortcols]]" != ""} {
-               lappend cmd "-sort" $sort_cols "-sortorder" [$astrocat sortorder]
+            if {"[set sort_cols [{*}$astrocat sortcols]]" != ""} {
+               lappend cmd "-sort" $sort_cols "-sortorder" [{*}$astrocat sortorder]
             }
          } else {
             if {"$width" != "" || "$height" != ""} {
@@ -274,7 +274,7 @@ itcl::class gaia::GaiaQuery {
 
       #  Local catalogues must be processed at this level so that
       #  internal changes are retained.
-      if {"[$astrocat servtype]" == "local"} {
+      if {"[{*}$astrocat servtype]" == "local"} {
          $w_.batch fg_eval [code $this do_query $cmd]
       } else {
          $w_.batch bg_eval [code $this do_query $cmd]

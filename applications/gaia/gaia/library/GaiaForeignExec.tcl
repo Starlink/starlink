@@ -252,7 +252,7 @@ itcl::class gaia::GaiaForeignExec {
       #  If request use a callback to preprocess the output (this
       #  allows the user to clean the output of escape sequences).
       if { $preprocess != {} } {
-         set output [$preprocess $msg]
+         set output [{*}$preprocess $msg]
       } else {
          set output $msg
       }
