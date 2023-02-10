@@ -190,7 +190,7 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  Add the table for displaying the query results.
       itk_component add results {
-         GaiaQueryResult $w_.results \
+         gaia::GaiaQueryResult $w_.results \
             -astrocat [code $w_.cat] \
             -title "Query Results" \
             -hscroll 1 \

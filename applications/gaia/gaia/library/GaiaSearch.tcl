@@ -211,7 +211,7 @@ itcl::class gaia::GaiaSearch {
 
       #  Table to display results as text
       itk_component add results {
-         set results_ [GaiaQueryResult $w_.results \
+         set results_ [gaia::GaiaQueryResult $w_.results \
                           -astrocat [code $w_.cat] \
                           -skycat $skycat_ \
                           -title "Search Results" \
@@ -281,7 +281,7 @@ itcl::class gaia::GaiaSearch {
    #  GaiaQuery instead.
    public method add_search_options {} {
       itk_component add searchopts {
-         set searchopts_ [GaiaQuery $w_.searchopts \
+         set searchopts_ [gaia::GaiaQuery $w_.searchopts \
                              -relief groove \
                              -borderwidth 2 \
                              -astrocat [code $w_.cat] \

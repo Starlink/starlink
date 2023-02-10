@@ -330,7 +330,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Float panel.
       itk_component add floatpanel {
-         StarLabelCheck $parent.floatpanel \
+         gaia::StarLabelCheck $parent.floatpanel \
             -text "Use a floating panel:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -356,7 +356,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Zoom window
       itk_component add withzoomwindow {
-         StarLabelCheck $parent.withzoomwindow \
+         gaia::StarLabelCheck $parent.withzoomwindow \
             -text "Display a zoom window:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -368,7 +368,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Pan window
       itk_component add withpanwindow {
-         StarLabelCheck $parent.withpanwindow \
+         gaia::StarLabelCheck $parent.withpanwindow \
             -text "Display a panner window:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -380,7 +380,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Colorramp window
       itk_component add withcolorramp {
-         StarLabelCheck $parent.withcolorramp \
+         gaia::StarLabelCheck $parent.withcolorramp \
             -text "Display a color ramp:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -392,7 +392,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Scrollbars
       itk_component add scrollbars {
-         StarLabelCheck $parent.scrollbars \
+         gaia::StarLabelCheck $parent.scrollbars \
             -text "Show image scrollbars:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -404,7 +404,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Show HDU chooser by default
       itk_component add hduchooser {
-         StarLabelCheck $parent.hduchooser \
+         gaia::StarLabelCheck $parent.hduchooser \
             -text "Show HDU chooser:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -416,7 +416,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Display the SAMP interop menu.
       itk_component add interopmenu {
-         StarLabelCheck $parent.interopmenu \
+         gaia::StarLabelCheck $parent.interopmenu \
             -text "Show Interop menu:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -470,7 +470,7 @@ itcl::class gaia::GaiaStartup {
    protected method add_control_controls_ {parent} {
       #  Focus follows mouse
       itk_component add focusfollowsmouse {
-         StarLabelCheck $parent.focusfollowsmouse \
+         gaia::StarLabelCheck $parent.focusfollowsmouse \
             -text "Focus follows mouse:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -482,7 +482,7 @@ itcl::class gaia::GaiaStartup {
 
       # Transient tools
       itk_component add transienttools {
-         StarLabelCheck $parent.transienttools \
+         gaia::StarLabelCheck $parent.transienttools \
             -text "Make toolboxes transient:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -494,7 +494,7 @@ itcl::class gaia::GaiaStartup {
 
       # Transient spectral plot.
       itk_component add transientplot {
-         StarLabelCheck $parent.transientplot \
+         gaia::StarLabelCheck $parent.transientplot \
             -text "Make spectral plot transient:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -506,7 +506,7 @@ itcl::class gaia::GaiaStartup {
 
       # Exit without asking.
       itk_component add quietexit {
-         StarLabelCheck $parent.quietexit \
+         gaia::StarLabelCheck $parent.quietexit \
             -text "Exit without prompt:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -518,7 +518,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Extended precision.
       itk_component add precision {
-         StarLabelCheck $parent.precision \
+         gaia::StarLabelCheck $parent.precision \
             -text "Display milli-arcsecs:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -530,7 +530,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Linear cartesian projection.
       itk_component add cartesian {
-         StarLabelCheck $parent.cartesian \
+         gaia::StarLabelCheck $parent.cartesian \
             -text "Linear CAR projections:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -542,7 +542,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Force display of degrees.
       itk_component add forcedegrees {
-         StarLabelCheck $parent.forcedegrees \
+         gaia::StarLabelCheck $parent.forcedegrees \
             -text "Display decimal degrees:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -554,7 +554,7 @@ itcl::class gaia::GaiaStartup {
 
       #  How to merge MEF headers.
       itk_component add alwaysmerge {
-         StarLabelCheck $parent.alwaysmerge \
+         gaia::StarLabelCheck $parent.alwaysmerge \
             -text "Always merge MEF headers:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -566,7 +566,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Check for cubes.
       itk_component add checkforcubes {
-         StarLabelCheck $parent.checkforcubes \
+         gaia::StarLabelCheck $parent.checkforcubes \
             -text "Check for cubes:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -578,7 +578,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Autoscale images to fit window.
       itk_component add autoscale {
-         StarLabelCheck $parent.autoscale \
+         gaia::StarLabelCheck $parent.autoscale \
             -text "Auto scale:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -590,7 +590,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Autofit images to window (once).
       itk_component add autofit {
-         StarLabelCheck $parent.autofit \
+         gaia::StarLabelCheck $parent.autofit \
             -text "Auto fit:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -602,7 +602,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Display pixel indices not grid coordinates.
       itk_component add pixelindices {
-         StarLabelCheck $parent.pixelindices \
+         gaia::StarLabelCheck $parent.pixelindices \
             -text "Pixel indices:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
@@ -773,7 +773,7 @@ itcl::class gaia::GaiaStartup {
 
       #  Fonts, label and text.
       itk_component add labelfont {
-         LabelFontChooser $parent.labelfont \
+         gaia::LabelFontChooser $parent.labelfont \
             -text "Label font:" \
             -chooser_title "Label font" \
             -labelwidth 10 \
@@ -785,7 +785,7 @@ itcl::class gaia::GaiaStartup {
       pack $itk_component(labelfont) -side top -fill x -expand 0
 
       itk_component add textfont {
-         LabelFontChooser $parent.textfont \
+         gaia::LabelFontChooser $parent.textfont \
             -text "Text font:" \
             -chooser_title "Text font" \
             -chooser_fixed_width 1 \
@@ -819,7 +819,7 @@ itcl::class gaia::GaiaStartup {
       #  Whether to use unicode RA and Dec labels. Sometimes these are not available.
       #  Focus follows mouse
       itk_component add unicoderadec {
-         StarLabelCheck $parent.unicoderadec \
+         gaia::StarLabelCheck $parent.unicoderadec \
             -text "Use unicode RA and Dec symbols:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \

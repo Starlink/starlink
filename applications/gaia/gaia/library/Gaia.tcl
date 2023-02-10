@@ -1117,7 +1117,7 @@ itcl::class gaia::Gaia {
    #  Make an STC-S toolbox.
    public method make_stcs_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaStcs $w_.\#auto \
+         gaia::GaiaStcs $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1133,7 +1133,7 @@ itcl::class gaia::Gaia {
    #  Make a MOS toolbox.
    public method make_moc_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaMOC $w_.\#auto \
+         gaia::GaiaMOC $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1149,7 +1149,7 @@ itcl::class gaia::Gaia {
    #  Make an AST grid toolbox.
    public method make_astgrid_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstGrid $w_.\#auto \
+         gaia::GaiaAstGrid $w_.\#auto \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -1163,7 +1163,7 @@ itcl::class gaia::Gaia {
    #  Make the simple autoastrom toolbox.
    public method make_simpleautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstrom $w_.\#auto \
+         gaia::GaiaAutoAstrom $w_.\#auto \
             -expert 0 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
@@ -1178,7 +1178,7 @@ itcl::class gaia::Gaia {
    #  Make the advanced autoastrom toolbox.
    public method make_advancedautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstrom $w_.\#auto \
+         gaia::GaiaAutoAstrom $w_.\#auto \
             -expert 1 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
@@ -1193,7 +1193,7 @@ itcl::class gaia::Gaia {
    #  Make an AST reference WCS toolbox.
    public method make_astreference_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstReference $w_.\#auto \
+         gaia::GaiaAstReference $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1210,7 +1210,7 @@ itcl::class gaia::Gaia {
    #  Make an AST define WCS toolbox.
    public method make_astdefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDefine $w_.\#auto \
+         gaia::GaiaAstDefine $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1223,7 +1223,7 @@ itcl::class gaia::Gaia {
    #  Make an AST copy WCS toolbox.
    public method make_astcopy_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstCopy $w_.\#auto \
+         gaia::GaiaAstCopy $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1237,7 +1237,7 @@ itcl::class gaia::Gaia {
    #  Make an AST refine WCS toolbox or make it visible.
    public method make_astrefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstRefine $w_.\#auto \
+         gaia::GaiaAstRefine $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1254,7 +1254,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set celestial coordinates system toolbox.
    public method make_astsystem_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstSystem $w_.\#auto \
+         gaia::GaiaAstSystem $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1267,7 +1267,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set secondary coordinates system toolbox.
    public method make_astdomain_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDomain $w_.\#auto \
+         gaia::GaiaAstDomain $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1280,7 +1280,7 @@ itcl::class gaia::Gaia {
    #  Make an AST display all known coordinates readout.
    public method make_astdisplay_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDisplayDomains $w_.\#auto \
+         gaia::GaiaAstDisplayDomains $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1292,7 +1292,7 @@ itcl::class gaia::Gaia {
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPatch $w_.\#auto \
+         gaia::GaiaPatch $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -1338,7 +1338,7 @@ itcl::class gaia::Gaia {
    #  Make a contour toolbox.
    public method make_contour_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaContour $w_.\#auto \
+         gaia::GaiaContour $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1355,7 +1355,7 @@ itcl::class gaia::Gaia {
    #  Make an ESP toolbox.
    public method make_esp_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaEsp $w_.\#auto \
+         gaia::GaiaEsp $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -image $image_ \
@@ -1370,7 +1370,7 @@ itcl::class gaia::Gaia {
    #  Make positions toolbox.
    public method make_positions_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPositions $w_.\#auto \
+         gaia::GaiaPositions $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1420,7 +1420,7 @@ itcl::class gaia::Gaia {
    }
    public method make_xyprofile_ {name cloned rect_id x0 y0 x1 y1} {
       itk_component add $name {
-         GaiaXYProfile $w_.\#auto \
+         gaia::GaiaXYProfile $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
@@ -1472,7 +1472,7 @@ itcl::class gaia::Gaia {
    }
    public method make_xyhistogram_ {name cloned rect_id x0 y0 x1 y1} {
       itk_component add $name {
-         GaiaXYHistogram $w_.\#auto \
+         gaia::GaiaXYHistogram $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
@@ -1486,7 +1486,7 @@ itcl::class gaia::Gaia {
    #  Make polarimetry toolbox.
    public method make_polarimetry_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPolarimetry $w_.\#auto \
+         gaia::GaiaPolarimetry $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
@@ -1508,7 +1508,7 @@ itcl::class gaia::Gaia {
    #  Create the mask image toolbox.
    public method make_mask_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaMask $w_.\#auto \
+         gaia::GaiaMask $w_.\#auto \
             -gaia $w_ \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -1520,7 +1520,7 @@ itcl::class gaia::Gaia {
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaDemo $w_.\#auto \
+         gaia::GaiaDemo $w_.\#auto \
             -gaiamain $w_ \
             -rtdimage [$image_ get_image] \
             -gaiactrl $image_ \
@@ -1536,7 +1536,7 @@ itcl::class gaia::Gaia {
    #  Create the startup options toolbox.
    public method make_startup_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaStartup $w_.\#auto \
+         gaia::GaiaStartup $w_.\#auto \
             -gaia $w_ \
             -image $image_ \
             -transient $itk_option(-transient_tools) \

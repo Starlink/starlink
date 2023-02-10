@@ -467,7 +467,7 @@ itcl::class gaiavo::GaiaVOCats {
       }
 
       itk_component add results$current_ {
-         GaiaQueryResult $site.results \
+         gaia::GaiaQueryResult $site.results \
             -astrocat [code $w_.cat$current_] \
             -title "Query Results" \
             -hscroll 1 \

@@ -230,7 +230,7 @@ itcl::class gaia::GaiaAstReference {
       #  adds to the edit menu and the markers menu which controls
       #  the apperance of the graphics markers.
       itk_component add table {
-         GaiaAstTable $w_.table \
+         gaia::GaiaAstTable $w_.table \
 		 -editmenu $Edit \
 		 -markmenu $Markers \
 		 -rtdimage $itk_option(-rtdimage) \

@@ -283,7 +283,7 @@ itcl::class gaia::GaiaPhotomList {
    #  Create a new GaiaPhotomObject with all the current
    #  configurations and an arbitrary name.
    public method new_object {index} {
-      set object [GaiaPhotomObject \#auto \
+      set object [gaia::GaiaPhotomObject \#auto \
                      -index $index \
                      -major $semimajor \
                      -eccen $eccentricity \
