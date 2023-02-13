@@ -1589,14 +1589,19 @@ int *status            /* global status (given and returned) */
 /*   Get network data structure for this machine */
 
          hostentptr = gethostbyname ( "localhost" );
-         hostentstruct = *hostentptr;
 
 /*   Construct the data structure for the connection request to the given
      port number on THIS machine */
 
          memset ( &connect_addr, 0, sizeof(connect_addr) );
          connect_addr.sin_family = AF_INET;
-         connect_addr.sin_addr = *((struct in_addr *) hostentstruct.h_addr);
+         if (hostentptr) {
+            hostentstruct = *hostentptr;
+            connect_addr.sin_addr = *((struct in_addr *) hostentstruct.h_addr);
+         }
+         else {
+            connect_addr.sin_addr.s_addr = htonl ( INADDR_LOOPBACK );
+         }
          connect_addr.sin_port = htons ( taskport );
 
          mysockets[j] = socket ( AF_INET, SOCK_STREAM, 0 );
