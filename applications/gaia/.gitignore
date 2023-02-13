@@ -9,7 +9,7 @@ gaiavo_tcl
 #  Want this directory to be checked.
 !gaia.htx
 
-/demodata.tar
+/demodata.tar.gz
 /gaia/gaia_tcl
 /gaia/gaia_wish
 /gaia/library/tclIndex

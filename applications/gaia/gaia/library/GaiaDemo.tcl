@@ -234,9 +234,9 @@ itcl::class gaia::GaiaDemo {
       #  Check for demo data. This such be stored in a tar file in
       #  the main gaia_dir directory.
       global gaia_dir
-      if { ! [file exists $gaia_dir/demodata.tar] } {
+      if { ! [file exists $gaia_dir/demodata.tar.gz] } {
          error_dialog {Failed to locate demonstration files \
-                       in $GAIA_DIR/demodata.tar. Cannot continue\
+                       in $GAIA_DIR/demodata.tar.gz. Cannot continue\
                        with demonstration.}
          after 0 "destroy $w_"
          return
@@ -255,11 +255,11 @@ itcl::class gaia::GaiaDemo {
          } else {
 
             #  OK, untar data files.
-            set tar_out "tar xf"
+            set tar_out "tar -zxf"
             if { [info exists env(TAR_OUT)] } {
                set tar_out $env(TAR_OUT)
             }
-            eval exec $tar_out $gaia_dir/demodata.tar
+            eval exec $tar_out $gaia_dir/demodata.tar.gz
          }
       }
       wm deiconify $w_

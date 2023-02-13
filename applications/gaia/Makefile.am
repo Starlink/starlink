@@ -23,11 +23,11 @@ EXTRA_DIST = teagaia gaia gaia3d gaiavo gaia.news sun214fig.ps gaia.htx
 
 ##  Additional files. These have traditionally gone into bindir.
 gaiasupportdir = $(bindir)
-dist_gaiasupport_DATA = demodata.tar
+dist_gaiasupport_DATA = demodata.tar.gz
 
-##  demodata.tar depends on demodata
-demodata.tar:
-	cd demodata && tar cvf ../demodata.tar *
+##  demodata.tar.gz depends on demodata
+demodata.tar.gz:
+	cd demodata && tar -cvzf ../demodata.tar.gz *
 
 ##  Before distributing subdirectories we need to clean then up (we get all
 ##  the files in these directories). Also remove the CVS trace and any
