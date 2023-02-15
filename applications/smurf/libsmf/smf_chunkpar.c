@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     result = smf_chunkpar( smfData *data, const char *par, const char *label,
-*                            AstKeyMap *keymap, int contchunk, int *status )
+*                            AstKeyMap *keymap, dim_t contchunk, int *status )
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -26,7 +26,7 @@
 *        messages (e.g. "weight" "scale factor", etc).
 *     keymap = AstKeyMap * (Given)
 *        The KeyMap holding the configuration parameters.
-*     contchunk = int (Given)
+*     contchunk = dim_t (Given)
 *        The zero-based index of the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -91,7 +91,7 @@
 #define MAXCHUNKS 200
 
 double smf_chunkpar( smfData *data, const char *par, const char *label,
-                     AstKeyMap *keymap, int contchunk, int *status ){
+                     AstKeyMap *keymap, dim_t contchunk, int *status ){
 
 /* Local Variables: */
    const char *cval = NULL;
@@ -112,14 +112,14 @@ double smf_chunkpar( smfData *data, const char *par, const char *label,
 
 /* Get the required element value, using the last element if the vector
    is too short. */
-      if( contchunk < nval ) {
+      if( contchunk < (dim_t) nval ) {
          result = values[ contchunk ];
       } else {
          result = values[ nval - 1 ];
       }
       msgOutiff( MSG__VERB, "", "Using a %s of %g for chunk %d "
                  "specified by config parameter %s", status, label,
-                 result, contchunk, par );
+                 result, (int) contchunk, par );
 
 /* If the named parameter is not a vector of numerical values,
    annull the error and try to access it first as a text string. */
@@ -169,7 +169,7 @@ double smf_chunkpar( smfData *data, const char *par, const char *label,
 /* Tell the user what value we are using. */
       msgOutiff( MSG__VERB, "", "Using a %s of %g for chunk %d read from "
                  "FITS header expression '%s'", status, label, result,
-                 contchunk, cval );
+                 (int) contchunk, cval );
    }
 
    return result;

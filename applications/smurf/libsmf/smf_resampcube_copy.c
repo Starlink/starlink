@@ -14,14 +14,14 @@
 *     C function
 
 *  Invocation:
-*     void smf_resampcube_copy( dim_t nchan, int *spectab,
+*     void smf_resampcube_copy( dim_t nchan, dim_t *spectab,
 *                               dim_t iv0, dim_t nxy, float *ddata,
 *                               float *in_data, int *status );
 
 *  Arguments:
 *     nchan = dim_t (Given)
 *        Number of spectral channels in the template time series cube.
-*     spectab = int * (Given)
+*     spectab = dim_t * (Given)
 *        This array should have "nchan" elements, and each element should
 *        hold the integer index (zero-based) of the nearest neighbouring
 *        sky cube channel. A value of -1 should flag time series channels
@@ -88,13 +88,13 @@
 
 #define FUNC_NAME "smf_resampcube_copy"
 
-void smf_resampcube_copy( dim_t nchan, int *spectab,
+void smf_resampcube_copy( dim_t nchan, dim_t *spectab,
                           dim_t iv0, dim_t nxy, float *ddata,
                           float *in_data, int *status ){
 
 /* Local Variables */
    dim_t iv;                   /* Vector index into sky cube 3D array */
-   int ichan;                  /* Index of current channel */
+   dim_t ichan;                /* Index of current channel */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;

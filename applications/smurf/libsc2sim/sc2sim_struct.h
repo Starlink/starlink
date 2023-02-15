@@ -94,7 +94,7 @@
  *     2007-09-06 (AGG):
  *        Redefine heatnum as an int.
  *     2007-10-31 (TIMJ):
- *        Use size_t following sc2store changes.
+ *        Use dim_t following sc2store changes.
  *     2008-03-19 (AGG):
  *        Add obstype.
  *     2008-04-24 (AGG):
@@ -136,6 +136,7 @@
 #define SC2SIM_STRUCT_DEFINED
 
 #include "smurf_par.h"
+#include "smurf_typ.h"
 
 struct bolpix             /* pixel location of bolometer */
        {
@@ -197,15 +198,15 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				    (units: number of detectors) */
   double mspat_y[SC2SIM__MXMSTP]; /* microstep pattern offsets in y
 				    (units: number of decectors) */
-  size_t colsize;             /* number of bolometers in column */
-  size_t rowsize;             /* number of bolometers in row */
+  dim_t colsize;             /* number of bolometers in column */
+  dim_t rowsize;             /* number of bolometers in row */
   int nfocstep;               /* Number of focus positions */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */
   double nmaps;               /* Number of times to repeat pattern */
   int nmicstep;               /* number of microsteps */
   int numsamples;             /* number of samples in STARE */
-  size_t nvert;               /* Nr of vertices in the Jiggle pattern */
+  dim_t nvert;               /* Nr of vertices in the Jiggle pattern */
   char obsmode[SZFITSTR];     /* Observation mode (DREAM, STARE, PONG etc) */
   char externobs[SC2SIM__FLEN];/* filename of an external SCUBA2 observation used to generate a scan pattern */
   char obstype[SZFITSTR];     /* Observation type (POINT, FOCUS or SCIENCE) */

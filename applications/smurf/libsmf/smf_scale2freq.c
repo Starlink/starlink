@@ -119,13 +119,11 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
 
 /* Ohterwise convert the supplied values. */
       } else {
-         double scale = 0.0;
          msgOutiff( MSG__VERB, "", "smf_scale2freq: Based on a slew "
                     "speed of %.1lf arcsec/sec, setting:", status,
                     hdr->scanvel );
 
          if( f_edgesmall > 0.0 ) {
-            scale = f_edgesmall;
             *f_edgelow = hdr->scanvel / f_edgesmall;
             msgOutiff( MSG__VERB, "", "smf_scale2freq: FILT_EDGELOW = "
                        "%.3lf Hz (> %.1lf arcsec scales)", status, *f_edgelow,
@@ -133,7 +131,6 @@ void smf_scale2freq( double f_edgesmall, double f_edgelarge,
          }
 
          if( f_edgelarge > 0.0 ) {
-            scale = f_edgelarge;
             *f_edgehigh = hdr->scanvel / f_edgelarge;
             msgOutiff( MSG__VERB, "", "smf_scale2freq: FILT_EDGEHIGH = "
                        "%.3lf Hz (< %.1lf arcsec scales)", status, *f_edgehigh,

@@ -70,7 +70,7 @@
 
 #define EXTENSION "AZTEC"
 
-void aztec_fill_smfHead( smfHead * hdr, int indf, int * status ) {
+void aztec_fill_smfHead( smfHead * hdr, int indf __attribute__((unused)), int * status ) {
 
   double * fplanex = NULL; /* X coordinates in radians */
   double * fplaney = NULL; /* Y coordinates in radians */

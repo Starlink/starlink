@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     smf_bolonoise( ThrWorkForce *wf, smfData *data,
-*                    double gfrac, size_t window, double f_low,
+*                    double gfrac, dim_t window, double f_low,
 *                    double f_white1, double f_white2,
-*                    int nep, size_t len, double *whitenoise, double *fratio,
+*                    int nep, dim_t len, double *whitenoise, double *fratio,
 *                    smfData **fftpow, int *status )
 
 *  Arguments:
@@ -30,7 +30,7 @@
 *        this fraction of good values is left with a VAL__BADD value in
 *        "whitemoise". Supply a negative value if you do not want this
 *        check to be performed.
-*     window = size_t (Given)
+*     window = dim_t (Given)
 *        Width of boxcar smooth to apply to power spectrum before measurement
 *     f_low = double (Given)
 *        Frequency (Hz) at which to measure low-frequency power
@@ -41,7 +41,7 @@
 *     nep = int (Given)
 *        If set, calculate whitenoise in 1 second of averaged time-series data
 *        by dividing by the sample rate.
-*     len = size_t (Given)
+*     len = dim_t (Given)
 *        Number of samples over which to apply apodization. Can be set to
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len). Set it to
@@ -163,31 +163,31 @@
 #define FUNC_NAME "smf_bolonoise"
 
 void smf_bolonoise( ThrWorkForce *wf, smfData *data, double gfrac,
-                    size_t window, double f_low,
+                    dim_t window, double f_low,
                     double f_white1, double f_white2,
-                    int nep, size_t len, double *whitenoise, double *fratio,
+                    int nep, dim_t len, double *whitenoise, double *fratio,
                     smfData **fftpow,int *status ) {
 
   double *base=NULL;       /* Pointer to base coordinates of array */
-  size_t bstride;          /* bolometer index stride */
+  dim_t bstride;          /* bolometer index stride */
   double df=1;             /* Frequency step size in Hz */
-  size_t i;                /* Loop counter */
-  size_t i_low;            /* Index in power spectrum to f_low */
-  size_t i_w1;             /* Index in power spectrum to f_white1 */
-  size_t i_w2;             /* Index in power spectrum to f_white2 */
-  size_t j;                /* Loop counter */
-  size_t mingood;          /* Min. required no. of good values in bolometer */
+  dim_t i;                /* Loop counter */
+  dim_t i_low;            /* Index in power spectrum to f_low */
+  dim_t i_w1;             /* Index in power spectrum to f_white1 */
+  dim_t i_w2;             /* Index in power spectrum to f_white2 */
+  dim_t j;                /* Loop counter */
+  dim_t mingood;          /* Min. required no. of good values in bolometer */
   dim_t nbolo;             /* Number of bolometers */
   dim_t ndata;             /* Number of data points */
   dim_t nf=0;              /* Number of frequencies */
-  size_t ngood;            /* Number of good samples */
+  dim_t ngood;            /* Number of good samples */
   dim_t ntslice;           /* Number of time slices */
   double p_low;            /* Power at f_low */
   double p_white;          /* Average power from f_white1 to f_white2 */
   smfData *pow=NULL;       /* Pointer to power spectrum data */
   smf_qual_t *qua=NULL; /* Pointer to quality component */
   double steptime=1;       /* Length of a sample in seconds */
-  size_t tstride;          /* time index stride */
+  dim_t tstride;          /* time index stride */
 
   if (*status != SAI__OK) return;
 

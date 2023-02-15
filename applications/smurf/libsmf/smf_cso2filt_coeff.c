@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_cso2filt_coeff( const smfHead *hdr, AstKeyMap *extpars,
-*                         size_t nvals, double coeffs[3], size_t *ncoeff, int * status );
+*                         dim_t nvals, double coeffs[3], dim_t *ncoeff, int * status );
 
 *  Arguments:
 *     hdr = const smfHead* (Given)
@@ -24,11 +24,11 @@
 *        the tau (on the CSO scale) to the current filter. Must
 *        contain the "taurelation" key which itself will be a keymap
 *        containing the parameters for the specific filter.
-*     nvals = size_t (Given)
+*     nvals = dim_t (Given)
 *        Number of elements in coeff[] array.
 *     coeff = double [3] (Given & Returned)
 *        Array to receive coefficients. Should be sized to at least 3 elements.
-*     ncoeff = size_t * (Returned)
+*     ncoeff = dim_t * (Returned)
 *        Number of coefficients stored in coeff[] array.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -93,10 +93,10 @@
 #include "smf.h"
 
 static const double default_coeffs[] = {1.0, 0.0, 0.0};
-static const size_t n_default_coeffs = sizeof(default_coeffs) / sizeof(*default_coeffs);
+static const dim_t n_default_coeffs = sizeof(default_coeffs) / sizeof(*default_coeffs);
 
 void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
-                         size_t nvals, double coeffs[], size_t *ncoeff, int *status) {
+                         dim_t nvals, double coeffs[], dim_t *ncoeff, int *status) {
   char filter[81];         /* somewhere for the filter name */
   AstKeyMap * taumap = NULL; /* tau relation keymap */
 
@@ -116,7 +116,7 @@ void smf_cso2filt_coeff( const smfHead *hdr,  AstKeyMap * extpars,
 
 
   /* Now look for the filter */
-  ast_nvals = nvals;
+  ast_nvals = (int) nvals;
   if (astMapGet1D( taumap, filter, ast_nvals, &ast_ncoeff, coeffs )) {
     *ncoeff = ast_ncoeff;
 

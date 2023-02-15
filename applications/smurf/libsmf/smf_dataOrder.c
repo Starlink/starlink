@@ -157,17 +157,17 @@ int smf_dataOrder( ThrWorkForce *wf, smfData *data, int isTordered,
                    int *status ) {
 
   /* Local Variables */
-  size_t bstr1;                 /* bolometer index stride input */
-  size_t bstr2;                 /* bolometer index stride output */
+  dim_t bstr1;                  /* bolometer index stride input */
+  dim_t bstr2;                  /* bolometer index stride output */
   dim_t i;                      /* loop counter */
   int inPlace=0;                /* If set change array in-place */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t newdims[3];             /* Size of each dimension new buffer */
-  int newlbnd[3];               /* New pixel origin */
+  dim_t newlbnd[3];             /* New pixel origin */
   dim_t ntslice;                /* Number of time slices */
-  size_t tstr1;                 /* time index stride input */
-  size_t tstr2;                 /* time index stride output */
+  dim_t tstr1;                  /* time index stride input */
+  dim_t tstr2;                  /* time index stride output */
   int waschanged = 0;           /* did we chagne the order? */
   int writable;                 /* Is the NDF writable? */
   int freeold;                  /* Free the old array if change is not in place? */

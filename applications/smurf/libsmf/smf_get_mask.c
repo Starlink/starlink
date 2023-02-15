@@ -226,6 +226,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    const char *pref;          /* The "refparam" value to use */
    const char *skyrefis;      /* Pointer to SkyRefIs attribute value */
    dim_t i;                   /* Pixel index */
+   dim_t lbnd_grid[ 2 ];      /* Lower bounds of map in GRID coords */
+   dim_t ngood;               /* Number good samples for stats */
+   dim_t ubnd_grid[ 2 ];      /* Upper bounds of map in GRID coords */
    double *mapuse;            /* Map to use for SNR mask */
    double *mapuset;           /* Intermediate map */
    double *pd;                /* Pointer to next element of map data */
@@ -251,22 +254,19 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
    int isstatic;              /* Are all used masks static? */
-   int lbnd_grid[ 2 ];        /* Lower bounds of map in GRID coords */
    int mask_types[ NTYPE ];   /* Identifier for the types of mask to use */
    int munion;                /* Use union of supplied masks */
-   int nel;                   /* Number of mapped NDF pixels */
    int nmask;                 /* The number of masks to be combined */
    int nsource;               /* No. of source pixels in final mask */
    int skip;                  /* No. of iters for which AST is not subtracted */
    int thresh;                /* Absolute threshold on hits */
-   int ubnd_grid[ 2 ];        /* Upper bounds of map in GRID coords */
    int zero_accum;            /* Accumulate source pixels? */
    int zero_c_n;              /* Number of zero circle parameters read */
    int zero_mask;             /* Use the reference NDF as a mask? */
    int zero_notlast;          /* Don't zero on last iteration? */
    int zero_snr_ffclean;      /* Define mask using ffclean algorithm? */
    int zero_snr_lopass;       /* Size of box for low-pass smoothing SNR map */
-   size_t ngood;              /* Number good samples for stats */
+   size_t nel;                /* Number of mapped NDF pixels */
    unsigned char **mask;      /* Address of model's mask pointer */
    unsigned char *accmask;    /* Mask to be accumulated into the new mask */
    unsigned char *newmask;    /* Individual mask work space */
@@ -597,9 +597,9 @@ unsigned char *smf_get_mask( ThrWorkForce *wf, smf_modeltype mtype,
 
 /* Get the mapping from the sky frame (current) to the grid frame (base),
    and then set the mask to 1 for all of the values outside this circle */
-                     astMaskUB( circle, astGetMapping( dat->outfset, AST__CURRENT,
+                     astMask8UB( circle, astGetMapping( dat->outfset, AST__CURRENT,
                                                        AST__BASE ),
-                                0, 2, lbnd_grid, ubnd_grid, newmask, 1 );
+                                 0, 2, lbnd_grid, ubnd_grid, newmask, 1 );
 
 /* Report masking info. */
                      if( zero_niter == 0.0 ) {

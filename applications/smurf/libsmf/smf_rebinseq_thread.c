@@ -90,23 +90,25 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* And finally call astRebinSeqF or astRebinSeqD to paste the input data
    into the output array. */
+   #pragma GCC diagnostic ignored "-Wcast-qual"
    if( data->is_double ) {
-      astRebinSeqD( data->this, data->wlim, data->ndim_in, data->lbnd_in,
-                    data->ubnd_in, (double *)data->in, (double *)data->in_var,
-                    data->spread, data->params, data->flags, data->tol,
-                    data->maxpix, data->badval_d, data->ndim_out,
-                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
-                    (double *) data->out, (double *) data->out_var,
-                    data->weights, &(data->nused) );
+      astRebinSeq8D( data->this, data->wlim, data->ndim_in, data->lbnd_in,
+                     data->ubnd_in, (double *)data->in, (double *)data->in_var,
+                     data->spread, data->params, data->flags, data->tol,
+                     data->maxpix, data->badval_d, data->ndim_out,
+                     data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
+                     (double *) data->out, (double *) data->out_var,
+                     data->weights, &(data->nused) );
    } else {
-      astRebinSeqF( data->this, data->wlim, data->ndim_in, data->lbnd_in,
-                    data->ubnd_in, (float *)data->in, (float *)data->in_var,
-                    data->spread, data->params, data->flags, data->tol,
-                    data->maxpix, data->badval_f, data->ndim_out,
-                    data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
-                    (float *) data->out, (float *) data->out_var,
-                    data->weights, &(data->nused) );
+      astRebinSeq8F( data->this, data->wlim, data->ndim_in, data->lbnd_in,
+                     data->ubnd_in, (float *)data->in, (float *)data->in_var,
+                     data->spread, data->params, data->flags, data->tol,
+                     data->maxpix, data->badval_f, data->ndim_out,
+                     data->lbnd_out, data->ubnd_out, data->lbnd, data->ubnd,
+                     (float *) data->out, (float *) data->out_var,
+                     data->weights, &(data->nused) );
    }
+   #pragma GCC diagnostic pop
 
 /* Unlock the Mapping so that the parent thread can lock it and then
    annul it. */

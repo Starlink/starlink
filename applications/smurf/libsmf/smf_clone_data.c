@@ -77,7 +77,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-void smf_clone_data ( const smfData *idata, smfData **odata,
+void smf_clone_data ( smfData *idata, smfData **odata,
                       int *status __attribute__((unused)) ) {
 
 

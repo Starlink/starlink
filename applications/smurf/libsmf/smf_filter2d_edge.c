@@ -100,8 +100,8 @@
 void smf_filter2d_edge( smfFilter *filt, double f, int lowpass, int *status ) {
 
   double d;                     /* magnitude spatial frequency */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
+  dim_t j;                     /* Loop counter */
   double x;                     /* x-component spatial frequency */
   double y;                     /* y-component spatial frequency */
 

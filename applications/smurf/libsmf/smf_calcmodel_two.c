@@ -134,20 +134,20 @@ void smf_calcmodel_two( ThrWorkForce *wf __attribute__((unused)),
   /* Local Variables */
   double *a=NULL;               /* pointer to coefficients 1st component */
   double *b=NULL;               /* pointer to coefficients 2nd component */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;               /* bolo stride */
   double *ccomp=NULL;           /* component time series pointer */
   double *ccoeff=NULL;          /* component bolo coeffs pointer */
   double *comp=NULL;            /* component time series pointer */
   double *coeff=NULL;           /* component bolo coeffs pointer */
   double dchisq=0;              /* this - last model residual chi^2 */
-  size_t i;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   dim_t index;                  /* index into data buffer */
   dim_t j;                      /* Loop counter */
-  size_t jt1;
-  size_t jt2;
-  size_t jf1;                   /* Starting tslice that should be fit */
-  size_t jf2;                   /* Final tslice that should be fit */
+  dim_t jt1;
+  dim_t jt2;
+  dim_t jf1;                   /* Starting tslice that should be fit */
+  dim_t jf2;                   /* Final tslice that should be fit */
   dim_t k;                      /* Loop counter */
   AstKeyMap *kmap=NULL;         /* Pointer to PLN-specific keys */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -155,21 +155,19 @@ void smf_calcmodel_two( ThrWorkForce *wf __attribute__((unused)),
   double *model_data_copy=NULL; /* Copy of model_data for one bolo */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
-  size_t ndchisq=0;             /* number of elements contributing to dchisq */
-  size_t nfit;                  /* number of samples over good range to fit */
+  dim_t ndchisq=0;             /* number of elements contributing to dchisq */
   dim_t nmodel=0;               /* Total number of elements in model buffer */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  size_t noibstride;            /* bolo stride for noise */
+  dim_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  size_t noitstride;            /* Time stride for noise */
-  size_t ntot;                  /* total good excluding padding */
+  dim_t noitstride;            /* Time stride for noise */
   dim_t ntslice=0;              /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t tstride;               /* Time slice stride in data array */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -224,7 +222,6 @@ void smf_calcmodel_two( ThrWorkForce *wf __attribute__((unused)),
       jf1 = 0;
       jf2 = ntslice-1;
     }
-    nfit = jf2-jf1+1;
 
     /* Total range using SMF__Q_PAD to avoid causing discontinuities when
        we fit/remove two-component common-mode (i.e. include apodized
@@ -236,7 +233,6 @@ void smf_calcmodel_two( ThrWorkForce *wf __attribute__((unused)),
       jt1 = 0;
       jt2 = ntslice-1;
     }
-    ntot = jt2-jt1+1;
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;

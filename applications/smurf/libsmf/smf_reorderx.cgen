@@ -15,8 +15,8 @@
 *     C function
 
 *  Invocation:
-*     void smf_reorder<X>( CGEN_TYPE *in, int len, int ndim, int *dims_in,
-*                     int axis, int *index, int maxis, int *mask, CGEN_TYPE *out,
+*     void smf_reorder<X>( CGEN_TYPE *in, int len, int ndim, dim_t *dims_in,
+*                     int axis, dim_t *index, int maxis, dim_t *mask, CGEN_TYPE *out,
 *                     int *status );
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *        arrays. Note, this argument should only be used for type <C>
 *     ndim = int (Given)
 *        Number of array axes in "in" and "out".
-*     dims_in = int * (Given)
+*     dims_in = dim_t * (Given)
 *        Pointer to an array of "ndim" values, each being the length of
 *        the corresponding dimension of the "in" array. The dimensions of
 *        the "out" array should be the same as those of the "in" array,
@@ -38,7 +38,7 @@
 *     axis = int (Given)
 *        The zero-based index of the dimension that is to be re-ordered.
 *        Ignored if "index" is NULL.
-*     index = int * (Given)
+*     index = dim_t * (Given)
 *        An array with one element for each input pixel on the dimension that
 *        is being re-ordered (i.e. it should have "dims_in[axis]" elements).
 *        This array lists the old planes in their sorted order. That is,
@@ -50,7 +50,7 @@
 *        The zero-based index of the dimension that is to be masked. Only
 *        the last axis (if no index is supplied), or last but one axis
 *        (if an axis was supplied) can be masked. Ignored if "mask" is NULL.
-*     mask = int * (Given)
+*     mask = dim_t * (Given)
 *        An array with one element for each input pixel on the dimension that
 *        is being masked (i.e. it should have "dims_in[maxis]" elements). This
 *        array should contain non-zero values for those hyper-rows that
@@ -133,20 +133,21 @@
 #include "mers.h"
 #include "smf.h"
 
-void CGEN_FUNCTION(smf_reorder)( CGEN_TYPE *in, int len, int ndim, int *dims_in, int axis, int *index,
-                   int maxis, int *mask, CGEN_TYPE *out, int *status ){
+void CGEN_FUNCTION(smf_reorder)( CGEN_TYPE *in, int len, int ndim,
+                   dim_t *dims_in, int axis, dim_t *index, int maxis,
+                   dim_t *mask, CGEN_TYPE *out, int *status ){
 
 /* Local Variables */
    CGEN_TYPE *pin;
    CGEN_TYPE *pout;
-   int array_size;
-   int i;
-   int j;
-   int plane_size;
-   int row_size = 0;
+   dim_t i;
+   dim_t j;
+   dim_t plane_nbyte;
+   dim_t plane_size;
+   dim_t row_nbyte = 0;
+   dim_t row_size = 0;
    size_t array_nbyte;
-   size_t plane_nbyte;
-   size_t row_nbyte = 0;
+   size_t array_size;
 
 #ifndef IS_BYTE_TYPE
    /* ensure that we only use len for CHAR type */

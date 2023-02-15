@@ -234,7 +234,7 @@ void smurf_impaztec( int *status ) {
   AstFitsChan *fitschan;       /* FITS headers */
   double *fpar=NULL;           /* flat-field parameters  */
   int framesize=0;             /* # data points per timeslice (nbolos) */
-  size_t framespersecond;      /* frames per second */
+  dim_t framespersecond;      /* frames per second */
   double *full_bolosig=NULL;   /* all bolo signals [NBOLOSxNFRAMES] */
   double ha;                   /* hour angle */
   struct JCMTState *head=NULL; /* header data for each frame  */
@@ -259,7 +259,7 @@ void smurf_impaztec( int *status ) {
   int min;                     /* minute of beginning of observation */
   double *mjuldate=NULL;       /* modified Julian date each sample */
   int month;                   /* month of beginning of observation */
-  size_t nbolos;               /* number of bolometers in netCDF data format */
+  dim_t nbolos;               /* number of bolometers in netCDF data format */
   char ncfile[MAXSTRING];      /* input NetCDF file name */
   int ncid;                    /* id of netCDF file */
   int ncol;                    /* number of bolometers in column  */
@@ -282,7 +282,7 @@ void smurf_impaztec( int *status ) {
   char ra_str[MAXSTRING];      /* string rep. of ra */
   double steptime;             /* sample interval in msec  */
   int sec;                     /* second of beginning of observation */
-  size_t seconds;              /* seconds in observation */
+  dim_t seconds;              /* seconds in observation */
   int starttime;               /* seconds since noon, UT */
   int startframe;               /* frame at which observation starts */
   double telpos[3];            /* Geodetic location of the telescope */
@@ -549,7 +549,7 @@ void smurf_impaztec( int *status ) {
       /* calculate base for planet at each time slice */
 
     } else {
-      size_t len;
+      dim_t len;
       /* need to get tracking centre */
       nc_get_att_text ( ncid, NC_GLOBAL, "source_ra", ra_str );
       nc_get_att_text ( ncid, NC_GLOBAL, "source_dec", dec_str );

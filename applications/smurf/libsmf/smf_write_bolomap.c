@@ -16,7 +16,7 @@
 *     smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 *                        smfArray *qua, smfDIMMData *dat, dim_t msize,
 *                        const Grp *bolrootgrp, int varmapmethod,
-*                        const int *lbnd_out, const int *ubnd_out,
+*                        const dim_t *lbnd_out, const dim_t *ubnd_out,
 *                        AstFrameSet *outfset, const char *root,
 *                        double chunkfactor, int *status ) {
 
@@ -39,9 +39,9 @@
 *     varmapmethod = int (Given)
 *        Method for estimating map variance. If 1 use sample variance,
 *        if 0 propagate noise from time series.
-*     lbnd_out = const int* (Given)
+*     lbnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = const int* (Given)
+*     ubnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping. May be NULL.
@@ -136,24 +136,23 @@
 void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
                         smfArray *qua, smfDIMMData *dat, dim_t msize,
                         const Grp *bolrootgrp, int varmapmethod,
-                        const int *lbnd_out, const int *ubnd_out,
+                        const dim_t *lbnd_out, const dim_t *ubnd_out,
                         AstFrameSet *outfset, const char *root,
                         double chunkfactor, int *status ) {
 
-  int addtomap=0;               /* Set if adding to existing map */
-  size_t bstride;               /* Bolometer stride */
+  char *pname=NULL;             /* Poiner to name */
+  char name[GRP__SZNAM+1];      /* Buffer for storing names */
+  dim_t bstride;                /* Bolometer stride */
+  dim_t dsize;                  /* Size of data arrays in containers */
+  dim_t idx=0;                  /* index within subgroup */
+  dim_t k;                      /* loop counter */
+  dim_t nbolo;                  /* Number of bolometers */
+  dim_t nbolomaps = 0;          /* Number of bolomaps written */
   double *curmap=NULL;          /* Pointer to current map being rebinned */
   double *curvar=NULL;          /* Pointer to variance associate with curmap */
-  dim_t dsize;                  /* Size of data arrays in containers */
-  size_t idx=0;                 /* index within subgroup */
-  size_t k;                     /* loop counter */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  char name[GRP__SZNAM+1];      /* Buffer for storing names */
-  dim_t nbolo;                  /* Number of bolometers */
-  size_t nbolomaps = 0;         /* Number of bolomaps written */
-  char *pname=NULL;             /* Poiner to name */
+  int addtomap=0;               /* Set if adding to existing map */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
-  double *res_data=NULL;        /* Pointer to DATA component of res */
 
   if( *status != SAI__OK ) return;
 
@@ -181,7 +180,6 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
     int *bhitsmap = NULL;
 
     /* Pointers to everything we need */
-    res_data = res->sdata[idx]->pntr[0];
     lut_data = lut->sdata[idx]->pntr[0];
     qua_data = qua->sdata[idx]->pntr[0];
 
@@ -210,8 +208,8 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
           Grp *mgrp=NULL;       /* Temporary group to hold map names */
           smfData *mapdata=NULL;/* smfData for new map */
           char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-          char thisbol[20];     /* name particular to this bolometer */
-          size_t col, row;
+          char thisbol[30];     /* name particular to this bolometer */
+          dim_t col, row;
           char subarray[10];
 
           nbolomaps++;
@@ -236,8 +234,8 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
           smf_find_subarray( res->sdata[idx]->hdr, subarray, sizeof(subarray),
                              NULL, status );
           if (*status == SAI__OK) {
-            size_t len = strlen(subarray);
-            size_t n = 0;
+            dim_t len = strlen(subarray);
+            dim_t n = 0;
             for (n=0; n<len; n++) {
               subarray[n] = toupper(subarray[n]);
             }
@@ -297,7 +295,7 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
           /* If required, add this new map to the existing one */
           if( addtomap ) {
-            size_t i;
+            dim_t i;
             double *oldmap=NULL;
             double *oldvar=NULL;
             double weight;
@@ -335,8 +333,8 @@ void smf_write_bolomap( ThrWorkForce *wf, smfArray *res, smfArray *lut,
 
             fitschan = astFitsChan ( NULL, NULL, " " );
 
-            atlPtfti( fitschan, "COLNUM", col, "bolometer column", status);
-            atlPtfti( fitschan, "ROWNUM", row, "bolometer row", status );
+            atlPtfti( fitschan, "COLNUM", (int) col, "bolometer column", status);
+            atlPtfti( fitschan, "ROWNUM", (int) row, "bolometer row", status );
             atlPtfts( fitschan, "SUBARRAY", subarray, "Subarray identifier",
                       status );
             kpgPtfts( mapdata->file->ndfid, fitschan, status );

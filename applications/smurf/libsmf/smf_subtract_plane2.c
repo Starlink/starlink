@@ -120,47 +120,44 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 			  int *status ) {
 
   /* Local variables */
-  double *azel = NULL;     /* Array of AzEl coordinates */
-  gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
-  size_t base;             /* Starting point for index into arrays */
-  double chisq;            /* Chi-squared from the linear regression fit */
-  smfData *data = NULL;    /* Pointer to current smfData */
-  double dskyaz;           /* Sky power fit - azimuth gradient */
-  double dskyel;           /* Sky power fit - elev gradient */
-  size_t fitmean = 0;      /* Flag to specify if the fit type is mean */
-  size_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
-  size_t fitslope = 0;     /* Flag to specify if the fit is a 1-D elev slope */
-  smfHead *hdr = NULL;     /* Pointer to full header struct */
-  size_t i;                /* Loop counter */
-  double *indata = NULL;   /* Pointer to data array */
-  dim_t index;             /* index into vectorized data array */
-  size_t *indices = NULL;  /* Array of indices for data points within
-			      a given smfData */
-  dim_t ioff;                /* Index into azelmatx array */
-  size_t j;                   /* Loop counter */
-  size_t k;                /* Loop counter over timeslice */
-  size_t kk;               /* Loop counter of number of smfDatas in smfArray */
-  int lbnd[2];             /* Lower bound */
-  gsl_matrix *mcov = NULL; /* Covariance matrix */
-  size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
-  dim_t ndat;              /* Number of related data files in the smfArray */
-  size_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
-  size_t nframes = 0;      /* Number of frames/timeslices */
-  dim_t npts = 0;          /* Total Number of data points */
-  dim_t nptsdat = 0;       /* Number of points per data file */
-  size_t numgood = 0;      /* Number of good values for calculating mean */
-  dim_t offset;            /* Offset into azelmatx array */
-  const char *origsystem = NULL;  /* Character string to store the coordinate
-			      system on entry */
-  gsl_vector *psky = NULL; /* Vector containing sky brightness */
-  double sky;              /* Fitted sky level for current bolometer */
-  double sky0 = 0.0;       /* Sky power fit - intercept */
-  gsl_vector *skyfit = NULL; /* Solution vector */
-  int ubnd[2];             /* Upper bound */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
-  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
+  const char *origsystem = NULL;  /* Character string to store the coordinate on entry */
+  dim_t *indices = NULL;  /* Array of indices for data points within given smfData */
+  dim_t base;             /* Starting point for index into arrays */
+  dim_t fitmean = 0;      /* Flag to specify if the fit type is mean */
+  dim_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
+  dim_t i;                /* Loop counter */
+  dim_t index;            /* index into vectorized data array */
+  dim_t ioff;             /* Index into azelmatx array */
+  dim_t j;                /* Loop counter */
+  dim_t k;                /* Loop counter over timeslice */
+  dim_t kk;               /* Loop counter of number of smfDatas in smfArray */
+  dim_t lbnd[2];          /* Lower bound */
+  dim_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
+  dim_t ndat;             /* Number of related data files in the smfArray */
+  dim_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
+  dim_t nframes = 0;      /* Number of frames/timeslices */
+  dim_t npts = 0;         /* Total Number of data points */
+  dim_t nptsdat = 0;      /* Number of points per data file */
+  dim_t numgood = 0;      /* Number of good values for calculating mean */
+  dim_t offset;           /* Offset into azelmatx array */
+  dim_t ubnd[2];          /* Upper bound */
+  dim_t z;                /* Index counter for 2-d array */
+  double *azel = NULL;    /* Array of AzEl coordinates */
+  double *indata = NULL;  /* Pointer to data array */
+  double chisq;           /* Chi-squared from the linear regression fit */
+  double dskyaz;          /* Sky power fit - azimuth gradient */
+  double dskyel;          /* Sky power fit - elev gradient */
+  double sky0 = 0.0;      /* Sky power fit - intercept */
+  double sky;             /* Fitted sky level for current bolometer */
+  gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
+  gsl_matrix *mcov = NULL;/* Covariance matrix */
   gsl_multifit_linear_workspace *work = NULL; /* Workspace */
-  dim_t z;                 /* Index counter for 2-d array */
+  gsl_vector *psky = NULL;/* Vector containing sky brightness */
+  gsl_vector *skyfit = NULL; /* Solution vector */
+  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
+  smfData *data = NULL;   /* Pointer to current smfData */
+  smfHead *hdr = NULL;    /* Pointer to full header struct */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -172,7 +169,6 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
     ncoeff = 1; /* Not needed :-) */
   } else if ( strncmp( fittype, "SLOP", 4 ) == 0 )  {
     needast = 1;
-    fitslope = 1;
     ncoeff = 2;
   } else  if ( strncmp( fittype, "PLAN", 4 ) == 0 ) {
     needast = 1;
@@ -253,7 +249,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
       *meansky = sky0;
       /* Debugging info */
       if (msgFlevok( MSG__DEBUG, status )) {
-        msgSeti("K",k+1);
+        msgSetk("K",k+1);
         msgSetc("F",fittype);
         msgOutif(MSG__DEBUG," ",
                  " Fit results for timeslice ^K (fit type = ^F)", status );
@@ -268,9 +264,9 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
        fit */
 
     /* First, allocate space for the AzEl array */
-    azel = astMalloc( (2*npts)*sizeof(double) );
+    azel = astMalloc( (2*npts)*sizeof(*azel) );
     /* Bolometer indices */
-    indices = astMalloc( nptsdat*sizeof(size_t) );
+    indices = astMalloc( nptsdat*sizeof(*indices) );
     /* Free resources if status is bad after trying to allocate
        memory */
     if ( *status != SAI__OK ) goto CLEANUP;
@@ -327,7 +323,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
           }
         }
         /* Transform pixels to AzEl frame */
-        astTranGrid( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, nptsdat, azel );
+        astTranGrid8( wcs, 2, lbnd, ubnd, 0.1, 1000000, 1, 2, nptsdat, azel );
         /* Retrieve data array */
         indata = (data->pntr)[0];
         /* Offset into 3d data array */
@@ -394,7 +390,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 
       /* Debugging info */
       if (msgFlevok( MSG__DEBUG, status )) {
-        msgSeti("K",k+1);
+        msgSetk("K",k+1);
         msgSetc("F",fittype);
         msgOutif(MSG__DEBUG," ",
                  " Fit results for timeslice ^K (fit type = ^F)", status );

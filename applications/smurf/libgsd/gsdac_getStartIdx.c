@@ -96,7 +96,6 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   double currentRow;          /* current row map coord */
   double expStartCol;         /* expected start column coord */
   double expStartRow;         /* expected start row coord */
-  int found;                  /* found index? */
   int i;                      /* loop counter */
   int j;                      /* row increment */
   int k;                      /* column increment */
@@ -110,7 +109,6 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  found = 0;
   i = 1;
 
   if ( strcmp ( samMode, "grid" ) == 0 ) {
@@ -193,7 +191,6 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
         if ( currentCol == startRow && currentRow == startCol ) {
           j = nRows;
           k = nCols;
-          found = 1;
           *startIdx = i;
         }
 

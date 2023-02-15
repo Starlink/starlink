@@ -85,26 +85,26 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
    AstMapping *bolo2map = NULL;  /* Combined mapping bolo->map coordinates */
    AstMapping *sky2map = NULL;   /* Mapping from celestial->map coordinates */
    AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
-   dim_t nbol;                   /* # of bolometers in the sub-array */
-   double *boldata = NULL;       /* Pointer to bolometer data */
-   double *map;                  /* Pointer to output data array */
-   double *bolovar;              /* Pointer to bolometer variance array */
-   fts2Port fts_port;            /* FTS-2 port */
    const double *params;         /* Pointer to array of spreading params */
+   dim_t *nused;                 /* Point to count of i/p samples used */
+   dim_t *udim;                  /* Output array upper GRID bounds */
+   dim_t islice;                 /* Time slice index */
+   dim_t lbnd_in[ 2 ];           /* Lower pixel bounds for input maps */
+   dim_t nbol;                   /* # of bolometers in the sub-array */
+   dim_t nslice;                 /* No. of time slices */
+   dim_t ubnd_in[ 2 ];           /* Upper pixel bounds for input maps */
+   double *boldata = NULL;       /* Pointer to bolometer data */
+   double *bolovar;              /* Pointer to bolometer variance array */
+   double *map;                  /* Pointer to output data array */
    double *variance;             /* Pointer to output variance array */
    double *weights;              /* Pointer to output weights array */
-   int islice;                   /* Time slice index */
-   int lbnd_in[ 2 ];             /* Lower pixel bounds for input maps */
+   fts2Port fts_port;            /* FTS-2 port */
    int moving;                   /* Are we tracking a moving source? */
-   int nslice;                   /* No. of time slices */
    int rebinflags;               /* Control the rebinning procedure */
    int spread;                   /* Pixel spreading scheme */
-   int ubnd_in[ 2 ];             /* Upper pixel bounds for input maps */
-   int64_t *nused;               /* Point to count of i/p samples used */
-   int *udim;                    /* Output array upper GRID bounds */
    smfData *data;                /* Smurf data description */
    smfRebinMapData *job_data;    /* Pointer to data structure */
-   static int ldim[ 2 ] = {1,1}; /* Output array lower GRID bounds */
+   static dim_t ldim[ 2 ] = {1,1}; /* Output array lower GRID bounds */
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -162,10 +162,10 @@ void smf_rebinslices( void *job_data_ptr, int *status ){
       if (*status == SAI__OK && !bolo2map) continue;
 
 /* Rebin this time slice */
-      astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, boldata,
-                    bolovar, spread, params, rebinflags, 0.1, 1000000,
-                    VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
-                    map, variance, weights, nused );
+      astRebinSeq8D( bolo2map, 0.0, 2, lbnd_in, ubnd_in, boldata,
+                     bolovar, spread, params, rebinflags, 0.1, 1000000,
+                     VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
+                     map, variance, weights, nused );
 
 /* Free AST objects created in this loop. */
       bolo2map = astAnnul( bolo2map );

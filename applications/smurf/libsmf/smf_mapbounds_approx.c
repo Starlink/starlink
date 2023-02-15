@@ -15,20 +15,20 @@
 
 *  Invocation:
 *     smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
-*                           int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
+*                           dim_t *lbnd_out, dim_t *ubnd_out, AstFrameSet **outframeset,
 *                           int *moving, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
 *        Group of timestream NDF data files to retrieve pointing
-*     index = size_t (Given)
+*     index = int (Given)
 *        Index of the file to use for determining the map extent,
 *        usually 1 to use the first file in the Grp
 *     system = char* (Given)
 *        String indicating the type of projection (e.g. "icrs")
-*     lbnd_out = double* (Returned)
+*     lbnd_out = dim_t * (Returned)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = double* (Returned)
+*     ubnd_out = dim_t (Returned)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outframeset = AstFrameSet** (Returned)
 *        Frameset containing the sky->output map mapping
@@ -158,8 +158,8 @@
 
 #define FUNC_NAME "smf_mapbounds_approx"
 
-void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
-			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset,
+void smf_mapbounds_approx( Grp *igrp,  int index, char *system,
+			   dim_t *lbnd_out, dim_t *ubnd_out, AstFrameSet **outframeset,
 			   int *moving, int *status ) {
 
   /* Local variables */
@@ -170,7 +170,6 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
-  double hghtbox;              /* Map height in arcsec */
   int hghtpix;                 /* RA-Dec map height in pixels */
   int i;                       /* loop counter */
   dim_t k;                     /* Loop counter */
@@ -291,7 +290,6 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
     /* Calculate size of output map in pixels */
     /* Note: this works for the simulator... */
     wdthbox = mapwdth*fabs(cos(mappa)) + maphght*fabs(sin(mappa));
-    hghtbox = maphght*fabs(cos(mappa)) + mapwdth*fabs(sin(mappa));
     wdthpix = (int) ( wdthbox / pixsize);
     hghtpix = (int) ( wdthbox / pixsize);
     dxpix = (int) (mapx / pixsize);
@@ -375,10 +373,10 @@ void smf_mapbounds_approx( Grp *igrp,  size_t index, char *system,
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
       msgOutif( MSG__NORM, " ", " ", status );
-      msgSeti( "XL", lbnd_out[ 0 ] );
-      msgSeti( "YL", lbnd_out[ 1 ] );
-      msgSeti( "XU", ubnd_out[ 0 ] );
-      msgSeti( "YU", ubnd_out[ 1 ] );
+      msgSetk( "XL", lbnd_out[ 0 ] );
+      msgSetk( "YL", lbnd_out[ 1 ] );
+      msgSetk( "XU", ubnd_out[ 0 ] );
+      msgSetk( "YU", ubnd_out[ 1 ] );
       msgOutif( MSG__NORM, " ", "   Output map pixel bounds: ( ^XL:^XU, ^YL:^YU )",
                 status );
    }

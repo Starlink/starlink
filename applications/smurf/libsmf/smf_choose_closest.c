@@ -14,17 +14,17 @@
 
 *  Invocation:
 *     void smf_choose_closest( const smfArray *alldata, const smfData *indata,
-*                            size_t *previdx, size_t *nextidx, int * status );
+*                            dim_t *previdx, dim_t *nextidx, int * status );
 
 *  Arguments:
 *     alldata = const smfArray* (Given)
 *        Set of observations to search.
 *     indata = const smfData * (Given)
 *        Reference science observation.
-*     previdx = size_t * (Returned)
+*     previdx = dim_t * (Returned)
 *        Index in smfArray for the closest previous dataset. SMF__BADIDX if none
 *        can be found.
-*     nextidx = size_t * (Returned)
+*     nextidx = dim_t * (Returned)
 *        Index in smfArray for the closest following dataset.
 *        SMF__BADIDX if none can be found.
 *     status = int* (Given and Returned)
@@ -90,15 +90,15 @@
 #include "libsmf/smf.h"
 
 typedef struct {
-  size_t index;
+  dim_t index;
   double diff;
 } smf_timediff;
 
 #define FUNC_NAME "smf_choose_closest"
 
 void smf_choose_closest( const smfArray *alldata, const smfData *indata,
-                       size_t *previdx, size_t *nextidx, int * status ) {
-  size_t i;          /* loop counter */
+                       dim_t *previdx, dim_t *nextidx, int * status ) {
+  dim_t i;          /* loop counter */
   double reftime;    /* MJD of input science data */
   sc2ast_subarray_t refsubnum; /* Subarray number of science data */
 

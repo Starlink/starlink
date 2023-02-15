@@ -125,14 +125,9 @@ void smurf_nanten2acsis( int *status ) {
   /* Local variables */
   char directory[MAXNAME];        /* directory to write the file */
 
-
-  size_t nBeam = NBEAM;           /* Number of beams in receiver array */
-  size_t numRows = 0;
-  size_t numChans = 0;
-
   size_t nfiles = 0;
 
-  size_t i;
+  dim_t i;
   Grp *grp = NULL;
   Grp *grp2 = NULL;
   size_t ifile = 0;
@@ -185,7 +180,7 @@ void smurf_nanten2acsis( int *status ) {
     //    SupercamSpecHdr * hdr = NULL;  /* Per spectrum header information */
 
     char ** recepnames = NULL; /* All the receptor names for this observation */
-    size_t nrecep = 0;             /* Number of active receptors */
+    dim_t nrecep = 0;             /* Number of active receptors */
     AstKeyMap * detectors = NULL;
     long nRows = 0;
     long nChans = 0;          /* Number of channels from this file */
@@ -275,8 +270,10 @@ void smurf_nanten2acsis( int *status ) {
 
       detectors = astKeyMap( "SortBy=KeyUp,KeyCase=0" );
 
+      #pragma GCC diagnostic ignored "-Wcast-qual"
       CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char*)"TELESCOP", &colnum, &fitsStatus),
                    "Error getting number of TELESCOP column" );
+      #pragma GCC diagnostic pop
 
       for (rownum=1; rownum<=nRows; rownum++) {
         char telname[12];
@@ -302,10 +299,10 @@ void smurf_nanten2acsis( int *status ) {
 
       for (i=0; i<nrecep; i++) {
         const char * key = NULL;
-        const size_t buflen = 9;
+        const dim_t buflen = 9;
         fplanex[0] = 0.0;
         fplaney[0] = 0.0;
-        key = astMapKey( detectors, i );
+        key = astMapKey( detectors, (int) i );
         printf("Key %d = %s\n", (int)i, key);
         /* we know that these will be NANTEN2-xxx */
         recepnames[i] = astCalloc( buflen, sizeof(*recepnames) );
@@ -313,7 +310,7 @@ void smurf_nanten2acsis( int *status ) {
 
         /* Set the VALUE in the hash to be the index number
            so we can remember it */
-        astMapPut0I( detectors, key, i, "" );
+        astMapPut0I( detectors, key, (int) i, "" );
         //        printf("Storing %d in slot %s [%s]\n", (int)i, key, recepnames[i] );
 
       }
@@ -349,12 +346,13 @@ void smurf_nanten2acsis( int *status ) {
       AstFrameSet * wcsframe = NULL;
       float * specdata = NULL;
       int typecode = 0;
-      size_t obsnum = 0;                 /* Current observation number */
       double cdelt2;
       double cdelt3;
 
+      #pragma GCC diagnostic ignored "-Wcast-qual"
       CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char*)"SPECTRUM", &colnum, &fitsStatus ),
                    "Error getting SPECTRUM column number");
+      #pragma GCC diagnostic pop
       CALLCFITSIO( fits_get_coltype(fits, colnum, &typecode, &nChans, &dummy, &fitsStatus ),
                    "Error getting SPECTRUM column information" );
 

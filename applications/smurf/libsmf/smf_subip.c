@@ -216,8 +216,8 @@ typedef struct smfSubIPData {
    int *lut_data;
    int ipmodel;
    int oper;
-   size_t bstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t tstride;
    smfData *data;
    smf_qual_t *qua_data;
 } SmfSubIPData;
@@ -253,9 +253,9 @@ void smf_subip(  ThrWorkForce *wf, smfDIMMData *dat, AstKeyMap *keymap,
    int nw;
    int polref;
    int windblind;
-   size_t bstride;
-   size_t idx;
-   size_t tstride;
+   dim_t bstride;
+   dim_t idx;
+   dim_t tstride;
    smfArray *lut;
    smfArray *res;
    smfData *data = NULL;
@@ -672,8 +672,8 @@ static void smf1_subip( void *job_data_ptr, int *status ) {
    double utr;
    int *pl;
    int bad;
-   size_t bstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t tstride;
    smfData *data;
    smf_qual_t *pq;
 
@@ -954,9 +954,9 @@ static double *smf1_calcang( ThrWorkForce *wf, smfData *data, const char *trsys,
    int iw;
    int nw;
    int subsysnum;
-   size_t tstep;
-   size_t bstride;
-   size_t tstride;
+   dim_t tstep;
+   dim_t bstride;
+   dim_t tstride;
 
 /* Check the inherited status. Also return NULL if the Q/U values are
    already referenced to the focal plane Y axis (i.e. all returned angles

@@ -76,14 +76,14 @@
 void smf_startup( smfData *data, dim_t startup, int *status ){
 
 /* Local Variables */
+   dim_t bstride;              /* Vector stride between bolometer samples */
    dim_t ibolo;                /* Index of bolometer */
    dim_t itime;                /* Index of time-slice */
    dim_t nbolo;                /* Number of bolometers */
    dim_t ntime;                /* Number of time-slices */
-   size_t bstride;             /* Vector stride between bolometer samples */
-   size_t t_first;             /* First non-padding time slice index */
-   size_t t_last;              /* Last time slice index to flag */
-   size_t tstride;             /* Vector stride between time samples */
+   dim_t t_first;              /* First non-padding time slice index */
+   dim_t t_last;               /* Last time slice index to flag */
+   dim_t tstride;              /* Vector stride between time samples */
    smf_qual_t *pqua0;          /* Pointer to quality for first bolo sample */
    smf_qual_t *pqua;           /* Pointer to quality for time slice */
    smf_qual_t *qua = NULL;     /* Pointer to quality flags */

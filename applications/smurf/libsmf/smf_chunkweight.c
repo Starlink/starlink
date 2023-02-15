@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     result = smf_chunkweight( smfData *data, AstKeyMap *keymap,
-*                               int contchunk, int *status )
+*                               dim_t contchunk, int *status )
 
 *  Arguments:
 *     data = smfData * (Given)
 *        The smfData holding the current chunk.
 *     keymap = AstKeyMap * (Given)
 *        The KeyMap holding the configuration parameters.
-*     contchunk = int (Given)
+*     contchunk = dim_t (Given)
 *        The zero-based index of the current chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -87,7 +87,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-double smf_chunkweight( smfData *data, AstKeyMap *keymap, int contchunk,
+double smf_chunkweight( smfData *data, AstKeyMap *keymap, dim_t contchunk,
                         int *status ){
 
 /* Local Variables: */

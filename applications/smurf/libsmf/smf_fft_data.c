@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_fft_data( ThrWorkForce *wf, const smfData *indata,
-*                          smfData *outdata, int inverse, size_t len,
+*     pntr = smf_fft_data( ThrWorkForce *wf, smfData *indata,
+*                          smfData *outdata, int inverse, dim_t len,
 *                          int *status );
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *        case, return value is a pointer to the transformed data.
 *     inverse = int (Given)
 *        If set perform inverse transformation. Otherwise forward.
-*     len = size_t (Given)
+*     len = dim_t (Given)
 *        Number of samples over which to apply apodization. Can be set to
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len). Set it to
@@ -184,14 +184,14 @@ pthread_mutex_t smf_fft_data_mutex = PTHREAD_MUTEX_INITIALIZER;
    exclusive parts of data and retdata so we don't need to make
    local copies of entire smfDatas. */
 typedef struct smfFFTData {
-  size_t b1;                    /* Index of first bolometer to be FFT'd */
-  size_t b2;                    /* Index of last bolometer to be FFT'd */
+  dim_t b1;                     /* Index of first bolometer to be FFT'd */
+  dim_t b2;                     /* Index of last bolometer to be FFT'd */
   smfData *data;                /* Pointer to input data */
   int ijob;                     /* Job identifier */
   int inverse;                  /* Set if this is inverse transformation */
   dim_t nbolo;                  /* Number of detectors  */
   dim_t fdims[2];               /* Lengths of frequency axes */
-  size_t ndims;                 /* Number of real space dimensions */
+  int ndims;                    /* Number of real space dimensions */
   dim_t rdims[2];               /* Lengths of real-space axes */
   fftw_plan plan;               /* FFTW plan */
   smfData *retdata;             /* Pointer to returned FFT'd data */
@@ -315,9 +315,8 @@ void smfFFTDataParallel( void *job_data_ptr, int *status ) {
 
 #define FUNC_NAME "smf_fft_data"
 
-smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
-                       smfData *outdata, int inverse, size_t len,
-                       int *status ) {
+smfData *smf_fft_data( ThrWorkForce *wf, smfData *indata, smfData *outdata,
+                       int inverse, dim_t len, int *status ) {
   double *baseR=NULL;           /* base pointer to real part of fourier data */
   double *baseI=NULL;           /* base pointer to imag part of fourier data */
   double *baseD=NULL;           /* base pointer to real space data */
@@ -327,26 +326,26 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
   dim_t fdims[2];               /* Frequency dimensions */
   dim_t ibolo;                  /* Bolometer counter */
   int i;                        /* Loop counter */
-  size_t inbstr;                /* Bolometer stride in input data */
-  size_t intstr;                /* Time slice stride in input data */
+  dim_t inbstr;                 /* Bolometer stride in input data */
+  dim_t intstr;                 /* Time slice stride in input data */
   int isFFT=0;                  /* Are the input data freq. domain? */
-  size_t j;                     /* Loop counter */
+  dim_t j;                      /* Loop counter */
   smfFFTData *job_data=NULL;    /* Array of job data for each thread */
   dim_t nbolo=0;                /* Number of detectors  */
   dim_t ncols=0;                /* Number of columns */
-  size_t ndims;                 /* Number of real-space dimensions */
-  size_t nf=0;                  /* Number of frequencies in FFT */
+  int ndims;                    /* Number of real-space dimensions */
+  dim_t nf=0;                   /* Number of frequencies in FFT */
   int njobs=0;                  /* Number of jobs to be processed */
   double norm=1.;               /* Normalization factor for the FFT */
-  size_t nr=0;                  /* Number of elements in real space */
-  size_t nretdata=0;            /* Number of data points returned data array */
+  dim_t nr=0;                   /* Number of elements in real space */
+  dim_t nretdata=0;             /* Number of data points returned data array */
   dim_t nrows=0;                /* Number of rows */
   dim_t ntslice=0;              /* Number of time slices */
   int nw;                       /* Number of worker threads */
   smfFFTData *pdata=NULL;       /* Pointer to current job data */
   dim_t rdims[2];               /* real-space dimensions */
   smfData *retdata=NULL;        /* Pointer to new transformed smfData */
-  size_t step;                  /* step size for dividing up work */
+  dim_t step;                   /* step size for dividing up work */
   double *val=NULL;             /* Element of data to be normalized */
 
   if (*status != SAI__OK) return NULL;
@@ -409,14 +408,14 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
   /* Create some quality. We only apodize, pad or fill if we are doing a
      forward FFT of time-series data. */
   if( !inverse && (ndims == 1) ) {
-    const smf_qual_t *inqual = smf_select_cqualpntr( indata, NULL, status );
+    smf_qual_t *inqual = smf_select_qualpntr( indata, NULL, status );
 
     /* we know that "data" does not have a quality component because
        we did a deepcopy without copying it. Ensure that the output has
        quality with bolometer order. */
 
     if (inqual) {
-      data->qual = smf_dataOrder_array( wf, (void *)inqual, SMF__QUALTYPE,
+      data->qual = smf_dataOrder_array( wf, inqual, SMF__QUALTYPE,
                                         SMF__QUALTYPE, nbolo*nr, nr,
                                         nbolo, intstr, inbstr, 1, nr, 0, 0,
                                         status );
@@ -466,7 +465,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
     /* If the caller supplies the output container we check dimensions */
     dim_t o_fdims[2];
     dim_t o_nbolo;
-    size_t o_ndims;
+    int o_ndims;
     dim_t o_rdims[2];
     int o_isfft;
 
@@ -590,19 +589,19 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
        a forward or inverse transform.
     */
 
-    (dims[0]).n = rdims[0];
+    (dims[0]).n = (int) rdims[0];
     (dims[0]).is = 1;
     (dims[0]).os = 1;
 
     for( j=1; j<ndims; j++ ) {
-      (dims[j]).n = rdims[j];
+      (dims[j]).n = (int) rdims[j];
 
       if( inverse ) {
-        (dims[j]).is = fdims[j-1]*(dims[j-1]).is;
-        (dims[j]).os = rdims[j-1]*(dims[j-1]).os;
+        (dims[j]).is = (int)fdims[j-1]*(dims[j-1]).is;
+        (dims[j]).os = (int)rdims[j-1]*(dims[j-1]).os;
       } else {
-        (dims[j]).is = rdims[j-1]*(dims[j-1]).is;
-        (dims[j]).os = fdims[j-1]*(dims[j-1]).os;
+        (dims[j]).is = (int)rdims[j-1]*(dims[j-1]).is;
+        (dims[j]).os = (int)fdims[j-1]*(dims[j-1]).os;
       }
     }
 
@@ -873,7 +872,7 @@ smfData *smf_fft_data( ThrWorkForce *wf, const smfData *indata,
 
     /* Set the FITS keyword */
     if( retdata->hdr && retdata->hdr->fitshdr ) {
-      atlPtfti( retdata->hdr->fitshdr, "ISFFT", retdata->isFFT,
+      atlPtfti( retdata->hdr->fitshdr, "ISFFT", (int)retdata->isFFT,
                 "-1 if real space, 0 if unknown, >0 if FFT", status );
     }
   }

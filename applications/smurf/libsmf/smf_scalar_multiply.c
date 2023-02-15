@@ -80,7 +80,7 @@ smf_scalar_multiply( smfData * data, double dscalar, int * status ) {
   double dvar;              /* Change in variance */
   double *dvpntr = NULL;    /* Pointer to variance */
   dim_t nelem = 0;          /* Number of elements in smfData */
-  size_t i = 0;
+  dim_t i = 0;
 
 
   if (*status != SAI__OK) return;

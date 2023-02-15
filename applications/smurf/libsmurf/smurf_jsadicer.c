@@ -153,7 +153,7 @@ void smurf_jsadicer( int *status ) {
    char text[ 255 ];
    int indf;
    int trim;
-   size_t ntile;
+   int ntile;
    size_t size;
    smfJSATiling tiling;
    smf_jsaproj_t proj;

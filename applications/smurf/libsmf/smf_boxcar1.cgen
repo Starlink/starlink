@@ -13,19 +13,19 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_boxcar1<X>( CGEN_TYPE *series, const size_t ninpts,
-*                          size_t stride, size_t window, smf_qual_t *qual,
+*     void smf_boxcar1<X>( CGEN_TYPE *series, const dim_t ninpts,
+*                          dim_t stride, dim_t window, smf_qual_t *qual,
 *                          smf_qual_t mask, int update, double *var,
 *                          int *status )
 
 *  Arguments:
 *     series = CGEN_TYPE* (Given and Returned)
 *        Pointer to array that will be smoothed
-*     ninpts = const size_t (Given)
+*     ninpts = const dim_t (Given)
 *        Number of points in input series
-*     stride = const size_t (Given)
+*     stride = const dim_t (Given)
 *        Stride between elements in the "series", "qual" and "var" arrays.
-*     window = size_t (Given)
+*     window = dim_t (Given)
 *        Size of boxcar filter window (in array elements)
 *     qual = smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
@@ -65,7 +65,7 @@
 *     2006-05-26 (AGG):
 *        Initial test version
 *     2006-10-11 (AGG):
-*        Change int arguments to size_t
+*        Change int arguments to dim_t
 *     2007-06-27 (EC):
 *        Changed algorithm to calculate a "smooth" boxcar (old algorithm
 *        assigned same smooth value to all samples within disjoint windows)
@@ -79,7 +79,7 @@
 *     2008-08-28 (EC):
 *        Re-written as a generic function
 *     2010-05-28 (TIMJ):
-*        size_t can't go negative so "off" must be a long and when copying
+*        dim_t can't go negative so "off" must be a long and when copying
 *        from i and window we need to cast to long before negating.
 *     2013-10-21 (DSB):
 *        - Added arguments stride, update and var.
@@ -135,15 +135,15 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_boxcar1"
 
-void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
-                                 size_t stride, size_t window, smf_qual_t *qual,
+void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const dim_t ninpts,
+                                 dim_t stride, dim_t window, smf_qual_t *qual,
                                  smf_qual_t mask, int update, double *var,
                                  int *status) {
 
   /* Local variables */
   long off;                   /* offset from loop counter to modified sample */
-  size_t count;               /* Number of samples in window */
-  size_t i;                   /* Loop counter */
+  dim_t count;               /* Number of samples in window */
+  dim_t i;                   /* Loop counter */
   CGEN_TYPE *seriescopy;      /* Copy of the time series */
   double sum;                 /* Sum of values in the window */
   double sum2;                /* Sum of squared values in the window */
@@ -157,8 +157,8 @@ void CGEN_FUNCTION(smf_boxcar1)( CGEN_TYPE *series, const size_t ninpts,
 
   /* Sanity check: is window smaller than size of input array? */
   if ( window > ninpts ) {
-    msgSeti("B",(int)window);
-    msgSeti("N",(int)ninpts);
+    msgSetk("B",window);
+    msgSetk("N",ninpts);
     *status = SAI__ERROR;
     errRep(" ", FUNC_NAME
            ": Size of window (^B) exceeds extent of data array (^N)",

@@ -16,7 +16,7 @@
 *  Invocation:
 *     void smf_jsadicer( int indf, const char *base, int trim,
 *                        smf_inst_t instrument, smf_jsaproj_t proj,
-*                        size_t *ntile, Grp *grp, int *status )
+*                        int *ntile, Grp *grp, int *status )
 
 *  Arguments:
 *     indf = int (Given)
@@ -40,7 +40,7 @@
 *     proj = smf_jsaproj_t (Given)
 *        Specified the projection to use for the created tiles. Should
 *        always be SMF__JSA_HPX, except for debugging or experiments.
-*     ntile = * size_t (Returned)
+*     ntile = * dim_t (Returned)
 *        The number of tiles created.
 *     grp = * Grp (Returned)
 *        Pointer to a Grp group. The names of all the tile NDFs created
@@ -161,14 +161,14 @@
 #include "libsmf/jsatiles.h"
 
 /* Prototypes for local functions. */
-static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
+static void smf1_jsadicer( int indfo, dim_t *olbnd, dim_t *oubnd,
                            AstMapping *tile_map, AstFrame *tile_frm,
                            AstMapping *p2pmap, void *ipd, void *ipv,
                            unsigned char *ipq, int *status );
 
 /* Main entry */
 void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
-                   smf_jsaproj_t proj, size_t *ntile, Grp *grp, int *status ){
+                   smf_jsaproj_t proj, int *ntile, Grp *grp, int *status ){
 
 /* Local Variables: */
    AstBox *box;
@@ -192,6 +192,16 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    const char *keyword;
    const char *latsys = NULL;
    const char *lonsys = NULL;
+   dim_t lbnd[3];
+   dim_t lbnd_tile[ 3 ];
+   dim_t lbndx[ NDF__MXDIM ];
+   dim_t olbnd[ 3 ];
+   dim_t oubnd[ 3 ];
+   dim_t tile_lbnd[2];
+   dim_t tile_ubnd[2];
+   dim_t ubnd[3];
+   dim_t ubnd_tile[ 3 ];
+   dim_t ubndx[ NDF__MXDIM ];
    double *pd;
    double dlbnd[3];
    double dubnd[3];
@@ -206,7 +216,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    int axlat;
    int axlon;
    int axspec;
-   int bbox[ 6 ];
+   dim_t bbox[ 6 ];
    int i;
    int ifrm;
    int igrid;
@@ -218,34 +228,24 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
    int ishpx;
    int isxph;
    int itile;
-   int ix;
-   int iy;
-   int iz;
-   int junk;
+   dim_t ix;
+   dim_t iy;
+   dim_t iz;
    int latax = -1;
-   int lbnd[3];
-   int lbnd_tile[ 3 ];
-   int lbndx[ NDF__MXDIM ];
    int lonax = -1;
-   int nbase;
+   dim_t nbase;
    int ndim;
    int ndimx;
    int nfrm;
    int nsig;
    int ntiles;
-   int olbnd[ 3 ];
-   int oubnd[ 3 ];
    int outperm[ 3 ];
    int place;
    int qual;
    int tile_index;
-   int tile_lbnd[2];
-   int tile_ubnd[2];
-   int ubnd[3];
-   int ubnd_tile[ 3 ];
-   int ubndx[ NDF__MXDIM ];
    int var;
    size_t iext;
+   size_t junk;
    size_t size;
    smfJSATiling tiling;
    unsigned char *ipq = NULL;
@@ -494,7 +494,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       astInvert( tile_map );
 
 /* Show the bounds of the tile within the input NDF. */
-      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%d:%d,%d:%d) "
+      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%" DIM_T_FMT ":%" DIM_T_FMT ",%" DIM_T_FMT ":%" DIM_T_FMT ") "
                  "within the output NDF.", status, tile_index,
                  tile_lbnd[ 0 ], tile_ubnd[ 0 ], tile_lbnd[ 1 ],
                  tile_ubnd[ 1 ] );
@@ -526,7 +526,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
       ubnd_tile[ 2 ] = floor( ubnd_out[ 2 ] ) + 1;
 
 /* Show the bounds of the tile within the input NDF. */
-      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%d:%d,%d:%d) "
+      msgOutiff( MSG__DEBUG, "", "   tile %d has bounds (%" DIM_T_FMT ":%" DIM_T_FMT ",%" DIM_T_FMT ":%" DIM_T_FMT ") "
                  "within the input NDF.", status, tile_index,
                  lbnd_tile[ 0 ], ubnd_tile[ 0 ], lbnd_tile[ 1 ],
                  ubnd_tile[ 1 ] );
@@ -558,12 +558,12 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 
 /* Initialise the pixel bounds (within the input NDF) of the box holding
    good data values for the current tile. */
-         bbox[ 0 ] = INT_MAX;
-         bbox[ 1 ] = INT_MAX;
-         bbox[ 2 ] = INT_MAX;
-         bbox[ 3 ] = -INT_MAX;
-         bbox[ 4 ] = -INT_MAX;
-         bbox[ 5 ] = -INT_MAX;
+         bbox[ 0 ] = INT64_MAX;
+         bbox[ 1 ] = INT64_MAX;
+         bbox[ 2 ] = INT64_MAX;
+         bbox[ 3 ] = -INT64_MAX;
+         bbox[ 4 ] = -INT64_MAX;
+         bbox[ 5 ] = -INT64_MAX;
 
 /* Loop round all pixels in the section. */
          if( *status == SAI__OK ) {
@@ -602,7 +602,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
             }
 
 /* Skip empty tiles. */
-            if( bbox[ 0 ] != INT_MAX ) {
+            if( bbox[ 0 ] != INT64_MAX ) {
                msgOutf( "", "   tile %d", status, tile_index );
 
 /* If required, trim the bounds to the edges of the bounding box. */
@@ -647,7 +647,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 
 /* Get the full path to the output NDF for the current tile, and create an
    NDF placeholder for it. */
-               sprintf( path, "%.*s_%d", nbase, base, tile_index );
+               sprintf( path, "%.*s_%d", (int) nbase, base, tile_index );
                ndfPlace( NULL, path, &place, status );
 
 /* Create a new output NDF by copying the meta-data from the input NDF
@@ -761,7 +761,7 @@ void smf_jsadicer( int indf, const char *base, int trim, smf_inst_t instrument,
 
 
 
-static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
+static void smf1_jsadicer( int indfo, dim_t *olbnd, dim_t *oubnd,
                            AstMapping *tile_map, AstFrame *tile_frm,
                            AstMapping *p2pmap, void *ipd, void *ipv,
                            unsigned char *ipq, int *status ){
@@ -779,7 +779,7 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
 *     C function
 
 *  Invocation:
-*     void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
+*     void smf1_jsadicer( int indfo, dim_t *olbnd, dim_t *oubnd,
 *                         AstMapping *tile_map, AstFrame *tile_frm,
 *                         AstMapping *p2pmap, void *ipd, void *ipv,
 *                         unsigned char *ipq, int *status )
@@ -789,10 +789,10 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
 *        An identifier for the NDF in which the copied data is to be
 *        stored. It's original pixel bounds are used as the bounds of the
 *        ipd, ipv and ipq arrays.
-*     olbnd = int * (Given)
+*     olbnd = dim_t * (Given)
 *        The new lower pixel bounds required for the output NDF. The bounds
 *        of the supplied NDF are changed to match these values.
-*     oubnd = int * (Given)
+*     oubnd = dim_t * (Given)
 *        The new upper pixel bounds required for the output NDF. The bounds
 *        of the supplied NDF are changed to match these values.
 *     tile_map = AstMapping * (Given)
@@ -822,17 +822,17 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
    AstMapping *use_p2pmap = NULL;
    AstShiftMap *sm;
    char type[ NDF__SZTYP + 1 ];
+   dim_t lbnd_tile[ 3 ];
+   dim_t ubnd_tile[ 3 ];
    double shifts[ 3 ];
    int axes[ 2 ];
    int axout[ NDF__MXDIM ];
    int free_arrays;
    int isreal;
-   int lbnd_tile[ 3 ];
    int ndim;
-   int nel;
    int nin;
    int there;
-   int ubnd_tile[ 3 ];
+   size_t nel;
    unsigned char *ipq_out = NULL;
    void *ipd_out = NULL;
    void *ipv_out = NULL;
@@ -960,24 +960,24 @@ static void smf1_jsadicer( int indfo, int *olbnd, int *oubnd,
    piecewise linear. This gives a factor of about 5 decrease in the time
    spent within astResample. */
    if( !strcmp( type, "_REAL" ) ) {
-      (void) astResampleF( use_p2pmap, ndim, lbnd_tile, ubnd_tile, (float *) ipd,
-                           (float *) ipv, AST__NEAREST, NULL, NULL,
-                           AST__USEBAD, 0.1, 1000, VAL__BADR, ndim,
-                           olbnd, oubnd, olbnd, oubnd,
-                           (float *) ipd_out, (float *) ipv_out );
+      (void) astResample8F( use_p2pmap, ndim, lbnd_tile, ubnd_tile, (float *) ipd,
+                            (float *) ipv, AST__NEAREST, NULL, NULL,
+                            AST__USEBAD, 0.1, 1000, VAL__BADR, ndim,
+                            olbnd, oubnd, olbnd, oubnd,
+                            (float *) ipd_out, (float *) ipv_out );
    } else {
-      (void) astResampleD( use_p2pmap, ndim, lbnd_tile, ubnd_tile, (double *) ipd,
-                           (double *) ipv, AST__NEAREST, NULL, NULL,
-                           AST__USEBAD, 0.1, 1000, VAL__BADD, ndim,
-                           olbnd, oubnd, olbnd, oubnd,
-                           (double *) ipd_out, (double *) ipv_out );
+      (void) astResample8D( use_p2pmap, ndim, lbnd_tile, ubnd_tile, (double *) ipd,
+                            (double *) ipv, AST__NEAREST, NULL, NULL,
+                            AST__USEBAD, 0.1, 1000, VAL__BADD, ndim,
+                            olbnd, oubnd, olbnd, oubnd,
+                            (double *) ipd_out, (double *) ipv_out );
    }
 
    if( ipq ) {
-      (void) astResampleUB( use_p2pmap, ndim, lbnd_tile, ubnd_tile, ipq, NULL,
-                            AST__NEAREST, NULL, NULL, 0, 0.1, 1000, 0,
-                            ndim, olbnd, oubnd, olbnd, oubnd, ipq_out,
-                            NULL );
+      (void) astResample8UB( use_p2pmap, ndim, lbnd_tile, ubnd_tile, ipq, NULL,
+                             AST__NEAREST, NULL, NULL, 0, 0.1, 1000, 0,
+                             ndim, olbnd, oubnd, olbnd, oubnd, ipq_out,
+                             NULL );
    }
 
 /* Unmap everything the output NDF. */

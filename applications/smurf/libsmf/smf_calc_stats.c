@@ -148,16 +148,16 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 
   /* Local variables */
   void *indata = NULL;        /* Pointer to input data array */
-  size_t k;                   /* Loop counter */
-  size_t mult;                /* stride through data array */
-  size_t npts;                /* Number of data points in range */
-  size_t nbperel;             /* number of bytes in data type */
+  dim_t k;                    /* Loop counter */
+  dim_t mult;                 /* stride through data array */
+  dim_t npts;                 /* Number of data points in range */
+  dim_t nbperel;              /* number of bytes in data type */
   dim_t nbol;                 /* Number of bolometers */
   dim_t nmax;                 /* Max value for index */
   dim_t nsamp;                /* Number of samples */
-  size_t offset;              /* offset into data array */
+  dim_t offset;               /* offset into data array */
   void *statsdata = NULL;     /* Pointer to array for computing stats */
-  int temp;                   /* Temporary variable */
+  dim_t temp;                 /* Temporary variable */
 
   /* Per data type pointers */
   double *in_d = NULL;        /* pointer to double input data */
@@ -167,19 +167,19 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
 
   /* Current list of variables for kpgStatd - move into API as appropriate */
   int bad = 1;                /* Do we check for bad pixels? Default to yes */
-  int ngood;                  /* Number of valid pixels before clipping */
-  int imin;                   /* Index where the pixel with the lowest value was
+  dim_t ngood;                /* Number of valid pixels before clipping */
+  dim_t imin;                 /* Index where the pixel with the lowest value was
 				 (first) found before clipping */
   double dmin;                /* Minimum pixel value in the array before clipping */
-  int imax;                   /* Index where the pixel with the highest value was
+  dim_t imax;                 /* Index where the pixel with the highest value was
 				 (first) found before clipping*/
   double dmax;                /* Maximum pixel value in the array before clipping */
   double sum;                 /* Sum of valid pixels before clipping */
-  int ngoodc;                 /* Number of valid pixels in the array after clipping */
-  int iminc;                  /* Index where the pixel with the lowest value was
+  dim_t ngoodc;               /* Number of valid pixels in the array after clipping */
+  dim_t iminc;                /* Index where the pixel with the lowest value was
 				 (first) found after clipping */
   double dminc;               /* Minimum pixel value in the array after clipping */
-  int imaxc;                  /* Index where the pixel with the highest value was
+  dim_t imaxc;                /* Index where the pixel with the highest value was
 				 (first) found after clipping */
   double dmaxc;               /* Maximum pixel value in the array after clipping */
   double sumc;                /* Sum of valid pixels after clipping */
@@ -231,8 +231,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   /* Check index is in range */
   if ( index >= nmax ) {
     if ( *status == SAI__OK) {
-      msgSeti("I", index);
-      msgSeti("N", nmax);
+      msgSetk("I", index);
+      msgSetk("N", nmax);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested index, ^I, is out of range (max is ^N).",
              status);
@@ -243,8 +243,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   /* Check requested range is valid */
   if ( lo >= nsamp ) {
     if ( *status == SAI__OK) {
-      msgSeti("J", lo);
-      msgSeti("N", nsamp);
+      msgSetk("J", lo);
+      msgSetk("N", nsamp);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < lo < ^N).",
              status);
@@ -253,8 +253,8 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   }
   if ( hi >= nsamp ) {
     if ( *status == SAI__OK) {
-      msgSeti("J", hi);
-      msgSeti("N", nsamp);
+      msgSetk("J", hi);
+      msgSetk("N", nsamp);
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Requested sample, ^J, is out of range (0 < hi < ^N).",
              status);
@@ -346,13 +346,13 @@ void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
   if ( *status == SAI__OK) {
     switch ( data->dtype ) {
     case SMF__DOUBLE:
-      kpgStatd( bad, npts, stats_d, nclip, clip,
+      kpgStat8d( bad, npts, stats_d, nclip, clip,
                 &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
                 &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
                 status);
       break;
     case SMF__INTEGER:
-      kpgStati( bad, npts, stats_i, nclip, clip,
+      kpgStat8i( bad, npts, stats_i, nclip, clip,
                 &ngood, &imin, &dmin, &imax, &dmax, &sum, mean, stdev,
                 &ngoodc, &iminc, &dminc, &imaxc, &dmaxc, &sumc, &meanc, &stdevc,
                 status);

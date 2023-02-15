@@ -1,6 +1,7 @@
 #ifndef HEADGEN____sc2math_pro_h
 #define HEADGEN____sc2math_pro_h
 
+#include "../smurf_typ.h"
 
 /*+ sc2math_calcmapwt - Make weight matrix for DREAM solution*/
 
@@ -27,7 +28,7 @@ int smu_move,           /* The code for the SMU waveform that determines the
 double smu_offset,      /* smu timing offset in msec (given) */
 int ngrid,              /* number of grid coordinates (given) */
 int gridpts[][2],       /* relative grid coordinates (given) */
-int gridwtsdim[],       /* dimensions of gridwts array (returned) */
+dim_t gridwtsdim[],     /* dimensions of gridwts array (returned) */
 double **gridwts,       /* Pointer to array of sky grid weights (returned) */
 int *invmatdim,         /* dimension of inverted matrix (returned) */
 double **invmat,        /* pointer to inverted matrix (returned) */
@@ -119,9 +120,9 @@ int *status       /* global status (given and returned) */
 
 void sc2math_cubfit
 (
-int npts,                 /* number of data points (given) */
-double *x,                /* observed values (given) */
-double *y,                /* observed values (given) */
+dim_t npts,               /* number of data points (given) */
+const double *x,          /* observed values (given) */
+const double *y,          /* observed values (given) */
 double *coeffs,           /* coefficients of fit (returned) */
 double *variances,        /* variances of fit (returned) */
 int *status               /* global status (given and returned) */
@@ -141,9 +142,9 @@ double lmat[]      /* equation matrix (given and returned) */
 void sc2math_fitsky
 (
 int cliptype,          /* type of sigma clipping (given) */
-size_t nboll,          /* number of bolometers (given) */
-size_t nframes,        /* number of frames in scan (given) */
-size_t ncoeff,         /* number of coefficients (given) */
+dim_t nboll,          /* number of bolometers (given) */
+dim_t nframes,        /* number of frames in scan (given) */
+dim_t ncoeff,         /* number of coefficients (given) */
 const double *inptr,   /* measurement values (given) */
 double *coptr,         /* coefficients of fit (returned) */
 int *status            /* global status (given and returned) */
@@ -154,9 +155,9 @@ int *status            /* global status (given and returned) */
 void sc2math_fitskyi
 (
 int cliptype,          /* type of sigma clipping (given) */
-size_t nboll,          /* number of bolometers (given) */
-size_t nframes,        /* number of frames in scan (given) */
-size_t ncoeff,         /* number of coefficients (given) */
+dim_t nboll,          /* number of bolometers (given) */
+dim_t nframes,        /* number of frames in scan (given) */
+dim_t ncoeff,         /* number of coefficients (given) */
 const int *inptr,      /* measurement values (given) */
 double *coptr,         /* coefficients of fit (returned) */
 int *status            /* global status (given and returned) */
@@ -166,7 +167,7 @@ int *status            /* global status (given and returned) */
 
 void sc2math_flat2mask
 (
-int nboll,                /* number of bolometers (given) */
+dim_t nboll,              /* number of bolometers (given) */
 const char *flatname,     /* name of flatfield algorithm (given) */
 int nflat,                /* number of flatfield parameters (given) */
 const double *fcal,       /* calibration coefficients (given) */
@@ -177,10 +178,10 @@ int *status               /* global status (given and returned) */
 
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
-int sc2math_flatten
+dim_t sc2math_flatten
 (
-int nboll,                /* number of bolometers (given) */
-int nframes,              /* number of frames in scan (given) */
+dim_t nboll,              /* number of bolometers (given) */
+dim_t nframes,            /* number of frames in scan (given) */
 const char *flatname,     /* name of flatfield algorithm (given) */
 int nflat,                /* number of flatfield parameters (given) */
 const double *fcal,       /* calibration coefficients (given) */
@@ -259,7 +260,7 @@ int *status             /* global status (given and returned) */
 
 void sc2math_linfit
 (
-size_t np,            /* number of points (given) */
+dim_t np,            /* number of points (given) */
 const double x[],     /* X data (given) */
 const double y[],     /* Y data (given) */
 const double wt[],    /* weights (given) */
@@ -286,7 +287,7 @@ double *invmat,           /* inverted matrix (given) */
 int *qual,                /* bolometer quality array (given) */
 double *psbuf,            /* flatfielded data set [nbolx.nboly.nframes](given) */
 int maxmap,               /* maximum size of reconstructed map (given) */
-int dims[],               /* actual dimensions of map (returned) */
+dim_t dims[],             /* actual dimensions of map (returned) */
 double *map,              /* Solved intensities (returned) */
 double *pbolzero,         /* bolometer zero points (returned) */
 int *status
@@ -343,14 +344,14 @@ int *status           /* global status (given and returned) */
 
 void sc2math_recurfit
 (
-int despike,            /* flag for spike removal (given) */
-int npts,               /* number of data points (given) */
-int nterms,             /* number of combined waveforms (given) */
+int despike,              /* flag for spike removal (given) */
+dim_t npts,               /* number of data points (given) */
+int nterms,               /* number of combined waveforms (given) */
 double *standard_waves,   /* values of standard waveforms (given) */
 double *standard_weights, /* if volts[j] is not to be used,
                             standard_weights[j] = 0.0, otherwise
                             standard_weights[j] = 1.0 (given) */
-double *volts,            /* observed values (given) */
+const double *volts,      /* observed values (given) */
 double *used_weights,     /* if volts[j] was not used,
                             used_weights[j] = 0.0, otherwise
                             used_weights[j] = 1.0 (returned) */
@@ -358,9 +359,9 @@ double *fitted_volts,     /* combined waveform computed from the fit
                             (returned) */
 double *coeffs,           /* coefficients of fit (returned) */
 double *variances,        /* variances of fit (returned) */
-int *nbad,              /* number of points rejected as suspected
-                            "spikes" (returned) */
-int *status             /* status must be 0 on entry.
+dim_t *nbad,              /* number of points rejected as suspected
+                             "spikes" (returned) */
+int *status               /* status must be 0 on entry.
                             If no valid fit was found, SAI__ERROR is
                             returned (given and returned) */
 );
@@ -369,11 +370,11 @@ int *status             /* status must be 0 on entry.
 
 void sc2math_regres
 (
-int npts,      /* number of data points (given) */
-int nterms,    /* number of combined waveforms (given) */
-double *x,       /* values of standard waveforms (given) */
-double *y,       /* observed values (given) */
-double *weight,  /* weight for each observed value (given) */
+dim_t npts,      /* number of data points (given) */
+int nterms,      /* number of combined waveforms (given) */
+const double *x,       /* values of standard waveforms (given) */
+const double *y,       /* observed values (given) */
+const double *weight,  /* weight for each observed value (given) */
 double *yfit,    /* values of Y computed from the fit (returned) */
 double *a0,      /* constant term in fit (returned) */
 double *a,       /* coefficients of fit (returned) */
@@ -422,9 +423,9 @@ double *r     /* Response value (returned) */
 
 void sc2math_setcal
 (
-int nboll,               /* total number of bolometers (given) */
-int bol,                 /* number of current bolometer (given) */
-int numsamples,          /* number of data samples (given) */
+dim_t nboll,             /* total number of bolometers (given) */
+dim_t bol,               /* number of current bolometer (given) */
+dim_t numsamples,        /* number of data samples (given) */
 const double values[],   /* measurements by bolometer (given) */
 int ncal,                /* number of calibration measurements (given) */
 const double heat[],     /* calibration heater settings (given) */
@@ -437,8 +438,8 @@ int *status              /* global status (given and returned) */
 
 void sc2math_setcaldec
 (
-int nboll,               /* total number of bolometers (given) */
-int bol,                 /* number of current bolometer (given) */
+dim_t nboll,             /* total number of bolometers (given) */
+dim_t bol,               /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
 int ncal,                /* number of calibration measurements (given) */
 const double heat[],     /* calibration heater settings (given) */
@@ -451,8 +452,8 @@ int *status              /* global status (given and returned) */
 
 void sc2math_setcalinc
 (
-int nboll,               /* total number of bolometers (given) */
-int bol,                 /* number of current bolometer (given) */
+dim_t nboll,             /* total number of bolometers (given) */
+dim_t bol,               /* number of current bolometer (given) */
 const double dvalue,     /* representative data number (given) */
 int ncal,                /* number of calibration measurements (given) */
 const double heat[],     /* calibration heater settings (given) */
@@ -468,7 +469,7 @@ void sc2math_sigmaclip
 int type,             /* 0 for double sided clip,
                         >0 positive clip,
                         <0 negative clip (given) */
-size_t np,            /* number of points (given) */
+dim_t np,            /* number of points (given) */
 const double x[],     /* X data (given) */
 const double y[],     /* Y data (given) */
 double wt[],          /* weights (returned) */

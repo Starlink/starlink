@@ -98,7 +98,7 @@ void smf_stripsuffix( const char *instr, const char *suffix,
   int flag;                     /* Flag */
   char grpex[GRP__SZNAM+1];     /* String for holding grpex */
   Grp *inname=NULL;             /* 1-element group to hold input string */
-  size_t len;                   /* Length of buffer */
+  dim_t len;                    /* Length of buffer */
   size_t msize;                 /* Size of group */
   Grp *outname = NULL;          /* 1-element group to hold output string */
   char *pname=NULL;             /* Poiner to name */

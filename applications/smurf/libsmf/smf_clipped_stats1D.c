@@ -13,30 +13,30 @@
 *     Library routine
 
 *  Invocation:
-*     void smf_clipped_stats1D( const double *data, size_t nclips,
-*                               const float clips[], size_t stride,
-*                               size_t nsamp, smf_qual_t *quality,
-*                               size_t qstride, smf_qual_t mask, double *mean,
+*     void smf_clipped_stats1D( const double *data, dim_t nclips,
+*                               const float clips[], dim_t stride,
+*                               dim_t nsamp, smf_qual_t *quality,
+*                               dim_t qstride, smf_qual_t mask, double *mean,
 *                               double *sigma, double *median, int usemedian,
-*                               size_t *ngood, int *status );
+*                               dim_t *ngood, int *status );
 
 *  Arguments:
 *     data = const double* (Given)
 *        Pointer to input data array
-*     nclips = size_t (Given)
+*     nclips = dim_t (Given)
 *        Number of clips to read from the clips[] array.
 *     clips[] = const float (Given)
 *        Array of sigma-clips to apply to the data before recalculating mean and
 *        standard deviation.
-*     stride = size_t (Given)
+*     stride = dim_t (Given)
 *        Index stride between elements
-*     nsamp = size_t (Given)
+*     nsamp = dim_t (Given)
 *        Length of the interval to analyze
 *     quality = smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to VAL__BADD.
-*     qstride = size_t (Given)
+*     qstride = dim_t (Given)
 *        Stride for qual. If 0 assumed to be stride.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
@@ -50,7 +50,7 @@
 *     usemedian = int (Given)
 *        If set, when applying the clips, will check for offsets from the
 *        median rather than the mean.
-*     ngood = size_t* (Given and Returned)
+*     ngood = dim_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
 *     status = int* (Given and Returned)
@@ -108,24 +108,24 @@
 #include "smf.h"
 #include "sae_par.h"
 
-static size_t smf__flag_clipped_data( const double *data, size_t stride,
-                                      size_t nsamp, smf_qual_t *qua,
+static dim_t smf__flag_clipped_data( const double *data, dim_t stride,
+                                      dim_t nsamp, smf_qual_t *qua,
                                       smf_qual_t badqual, double mean,
                                       double sigma, double sigclip,
                                       int * status );
 
-void smf_clipped_stats1D( const double *data, size_t nclips,
-                          const float clips[], size_t stride, size_t nsamp,
-                          const smf_qual_t *quality, size_t qstride,
+void smf_clipped_stats1D( const double *data, dim_t nclips,
+                          const float clips[], dim_t stride, dim_t nsamp,
+                          const smf_qual_t *quality, dim_t qstride,
                           smf_qual_t mask, double *mean, double *sigma,
-                          double *median, int usemedian, size_t *ngood,
+                          double *median, int usemedian, dim_t *ngood,
                           int *status ) {
 
-  size_t clip = 0;                /* Clip index */
-  size_t i = 0;                   /* Loop counter */
+  dim_t clip = 0;                /* Clip index */
+  dim_t i = 0;                   /* Loop counter */
   double lmean = VAL__BADD;       /* Local mean */
   double lmedian = VAL__BADD;     /* Local median */
-  size_t lngood = 0;              /* Local ngood */
+  dim_t lngood = 0;              /* Local ngood */
   double lsigma = VAL__BADD;      /* Local sigma */
   const smf_qual_t BADQUAL = 1;   /* The value we use for local bad quality */
   smf_qual_t * qua = NULL;        /* Quality we will be using locally */
@@ -149,7 +149,7 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
   qua = astCalloc( nsamp, sizeof(*qua) );
 
   if ( quality ) {
-    size_t j = 0;
+    dim_t j = 0;
 
     /* make sure we step through properly */
     if (!qstride) qstride = stride;
@@ -163,7 +163,7 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
     }
 
   } else {
-    size_t j = 0;
+    dim_t j = 0;
     /* fill it from the bad values */
     for (i=0; i<nsamp*stride; i+=stride ) {
       if ( data[i] == VAL__BADD ) {
@@ -206,15 +206,15 @@ void smf_clipped_stats1D( const double *data, size_t nclips,
    the suppliedq value if a data point is out of range. It does
    recalculate ngood and returns it. */
 
-static size_t smf__flag_clipped_data( const double *data, size_t stride,
-                                      size_t nsamp, smf_qual_t *qua,
+static dim_t smf__flag_clipped_data( const double *data, dim_t stride,
+                                      dim_t nsamp, smf_qual_t *qua,
                                       smf_qual_t badqual, double mean,
                                       double sigma, double sigclip,
                                       int * status ) {
 
-  size_t i = 0;
-  size_t j = 0;
-  size_t ngood = 0;
+  dim_t i = 0;
+  dim_t j = 0;
+  dim_t ngood = 0;
   double dmax;
   double dmin;
 

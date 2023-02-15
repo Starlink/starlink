@@ -100,7 +100,8 @@ void smf_calc_wvm_clear( int *status ) {
 }
 
 
-static void smf1_calc_wvm_clear_job( void *job_data, int *status ) {
+static void smf1_calc_wvm_clear_job( void *job_data __attribute__((unused)),
+                                     int *status ) {
 /*
 *  Name:
 *     smf1_calc_wvm_clear_job

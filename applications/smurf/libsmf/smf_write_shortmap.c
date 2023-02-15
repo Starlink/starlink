@@ -13,18 +13,18 @@
 *     Library routine
 
 *  Invocation:
-*     smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
+*     smf_write_shortmap( ThrWorkForce *wf, dim_t shortmap, double cycleperiod,
 *                         double cyclestart, smfArray *res,
 *                         smfArray *lut, smfArray *qua, smfDIMMData *dat,
-*                         dim_t msize, const Grp *shortrootgrp,size_t contchunk,
-*                         int varmapmethod, const int *lbnd_out,
-*                         const int *ubnd_out, AstFrameSet *outfset,
+*                         dim_t msize, const Grp *shortrootgrp,dim_t contchunk,
+*                         int varmapmethod, const dim_t *lbnd_out,
+*                         const dim_t *ubnd_out, AstFrameSet *outfset,
 *                         double chunkfactor, int *status );
 
 *  Arguments:
 *     wf = ThrWOrkForce * (Given)
 *        Threads work force.
-*     shortmap = int (Given)
+*     shortmap = dim_t (Given)
 *        Number of time slices per short map, or if set to -1, create a map
 *        each time TCS_INDEX is incremented (i.e., produce a map each time
 *        a full pass through the scan pattern is completed).
@@ -46,14 +46,14 @@
 *        Number of pixels in map/mapvar
 *     shortrootgrp = const Grp* (Given)
 *        Root name for shortmaps. Can be path to HDS container.
-*     contchunk = size_t (Given)
+*     contchunk = dim_t (Given)
 *        Continuous chunk number
 *     varmapmethod = int (Given)
 *        Method for estimating map variance. If 1 use sample variance,
 *        if 0 propagate noise from time series.
-*     lbnd_out = const int* (Given)
+*     lbnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = const int* (Given)
+*     ubnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
@@ -144,39 +144,38 @@
 
 #define FUNC_NAME "smf_write_shortmap"
 
-void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
+void smf_write_shortmap( ThrWorkForce *wf, dim_t shortmap, double cycleperiod,
                          double cyclestart, smfArray *res,
                          smfArray *lut, smfArray *qua, smfDIMMData *dat,
-                         dim_t msize, const Grp *shortrootgrp, size_t contchunk,
-                         int varmapmethod, const int *lbnd_out,
-                         const int *ubnd_out, AstFrameSet *outfset,
+                         dim_t msize, const Grp *shortrootgrp, dim_t contchunk,
+                         int varmapmethod, const dim_t *lbnd_out,
+                         const dim_t *ubnd_out, AstFrameSet *outfset,
                          double chunkfactor, int *status ) {
 
-  dim_t dsize;                  /* Size of data arrays in containers */
-  size_t i;                     /* loop counter */
-  size_t idx=0;                 /* index within subgroup */
-  size_t istart;                /* First useful timeslice */
-  size_t iend;                  /* Last useful timeslice */
-  int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  char name[GRP__SZNAM+1];      /* Buffer for storing names */
-  size_t nshort=0;              /* Number of short maps */
-  dim_t ntslice;                /* Number of time slices */
   char *pname=NULL;             /* Poiner to name */
-  smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
-  double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t sc;                    /* Short map counter */
+  char name[GRP__SZNAM+1];      /* Buffer for storing names */
+  dim_t cycle_i_prev=0;         /* Data index at start of bin */
+  dim_t cycle_nhit=0;           /* Number of sections of data for current cycle map */
+  dim_t dsize;                  /* Size of data arrays in containers */
+  dim_t i;                      /* loop counter */
+  dim_t idx=0;                  /* index within subgroup */
+  dim_t iend;                   /* Last useful timeslice */
+  dim_t istart;                 /* First useful timeslice */
+  dim_t nshort=0;               /* Number of short maps */
+  dim_t ntslice;                /* Number of time slices */
+  dim_t sc;                     /* Short map counter */
+  dim_t shortend = 0;           /* last time slice of short map */
+  dim_t shortstart;             /* first time slice of short map */
+  dim_t tstride;                /* Time stride */
   double *shortmapweight=NULL;  /* buffer for shotmap weights */
   double *shortmapweightsq=NULL;/* buffer for shotmap weights squared */
-  int *shorthitsmap=NULL;       /* buffer for shotmap hits */
-  size_t shortstart;            /* first time slice of short map */
-  size_t shortend;              /* last time slice of short map */
-  size_t tstride;               /* Time stride */
-  int rebinflag=0;              /* Rebinning flags */
   double cycletime=0.0;         /* Time [s] from cyclestart */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
+  int *shorthitsmap=NULL;       /* buffer for shotmap hits */
   int cycle_bin=0;              /* Cycle map number */
   int cycle_bin_prev=0;         /* Previous cycle map number */
-  size_t cycle_nhit=0;          /* Number of sections of data for current cycle map */
-  size_t cycle_i_prev=0;        /* Data index at start of bin */
+  int rebinflag=0;              /* Rebinning flags */
+  smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
 
   if( *status != SAI__OK ) return;
 
@@ -236,12 +235,12 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
       if( nshort ) {
         msgOutf( "", FUNC_NAME
                  ": writing %zu short maps of length %i time slices.",
-                 status, nshort, shortmap );
+                 status, nshort, (int) shortmap );
       } else {
         /* Generate warning message if requested short maps are too long*/
         msgOutf( "", FUNC_NAME
                  ": Warning! short maps of lengths %i requested, but "
-                 "data only %zu time slices.", status, shortmap,
+                 "data only %zu time slices.", status, (int) shortmap,
                  iend-istart+1 );
       }
     }
@@ -254,7 +253,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
     smfData *mapdata=NULL;      /* smfData for new map */
     char tempstr[20];           /* Temporary string */
     char tmpname[GRP__SZNAM+1]; /* temp name buffer */
-    char thisshort[20];         /* name particular to this shortmap */
+    char thisshort[30];         /* name particular to this shortmap */
 
     /* Create a name for the new map, take into account the
        chunk number. Only required if we are using a single
@@ -330,7 +329,6 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
     /* Loop over subgroup index (subarray) */
     for( idx=0; (idx<res->ndat)&&(*status==SAI__OK); idx++ ) {
       /* Pointers to everything we need */
-      res_data = (res->sdata[idx]->pntr)[0];
       lut_data = (lut->sdata[idx]->pntr)[0];
       qua_data = (qua->sdata[idx]->pntr)[0];
 
@@ -405,7 +403,7 @@ void smf_write_shortmap( ThrWorkForce *wf, int shortmap, double cycleperiod,
             res->sdata[idx]->hdr->allState ) {
           AstFitsChan *fitschan=NULL;
           JCMTState *allState = res->sdata[idx]->hdr->allState;
-          size_t midpnt = (shortstart + shortend) / 2;
+          dim_t midpnt = (shortstart + shortend) / 2;
 
           fitschan = astFitsChan ( NULL, NULL, " " );
 

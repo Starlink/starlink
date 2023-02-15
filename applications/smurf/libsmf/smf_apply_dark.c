@@ -85,8 +85,8 @@
 int smf_apply_dark( smfData *indata, const smfArray *darks,
                      int *status) {
 
-  size_t dark1;
-  size_t dark2;
+  dim_t dark1;
+  dim_t dark2;
   smfData * dkdata1 = NULL;
   smfData * dkdata2 = NULL;
   int retval = 0;

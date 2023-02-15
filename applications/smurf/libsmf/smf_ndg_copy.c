@@ -13,15 +13,15 @@
 *     C function
 
 *  Invocation:
-*     Grp *smf_ndg_copy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
+*     Grp *smf_ndg_copy( const Grp *grp1, dim_t indxlo, dim_t indxhi, int reject,
 *                        int *status )
 
 *  Arguments:
 *     grp = const Grp * (Given)
 *        Pointer to the input group to be copied.
-*     indxlo = size_t (Given)
+*     indxlo = dim_t (Given)
 *        The lowest index to reject or to copy.
-*     indxhi = size_t (Given)
+*     indxhi = dim_t (Given)
 *        The highest index to reject or to copy.
 *     reject = int (Given)
 *        If reject is non-zero, then names in the given range are
@@ -78,7 +78,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-Grp *smf_ndg_copy( const Grp *grp1, size_t indxlo, size_t indxhi, int reject,
+Grp *smf_ndg_copy( const Grp *grp1, dim_t indxlo, dim_t indxhi, int reject,
                    int *status ){
 
 /* Local Variables: */

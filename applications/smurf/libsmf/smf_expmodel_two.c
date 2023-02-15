@@ -80,17 +80,17 @@
 
 void smf_expmodel_two( const smfData *indata, smfData **outdata, int *status) {
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;               /* bolo stride */
   double *d=NULL;               /* pointer to data array */
   smfData *data=NULL;           /* newly created smfData */
   double *comp=NULL;            /* Pointer to current component */
   double *coeff=NULL;           /* Array of coeffs for all bolos in this col */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
-  size_t k;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
+  dim_t j;                     /* Loop counter */
+  dim_t k;                     /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ntslice;                /* Number of time slices */
-  size_t tstride;               /* time stride */
+  dim_t tstride;               /* time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;

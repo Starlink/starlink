@@ -102,9 +102,9 @@ void smf_flat_mergedata( const smfArray * heatframes,
 
   double * bolval = NULL; /* Output bolometer data */
   double * bolvalvar = NULL; /* Variance */
-  size_t i;
-  size_t nheat;           /* Number of input frames */
-  size_t numbol;          /* Number of bolometers */
+  dim_t i;
+  dim_t nheat;           /* Number of input frames */
+  dim_t numbol;          /* Number of bolometers */
 
   if (bolvald) *bolvald = NULL;
 
@@ -141,7 +141,7 @@ void smf_flat_mergedata( const smfArray * heatframes,
         memcpy( varpntr, (heatframes->sdata)[i]->pntr[1],
                 numbol * smf_dtype_sz( (heatframes->sdata)[i]->dtype, status ) );
       } else {
-        size_t j;
+        dim_t j;
         for (j = 0; j < numbol; j++) {
           varpntr[j] = VAL__BADD;
         }

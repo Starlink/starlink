@@ -78,7 +78,7 @@
 void smf_lock_related( smfArray *data, int lock, int *status ){
 
   /* Local Variables */
-  size_t i;           /* Loop counter */
+  dim_t i;           /* Loop counter */
 
   if( *status != SAI__OK ) return;
 

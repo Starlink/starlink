@@ -87,8 +87,8 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-void sc2sim_ptoi( double flux, int ncoeffs, double coeffs[], double pzero,
-                  double *current, int *status ) {
+void sc2sim_ptoi( double flux, int ncoeffs __attribute__((unused)), double coeffs[],
+                  double pzero, double *current, int *status ) {
   /* Local variables */
   double p;
 

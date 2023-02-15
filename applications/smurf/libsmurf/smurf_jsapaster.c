@@ -133,43 +133,43 @@ void smurf_jsapaster( int *status ) {
    char *buf;
    char ndfname[ GRP__SZNAM ];
    const char *key;
-   int *lbnd;
+   dim_t *lbnd;
+   dim_t *ubnd;
+   dim_t dims[ NDF__MXDIM ];
+   dim_t dims_in[ NDF__MXDIM ];
+   dim_t dims_out[ NDF__MXDIM ];
+   dim_t lbnd_hpx12[ NDF__MXDIM ];
+   dim_t lbnd_hpx[ NDF__MXDIM ];
+   dim_t lbnd_ref[ 2 ];
+   dim_t lbnd_xphn[ NDF__MXDIM ];
+   dim_t lbnd_xphs[ NDF__MXDIM ];
+   dim_t ubnd_hpx12[ NDF__MXDIM ];
+   dim_t ubnd_hpx[ NDF__MXDIM ];
+   dim_t ubnd_ref[ 2 ];
+   dim_t ubnd_xphn[ NDF__MXDIM ];
+   dim_t ubnd_xphs[ NDF__MXDIM ];
    int *ndflist;
    int *temp;
-   int *ubnd;
    int ax_spec;
-   int dims[ NDF__MXDIM ];
-   int dims_in[ NDF__MXDIM ];
-   int dims_out[ NDF__MXDIM ];
    int idim;
    int ikey;
    int indf2;
    int indf3;
    int indf;
    int isky;
-   int lbnd_hpx[ NDF__MXDIM ];
-   int lbnd_hpx12[ NDF__MXDIM ];
-   int lbnd_ref[ 2 ];
-   int lbnd_xphn[ NDF__MXDIM ];
-   int lbnd_xphs[ NDF__MXDIM ];
    int ndim;
    int nkey;
    int nndf;
    int place;
    int ref_tile;
    int there;
-   int ubnd_hpx12[ NDF__MXDIM ];
-   int ubnd_hpx[ NDF__MXDIM ];
-   int ubnd_ref[ 2 ];
-   int ubnd_xphn[ NDF__MXDIM ];
-   int ubnd_xphs[ NDF__MXDIM ];
    smf_jsaproj_t proj;
    size_t index;
-   size_t npix;
-   size_t npix_hpx;
-   size_t npix_hpx12;
-   size_t npix_xphn;
-   size_t npix_xphs;
+   dim_t npix;
+   dim_t npix_hpx;
+   dim_t npix_hpx12;
+   dim_t npix_xphn;
+   dim_t npix_xphs;
    size_t size;
    size_t size2;
    smfJSATiling tiling;
@@ -322,7 +322,7 @@ void smurf_jsapaster( int *status ) {
    there is probably no need since JSA always has axis 3 as the spectral
    axis. */
    if( ax_spec == 3 ) {
-      atlAddWcsAxis(  refwcs, smap, sfrm, lbnd + 2, ubnd + 2, status );
+      atlAddWcsAxis8(  refwcs, smap, sfrm, lbnd + 2, ubnd + 2, status );
 
    } else if( ax_spec > 0 && *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -379,11 +379,11 @@ void smurf_jsapaster( int *status ) {
 
 /* Paste the input NDFs into the output NDF, and return the identifiers
    for the input NDFs and the group of extension NDFs. */
-   smf1_jsapaster( size, igrp, ndflist, indf2,  igrp2, status );
+   smf1_jsapaster( (int) size, igrp, ndflist, indf2,  igrp2, status );
 
 /* Modify the output provenance information to record each input NDF as
    a direct parent of the output NDF. */
-   ndgAddProv( indf2, "SMURF:JSAPASTER", size, ndflist, 0, status );
+   ndgAddProv( indf2, "SMURF:JSAPASTER", (int) size, ndflist, 0, status );
 
 /* Now we need to mosaic any NDFs stored within the SMURF extension of
    each input NDF. */
@@ -419,7 +419,7 @@ void smurf_jsapaster( int *status ) {
          key = astMapKey( km, ikey );
 
 /* Get the list of input NDF identifiers for this extension NDF. */
-         astMapGet1I( km, key, size, &nndf, ndflist );
+         astMapGet1I( km, key, (int) size, &nndf, ndflist );
 
 /* Erase any existing NDF with this name in the output SMURF extension. */
          datThere(  xloc, key, &there, status );
@@ -529,10 +529,11 @@ static void smf1_jsapaster( int nndf, Grp *grp1, int *idlist, int indf_out,
    char ndfname[ GRP__SZNAM ];
    char type[ NDF__SZTYP + 1 ];
    const char *proj;
+   dim_t dims_in[ NDF__MXDIM ];
+   dim_t dims_out[ NDF__MXDIM ];
+   dim_t origin[ 3 ] = { 1, 1, 1 };
    double *weightsq = NULL;
    double *weights = NULL;
-   int dims_in[ NDF__MXDIM ];
-   int dims_out[ NDF__MXDIM ];
    int flags;
    int index;
    int indf_in;
@@ -540,12 +541,11 @@ static void smf1_jsapaster( int nndf, Grp *grp1, int *idlist, int indf_out,
    int ndgflag;
    int ndim;
    int ndim_in;
-   int nel;
-   int origin[ 3 ] = { 1, 1, 1 };
    int qual;
    int var;
-   int64_t nusedq;
    int64_t nused;
+   int64_t nusedq;
+   size_t nel;
    size_t size2;
    size_t size_out;
    void *ipd_in;
@@ -684,17 +684,17 @@ static void smf1_jsapaster( int nndf, Grp *grp1, int *idlist, int indf_out,
 
 /* Rebin them into the output NDF. */
       if( !strcmp( type, "_REAL" ) ) {
-         astRebinSeqF( g2gmap, 0.0, ndim, origin, dims_in, (float *) ipd_in,
-                       (float *) ipv_in, AST__NEAREST, NULL, flags, 0.1,
-                       1000, VAL__BADR, ndim, origin, dims_out, origin,
-                       dims_in, (float *) ipd_out, (float *) ipv_out,
-                       weights, &nused );
+         astRebinSeq8F( g2gmap, 0.0, ndim, origin, dims_in, (float *) ipd_in,
+                        (float *) ipv_in, AST__NEAREST, NULL, flags, 0.1,
+                        1000, VAL__BADR, ndim, origin, dims_out, origin,
+                        dims_in, (float *) ipd_out, (float *) ipv_out,
+                        weights, &nused );
       } else {
-         astRebinSeqD( g2gmap, 0.0, ndim, origin, dims_in, (double *) ipd_in,
-                       (double *) ipv_in, AST__NEAREST, NULL, flags, 0.1,
-                       1000, VAL__BADD, ndim, origin, dims_out, origin,
-                       dims_in, (double *) ipd_out, (double *) ipv_out,
-                       weights, &nused );
+         astRebinSeq8D( g2gmap, 0.0, ndim, origin, dims_in, (double *) ipd_in,
+                        (double *) ipv_in, AST__NEAREST, NULL, flags, 0.1,
+                        1000, VAL__BADD, ndim, origin, dims_out, origin,
+                        dims_in, (double *) ipd_out, (double *) ipv_out,
+                        weights, &nused );
       }
 
 /* Now rebin the Quality array, if it exists in the input NDF. */
@@ -707,11 +707,11 @@ static void smf1_jsapaster( int nndf, Grp *grp1, int *idlist, int indf_out,
 /* Rebin it into the output NDF. Since there are no bad values or
    variances for quality, cancel the corresponding flags. */
          flags &= ~(AST__USEBAD | AST__USEVAR);
-         astRebinSeqUB( g2gmap, 0.0, ndim, origin, dims_in,
-                        (unsigned char *) ipq_in, NULL, AST__NEAREST, NULL,
-                        flags, 0.1, 1000, 0, ndim, origin, dims_out, origin,
-                        dims_in, (unsigned char *) ipq_out, NULL, weightsq,
-                        &nusedq );
+         astRebinSeq8UB( g2gmap, 0.0, ndim, origin, dims_in,
+                         (unsigned char *) ipq_in, NULL, AST__NEAREST, NULL,
+                         flags, 0.1, 1000, 0, ndim, origin, dims_out, origin,
+                         dims_in, (unsigned char *) ipq_out, NULL, weightsq,
+                         &nusedq );
       }
 
 /* If "grp2" was supplied, find any NDFs stored within the SMURF extension

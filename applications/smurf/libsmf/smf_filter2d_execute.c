@@ -95,15 +95,15 @@
 void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                            int complement, int *status ) {
 
-  double *data_i=NULL;          /* Imaginary part of the transformed data */
-  double *data_r=NULL;          /* Real part of the transformed data */
-  smfData *fdata=NULL;          /* Transform of data */
-  dim_t fdims[2]={0,0};         /* Frequency dimensions */
-  size_t i;                     /* loop counter */
-  size_t ndims=0;               /* Number of real-space dimensions */
-  size_t nfdata;                /* Total number of frequency data points */
-  smfData *varfilt=NULL; /* real-space square of supplied filter for var */
-  AstFrameSet *wcs=NULL;        /* Copy of real-space WCS */
+  double *data_i=NULL;     /* Imaginary part of the transformed data */
+  double *data_r=NULL;     /* Real part of the transformed data */
+  smfData *fdata=NULL;     /* Transform of data */
+  dim_t fdims[2]={0,0};    /* Frequency dimensions */
+  dim_t i;                 /* loop counter */
+  int ndims=0;             /* Number of real-space dimensions */
+  dim_t nfdata;            /* Total number of frequency data points */
+  smfData *varfilt=NULL;   /* real-space square of supplied filter for var */
+  AstFrameSet *wcs=NULL;   /* Copy of real-space WCS */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -191,14 +191,8 @@ void smf_filter2d_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
     data_i = data_r + nfdata;
 
     if( filt->isComplex ) {
-      double ac, bd, aPb, cPd;
-      for( i=0; i<nfdata; i++ ) {
-        ac = data_r[i] * filt->real[i];
-        bd = data_i[i] * filt->imag[i];
-
-        aPb = data_r[i] + data_i[i];
-        cPd = filt->real[i] + filt->imag[i];
-      }
+       errRep( " ", "smf_filter2d_execute: complex filers are not "
+               "supported.", status );
     } else {
       for( i=0; i<nfdata; i++ ) {
         data_r[i] *= filt->real[i];

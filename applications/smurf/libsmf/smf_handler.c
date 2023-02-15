@@ -70,7 +70,7 @@
    occurred. */
 extern volatile sig_atomic_t smf_interupt;
 
-void smf_handler( int sig ){
+void smf_handler( int sig __attribute__((unused))){
    smf_interupt = 1;
 }
 

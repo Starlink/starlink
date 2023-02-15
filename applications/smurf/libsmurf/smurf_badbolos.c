@@ -170,18 +170,18 @@ void smurf_badbolos( int *status ) {
    int *bolos = NULL;             /* Array of all bolometers */
    void *bolpntr[3];              /* ndfMap array */
    HDSLoc *bbmloc=NULL;           /* HDS locator of bad pixel extension */
-   int curbad;                    /* The current bad object */
+   dim_t curbad;                  /* The current bad object */
    int i;                         /* Loop counter */
    int j;                         /* Loop counter */
    int indf;                      /* NDF identifier of input file */
-   int dims[3];                   /* Dimensions of input file */
-   int lbnd[2];                   /* Lower pixel bounds for bad pixel mask */
-   int lbnde[2];                  /* Lower pixel bounds encompassing all
+   dim_t dims[3];                 /* Dimensions of input file */
+   dim_t lbnd[2];                 /* Lower pixel bounds for bad pixel mask */
+   dim_t lbnde[2];                /* Lower pixel bounds encompassing all
                                      external pixels */
-   int lbndi[2];                  /* Lower pixel bounds encompassing all
+   dim_t lbndi[2];                /* Lower pixel bounds encompassing all
                                      internal pixels */
    char method[LEN__METHOD];      /* String for bad-bolo generation method */
-   int n;                         /* # elements in the output map */
+   size_t n;                      /* # elements in the output map */
    int nbadbolos;                 /* Number of bad individual bolos */
    int nbadcols;                  /* Number of bad columns */
    int nbadrows;                  /* Number of bad rows */
@@ -190,10 +190,10 @@ void smurf_badbolos( int *status ) {
    int seed;                      /* Seed for random number generator */
    struct timeval time;           /* Structure for system time */
    float trcoeff;                 /* Coefficients for ARD mapping */
-   int ubnd[2];                   /* Upper pixel bounds for bad pixel mask */
-   int ubnde[2];                  /* Upper pixel bounds encompassing all
+   dim_t ubnd[2];                 /* Upper pixel bounds for bad pixel mask */
+   dim_t ubnde[2];                /* Upper pixel bounds encompassing all
                                      external pixels */
-   int ubndi[2];                  /* Upper pixel bounds encompassing all
+   dim_t ubndi[2];                /* Upper pixel bounds encompassing all
                                      internal pixels */
 
    /* Main routine */
@@ -249,14 +249,14 @@ void smurf_badbolos( int *status ) {
 
       trcoeff = VAL__BADR;
 
-      ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
-                lbndi, ubndi, lbnde, ubnde, status );
+      ardWork8 ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
+                 lbndi, ubndi, lbnde, ubnde, status );
 
    } else if ( strncmp( method, "RAN", 3 ) == 0 ) {
 
      /* Allocate memory for the arrays */
-     badcols = astCalloc( (size_t)dims[0], sizeof ( *badcols ) );
-     badrows = astCalloc( (size_t)dims[1], sizeof ( *badrows ) );
+     badcols = astCalloc( (dim_t)dims[0], sizeof ( *badcols ) );
+     badrows = astCalloc( (dim_t)dims[1], sizeof ( *badrows ) );
 
      /* Get number of bad columns and make sure it isn't greater
 	than the max */
@@ -300,7 +300,7 @@ void smurf_badbolos( int *status ) {
      if ( *status == PAR__NULL ) {
        errAnnul ( status );
        gettimeofday ( &time, NULL );
-       seed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+       seed = (int)( ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 ) );
        msgOutif(MSG__VERB," ",
 		"Seeding random numbers with clock time", status);
      } else {

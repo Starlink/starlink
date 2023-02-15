@@ -19,12 +19,12 @@
 *                    AstKeyMap *akeymap,
 *                    const smfArray * darks, const smfArray *bbms,
 *                    const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
-*                    int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
+*                    int moving, dim_t *lbnd_out, dim_t *ubnd_out, fts2Port fts_port, size_t maxmem,
 *                    int abortsoon, int *abortedat, double *map, int *hitsmap, double *exp_time,
 *                    double *mapvar, smf_qual_t *mapqual, double *weights,
 *                    char data_units[], char data_label[], double *nboloeff,
-*                    size_t *numcontchunks, size_t *ncontig, int *memlow,
-*                    size_t *numinsmp, size_t *numcnvg, int *iters,
+*                    dim_t *numcontchunks, dim_t *ncontig, int *memlow,
+*                    dim_t *numinsmp, dim_t *numcnvg, int *iters,
 *                    int *masked, double *totexp, double *nomfcf, int *status );
 
 *  Arguments:
@@ -67,10 +67,10 @@
 *        pointing LUT on-the-fly
 *     moving = int (Given)
 *        Is coordinate system tracking moving object? (if outfset specified)
-*     lbnd_out = int* (Given)
+*     lbnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
 *        (if outfset specified)
-*     ubnd_out = int* (Given)
+*     ubnd_out = dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *        (if outfset specified)
 *     fts_port = fts2Port (Given)
@@ -112,19 +112,19 @@
 *     nboloeff = double * (Returned)
 *        If non-NULL, will contain the effective number of bolometers used
 *        to create the map.
-*     numcontchunks = size_t *(Returned)
+*     numcontchunks = dim_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        were processed.
-*     ncontig = size_t * (Returned)
+*     ncontig = dim_t * (Returned)
 *        If non-NULL, will contain the number of continuous chunks within
 *        the supplied data.
 *     memlow = int * (Returned)
 *        If non-NULL, will be non-zerp if the data was chunked due to
 *        insufficient memory.
-*     numinsmp = size_t *(Returned)
+*     numinsmp = dim_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        did not go into the map due to insufficient samples.
-*     numcnvg = size_t *(Returned)
+*     numcnvg = dim_t *(Returned)
 *        If non-NULL, will contain the number of continuous data chunks that
 *        did not converge (although they are still added to the map).
 *     iters = int * (Returned)
@@ -590,7 +590,7 @@
 #define _POSIX_C_SOURCE 200809L
 
 /* Some compilers need this to get SA_RESTART */
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 
 #include <stdio.h>
 #include <signal.h>
@@ -625,7 +625,7 @@
 #ifdef __ITERATEMAP_SHOW_MEM
 void _smf_iteratemap_showmem( int *status );
 void _smf_iteratemap_showmem( int *status ) {
-  size_t memcurrent,mempeak;
+  dim_t memcurrent,mempeak;
   astMemoryStats( 0, &mempeak, &memcurrent );
   msgOutf( "", "SMURF: === current /peak memory usage: %zu / %zu MiB ===",
            status, memcurrent/SMF__MIB, mempeak/SMF__MIB );
@@ -648,8 +648,8 @@ typedef struct smfIterateMapData {
    double *thismap;
    int *lut_data;
    int operation;
-   size_t d1;
-   size_t d2;
+   dim_t d1;
+   dim_t d2;
    smf_qual_t *qua_data;
    smf_qual_t *thisqual;
 } SmfIterateMapData;
@@ -666,19 +666,19 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                      AstKeyMap *akeymap,
                      const smfArray *darks, const smfArray *bbms,
                      const smfArray * flatramps, AstKeyMap * heateffmap, AstFrameSet *outfset,
-                     int moving, int *lbnd_out, int *ubnd_out, fts2Port fts_port, size_t maxmem,
+                     int moving, dim_t *lbnd_out, dim_t *ubnd_out, fts2Port fts_port, size_t maxmem,
                      int abortsoon, int *abortedat, double *map, int *hitsmap, double * exp_time,
                      double *mapvar, smf_qual_t *mapqual, double *weights,
                      char data_units[], char data_label[], double * nboloeff,
-                     size_t *numcontchunks,  size_t *ncontig, int *memlow,
-                     size_t *numinsmp, size_t *numcnvg, int *iters,
+                     dim_t *numcontchunks,  dim_t *ncontig, int *memlow,
+                     dim_t *numinsmp, dim_t *numcnvg, int *iters,
                      double *totexp, double *nomfcf, int *status ) {
 
   /* Local Variables */
   float ast_filt_diff;          /* Size of map-change filter */
   int ast_skip;                 /* Number of iterations with no AST model */
   int bolomap=0;                /* If set, produce single bolo maps */
-  size_t bstride;               /* Bolometer stride */
+  dim_t bstride;                /* Bolometer stride */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double sumwchisq1;            /* Sum of unnormalised weighted chisquareds for all chunks */
   double sumwchisq2;            /* Sum of weights for weighted chisquared for all chunks */
@@ -690,7 +690,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   double chunkweight;           /* The relative weight to give to the
                                    current chunk when adding into the running
                                    sum map. */
-  size_t contchunk;             /* Continuous chunk in outer loop counter */
+  dim_t contchunk;              /* Continuous chunk in outer loop counter */
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
@@ -716,8 +716,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   double fcf_s2;                /* Sum of FCF weight values */
   double fcf;                   /* Nominal FCF for output map */
   int firstiter;                /* First iteration in this invocation of makemap? */
-  size_t count_mcnvg=0;         /* # chunks fail to converge */
-  size_t count_minsmp=0;        /* # chunks fail due to insufficient samples */
+  dim_t count_mcnvg=0;          /* # chunks fail to converge */
+  dim_t count_minsmp=0;         /* # chunks fail due to insufficient samples */
   smf_qual_t flagmap=0;         /* bit mask for flagmaps */
   int flt_undofirst = 1;        /* Undo FLT model at start of iteration? */
   int groupsubarray;            /* Handle subarrays separately? */
@@ -732,26 +732,26 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int havenoi=0;                /* Set if NOI is one of the models */
   double hitslim;               /* Min fraction of hits allowed in a map pixel */
   smfData *refdata=NULL;        /* Pointer to reference smfData */
-/*  size_t i;                     */ /* Loop counter */
-  size_t idat;                  /* smfData counter */
-  size_t imodel;                /* Model counter */
-  size_t importsky = 0;         /* Subtract a supplied initial sky map? */
+/*  dim_t i;                     */ /* Loop counter */
+  dim_t idat;                   /* smfData counter */
+  dim_t imodel;                 /* Model counter */
+  dim_t importsky = 0;          /* Subtract a supplied initial sky map? */
   int intopt;                   /* Interupt option */
-  size_t ipix;                  /* Pixel counter */
+  dim_t ipix;                   /* Pixel counter */
   int ii;                       /* Loop counter */
-  size_t idx=0;                 /* index within subgroup */
+  dim_t idx=0;                  /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
-  int isize;                    /* Number of files in input group */
+  size_t isize;                 /* Number of files in input group */
   int qui;                      /* +1 if "Q", -1 if "U", 0 if "I", VAL__BADI if non-pol2 */
   int iter;                     /* Iteration number */
   int itermap=0;                /* If set, produce maps each iteration */
   int itsdone;                  /* Number of previously completed iterations */
   int iw;                       /* Thread index */
-  size_t j;                     /* Loop counter */
-  size_t k;                     /* Loop counter */
+  dim_t j;                      /* Loop counter */
+  dim_t k;                      /* Loop counter */
   AstKeyMap *keymap=NULL;       /* Copy of supplied keymap */
   AstKeyMap *kmap=NULL;         /* Pointer to model-specific keys */
-  size_t l;                     /* Loop counter */
+  dim_t l;                      /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   double *lastmap=NULL;         /* map from the last iter */
   int last_skipped=0;           /* Was the AST model skipped on the previous iteration? */
@@ -791,23 +791,23 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int mw = 0;                   /* No. of threads to use when rebinning data into a map */
   char name[1500];              /* Buffer for storing exported model names */
   dim_t nbolo;                  /* Number of bolometers */
-  size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
-  int nhitslim=0;               /* Min number of hits allowed in a map pixel */
+  dim_t ncontchunks=0;          /* Number continuous chunks outside iter loop*/
+  dim_t nhitslim=0;             /* Min number of hits allowed in a map pixel */
   int nm=0;                     /* Signed int version of nmodels */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int noidone;                  /* Has the NOI model been calculated yet? */
   int noi_export;               /* Export the compressed NOI model? */
   int noi_usevar;               /* Use the input Variances to make the NOI model? */
-  size_t nsamples_tot = 0;      /* Number of valid samples in all chunks */
+  dim_t nsamples_tot = 0;       /* Number of valid samples in all chunks */
   dim_t nthetabin;              /* Number of scan angle bins */
-  size_t ntgood_tot = 0;        /* Number of good time slices in all chunks */
+  dim_t ntgood_tot = 0;         /* Number of good time slices in all chunks */
   dim_t ntslice;                /* Number of time slices */
-  size_t numdata;               /* Total number of samples in chunk */
+  dim_t numdata;                /* Total number of samples in chunk */
   int numiter=0;                /* Total number iterations */
   int nw;                       /* Number of worker threads */
   dim_t pad=0;                  /* How many samples of padding at both ends */
   double pixsize = 0.0;         /* Pixel size */
-  size_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
+  dim_t qcount_last[SMF__NQBITS_TSERIES];/* quality bit counter -- last iter */
   smfArray **qua=NULL;          /* Quality flags for each file */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
   int quit=0;                   /* flag indicates when to quit */
@@ -818,7 +818,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   int reuse_var;                /* Reuse map variances from previous iteration? */
   int sampcube;                 /* write SAMPCUBES extensions? */
   double scalevar=0;            /* scale factor for variance */
-  int shortmap=0;               /* If set, produce maps every shortmap tslices*/
+  dim_t shortmap=0;             /* If set, produce maps every shortmap tslices*/
   double cyclemap_par[3];       /* Cyclemap parameters */
   int cyclemap_n;               /* Number of cyclemap parameters given */
   int cyclemap=0;               /* If set, produce this many cycle maps */
@@ -837,8 +837,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   double *thisvar=NULL;         /* Pointer to this variance map */
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisweightsq=NULL;    /* Pointer to this weights map^2 */
-  size_t try;                   /* Try to concatenate this many samples */
-  size_t tstride;               /* Time stride */
+  dim_t try;                    /* Try to concatenate this many samples */
+  dim_t tstride;                /* Time stride */
   struct timeval tv1, tv2;      /* Timers */
   double tol;                   /* Map change value to compare to maptol */
   int untilconverge=0;          /* Set if iterating to convergence */
@@ -851,7 +851,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   dim_t whichcom=0;             /* Model index of COM if present */
   dim_t whichgai=0;             /* Model index of GAI if present */
   dim_t whichnoi=0;             /* Model index of NOI if present */
-  int *whichthetabin=NULL;      /* Which scan angle bin each time slice */
+  dim_t *whichthetabin=NULL;    /* Which scan angle bin each time slice */
   SmfIterateMapData *job_data = NULL;  /* Array of job descriptions */
   SmfIterateMapData *pdata;     /* Pointer to next job description */
   int fcount;
@@ -897,10 +897,10 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   /* Calculate number of elements in the map */
   if( (ubnd_out[0]-lbnd_out[0] < 0) || (ubnd_out[1]-lbnd_out[1] < 0) ) {
     *status = SAI__ERROR;
-    msgSeti("L0",lbnd_out[0]);
-    msgSeti("L1",lbnd_out[1]);
-    msgSeti("U0",ubnd_out[0]);
-    msgSeti("U1",ubnd_out[1]);
+    msgSetk("L0",lbnd_out[0]);
+    msgSetk("L1",lbnd_out[1]);
+    msgSetk("U0",ubnd_out[0]);
+    msgSetk("U1",ubnd_out[1]);
     errRep("", FUNC_NAME ": Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]",
            status);
   }
@@ -1088,7 +1088,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
       tempstr = NULL;
       astMapGet0C( keymap, "DUMPDIR", &tempstr );
       if( tempstr ) {
-         size_t clen = strlen( tempstr );
+         dim_t clen = strlen( tempstr );
          dumpdir = astStore( NULL, tempstr, clen + 2 );
          if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
       }
@@ -1400,7 +1400,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
     msgOut(" ", FUNC_NAME ": ^MAX Iterations", status );
   }
 
-  msgSeti("NUMCOMP",nmodels);
+  msgSetk("NUMCOMP",nmodels);
   msgOutif(MSG__VERB," ",
            FUNC_NAME ": ^NUMCOMP model components in solution: ",
            status);
@@ -1459,7 +1459,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
   if (igroup) {
     if( ncontig ) *ncontig = igroup->chunk[igroup->ngroups-1]+1;
-    msgOutf( " ", FUNC_NAME ": provided data are in %" DIM_T_FMT
+    msgOutf( " ", FUNC_NAME ": provided data are in %d"
              " continuous chunks, the largest of which has %zu samples "
              "(%lg s)", status, igroup->chunk[igroup->ngroups-1]+1,
              maxconcat, maxconcat/srate_maxlen );
@@ -1549,13 +1549,13 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
          requested to available memory (rounded up to an integral
          number) to estimate the number of time steps for try. */
       ncontchunks = ceil((double)memneeded/(double)maxdimm);
-      try = (size_t) ceil( maxconcat / ncontchunks );
+      try = (dim_t) ceil( maxconcat / ncontchunks );
 
       /* Then figure out how many files this corresponds to, round up
          to get integral number of files, and finally multiply by file
          length and add on padding to get back into time steps */
 
-      try = (size_t) ceil((double)try/(double)maxfile)*maxfile + pad;
+      try = (dim_t) ceil((double)try/(double)maxfile)*maxfile + pad;
 
       /*  If we exceed available memory subtract off the length of
           one file. If we don't have enough memory even for one input
@@ -1595,8 +1595,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
          make them of more equal size. */
       if( maxconcat2*ncontchunks < maxconcat - 2*pad && *status == SAI__OK ) {
          ncontchunks++;
-         try = (size_t) ceil( maxconcat / ncontchunks );
-         try = (size_t) ceil((double)try/(double)maxfile)*maxfile + pad;
+         try = (dim_t) ceil( maxconcat / ncontchunks );
+         try = (dim_t) ceil((double)try/(double)maxfile)*maxfile + pad;
          if( (try > (maxconcat*( (double) maxdimm / (double) memneeded ))) &&
              (try > maxfile) ) try -= maxfile;
 
@@ -1646,7 +1646,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
        iteration loop */
     ncontchunks = igroup->chunk[igroup->ngroups-1]+1;
 
-    msgSeti( "NCONTCHUNKS", ncontchunks );
+    msgSetk( "NCONTCHUNKS", ncontchunks );
     msgOutif(MSG__VERB," ",
              FUNC_NAME ": ^NCONTCHUNKS large continuous chunks outside"
              " iteration loop.", status);
@@ -1654,7 +1654,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
   /* Load in the error map */
   if( epsin && (*status==SAI__OK) ) {
-    int nmap, tndf;
+    int tndf;
+    size_t nmap;
     void *ptr;
     msgOutf( "", FUNC_NAME ": loading external error map `%s'", status, epsin );
 
@@ -1709,8 +1710,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
   for( contchunk=0; contchunk<ncontchunks  && !smf_interupt && *status == SAI__OK;
        contchunk++ ) {
 
-    size_t ntgood = 0;       /* Number of good time slices in this chunk */
-    size_t nsamples = 0;     /* Number of good samples in this chunk */
+    dim_t ntgood = 0;       /* Number of good time slices in this chunk */
+    dim_t nsamples = 0;     /* Number of good samples in this chunk */
 
     smfArray *noisemaps=NULL;/* Array of noise maps for current chunk */
 
@@ -1719,8 +1720,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
     _smf_iteratemap_showmem(status);
 #endif
 
-    msgSeti("CHUNK", contchunk+1);
-    msgSeti("NUMCHUNK", ncontchunks);
+    msgSetk("CHUNK", contchunk+1);
+    msgSetk("NUMCHUNK", ncontchunks);
     msgOut( " ",
             FUNC_NAME ": Continuous chunk ^CHUNK / ^NUMCHUNK =========",
             status);
@@ -1750,7 +1751,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
       /* Concat everything in this contchunk into a single smfArray. Note
          that the pointing LUT gets generated in smf_concat_smfGroup below. */
 
-      msgSeti("C",contchunk+1);
+      msgSetk("C",contchunk+1);
       msgOutif(MSG__VERB," ",
                FUNC_NAME ": Concatenating files in continuous chunk ^C",
                status);
@@ -2462,7 +2463,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
               if( ( iter > 0 || importsky ) && !dat.ast_skipped ) {
 
                 /* First find how many samples to process in each worker thread. */
-                size_t sampstep = dsize/nw;
+                dim_t sampstep = dsize/nw;
                 if( sampstep == 0 ) sampstep = 1;
 
                 /* Store the range of samples to be processed by each thread.
@@ -2734,7 +2735,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
             /* Check for consistency between quality and data arrays */
             for( idx=0; (*status==SAI__OK)&&(idx<res[0]->ndat); idx++ ) {
-              size_t nbad;
+              dim_t nbad;
               nbad = smf_check_quality( wf, res[0]->sdata[idx], 0, status );
               if( nbad ) {
                 msgOut( "", FUNC_NAME ": *** Possible programming error! ***",
@@ -2809,7 +2810,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
              map. Ignore bad and zero-constrained pixels. */
 
           if( *status == SAI__OK ) {
-            int maptol_nhitslim;
+            dim_t maptol_nhitslim;
             double *usemap;
 
             /* Pixels with very low hits will have unreliable variances. So
@@ -2824,7 +2825,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
             if( hitslim > 0.0 || maptol_hits > 0.0 ) {
               double meanhits;
               int *ph = thishits;
-              int ngood = 0;
+              dim_t ngood = 0;
               nhitslim = 0;
               for( ipix = 0; ipix < msize; ipix++,ph++ ) {
                  if( *ph > 0 ) {
@@ -2880,7 +2881,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
                   /* Calculate the max of the smoothed map change values. */
                   mapchange_max = 0;
-                  int maxat = -1;
+                  dim_t maxat = -1;
                   for( ipix = 0; ipix < msize; ipix++ ) {
                      if( usemap[ipix] != VAL__BADD ){
                         if( usemap[ipix] > mapchange_max ) {
@@ -2891,7 +2892,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
                   }
 
                   msgOutiff( MSG__VERB, "", FUNC_NAME ":     Maximum map change is "
-                             "at pixel (%d,%d).", status,
+                             "at pixel (%" DIM_T_FMT ",%" DIM_T_FMT ").", status,
                              ( maxat % (int)mdims[0] ) + lbnd_out[0],
                              ( maxat / (int)mdims[0] ) + lbnd_out[1] );
                }
@@ -3093,9 +3094,10 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
            /* Otherwise map the epsout NDF data array and store the median of
               the three last difference maps in it. */
            } else {
-              int place, tndf, el;
+              int place, tndf;
+              size_t el;
               double *ip;
-              size_t pixstep;
+              dim_t pixstep;
 
               msgOutf( "", FUNC_NAME ": creating output error map `%s'",
                        status, epsout );
@@ -3157,7 +3159,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
         /* Set map pixels bad if they have very low hits. */
         if( hitslim > 0 ) {
           int *ph = thishits;
-          int nrej = 0;
+          dim_t nrej = 0;
           for( ipix = 0; ipix < msize; ipix++ ) {
             if( *(ph++) < nhitslim ) {
               thismap[ ipix ] = thisvar[ ipix ] = thisweight[ ipix ] = VAL__BADD;
@@ -3165,8 +3167,8 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
             }
           }
           if( nrej > 0 ) {
-             msgOutf( "", "Setting %d map pixels bad because they contain "
-                      "fewer than %d samples (=%g of the mean samples per pixel).",
+             msgOutf( "", "Setting %" DIM_T_FMT " map pixels bad because they contain "
+                      "fewer than %" DIM_T_FMT " samples (=%g of the mean samples per pixel).",
                       status, nrej, nhitslim, hitslim );
           }
         }
@@ -3479,7 +3481,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
               if( exportNDF_which[nmodels+2] ) {
                 if( (res[0]->sdata[idx]->file->name)[0] ) {
-                  int *info[2];
+                  dim_t *info[2];
                   smf_model_createHdr( lut[0]->sdata[idx], SMF__RES, refdata,
                                        status );
                   *name = 0;
@@ -3889,7 +3891,7 @@ void smf_iteratemap( ThrWorkForce *wf, Grp *igrp, const Grp *iterrootgrp,
 
   /* Store the final mapchange value for each chunk in an output
      parameter. Then free the array. */
-  parPut1d( "CHUNKCHANGE", ncontchunks, chunkchange, status );
+  parPut1d( "CHUNKCHANGE", (int) ncontchunks, chunkchange, status );
   chunkchange = astFree( chunkchange );
 
 
@@ -4006,7 +4008,7 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
    double cf;
    double *pr;
    int *pl;
-   size_t idata;
+   dim_t idata;
    smf_qual_t *pq;
 
 /* Check inherited status */
@@ -4070,8 +4072,8 @@ static void smf1_iteratemap( void *job_data_ptr, int *status ) {
 }
 
 
-static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info,
-                            int *status ){
+static void smf1_storebnds( ThrWorkForce *wf  __attribute__((unused)),
+                            int indf, void *info, int *status ){
 /*
 *  Name:
 *     smf1_storebnds
@@ -4099,7 +4101,7 @@ static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info,
 
 /* Local Variables: */
    HDSLoc *xloc = NULL;
-   int **bnds;
+   dim_t **bnds;
    int there;
 
 /* Check inherited status */
@@ -4114,7 +4116,7 @@ static void smf1_storebnds( ThrWorkForce *wf, int indf, void *info,
    }
 
 /* Store the bounds in the SMURF extension. */
-   bnds = (int **) info;
+   bnds = (dim_t **) info;
    ndfXpt0i( bnds[ 0 ][ 0 ], indf, SMURF__EXTNAME, "LUT_LBNDX", status );
    ndfXpt0i( bnds[ 0 ][ 1 ], indf, SMURF__EXTNAME, "LUT_LBNDY", status );
    ndfXpt0i( bnds[ 1 ][ 0 ], indf, SMURF__EXTNAME, "LUT_UBNDX", status );

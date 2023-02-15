@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar,
 *                        const smf_qual_t *mapqua, dim_t msize,
-*                        const Grp *iterrootgrp, size_t contchunk, int iter,
-*                        const int *lbnd_out, const int *ubnd_out,
+*                        const Grp *iterrootgrp, dim_t contchunk, int iter,
+*                        const dim_t *lbnd_out, const dim_t *ubnd_out,
 *                        AstFrameSet *outfset, const smfHead *hdr,
 *                        const smfArray *qua, int *status )
 
@@ -33,13 +33,13 @@
 *        Number of pixels in map/mapvar
 *     iterrootgrp = const Grp* (Given)
 *        Root name for iteration output maps. Can be path to HDS container.
-*     contchunk = size_t (Given)
+*     contchunk = dim_t (Given)
 *        Continuous chunk number
 *     iter = int (Given)
 *        Iteration number
-*     lbnd_out = const int* (Given)
+*     lbnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = const int* (Given)
+*     ubnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
@@ -124,8 +124,8 @@
 
 void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapvar,
                         const smf_qual_t *mapqua, dim_t msize,
-                        const Grp *iterrootgrp, size_t contchunk, int iter,
-                        const int *lbnd_out, const int *ubnd_out,
+                        const Grp *iterrootgrp, dim_t contchunk, int iter,
+                        const dim_t *lbnd_out, const dim_t *ubnd_out,
                         AstFrameSet *outfset, const smfHead *hdr,
                         const smfArray *qua, int *status ) {
 
@@ -194,8 +194,8 @@ void smf_write_itermap( ThrWorkForce *wf, const double *map, const double *mapva
     char *cval=NULL;
     char obsidssbuf[SZFITSTR];
     double iter_nboloeff;
-    size_t nmap;
-    size_t ngood_tslices;
+    dim_t nmap;
+    dim_t ngood_tslices;
     int ival;
     dim_t ntslice;                /* Number of time slices */
 

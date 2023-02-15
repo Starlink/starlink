@@ -16,7 +16,7 @@
 *     smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
 *                     int *lut, smf_qual_t mask, double *map,
 *                     double *mapweight, int *hitsmap, double *mapvar,
-*                     double thresh, size_t *nflagged, int *status )
+*                     double thresh, dim_t *nflagged, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -44,7 +44,7 @@
 *        Variance of each pixel in map
 *     thresh = doublge (Given)
 *        N-sigma threshold for spike detection
-*     nflagged = size_t * (Returned)
+*     nflagged = dim_t * (Returned)
 *        The number of new samples that were flagged. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -142,10 +142,10 @@ typedef struct smfMapSpikesData {
    int *hitsmap;
    int *lut_data;
    int nflag;
-   size_t bstride;
-   size_t tstride;
-   size_t vbstride;
-   size_t vtstride;
+   dim_t bstride;
+   dim_t tstride;
+   dim_t vbstride;
+   dim_t vtstride;
    smf_qual_t *qua_data;
    smf_qual_t mask;
 } SmfMapSpikesData;
@@ -158,26 +158,26 @@ typedef struct smfMapSpikesData {
 void smf_map_spikes( ThrWorkForce *wf, smfData *data, smfData *variance,
                      int *lut, smf_qual_t mask, double *map, double *mapweight,
                      int *hitsmap, double *mapvar, double thresh,
-                     size_t *nflagged, int *status ) {
+                     dim_t *nflagged, int *status ) {
 
   /* Local Variables */
   double *dat=NULL;          /* Pointer to data array */
   dim_t bolostep;            /* Bolos per worker thread */
-  size_t bstride;            /* bolo stride of data */
+  dim_t bstride;            /* bolo stride of data */
   dim_t dsize;               /* total number of elements in data */
-  size_t tstride;            /* tstride of data */
+  dim_t tstride;            /* tstride of data */
   int iw;                    /* Thread index */
   dim_t nbolo;               /* number of bolos */
-  size_t nflag=0;            /* Number of samples flagged */
+  dim_t nflag=0;            /* Number of samples flagged */
   dim_t ntslice;             /* number of time slices */
   int nw;                    /* Number of worker threads */
   smf_qual_t * qual = NULL;  /* Quality to update for flagging */
   double threshsq;           /* square of thresh */
   double *var=NULL;          /* Pointer to variance array */
-  size_t vbstride;           /* bolo stride of variance */
+  dim_t vbstride;           /* bolo stride of variance */
   dim_t vnbolo;              /* number of bolos in variance */
   dim_t vntslice;            /* number of bolos in variance */
-  size_t vtstride;           /* tstride of variance */
+  dim_t vtstride;           /* tstride of variance */
   SmfMapSpikesData *job_data = NULL; /* Data for jobs */
   SmfMapSpikesData *pdata;   /* Data for job */
 
@@ -322,8 +322,8 @@ static void smf1_map_spikes( void *job_data_ptr, int *status ) {
    double thisweight;
    double woffsq;
    int *pl;
-   size_t ibase;
-   size_t vi;
+   dim_t ibase;
+   dim_t vi;
    smf_qual_t *pq;
 
 /* Check inherited status */

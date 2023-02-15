@@ -157,8 +157,8 @@ pthread_mutex_t smf_filter_execute_mutex = PTHREAD_MUTEX_INITIALIZER;
    exclusive parts of the master smfData so we don't need to make
    local copies of the entire smfData. */
 typedef struct smfFilterExecuteData {
-  size_t b1;               /* Index of first bolometer to be filtered */
-  size_t b2;               /* Index of last bolometer to be filtered */
+  dim_t b1;               /* Index of first bolometer to be filtered */
+  dim_t b2;               /* Index of last bolometer to be filtered */
   int complement;          /* Using complementary filter */
   smfData *data;           /* Pointer to master smfData */
   double *data_fft_r;      /* Real part of the data FFT (1-bolo) */
@@ -179,7 +179,7 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status );
 void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   double ac, bd, aPb, cPd;      /* Components for complex multiplication */
   double *base=NULL;            /* Pointer to start of current bolo in array */
-  size_t bstride;               /* Bolometer stride */
+  dim_t bstride;               /* Bolometer stride */
   double *data_fft_r=NULL;      /* Real part of the data FFT */
   double *data_fft_i=NULL;      /* Imaginary part of the data FFT */
   smfData *data=NULL;           /* smfData that we're working on */
@@ -191,10 +191,10 @@ void smfFilterExecuteParallel( void *job_data_ptr, int *status ) {
   double *inv_filt_i = NULL;    /* Array holding inverted imaginary filter values */
   smfFilterExecuteData *pdata=NULL; /* Pointer to job data */
   smfFilter *filt=NULL;         /* Frequency domain filter */
-  size_t i;                     /* Loop counter */
+  dim_t i;                     /* Loop counter */
   int iloop;                    /* Loop counter */
   int invert;                   /* Invert the filter to produce a low pass filter? */
-  size_t j;                     /* Loop counter */
+  dim_t j;                     /* Loop counter */
   double *mask = NULL;          /* Array holding mask values to be filtered */
   dim_t nbolo;                  /* Number of bolometers */
   int newalg;                   /* Use new algorithm for handling missing data? */
@@ -520,19 +520,19 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
                          int complement, int whiten, int *status ) {
 
   /* Local Variables */
-  size_t apod_length=0;           /* apodization length */
+  dim_t apod_length=0;            /* apodization length */
   fftw_iodim dims;                /* I/O dimensions for transformations */
-  size_t first;                   /* First sample apodization at start */
+  dim_t first;                    /* First sample apodization at start */
   int i;                          /* Loop counter */
   smfFilterExecuteData *job_data=NULL;/* Array of job data for each thread */
-  size_t last;                    /* Last sample apodization at end */
+  dim_t last;                     /* Last sample apodization at end */
   dim_t nbolo=0;                  /* Number of bolometers */
   dim_t ndata=0;                  /* Total number of data points */
   int nw;                         /* Number of worker threads */
   dim_t ntslice=0;                /* Number of time slices */
   smf_qual_t *qua=NULL;           /* Pointer to quality flags */
   smfFilterExecuteData *pdata=NULL; /* Pointer to current job data */
-  size_t step;                    /* step size for dividing up work */
+  dim_t step;                     /* step size for dividing up work */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -614,7 +614,7 @@ void smf_filter_execute( ThrWorkForce *wf, smfData *data, smfFilter *filt,
      - dims describes the length and stepsize of time slices within a bolometer
   */
 
-  dims.n = ntslice;
+  dims.n = (int) ntslice;
   dims.is = 1;
   dims.os = 1;
 

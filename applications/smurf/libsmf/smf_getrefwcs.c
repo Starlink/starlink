@@ -145,14 +145,14 @@ void smf_getrefwcs( const char *param, Grp *igrp, AstFrameSet **specwcs,
    AstFrameSet *refwcs = NULL;  /* The WCS FrameSet from the reference NDF */
    AstRegion *circle;
    char text[ 255 ];            /* Parameter value */
+   dim_t lbnd[2];               /* Lower pixel index bounds of mid tile */
+   dim_t ubnd[2];               /* Upper pixel index bounds of mid tile */
    int *tiles;
    int i;
    int jsatiles;
-   int lbnd[2];                 /* Lower pixel index bounds of mid tile */
    int ntile;
    int perm[ 2 ];
    int refndf;                  /* NDF identifier for the refence NDF */
-   int ubnd[2];                 /* Upper pixel index bounds of mid tile */
    size_t code;
    smfData *data = NULL;        /* Structure describing 1st input file */
    smfJSATiling skytiling;

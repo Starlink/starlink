@@ -81,8 +81,8 @@ typedef struct smfAddGaiData {
    const double *gai;
    dim_t nbolo;
    double *out;
-   size_t t1;
-   size_t t2;
+   dim_t t1;
+   dim_t t2;
 } smfAddGaiData;
 
 /* Prototypes for local functions. */

@@ -116,8 +116,8 @@ void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
                      const smfArray *bbms, smf_bbm_meth method,
                      smf_qual_t addqual, int *status) {
 
-  size_t previdx;
-  size_t nextidx;
+  dim_t previdx;
+  dim_t nextidx;
   smfData * bbm1 = NULL;
   smfData * bbm2 = NULL;
   smfData * bbm = NULL;
@@ -181,8 +181,8 @@ void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
     bbm = smf_create_smfData( SMF__NOCREATE_FILE | SMF__NOCREATE_DA |
                               SMF__NOCREATE_HEAD, status );
     if (*status == SAI__OK) {
-      size_t nelem;
-      size_t i;
+      dim_t nelem;
+      dim_t i;
       double *ddata = NULL;
       int *idata = NULL;
       int *odata = NULL;
@@ -198,10 +198,10 @@ void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
       if (nelem != nbolo ) {
         if (*status == SAI__OK) {
           *status = SAI__ERROR;
-          msgSeti( "B1", bbm->dims[0]);
-          msgSeti( "B2", bbm->dims[1]);
-          msgSeti( "TB", bbm->dims[0] * bbm->dims[1] );
-          msgSeti( "NB", nbolo );
+          msgSetk( "B1", bbm->dims[0]);
+          msgSetk( "B2", bbm->dims[1]);
+          msgSetk( "TB", bbm->dims[0] * bbm->dims[1] );
+          msgSetk( "NB", nbolo );
           errRep( " ", FUNC_NAME ": the selected bad bolometer mask has a "
                   "different number of elements (^B1 x ^B2 = ^TB) than the data "
                   "it is masking (^NB)",
@@ -260,8 +260,8 @@ void smf_apply_mask( ThrWorkForce *wf, smfData *indata,
           /* just mask the first nelem items */
           smf_qual_t maskqual = SMF__Q_BADB | addqual;
           int *mask = bbm->pntr[0];
-          size_t nelem = bbm->dims[0] * bbm->dims[1];
-          size_t i;
+          dim_t nelem = bbm->dims[0] * bbm->dims[1];
+          dim_t i;
 
           for (i=0; i<nelem; i++) {
             if (mask[i] == VAL__BADI) {

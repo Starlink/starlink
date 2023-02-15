@@ -106,13 +106,12 @@
 #include "smurf_par.h"
 
 void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
-                           const unsigned int stepNum, const int subBandNum,
-                           const dasFlag dasFlag, const gsdWCS *wcs,
-                           struct JCMTState *record, int *status )
+                           const unsigned int stepNum __attribute__((unused)),
+                           const int subBandNum,
+                           const dasFlag dasFlag __attribute__((unused)),
+                           const gsdWCS *wcs, struct JCMTState *record, int *status )
 {
 
-  /* Local variables */
-  int arrayIndex;             /* index into array for retrieving values */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -173,15 +172,6 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 
  /* Get the frontend LO frequency. */
   record->fe_lofreq = gsdVars->LOFreqs[subBandNum];
-
-  /* Use the dasFlag to determine the dimensionality/size of
-     the TSKY array. */
-  if ( dasFlag == DAS_CONT_CAL ) {
-    arrayIndex =  ( stepNum * gsdVars->nBESections ) +
-                  subBandNum;
-  } else {
-    arrayIndex = subBandNum;
-  }
 
   record->enviro_air_temp = gsdVars->tamb + 273.15; /* Kelvin */
 

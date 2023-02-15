@@ -219,20 +219,20 @@ void smurf_sc2fft( int *status ) {
   Grp * basegrp = NULL;     /* Basis group for output filenames */
   smfArray *bbms = NULL;    /* Bad bolometer masks */
   smfArray *concat=NULL;    /* Pointer to a smfArray */
-  size_t contchunk;         /* Continuous chunk counter */
+  dim_t contchunk;          /* Continuous chunk counter */
   smfArray *darks = NULL;   /* dark frames */
   int ensureflat;           /* Flag for flatfielding data */
   Grp *fgrp = NULL;         /* Filtered group, no darks */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
-  size_t gcount=0;          /* Grp index counter */
-  size_t i;                 /* Loop counter */
+  dim_t gcount=0;           /* Grp index counter */
+  dim_t i;                  /* Loop counter */
   smfGroup *igroup=NULL;    /* smfGroup corresponding to igrp */
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
   int isfft=0;              /* Are data fft or real space? */
   dim_t maxconcat=0;        /* Longest continuous chunk length in samples */
-  size_t ncontchunks=0;     /* Number continuous chunks outside iter loop */
+  dim_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Total number of NDF names in the output group */
@@ -324,7 +324,7 @@ void smurf_sc2fft( int *status ) {
 
   gcount = 1;
   for( contchunk=0;(*status==SAI__OK)&&contchunk<ncontchunks; contchunk++ ) {
-    size_t idx;
+    dim_t idx;
 
     /* Concatenate this continuous chunk but forcing a raw data read.
        We will need quality. */
@@ -386,7 +386,7 @@ void smurf_sc2fft( int *status ) {
             double *whitenoise=NULL;
             smf_qual_t *bolomask=NULL;
             double mean, sig, freqlo;
-            size_t ngood, newgood;
+            dim_t ngood, newgood;
 
             whitenoise = astCalloc( nbolo, sizeof(*whitenoise) );
             bolomask = astCalloc( nbolo, sizeof(*bolomask) );
@@ -459,7 +459,7 @@ void smurf_sc2fft( int *status ) {
             odata = tempdata;
             tempdata = NULL;
 	    /* Store the number of good bolometers */
-	    parPut0i( "NGOOD", newgood, status );
+	    parPut0k( "NGOOD", newgood, status );
           } else {
             /* Otherwise do forward/inverse transforms here as needed */
 

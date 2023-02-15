@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
-*                          const smfArray *qua, size_t qcount[SMF__NQBITS],
-*                          size_t * ngoodbolo, size_t * nmap, size_t *nmax,
-*                          dim_t *ntslice, size_t * ntgood, size_t * tbound,
-*                          size_t * tpad, int * status );
+*                          const smfArray *qua, dim_t qcount[SMF__NQBITS],
+*                          dim_t * ngoodbolo, dim_t * nmap, dim_t *nmax,
+*                          dim_t *ntslice, dim_t * ntgood, dim_t * tbound,
+*                          dim_t * tpad, int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -30,28 +30,28 @@
 *        Pointer to smfArray of smfData's containing quality. Assumes that the
 *        dimensionality of each smfData is the same and that the padding
 *        is the same.
-*     qcount = size_t[SMF__NQBITS] (Returned)
+*     qcount = dim_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual. Will only use the number of elements determined
 *        by the quality family. Can be NULL.
-*     ngoodbolo = size_t* (Returned)
+*     ngoodbolo = dim_t* (Returned)
 *        If specified, return number of bolometers that are flagged as good.
-*     nmap = size_t* (Returned)
+*     nmap = dim_t* (Returned)
 *        If specified, return total number of samples that could be used
 *        in the map (i.e., no quality bits in SMF__Q_GOOD set).
-*     nmax = size_t* (Returned)
+*     nmax = dim_t* (Returned)
 *        If specified, return the maximum theoretical number of samples that
 *        could be used for a map -- excluding only SMF__Q_PAD|SMF__Q_APOD
 *        (padding/apodization).
-*     ntslice = size_t * (Returned)
+*     ntslice = dim_t * (Returned)
 *        Number of time slices in model. Can be NULL. Will not include padding if "nopad"
 *        is true.
-*     ntgood = size_t * (Returned)
+*     ntgood = dim_t * (Returned)
 *        Number of good time slices in model (not including padding or apodization). Can be NULL.
-*     tbound = size_t * (Returned)
+*     tbound = dim_t * (Returned)
 *        Number of time slice in boundary. Can be NULL. Will not include padding if "nopad"
 *        is true.
-*     tpad = size_t * (Returned)
+*     tpad = dim_t * (Returned)
 *        Number of time slices in padding. Can be NULL. Will be zero if nopad is false.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -128,20 +128,20 @@
 
 void
 smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
-                     const smfArray *qua, size_t qcount[SMF__NQBITS],
-                     size_t * ngoodbolo, size_t * nmap, size_t *nmax, dim_t * ntslice,
-                     size_t * ntgood, size_t * tbound, size_t *tpad, int * status ) {
+                     const smfArray *qua, dim_t qcount[SMF__NQBITS],
+                     dim_t * ngoodbolo, dim_t * nmap, dim_t *nmax, dim_t * ntslice,
+                     dim_t * ntgood, dim_t * tbound, dim_t *tpad, int * status ) {
 
   /* Local Variables */
-  size_t i;                     /* loop counter */
+  dim_t i;                     /* loop counter */
   dim_t idx;                    /* Subarray counter */
-  size_t nbolo_tot;             /* total bolos in all subarrays */
-  size_t nmap_tot;              /* number of good map samples */
-  size_t nmax_tot;              /* theoretical maximum good map samples */
-  size_t nqbits = 0;            /* Number of quality bits in this family */
+  dim_t nbolo_tot;             /* total bolos in all subarrays */
+  dim_t nmap_tot;              /* number of good map samples */
+  dim_t nmax_tot;              /* theoretical maximum good map samples */
+  dim_t nqbits = 0;            /* Number of quality bits in this family */
   dim_t ntslice_ref;            /* reference number of time slices */
-  size_t tbound_local;          /* Local calculation of tbound */
-  size_t tpad_ref;              /* Reference padding slices */
+  dim_t tbound_local;          /* Local calculation of tbound */
+  dim_t tpad_ref;              /* Reference padding slices */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -178,14 +178,14 @@ smf_qualstats_model( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
       errRep(" ", FUNC_NAME
              ": NULL qual pointer encountered", status);
     } else {
-      size_t bstride;               /* bolo stride */
+      dim_t bstride;               /* bolo stride */
       dim_t nbolo;                  /* number of bolos */
       dim_t nslices;                /* Number of time slices in this smfData */
-      size_t subqcount[SMF__NQBITS];/* subarray quality bit counter */
-      size_t subnmap;               /* nmap for subarray */
-      size_t subnmax;               /* nmax for subarray */
-      size_t tstride;               /* time slice stride */
-      size_t tpadslices;            /* number of time slices in padding */
+      dim_t subqcount[SMF__NQBITS];/* subarray quality bit counter */
+      dim_t subnmap;               /* nmap for subarray */
+      dim_t subnmax;               /* nmax for subarray */
+      dim_t tstride;               /* time slice stride */
+      dim_t tpadslices;            /* number of time slices in padding */
 
       smf_get_dims( qua->sdata[idx], NULL, NULL, &nbolo, &nslices,
                     NULL, &bstride, &tstride, status );

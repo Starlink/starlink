@@ -102,7 +102,7 @@
 void smf_history_read( smfData* data,int *status) {
 
   char * buffer = NULL;       /* char buffer read from history info */
-  size_t bufelem = 0;         /* Size of one element in buffer */
+  dim_t bufelem = 0;          /* Size of one element in buffer */
   size_t clen = 0;            /* String length in _CHAR*X */
   smfFile *file = NULL;       /* data->file */
   size_t i = 0;               /* Loop counter */

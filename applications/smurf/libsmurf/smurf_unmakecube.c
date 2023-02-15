@@ -217,18 +217,18 @@ typedef struct SkyCube {
    AstSkyFrame *abskyfrm;   /* Input SkyFrame (always absolute) */
    int indf;                /* Input cube NDF identifier */
    int moving;              /* Is the telescope base position changing? */
-   int slbnd[3];            /* Array of lower bounds of input cube */
-   int subnd[3];            /* Array of lower bounds of input cube */
+   dim_t slbnd[3];          /* Array of lower bounds of input cube */
+   dim_t subnd[3];          /* Array of lower bounds of input cube */
 } SkyCube;
 
 
 void smurf_unmakecube( int *status ) {
 
 /* Local Variables */
-   AstFrame *tfrm = NULL;       /* Current Frame from input WCS */
-   AstFrameSet *wcsin = NULL;   /* WCS Frameset for input cube */
-   AstMapping *tmap = NULL;     /* Base->current Mapping from input WCS */
-   AstSkyFrame *iskyfrm = NULL; /* SkyFrame from the input WCS Frameset */
+   AstFrame *tfrm = NULL;     /* Current Frame from input WCS */
+   AstFrameSet *wcsin = NULL; /* WCS Frameset for input cube */
+   AstMapping *tmap = NULL;   /* Base->current Mapping from input WCS */
+   AstSkyFrame *iskyfrm = NULL;/* SkyFrame from the input WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp1 = NULL;         /* Group of input sky cube files */
    Grp *igrp2 = NULL;         /* Group of input template files */
@@ -239,19 +239,18 @@ void smurf_unmakecube( int *status ) {
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    double params[ 4 ];        /* astResample parameters */
    int axes[ 2 ];             /* Indices of selected axes */
-   int blank;                 /* Was a blank line just output? */
    int flag;                  /* Was the group expression flagged? */
-   int ifile;                 /* Input file index */
    int interp = 0;            /* Pixel interpolation method */
-   int iskycube;              /* Index of current sky cube */
-   int nel;                   /* Number of elements in 3D array */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
    int ondf;                  /* Output time series NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int overlap;               /* Does time series overlap sky cube? */
    int sdim[3];               /* Array of significant pixel axes */
    int usedetpos;             /* Should the detpos array be used? */
+   size_t ifile;              /* Input file index */
+   size_t iskycube;           /* Index of current sky cube */
    size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
+   size_t nel;                /* Number of elements in 3D array */
    size_t nskycube;           /* Number of supplied sky cubes */
    size_t outsize;            /* Number of files in output group */
    size_t size;               /* Number of files in input group */
@@ -266,9 +265,6 @@ void smurf_unmakecube( int *status ) {
 /* Check inherited status */
    if( *status != SAI__OK ) return;
 
-/* We have not yet displayed a blank line on stdout. */
-   blank = 0;
-
 /* Begin an AST context */
    astBegin;
 
@@ -280,7 +276,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Create an array of structures to hold information about each input sky
    cube. */
-   sky_cubes = astMalloc( sizeof( SkyCube )*(size_t) nskycube );
+   sky_cubes = astMalloc( sizeof( SkyCube )*(dim_t) nskycube );
 
 /* Store a description of each sky cube. */
    if( sky_cubes ) {
@@ -292,8 +288,8 @@ void smurf_unmakecube( int *status ) {
 
 /* Get the WCS FrameSet from the sky cube, together with its pixel index
    bounds. */
-         kpg1Asget( skycube->indf, 3, 0, 1, 1, sdim, skycube->slbnd,
-                    skycube->subnd, &wcsin, status );
+         kpg1Asget8( skycube->indf, 3, 0, 1, 1, sdim, skycube->slbnd,
+                     skycube->subnd, &wcsin, status );
 
 /* Get the base->current Mapping from the input WCS FrameSet, and split it
    into two Mappings; one (iskymap) that maps the first 2 GRID axes into
@@ -410,8 +406,8 @@ void smurf_unmakecube( int *status ) {
    ndgCreat ( "OUT", igrp2, &ogrp, &outsize, &flag, status );
    if( outsize != size && *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "O", outsize );
-      msgSeti( "I", size );
+      msgSetk( "O", outsize );
+      msgSetk( "I", size );
       errRep( "", "Numbers of input reference cubes (^I) and output "
               "cubes (^O) differ.", status );
    }
@@ -449,8 +445,8 @@ void smurf_unmakecube( int *status ) {
 
 /* Report the name of the input template. */
       smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
-      msgSeti( "THISFILE", ifile );
-      msgSeti( "NUMFILES", size );
+      msgSetk( "THISFILE", ifile );
+      msgSetk( "NUMFILES", size );
       msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
                 status );
 

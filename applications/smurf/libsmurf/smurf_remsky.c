@@ -194,6 +194,7 @@ void smurf_remsky( int * status ) {
   smfArray *flatramps = NULL;/* Flatfield ramps */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   size_t i;                  /* Loop counter */
+  dim_t j;                   /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   smfData *odata = NULL;     /* Output data struct */
   Grp *ogrp = NULL;          /* Output group */
@@ -270,8 +271,8 @@ void smurf_remsky( int * status ) {
                      NULL, NULL, status );
     if ( *status == SAI__OK ) {
       /* Open and process related files */
-      for (i=0; i<ogroup->ngroups; i++) {
-        smf_open_related( NULL, ogroup, i, "UPDATE", &relfiles, status );
+      for (j=0; j<ogroup->ngroups; j++) {
+        smf_open_related( NULL, ogroup, j, "UPDATE", &relfiles, status );
         smf_subtract_plane( NULL, relfiles, fittype, status );
         smf_close_related( NULL, &relfiles, status );
       }
@@ -288,7 +289,7 @@ void smurf_remsky( int * status ) {
 
       if (*status != SAI__OK) {
         /* Tell the user which file it was... */
-        msgSeti("I",i);
+        msgSetk("I",i);
         errRep(TASK_NAME, "Unable to open file ^I", status);
       }
       if ( *status == SAI__OK ) {

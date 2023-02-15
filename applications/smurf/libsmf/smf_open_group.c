@@ -117,7 +117,7 @@ void smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t refdims[],
 
   for (i = 1; i <= nfiles; i++) {
     smfData *ifile = NULL;
-    smf_open_file( wf, igrp, i, "READ", 0, &ifile, status );
+    smf_open_file( wf, igrp, (int) i, "READ", 0, &ifile, status );
     if (*status != SAI__OK) break;
 
     if (i == 1 && !refdims) {
@@ -126,11 +126,11 @@ void smf_open_group( ThrWorkForce *wf, const Grp * igrp, const dim_t refdims[],
     } else {
       if ( (dims[0] != (ifile->dims)[0]) ||
            (dims[1] != (ifile->dims)[1]) ) {
-        msgSeti( "N", i);
-        msgSeti( "RX", dims[0]);
-        msgSeti( "RY", dims[1]);
-        msgSeti( "BX", (ifile->dims)[0]);
-        msgSeti( "BY", (ifile->dims)[1]);
+        msgSetk( "N", i);
+        msgSetk( "RX", dims[0]);
+        msgSetk( "RY", dims[1]);
+        msgSetk( "BX", (ifile->dims)[0]);
+        msgSetk( "BY", (ifile->dims)[1]);
         *status = SAI__ERROR;
         errRep( " ", "Dimensions of file ^N (^BX x ^BY) differ from that"
                 " of the reference (^RX x ^RY)",

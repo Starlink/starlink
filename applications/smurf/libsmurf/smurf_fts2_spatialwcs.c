@@ -119,7 +119,7 @@ void smurf_fts2_spatialwcs(int* status)
 
   int indf;
   int outndf;
-  int nout;
+  size_t nout;
   void *outdata[1] = { NULL };
 
   double refra                = 0.0;
@@ -136,7 +136,7 @@ void smurf_fts2_spatialwcs(int* status)
   AstZoomMap* specmapping     = NULL;
 
   // GET INPUT GROUP
-  kpg1Rgndf("IN", 0, 1, "", &inputGrp, &inSize, status);
+  kpg1Rgndf("IN", 0, 1, " ", &inputGrp, &inSize, status);
 
   // GET OUTPUT GROUP
   kpg1Wgndf( "OUT", outputGrp, inSize, inSize,
@@ -218,7 +218,7 @@ void smurf_fts2_spatialwcs(int* status)
     }
 
     // CREATE ZOOMMAP FOR 1D SPECTRUM
-    specmapping = astZoomMap(1, wnFact, "");
+    specmapping = astZoomMap(1, wnFact, " ");
     double zshift[1];
     zshift[0] = -wnFact;
     AstShiftMap* zshiftmap = astShiftMap(1, zshift, " ");
@@ -226,13 +226,13 @@ void smurf_fts2_spatialwcs(int* status)
 
     // COMBINE 2D GRID MAPPING AND 1D SPECTRUM MAPPING
     // TO CREATE 3D MAPPING FOR SPECTRUM CUBE
-    speccubemapping = astCmpMap(gridmapping, specmapping, 0, "");
+    speccubemapping = astCmpMap(gridmapping, specmapping, 0, " ");
 
     // CREATE BASE FRAME FOR 3D SPECTRUM CUBE
     basefrm3d = astFrame(3, "DOMAIN=GRID");
 
     // CREATE CURRENT FRAME FOR 3D SPECTRUM CUBE
-    currentfrm3d = astCmpFrame(gridframe, specframe, "");
+    currentfrm3d = astCmpFrame(gridframe, specframe, " ");
 
     // SET PARAMETERS FOR CURRENT FRAME
     if(astTest(gridframe, "Epoch")) {
@@ -246,7 +246,7 @@ void smurf_fts2_spatialwcs(int* status)
     }
 
     // CREATE WCS FOR 3D SPECTRUM CUBE
-    speccubewcs = astFrameSet(basefrm3d, "");
+    speccubewcs = astFrameSet(basefrm3d, " ");
     astAddFrame(speccubewcs, AST__BASE, speccubemapping, currentfrm3d);
 
     // WRITE WCS

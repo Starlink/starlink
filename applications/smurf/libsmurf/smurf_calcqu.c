@@ -398,9 +398,20 @@ void smurf_calcqu( int *status ) {
    char subarray0[ 10 ];      /* Name of first subarray (e.g. "s4a", etc) */
    char subarray[ 10 ];       /* Subarray name (e.g. "s4a", etc) */
    const char *north;         /* Celestial system to use as ref. direction  */
+   dim_t block_end;           /* Index of last time slice in block */
+   dim_t block_start;         /* Index of first time slice in block */
+   dim_t bsize;               /* Number of files in base group */
+   dim_t gcount;              /* Output grp index counter */
+   dim_t ichunk;              /* Continuous chunk counter */
+   dim_t idx;                 /* Subarray counter */
+   dim_t igroup;              /* Index for group of related input NDFs */
    dim_t islice;              /* Index of current time slice */
+   dim_t nchunk;              /* Number continuous chunks outside iter loop */
+   dim_t nskipped;            /* Number of skipped blocks */
    dim_t ntslice0;            /* No of time slices in first subarray */
    dim_t ntslice;             /* No of time slices in current subarray */
+   dim_t skipped;             /* Number of skipped samples */
+   dim_t total;               /* Total number of time salices in sub-array */
    double *polang0;           /* Array of HWP angles at all time slices */
    double *ptr0;              /* Pointer to next HWP angle from first subarray */
    double ang0;               /* HWP angle at start of each fitting box */
@@ -409,8 +420,6 @@ void smurf_calcqu( int *status ) {
    double rotafreq;           /* HWP rotation frequency */
    double steptime;           /* STEPTIME header frm first input */
    float arcerror;            /* Max acceptable error (arcsec) in one block */
-   int block_end;             /* Index of last time slice in block */
-   int block_start;           /* Index of first time slice in block */
    int dkclean;               /* Clean dark squids? */
    int doclean;               /* Clean science data? */
    int fix;                   /* Fix the POL-2 triggering issue? */
@@ -420,6 +429,7 @@ void smurf_calcqu( int *status ) {
    int indfi;                 /* Cloned NDF identifier for output I array */
    int indfq;                 /* Cloned NDF identifier for output Q array */
    int indfu;                 /* Cloned NDF identifier for output U array */
+   int inidx;                 /* Index into group of science input NDFs */
    int iplace;                /* NDF placeholder for current block's I image */
    int ipolcrd;               /* Reference direction for waveplate angles */
    int ival;                  /* Integer parameter value */
@@ -427,24 +437,14 @@ void smurf_calcqu( int *status ) {
    int maxsize;               /* Max no. of time slices in a block */
    int minsize;               /* Min no. of time slices in a block */
    int nc;                    /* Number of characters written to a string */
-   int nskipped;              /* Number of skipped blocks */
    int nsubscan;              /* NSUBSCAN header from first input */
    int obsnum;                /* Observation number */
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
    int polbox;                /* HWP cycles in a fitting box */
    int qplace;                /* NDF placeholder for current block's Q image */
-   int skipped;               /* Number of skipped samples */
    int submean;               /* Subtract mean value from each time slice? */
-   int total;                 /* Total number of time salices in sub-array */
    int uplace;                /* NDF placeholder for current block's U image */
    int utdate;                /* UT date of observation */
-   size_t bsize;              /* Number of files in base group */
-   size_t gcount;             /* Output grp index counter */
-   size_t ichunk;             /* Continuous chunk counter */
-   size_t idx;                /* Subarray counter */
-   size_t igroup;             /* Index for group of related input NDFs */
-   size_t inidx;              /* Index into group of science input NDFs */
-   size_t nchunk;             /* Number continuous chunks outside iter loop */
    size_t osize;              /* Number of files in output group */
    size_t ssize;              /* Number of science files in input group */
    smfArray *concat = NULL;   /* Pointer to smfArray holding bolometer data */
@@ -485,7 +485,7 @@ void smurf_calcqu( int *status ) {
    } else {
 
 /* Check that all science files contain POL2 analysed intensoty data. */
-      smf_check_pol2( sgrp, ssize, 1, status );
+      smf_check_pol2( sgrp, (int) ssize, 1, status );
 
 /* See if a correction should be made for the POL2 triggering issue. */
       parGet0l( "FIX", &fix, status );
@@ -704,7 +704,7 @@ void smurf_calcqu( int *status ) {
          }
 
 /* If required correct for the POL2 triggering issue. */
-         if( fix ) smf_fix_pol2( wf, concat, status );
+         if( fix ) smf_fix_pol2( concat, status );
 
 /* Create an array and copy the POL_ANG values from the first subarray
    into it. Get the number of time slices and subarray name first. */
@@ -1118,12 +1118,12 @@ void smurf_calcqu( int *status ) {
 
 /* Warn about short blocks. */
                   } else {
-                     int blength = block_end - block_start - 1;
+                     dim_t blength = block_end - block_start - 1;
                      skipped += blength;
                      nskipped++;
                      msgOutiff( MSG__VERB, "", "   Skipping short block of %d "
                                 "time slices (parameter MINSIZE=%d).", status,
-                                blength, minsize );
+                                (int) blength, minsize );
                   }
 
 /* The next block starts at the first time slice following the previous
@@ -1236,8 +1236,8 @@ L999:
 
 /* Service routine called with smf_write_smfData. It adds provenance to
    the output NDF. */
-static void smurf1__putprov(  ThrWorkForce *wf, int indf, void *oprov,
-                              int *status ){
+static void smurf1__putprov(  ThrWorkForce *wf __attribute__((unused)),
+                              int indf, void *oprov, int *status ){
    if( oprov ) ndgWriteProv( oprov, indf, 1, status );
 }
 

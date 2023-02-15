@@ -56,8 +56,8 @@
 *     15-MAY-2014 (DSB):
 *        Flag bad variances in the quality array.
 *     2018-03-15 (DSB):
-*        Read existing model data from NDFs stored in the directory specified 
-*        by the config parameter "dumpdir", rather than from the current 
+*        Read existing model data from NDFs stored in the directory specified
+*        by the config parameter "dumpdir", rather than from the current
 *        directory.
 *     {enter_further_changes_here}
 
@@ -101,30 +101,30 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
 /* Local Variables */
    AstKeyMap *kmap = NULL;
    char *ename = NULL;
-   const char *bn = NULL;
    const char *tempstr = NULL;
+   const char *bn = NULL;
+   dim_t bstride;
+   dim_t dims[ 3 ];
    dim_t ibolo;
+   dim_t ibox;
+   dim_t itime;
+   dim_t itime_hi;
    dim_t nbolo;
    dim_t ncols;
    dim_t nrows;
    dim_t ntslice;
+   dim_t tstride;
    double *dp;
-   double *ip;
-   double *pd;
    double noival;
-   int dims[ 3 ];
-   int el;
-   int ibox;
+   double *pd;
+   double *ip;
    int import;
    int indf;
-   int itime;
-   int itime_hi;
    int nc;
    int ndim;
    int repeat;
-   int result ;
-   size_t bstride;
-   size_t tstride;
+   int result;
+   size_t el;
 
 /* Initialise. */
    result = 0;
@@ -149,7 +149,7 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
       tempstr = NULL;
       astMapGet0C( keymap, "DUMPDIR", &tempstr );
       if( tempstr ) {
-         nc = strlen( tempstr );
+         nc = (int) strlen( tempstr );
          ename = astStore( NULL, tempstr, nc + 2 );
          if( ename[nc-1] != '/' ) {
             strcpy( ename + nc, "/" );
@@ -170,7 +170,7 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
       ename = astAppendString( ename, &nc, bn );
 
 /* Terminate the banename after "_con". */
-      nc = strstr( ename, "_con" ) - ename + 4;
+      nc = (int)( strstr( ename, "_con" ) - ename + 4 );
       ename[ nc ] = 0;
 
 /* Append "_noi". */
@@ -187,16 +187,16 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
                   "must be 3.", status, ndim, ename );
       }
 
-      if( ( dims[ 1 ] != (int) ncols || dims[ 2 ] != (int) nrows ) && *status == SAI__OK ) {
+      if( ( dims[ 1 ] != ncols || dims[ 2 ] != nrows ) && *status == SAI__OK ) {
          *status = SAI__ERROR;
-         errRepf( "", "Illegal dimensions (%d,%d) for axes 2 and 3 in "
+         errRepf( "", "Illegal dimensions (%" DIM_T_FMT ",%" DIM_T_FMT ") for axes 2 and 3 in "
                   "'%s' - must be (32,40).", status, dims[1], dims[2],
                   ename );
       }
 
       if( ntslice == 1 && dims[ 0 ] > 1 && *status == SAI__OK ) {
          *status = SAI__ERROR;
-         errRepf( "", "Illegal dimension (%d) for axes 1 in "
+         errRepf( "", "Illegal dimension (%" DIM_T_FMT ") for axes 1 in "
                   "'%s' - must be 1.", status, dims[0], ename );
       }
 
@@ -272,8 +272,8 @@ int smf_import_noi( const char *name, smfDIMMHead *head, AstKeyMap *keymap,
 /* If a quality array was supplied, flag any samples that have unusable
    noise values (i.e. bad or non-positive). */
       if( qua ) {
-         size_t qbstride;
-         size_t qtstride;
+         dim_t qbstride;
+         dim_t qtstride;
          dim_t qntslice;
          smf_qual_t *pq;
 

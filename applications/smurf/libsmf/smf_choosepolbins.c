@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     ptime = smf_choosepolbins( Grp *igrp, int size, float binsize,
-*                                float binzero, AstFrameSet *wcsout2d,
-*                                int *npbin, double **pangle, int *status )
+*     dim_t ***smf_choosepolbins( Grp *igrp, int size, float binsize,
+*                                 float binzero, AstFrameSet *wcsout2d,
+*                                 int *npbin, double **pangle, int *status )
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -53,9 +53,9 @@
 *     Pointer to an array with an element for every input NDF, or NULL. Each
 *     element holds a pointer to another array that has an element for each
 *     polarisation angle bin. Each of these elements holds a pointer to an
-*     array of ints which are the zero-based indices for the time slices that
-*     contain data for the polarisatiom angle from the input NDF. The length
-*     of these final arrays is unspecified, but a value of VAL__MAXI will be
+*     array of dim_t values which are the zero-based indices for the time slices
+*     that contain data for the polarisatiom angle from the input NDF. The length
+*     of these final arrays is unspecified, but a value of VAL__MAXK will be
 *     stored to mark the end of each array. A NULL pointer is returned if
 *     no input NDFs contain any valid POL_ANG values.
 
@@ -131,9 +131,9 @@
 #include "libsmf/smf.h"
 #include "smurf_par.h"
 
-int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
-                          AstFrameSet *wcsout2d, int *npbin, double **pangle,
-                          int *status ){
+dim_t ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
+                            AstFrameSet *wcsout2d, int *npbin, double **pangle,
+                            int *status ){
 
 /* Local Variables */
    AstFrame *cfrm = NULL;/* Pointer to output sky frame */
@@ -143,6 +143,11 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    AstMapping *tmap2 = NULL;/* Mapping connecting POL_ANG frame and output sky frame */
    char *polcrd = NULL;  /* Name of frame in which POL_ANG values are defined */
    const JCMTState *state = NULL; /* Local pointer to STATE */
+   dim_t ***result;      /* Returned array */
+   dim_t **r;            /* Pointer to an output array element */
+   dim_t *ndftimes = NULL; /* Holds the no. of times slices in each NDF */
+   dim_t itime;          /* Index of current time slice */
+   dim_t ntime;          /* Total no. of input time slices */
    double **polang_ptr = NULL; /* Holds pointers to arrays of POL_ANG values */
    double *angsum;       /* Pointer to array holding the bin angles */
    double *p;            /* Pointer to next POL_ANG value */
@@ -154,19 +159,14 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
    double xout[ 3 ];     /* Grid axis values */
    double yin[ 3 ];      /* Sky axis values */
    double yout[ 3 ];     /* Grid axis values */
-   int ***result;        /* Returned array */
-   int **r;              /* Pointer to an output array element */
    int *angcnt;          /* Pointer to array holding the bin counts */
-   dim_t *ndftimes = NULL; /* Holds the no. of times slices in each NDF */
    int *pop;             /* Bin populations for a single NDF */
    int i;                /* Old bin index */
    int ibin;             /* Bin index */
    int ifile;            /* Index of current input file */
-   dim_t itime;          /* Index of current time slice */
    int j;                /* New bin index */
    int maxbin;           /* Max number of bins required */
    int nang;             /* No. of usable POL_ANG values */
-   int ntime;            /* Total no. of input time slices */
    int rot;              /* Are sky and GRID angles in opposite senses? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -494,12 +494,12 @@ int ***smf_choosepolbins( Grp *igrp, int size, float binsize, float binzero,
             }
          }
 
-/* Add a final element to each list of time slice indices holding VAL__MAXI.
+/* Add a final element to each list of time slice indices holding VAL__MAXK.
    This marks the end of the list. */
          if( r ) {
             for( ibin = 0; ibin < *npbin; ibin++ ) {
                r[ ibin ] = astGrow( r[ ibin ], pop[ ibin ] + 1, sizeof( **r ) );
-               if( r[ ibin ] ) r[ ibin ][ pop[ ibin ] ] = VAL__MAXI;
+               if( r[ ibin ] ) r[ ibin ][ pop[ ibin ] ] = VAL__MAXK;
             }
          }
       }

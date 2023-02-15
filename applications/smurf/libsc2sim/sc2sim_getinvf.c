@@ -82,7 +82,7 @@ void sc2sim_getinvf
 (
  double sigma,        /* dispersion of broad-band noise (given) */
  double corner,       /* corner frequency, where 1/f dispersion=sigma (given)*/
- double samptime,     /* time per data sample (given) */
+ double samptime __attribute__((unused)), /* time per data sample (given) */
  int nterms,          /* number of frequencies calculated (given) */
  double *noisecoeffs, /* 1/f spectrum (returned) */
  int *status          /* global status (given and returned) */

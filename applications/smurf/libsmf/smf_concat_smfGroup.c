@@ -16,10 +16,10 @@
  *     smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config,
  *                          const smfGroup *igrp, const smfArray *darks,
  *                          const smfArray *bbms, const smfArray *flatramps,
- *                          AstKeyMap * heateffmap, size_t whichchunk,
+ *                          AstKeyMap * heateffmap, dim_t whichchunk,
  *                          int ensureflat, int isTordered,
- *                          AstFrameSet *outfset, int moving, int *lbnd_out,
- *                          int *ubnd_out, fts2Port fts_port,
+ *                          AstFrameSet *outfset, int moving, dim_t *lbnd_out,
+ *                          dim_t *ubnd_out, fts2Port fts_port,
  *                          dim_t req_padStart,
  *                          dim_t req_padEnd, int flags, smfArray **concat,
  *                          smfData **first, int *status )
@@ -42,7 +42,7 @@
  *        Collection of flatfield ramps to apply (optionally) when flatfielding.
  *     heateffmap = AstKeyMap * (Given)
  *        Details of heater efficiency data to be applied during flatfielding.
- *     whichchunk = size_t (Given)
+ *     whichchunk = dim_t (Given)
  *        Which continuous subset of igrp will get concatenated?
  *     ensureflat = int (Given)
  *        If true, ensure that the flatfield is applied when opening the data
@@ -56,10 +56,10 @@
  *        pointing LUT on-the-fly
  *     moving = int (Given)
  *        Is coordinate system tracking moving object? (if outfset specified)
- *     lbnd_out = double* (Given)
+ *     lbnd_out = dim_t * (Given)
  *        2-element array pixel coord. for the lower bounds of the output map
  *        (if outfset specified)
- *     ubnd_out = double* (Given)
+ *     ubnd_out = dim_t * (Given)
  *        2-element array pixel coord. for the upper bounds of the output map
  *        (if outfset specified)
  *     fts_port = fts2Port (Given)
@@ -313,10 +313,10 @@ typedef struct smfConcatSmfGroupData {
    dim_t b1;
    dim_t b2;
    dim_t ntslice;
-   size_t bstride;
-   size_t tstride;
-   size_t rbstride;
-   size_t rtstride;
+   dim_t bstride;
+   dim_t tstride;
+   dim_t rbstride;
+   dim_t rtstride;
    dim_t tchunk;
    int oper;
    const double *in;
@@ -332,15 +332,15 @@ typedef struct smfConcatSmfGroupData {
 void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *igrp,
                           const smfArray *darks, const smfArray *bbms,
                           const smfArray *flatramps, AstKeyMap *heateffmap,
-                          size_t whichchunk, int ensureflat, int isTordered,
+                          dim_t whichchunk, int ensureflat, int isTordered,
                           AstFrameSet *outfset, int moving,
-                          int *lbnd_out, int *ubnd_out, fts2Port fts_port,
+                          dim_t *lbnd_out, dim_t *ubnd_out, fts2Port fts_port,
                           dim_t req_padStart,
                           dim_t req_padEnd, int flags, smfArray **concat,
                           smfData **first, int *status ) {
 
   /* Local Variables */
-  size_t bstr;                  /* Concatenated bolo stride */
+  dim_t bstr;                  /* Concatenated bolo stride */
   smfDA *da=NULL;               /* Pointer to smfDA struct */
   smfData *data=NULL;           /* Concatenated smfData */
   dim_t *dslen=NULL;            /* Down-sampled lengths */
@@ -387,14 +387,14 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   dim_t refnrow=0;              /* reference number of rows */
   dim_t reftlen;                /* Effective time slices in reference file */
   dim_t reftlenr;               /* real time slices in ref (before downsamp) */
-  size_t rbstr;                 /* Reference bolo stride */
-  size_t rtstr;                 /* Reference time slice stride */
+  dim_t rbstr;                 /* Reference bolo stride */
+  dim_t rtstr;                 /* Reference time slice stride */
   JCMTState *sourceState=NULL;  /* temporary JCMTState pointer */
   dim_t tchunk = 0;             /* Time offset in concat. array this chunk */
   dim_t tend;                   /* Time at start of padded region */
   dim_t tlen;                   /* Time length entire concatenated array */
   dim_t tstart;                 /* Time at end of padded region */
-  size_t tstr;                  /* Concatenated time slice stride */
+  dim_t tstr;                  /* Concatenated time slice stride */
   dim_t bolostep;
 
   /* Initialise returned values. */
@@ -410,7 +410,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
      tempstr = NULL;
      astMapGet0C( config, "DUMPDIR", &tempstr );
      if( tempstr ) {
-        size_t clen = strlen( tempstr );
+        dim_t clen = strlen( tempstr );
         dumpdir = astStore( NULL, tempstr, clen + 2 );
         if( dumpdir[clen-1] != '/' ) strcpy( dumpdir + clen, "/" );
      }
@@ -422,8 +422,8 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
   /* Verify that we have a valid whichchunk, and determine the range of
      indices into igrp->chunk */
   if( whichchunk > igrp->chunk[igrp->ngroups-1] ) {
-    msgSeti( "WHICHCHUNK", whichchunk );
-    msgSeti( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
+    msgSetk( "WHICHCHUNK", whichchunk );
+    msgSetk( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
     *status = SAI__ERROR;
     errRep( "", FUNC_NAME
             ": Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK",
@@ -572,10 +572,10 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           /* Check these dims against refdims */
           if( (nrow != refnrow) || (ncol != refncol) ) {
             *status = SAI__ERROR;
-            msgSeti( "XREF", refnrow );
-            msgSeti( "YREF", refncol );
-            msgSeti( "X", nrow );
-            msgSeti( "Y", ncol );
+            msgSetk( "XREF", refnrow );
+            msgSetk( "YREF", refncol );
+            msgSetk( "X", nrow );
+            msgSetk( "Y", ncol );
             errRep( "", FUNC_NAME ": Detector dimensions (^X,^Y) in "
                     "^FILE do not match reference (^XREF,^YREF)", status );
           }
@@ -942,7 +942,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
               /* Allocate space for arrays being propagated from template */
               for( k=0; k<2; k++ ) if( havearray[k] ) {
-                  size_t sz = smf_dtype_sz(data->dtype, status );
+                  dim_t sz = smf_dtype_sz(data->dtype, status );
                   data->pntr[k] = astCalloc( ndata, sz );
                 }
               if (havequal) {
@@ -1151,7 +1151,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
             }
 
             if( !change ) {
-              size_t ii = j*bstr + padStart*tstr;
+              dim_t ii = j*bstr + padStart*tstr;
               for( k=padStart; k<(tlen-padEnd); k++) {
                 data->qual[ii] |= SMF__Q_BADDA;
                 d[ii] = VAL__BADD;
@@ -1207,7 +1207,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
           /* Similarly handle QUALITY for dark squids */
           if( da && da->dksquid && da->dksquid->qual ) {
             dim_t dnbolo;
-            size_t dbstr, dtstr;
+            dim_t dbstr, dtstr;
 
             smf_get_dims( da->dksquid, NULL, NULL, &dnbolo, NULL, NULL, &dbstr,
                           &dtstr, status );
@@ -1305,7 +1305,7 @@ void smf_concat_smfGroup( ThrWorkForce *wf, AstKeyMap *config, const smfGroup *i
 
       /* If we are importing the LUT model from an NDF, do it now. */
       if( !(flags & SMF__NOCREATE_LUT) && outfset && importlut ) {
-        nc = strstr( pname, "_con" ) - pname + 4;
+        nc = (int) ( strstr( pname, "_con" ) - pname + 4 );
         ename = astStore( NULL, pname, nc + 1 );
         ename[ nc ] = 0;
         ename = astAppendString( ename, &nc, "_lut" );
@@ -1370,10 +1370,10 @@ static void smf1_concat_smfGroup( void *job_data_ptr, int *status ) {
    double *dp3;
    int *ip1;
    int *ip3;
-   size_t bstride;
-   size_t rbstride;
-   size_t rtstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t rbstride;
+   dim_t rtstride;
+   dim_t tstride;
    smf_qual_t *qp3;
    smf_qual_t *qp1;
 

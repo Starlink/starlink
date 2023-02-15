@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_qual_t *smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
-*                               smf_qfam_t *family, size_t *nmap, int * status );
+*                               smf_qfam_t *family, dim_t *nmap, int * status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -27,7 +27,7 @@
 *        Indicate which family of quality bits is represented in "qual". Can be NULL.
 *        Will only have a meaningful value if the file has been opened in READ or
 *        UPDATE mode (otherwise the values in the array are fresh).
-*     nmap = size_t * (Returned)
+*     nmap = dim_t * (Returned)
 *        Number of elements mapped or malloced
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -120,21 +120,21 @@ typedef struct smfQualMapData {
    int *ndfqtoval;
    int *ndfqval;
    int operation;
-   size_t i1;
-   size_t i2;
+   dim_t i1;
+   dim_t i2;
    smf_qfam_t lfamily;
    smf_qual_t *retval;
    unsigned char *qmap;
 } SmfQualMapData;
 
 smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
-                           smf_qfam_t *family, size_t *nmap, int * status ) {
+                           smf_qfam_t *family, dim_t *nmap, int * status ) {
 
-  size_t i;             /* Loop counter */
-  int itemp = 0;        /* temporary int */
+  int i;                /* Loop counter */
+  size_t itemp = 0;     /* temporary int */
   smf_qfam_t lfamily = SMF__QFAM_NULL; /* Local quality family */
-  size_t nout;          /* Number of elements mapped */
-  size_t numqn = 0;     /* number of quality names */
+  dim_t nout;           /* Number of elements mapped */
+  dim_t numqn = 0;      /* number of quality names */
   IRQLocs *qlocs = NULL;/* IRQ Quality */
   unsigned char *qmap;  /* pointer to mapped unsigned bytes */
   void *qpntr[1];       /* Somewhere to put the mapped pointer */
@@ -144,7 +144,7 @@ smf_qual_t * smf_qual_map( ThrWorkForce *wf, int indf, const char mode[],
   SmfQualMapData *job_data = NULL;
   SmfQualMapData *pdata;
   int nw;
-  size_t step;
+  dim_t step;
   int iw;
 
 
@@ -378,9 +378,9 @@ static void smf1_qual_map( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfQualMapData *pdata;
-   size_t i1;
-   size_t i2;
-   size_t i;
+   dim_t i1;
+   dim_t i2;
+   dim_t i;
    smf_qual_t *p1;
    unsigned char *p2;
 
@@ -422,13 +422,13 @@ static void smf1_qual_map( void *job_data_ptr, int *status ) {
 /* One to one mapping for TSERIES and MAP families. */
             if( pdata->lfamily == SMF__QFAM_TSERIES ||
                 pdata->lfamily == SMF__QFAM_MAP ) {
-               size_t k;
+               dim_t k;
                for( k = 0; k < NDFBITS; k++ ) {
                   if( *p2 & pdata->ndfqval[k] ) *p1 |=  pdata->ndfqtoval[ k ];
                }
 
             } else if( pdata->lfamily == SMF__QFAM_TCOMP ) {
-               size_t k;
+               dim_t k;
 
 /* This requires some guess work */
                for( k = 0; k < NDFBITS; k++ ) {

@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
+*     void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, dim_t index,
 *               const smfData* refdata, const char * datalabel,
 *               const char * units, int flags, smfData **bolmap,
 *               int *status );
@@ -24,7 +24,7 @@
 *     bgrp = const Grp * (Given)
 *        Group containing the relevant file name. If NULL no file
 *        is created and the smfData is malloced.
-*     index = size_t (Given)
+*     index = dim_t (Given)
 *        Index into bgrp.
 *     refdata = const smfData* (Given)
 *        Reference smfData. Dimensionality, sub array information and
@@ -119,14 +119,14 @@
 #include "ast.h"
 #include "star/one.h"
 
-void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
+void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, dim_t index,
                          const smfData* refdata, const char *datalabel,
                          const char *units, int flags, smfData **bolmap,
                          int *status ) {
 
   int col_index = SC2STORE__COL_INDEX;
-  int lbnd[2];
-  int ubnd[2];
+  dim_t lbnd[2];
+  dim_t ubnd[2];
   int row_index = SC2STORE__ROW_INDEX;
 
   *bolmap = NULL;
@@ -150,15 +150,15 @@ void smf_create_bolfile( ThrWorkForce *wf, const Grp * bgrp, size_t index,
   /* either create the file or use malloc */
   if (bgrp) {
     /* create the file for WRITE access */
-    smf_open_newfile( wf, bgrp, index, SMF__DOUBLE, 2, lbnd, ubnd,
+    smf_open_newfile( wf, bgrp, (int) index, SMF__DOUBLE, 2, lbnd, ubnd,
                       flags, bolmap, status );
     if (*bolmap) (*bolmap)->qfamily = SMF__QFAM_TSERIES;
   } else {
     void *pntr[] = {NULL, NULL};
     smf_qual_t *qual = NULL;
     dim_t mydims[2];
-    int mylbnd[2];
-    size_t nbols;
+    dim_t mylbnd[2];
+    dim_t nbols;
 
     mylbnd[0] = lbnd[0];
     mylbnd[1] = lbnd[1];

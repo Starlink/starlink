@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt,
 *                          const char *filename, const Grp *igrp,
-*                          size_t grpindex, int *status );
+*                          dim_t grpindex, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -28,7 +28,7 @@
 *     igrp = const Grp * (Given)
 *        Group containing the required filename. Can be NULL, in which
 *        case the explicitly supplied filename is used.
-*     grpindex = size_t (Given)
+*     grpindex = dim_t (Given)
 *        Index into group.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -93,12 +93,12 @@
 #define FUNC_NAME "smf_write_smfFilter"
 
 void smf_write_smfFilter( ThrWorkForce *wf, const smfFilter *filt, const char *filename,
-                          const Grp * igrp, size_t grpindex, int *status ) {
+                          const Grp * igrp, dim_t grpindex, int *status ) {
 
   double *d = NULL;             /* Data array pointer */
   smfData *data=NULL;           /* smfData for output */
-  size_t i;                     /* Loop counter */
-  size_t nsamp;                 /* Number of samples in the filter */
+  dim_t i;                     /* Loop counter */
+  dim_t nsamp;                 /* Number of samples in the filter */
 
   if( *status != SAI__OK ) return;
 

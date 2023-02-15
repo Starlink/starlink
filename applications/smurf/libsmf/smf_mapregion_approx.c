@@ -88,7 +88,6 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int *status ){
    AstRegion *result = NULL;
    char tracksys[ 80 ];
    const char *system;
-   dim_t isize;
    dim_t ntslice;
    double basec1;
    double basec2;
@@ -98,14 +97,15 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int *status ){
    double mapx;
    double mapy;
    double radius;
-   size_t index;
+   int index;
+   int isize;
    smfData *data;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;
 
 /* Loop until we find a sub-scan that can be used. */
-   isize = grpGrpsz( igrp, status );
+   isize = (int) grpGrpsz( igrp, status );
    for( index = 1; index <= isize && *status == SAI__OK; index++ ) {
 
 /* Open the requested file. */

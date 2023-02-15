@@ -84,7 +84,7 @@ smfDream *smf_create_smfDream( int * status ) {
   /* Need to make sure that any memory we malloc will be freed on error
      so make sure we NULL all pointers first. */
   smfDream *dream = NULL;      /* smfDream struct to fill */
-  size_t i;                    /* Loop counter */
+  dim_t i;                    /* Loop counter */
 
   if (*status != SAI__OK) return NULL;
 

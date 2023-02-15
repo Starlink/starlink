@@ -145,8 +145,8 @@ void smurf_starecalc ( int *status ) {
   smfArray *darks = NULL;         /* Dark data */
   smfData *data = NULL;           /* Input data */
   Grp *fgrp = NULL;               /* Filtered group, no darks */
-  smfArray *flatramps = NULL;      /* Flatfield ramps */
-  AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
+  smfArray *flatramps = NULL;     /* Flatfield ramps */
+  AstKeyMap *heateffmap = NULL;   /* Heater efficiency data */
   size_t i;                       /* Loop counter */
   Grp *igrp = NULL;               /* Input files */
   int naver;                      /* Averaging window, frames */
@@ -211,8 +211,8 @@ void smurf_starecalc ( int *status ) {
     /* Check status to see if there was a problem */
     if (*status != SAI__OK) {
       /* Tell the user which file it was... */
-      msgSeti("I",i);
-      msgSeti("N",size);
+      msgSetk("I",i);
+      msgSetk("N",size);
       errRep(FUNC_NAME,
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
     }

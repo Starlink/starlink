@@ -128,19 +128,19 @@
 /* Structure containing information about blocks of bolos that each
    thread will process */
 typedef struct {
-  size_t b1;               /* Index of first bolometer of block */
-  size_t b2;               /* Index of last bolometer of block */
-  size_t bstride;          /* bolometer stride for res/qua */
-  double *indata;          /* pointer to the bolometer data */
-  int ijob;                /* Job identifier */
-  int isTordered;          /* how are the raw data ordered */
-  dim_t nbolo;             /* number of bolometers */
-  dim_t ntslice;           /* number of time slices */
-  size_t order;            /* order of polynomial */
-  double *poly;            /* pointer to buffer to store poly coeffs */
-  const smf_qual_t *qual;  /* pointer to the quality array */
-  int remove;              /* set if removing poly fit from data */
-  size_t tstride;          /* time stride for res/qua */
+  dim_t b1;               /* Index of first bolometer of block */
+  dim_t b2;               /* Index of last bolometer of block */
+  dim_t bstride;          /* bolometer stride for res/qua */
+  double *indata;         /* pointer to the bolometer data */
+  int ijob;               /* Job identifier */
+  int isTordered;         /* how are the raw data ordered */
+  dim_t nbolo;            /* number of bolometers */
+  dim_t ntslice;          /* number of time slices */
+  dim_t order;            /* order of polynomial */
+  double *poly;           /* pointer to buffer to store poly coeffs */
+  smf_qual_t *qual;       /* pointer to the quality array */
+  int remove;             /* set if removing poly fit from data */
+  dim_t tstride;          /* time stride for res/qua */
 } smfFitPolyData;
 
 /* Function to be executed in thread: fit polynomials to blocks of bolos */
@@ -148,23 +148,23 @@ typedef struct {
 static void smfFitPolyPar( void *job_data_ptr, int *status );
 
 static void smfFitPolyPar( void *job_data_ptr, int *status ) {
-  size_t bstride;             /* bolo strides */
+  dim_t bstride;             /* bolo strides */
   double *curbolo=NULL;       /* pointer to current bolo data */
   double *curpoly=NULL;       /* pointer to poly coeffs fit to curbolo */
   double *curpolydata=NULL;   /* evaluated poly for curbolo */
   smf_qual_t *curqual=NULL;   /* pointer to current bolo quality */
-  size_t i;                   /* Loop counter */
+  dim_t i;                   /* Loop counter */
   double *indata=NULL;        /* Pointer to data array */
-  size_t j;                   /* Loop counter */
-  size_t k;                   /* Loop counter */
+  dim_t j;                   /* Loop counter */
+  dim_t k;                   /* Loop counter */
   dim_t nbolo;                /* Number of bolometers */
-  size_t ncoeff;              /* Number of poly coeffs */
+  dim_t ncoeff;              /* Number of poly coeffs */
   dim_t ntslice;              /* Number of time slices */
   int64_t nused;              /* Number of samples used in fit */
   smfFitPolyData *pdata=NULL; /* Pointer to job data */
   double *poly=NULL;          /* Pointer external poly coeff storage buffer */
   smf_qual_t *qual=NULL;      /* Pointer to QUALITY component */
-  size_t tstride;             /* time strides */
+  dim_t tstride;             /* time strides */
 
   /* Retrieve job data */
   pdata = job_data_ptr;
@@ -173,7 +173,7 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
   nbolo = pdata->nbolo;
   ntslice = pdata->ntslice;
   poly = pdata->poly;
-  qual = (smf_qual_t *) pdata->qual;
+  qual = pdata->qual;
   tstride = pdata->tstride;
 
   ncoeff = pdata->order + 1;
@@ -259,11 +259,11 @@ static void smfFitPolyPar( void *job_data_ptr, int *status ) {
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
+void smf_fit_poly( ThrWorkForce *wf, smfData *data, const dim_t order,
                    int remove, double *poly, int *status) {
 
   /* Local variables */
-  size_t bstride;             /* bolo strides */
+  dim_t bstride;              /* bolo strides */
   int i;                      /* Loop counter */
   smfFitPolyData *job_data=NULL;/* Array of job data for each thread */
   dim_t nbolo=0;              /* Number of bolometers */
@@ -271,9 +271,9 @@ void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
   dim_t ntslice = 0;          /* Number of time slices */
   int nw;                     /* Number of worker threads */
   smfFitPolyData *pdata=NULL; /* Pointer to job data */
-  const smf_qual_t *qual;     /* pointer to the quality array */
-  size_t step;                /* step size for dividing up work */
-  size_t tstride;             /* time strides */
+  smf_qual_t *qual;           /* pointer to the quality array */
+  dim_t step;                 /* step size for dividing up work */
+  dim_t tstride;              /* time strides */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -297,7 +297,7 @@ void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
                 &tstride, status);
 
   /* Return with error if there is no QUALITY component */
-  qual = smf_select_cqualpntr( data, NULL, status );
+  qual = smf_select_qualpntr( data, NULL, status );
 
   if( !qual && (*status == SAI__OK) ) {
     *status = SAI__ERROR;
@@ -309,8 +309,8 @@ void smf_fit_poly( ThrWorkForce *wf, smfData *data, const size_t order,
      points */
   if ( order >= ntslice ) {
     if ( *status == SAI__OK) {
-      msgSeti("O",order);
-      msgSeti("NF",ntslice);
+      msgSetk("O",order);
+      msgSetk("NF",ntslice);
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "Requested polynomial order, ^O, greater than or "
               "equal to the number of points, ^NF. Unable to fit polynomial.",

@@ -44,7 +44,7 @@
  *     2010-10-25 (EC):
  *        Add tlen to smfGroup
  *     2011-02-10 (COBA):
- *        Changed data types from dim_t to size_t
+ *        Changed data types from dim_t to dim_t
 
  *  Copyright:
  *     Copyright (C) 2006-2008,2010 University of British Columbia.
@@ -99,9 +99,9 @@
 void smf_close_smfGroup ( smfGroup **group, int *status ) {
 
   /* Local variables */
-  size_t i;                      /* Loop counter */
-  size_t **subgroups = NULL;     /* Array of pointers to arrays of Grp indices */
-  size_t *indices = NULL;        /* Pointer to array of Grp indices */
+  dim_t i;                      /* Loop counter */
+  int **subgroups = NULL;       /* Array of pointers to arrays of Grp indices */
+  int *indices = NULL;          /* Pointer to array of Grp indices */
 
   /* We need to be able to clean up even if input status is bad - this
      requires some defensive programming. */
@@ -149,7 +149,7 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
         /* Retrieve pointer to array of indices */
         if ( subgroups[i] == NULL ) {
           if ( *status == SAI__OK ) {
-            msgSeti("I",i);
+            msgSetk("I",i);
             *status = SAI__ERROR;
             errRep( FUNC_NAME, "Subgroup ^I is NULL (possible programming error)", status );
           }

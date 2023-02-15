@@ -103,18 +103,18 @@ smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
                      const dim_t mdims[],
                      const int lut[], int * status ) {
 
-  size_t bstride = 0;        /* Bolometer stride */
+  dim_t bstride = 0;        /* Bolometer stride */
   double * boldata = NULL;     /* Bolometer data */
-  size_t i;
+  dim_t i;
   gsl_matrix *mapxy = NULL;  /* Matrix of input positions */
   gsl_matrix *mcov = NULL;  /* Covariance matrix */
   dim_t nbolo = 0;           /* Number of bolometers */
-  size_t nfits = 0;          /* Number of fits attempted */
+  dim_t nfits = 0;          /* Number of fits attempted */
   dim_t ntslice = 0;         /* Number of time slices */
   gsl_vector *planefit = NULL; /* Solution vector */
   gsl_vector *psky = NULL;   /* Vector containing sky brightness */
   smf_qual_t * qua = NULL;/* Relevant quality information */
-  size_t tstride = 0;        /* Time stride */
+  dim_t tstride = 0;        /* Time stride */
   gsl_vector *weights = NULL; /* Weights for sky brightness vector */
   gsl_multifit_linear_workspace *work = NULL; /* Workspace */
   double *xpos = NULL;       /* X coordinates of a bolometer */
@@ -152,13 +152,13 @@ smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
 
   /* We need to loop over each time slice populating the matrices */
   for ( i = 0; i < ntslice; i++ ) {
-    size_t toff = i*tstride;
-    size_t ngood = 0;
+    dim_t toff = i*tstride;
+    dim_t ngood = 0;
     double chisq = 0.0;
-    size_t bol;
+    dim_t bol;
 
     for ( bol = 0; bol < nbolo; bol++) {
-      size_t offset = toff + bol*bstride;
+      dim_t offset = toff + bol*bstride;
       double weight = 1.0;
       xpos[bol] = VAL__BADD;
       ypos[bol] = VAL__BADD;
@@ -204,7 +204,7 @@ smf_subtract_plane3( ThrWorkForce *wf, smfData *data,
 
       /* Subtract the fit */
       for ( bol = 0; bol < nbolo; bol++) {
-        size_t offset = toff + bol*bstride;
+        dim_t offset = toff + bol*bstride;
 
         if ( ( !qua || (qua && !(qua[offset] & SMF__Q_MOD)) ) && boldata[offset] != VAL__BADD ) {
           double sky = sky0 + dskyy * ypos[bol] + dskyx * xpos[bol];

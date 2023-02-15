@@ -121,14 +121,11 @@ void smurf_findslices( int *status ) {
    JCMTState *state;
    char xpos[ 40 ];
    char ypos[ 40 ];
-   const char *bestf;
+   const char *bestf = "";
    const char *dom;
    const char *sys;
-   dim_t bestj;
-   dim_t i;
-   dim_t j;
+   dim_t bestj = -1;
    dim_t jthis;
-   dim_t nax;
    double best;
    double d;
    double dlast;
@@ -139,8 +136,10 @@ void smurf_findslices( int *status ) {
    int close;
    int display;
    int done;
-   int first;
    int indf;
+   int j;
+   int nax;
+   size_t i;
    size_t ssize;
    smfData *data = NULL;
 
@@ -169,7 +168,7 @@ void smurf_findslices( int *status ) {
    for( i = 0; i < ssize && *status == SAI__OK; i++ ) {
 
 /* Open the file. */
-      smf_open_file( NULL, igrp, i + 1, "Read", SMF__NOCREATE_DATA, &data,
+      smf_open_file( NULL, igrp, (int) i + 1, "Read", SMF__NOCREATE_DATA, &data,
                      status );
 
 /* If this is the first one, get the position to search for, and convert
@@ -240,7 +239,6 @@ void smurf_findslices( int *status ) {
 /* Loop round all the time slices. */
       if( data->hdr && data->hdr->allState && frm ) {
          dlast = VAL__BADD;
-         first = 1;
          done = 0;
          state = data->hdr->allState;
          for( j = 0; j < data->hdr->nframes; j++,state++ ) {

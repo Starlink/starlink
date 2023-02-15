@@ -104,9 +104,8 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   dim_t fdims[2];               /* Frequency space dimensions */
   AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
   smfFilter *filt=NULL;         /* Pointer to returned struct */
-  size_t i;                     /* Loop counter */
-  int isfft;                    /* Is the template FFT'd data? */
-  size_t ndims;                 /* Number of dimensions */
+  int i;                        /* Loop counter */
+  int ndims;                    /* Number of dimensions */
   dim_t rdims[2];               /* Real space dimensions */
 
   if( *status != SAI__OK ) return NULL;
@@ -126,7 +125,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
   filt = astCalloc( 1, sizeof(*filt) );
 
-  isfft = smf_isfft( template, rdims, NULL, fdims, filt->df, &ndims, status );
+  (void) smf_isfft( template, rdims, NULL, fdims, filt->df, &ndims, status );
 
   if( *status == SAI__OK ) {
 
@@ -245,7 +244,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
       } else {
         *status = SAI__ERROR;
         errRepf( "", FUNC_NAME
-                 ": don't know how to handle template with %zu real-space dims",
+                 ": don't know how to handle template with %d real-space dims",
                  status, ndims );
       }
     }

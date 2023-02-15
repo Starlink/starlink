@@ -207,14 +207,14 @@ void sc2sim_simframe
  double heater[],             /* bolometer heater ratios (given) */
  int nbol,                    /* total number of bolometers (given) */
  double focposn,              /* SMU position for FOCUS observation */
- int frame,                   /* number of current frame (given) */
+ int frame __attribute__((unused)), /* number of current frame (given) */
  int nterms,                  /* number of 1/f noise coeffs (given) */
  double *noisecoeffs,         /* 1/f noise coeffs (given) */
  double *pzero,               /* bolometer power offsets (given) */
  double samptime,             /* sample time in sec (given) */
  double start_time,           /* time at start of scan in sec since start of
                                  simulation (given) */
- double *weights,             /* impulse response (given) */
+ double *weights __attribute__((unused)), /* impulse response (given) */
  AstMapping *sky2map,         /* Mapping celestial->map coordinates */
  double *xbolo,               /* native X offsets of bolometers */
  double *ybolo,               /* native Y offsets of bolometers */

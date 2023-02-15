@@ -259,9 +259,10 @@ void smurf_pol2check( int *status ) {
    const char *key;           /* Pointer to KeyMap key string */
    const char *wave0;         /* Pointer to waveband for first POL2 file */
    const char *wave;          /* Pointer to waveband for current POL2 file */
-   int dims[NDF__MXDIM];      /* No. of pixels along each axis of NDF */
+   dim_t dims[NDF__MXDIM];    /* No. of pixels along each axis of NDF */
    int ikey;                  /* Index of next key */
    int indf;                  /* NDF identifier */
+   int j;                     /* Loop index */
    int multiobject;           /* OK for more than one object to be given? */
    int ndims;                 /* Number of dimensions in NDF */
    int nkey;                  /* Number of keys in KeyMap */
@@ -529,8 +530,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen && fd; i++ ) {
-            astMapGetElemC( km, "RAW_TS", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "RAW_TS", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          if( fd ) fclose( fd );
@@ -637,8 +638,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "RAW_INFO", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "RAW_INFO", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
@@ -655,8 +656,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "STOKES_TS", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "STOKES_TS", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
@@ -670,8 +671,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "STOKES_INFO", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "STOKES_INFO", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
@@ -687,8 +688,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "MAP", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "MAP", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
@@ -702,8 +703,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "MAP_INFO", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "MAP_INFO", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );
@@ -721,8 +722,8 @@ void smurf_pol2check( int *status ) {
          errAnnul( status );
       } else if ( *status == SAI__OK ) {
          fd = fopen( filepath, "w" );
-         for( i = 0; (int) i < veclen; i++ ) {
-            astMapGetElemC( km, "JUNK", sizeof(buf), i, buf );
+         for( j = 0; j < veclen && fd; j++ ) {
+            astMapGetElemC( km, "JUNK", sizeof(buf), j, buf );
             fprintf( fd, "%s\n", buf );
          }
          fclose( fd );

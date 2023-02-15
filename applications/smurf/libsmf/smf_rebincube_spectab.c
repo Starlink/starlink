@@ -91,12 +91,12 @@
 #define FUNC_NAME "smf_rebincube_spectab"
 
 void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
-                            int **pspectab, int *status ){
+                            dim_t **pspectab, int *status ){
 
 /* Local Variables */
    double *w1 = NULL;          /* Work space */
    double *w2 = NULL;          /* Work space */
-   int *spectab = NULL;        /* Returned pointer */
+   dim_t *spectab = NULL;      /* Returned pointer */
    dim_t ichan;                /* Index of current channel */
 
 /* Initialise */
@@ -106,7 +106,7 @@ void smf_rebincube_spectab( dim_t nchan, dim_t nchanout, AstMapping *ssmap,
    if( *status != SAI__OK ) return;
 
 /* Allocate memory for the returned array of integer channel numbers. */
-   spectab = (int *) astMalloc( sizeof( int )*nchan );
+   spectab = astMalloc( sizeof( *spectab )*nchan );
 
 /* Allocate memory for work arrays holding floating point spectral GRID
    values. */

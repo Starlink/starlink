@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     keymap = smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
-*                                  const Grp * igrp, size_t idx, int * status );
+*                                  const Grp * igrp, int idx, int * status );
 
 *  Arguments:
 *     subinst = smf_subinst_t (Given)
@@ -27,7 +27,7 @@
 *        If non-null and if indata is non-null and if subinst is
 *        SMF__SUBINST_NONE, the group (along with idx) will be used to
 *        determine which file should be opened.
-*     idx = size_t (Given)
+*     idx = int (Given)
 *        index into igrp.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -87,10 +87,10 @@
 #include "ast.h"
 
 AstKeyMap *smf_subinst_keymap( smf_subinst_t subinst, const smfData * indata,
-                               const Grp * igrp, size_t idx, int * status ) {
+                               const Grp * igrp, int idx, int * status ) {
 
   const smfHead * hdr = NULL;        /* Header of file to be examined */
-  size_t i;
+  dim_t i;
   smfData * sub_data = NULL;         /* File to be examined */
   AstKeyMap * sub_instruments;       /* Keymap to be filled */
 

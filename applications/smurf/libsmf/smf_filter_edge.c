@@ -110,10 +110,10 @@
 void smf_filter_edge( smfFilter *filt, double f, int order, int lowpass,
                       int *status ) {
   double rat;           /* Ratio of channel freq to edge freq */
-  size_t base;          /* Index to start of memory to be zero'd */
-  size_t i;             /* Channel index */
-  size_t iedge;         /* Index corresponding to the edge frequency */
-  size_t len;           /* Length of memory to be zero'd */
+  dim_t base;          /* Index to start of memory to be zero'd */
+  dim_t i;             /* Channel index */
+  dim_t iedge;         /* Index corresponding to the edge frequency */
+  dim_t len;           /* Length of memory to be zero'd */
 
   if( *status != SAI__OK ) return;
 

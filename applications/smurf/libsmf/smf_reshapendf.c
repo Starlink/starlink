@@ -94,20 +94,20 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
 
 /* Local Variables */
    IRQLocs *qlocs;
+   dim_t ix;
+   dim_t iy;
+   dim_t iz;
+   dim_t lbnd[ 3 ];
+   dim_t ubnd[ 3 ];
    int bit;
-   int ix;
-   int iy;
-   int iz;
-   int lbnd[ 3 ];
    int ndim;
-   int nel;
    int there;
    int tndf;
-   int ubnd[ 3 ];
+   size_t nel;
    unsigned char *ipq;
-   void *ipqpntr[1];
    unsigned char *q;
    unsigned char qval;
+   void *ipqpntr[1];
 
 /* Do nothing if no data was supplied. */
    if( *data ) {

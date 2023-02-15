@@ -16,7 +16,7 @@
 *     void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
 *                                float *data_array,
 *                                float *var_array, double *wgt_array,
-*                                int *pop_array, int *status );
+*                                dim_t *pop_array, int *status );
 
 *  Arguments:
 *     nout = dim_t (Given)
@@ -43,7 +43,7 @@
 *        the output cube will have the same weight). If "genvar" is 2, this
 *        array should be big enough to hold two spatial planes from the
 *        output cube.
-*     pop_array = int * (Given)
+*     pop_array = dim_t * (Given)
 *        A 2D array holding the number of input spectra that contribute to
 *        each output spectrum. This array should be the same size as
 *        "var_array".
@@ -101,7 +101,7 @@
 
 void smf_rebincube_norm2d( dim_t nout, dim_t nxy, int genvar,
                            float *data_array, float *var_array,
-                           double *wgt_array, int *pop_array, int *status ){
+                           double *wgt_array, dim_t *pop_array, int *status ){
 
 /* Local Variables */
    dim_t ichan;                /* Output channel index */

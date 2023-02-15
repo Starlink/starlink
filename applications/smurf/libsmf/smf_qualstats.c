@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
-*                    const smf_qual_t *qual, dim_t nbolo, size_t bstride,
-*                    size_t ntslice, size_t tstride,
-*                    size_t qcount[SMF__NQBITS], size_t *ngoodbolo,
-*                    size_t *nmap, size_t *nmax, size_t *tpad, int *status )
+*                    const smf_qual_t *qual, dim_t nbolo, dim_t bstride,
+*                    dim_t ntslice, dim_t tstride,
+*                    dim_t qcount[SMF__NQBITS], dim_t *ngoodbolo,
+*                    dim_t *nmap, dim_t *nmax, dim_t *tpad, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -30,28 +30,28 @@
 *        Pointer to quality array
 *     nbolo = dim_t (Given)
 *        Number of bolometers
-*     bstride = size_t (Given)
+*     bstride = dim_t (Given)
 *        How many elements to skip to get to the next bolometer at a given
 *        time slice.
 *     ntslice = dim_t (Given)
 *        Number of time slices
-*     tstride = size_t (Given)
+*     tstride = dim_t (Given)
 *        How many elements to skip to get to the next time slice for the
 *        current bolometer.
-*     qcount = size_t[SMF__NQBITS] (Returned)
+*     qcount = dim_t[SMF__NQBITS] (Returned)
 *        Pointer to array that will count number of occurences of each
 *        quality bit in qual. Will only use the number of elements determined
 *        by the quality family.
-*     ngoodbolo = size_t* (Returned)
+*     ngoodbolo = dim_t* (Returned)
 *        If specified, return number of bolometers that are flagged as good.
-*     nmap = size_t* (Returned)
+*     nmap = dim_t* (Returned)
 *        If specified, return total number of samples that could be used
 *        in the map (i.e., no quality bits in SMF__Q_GOOD set).
-*     nmax = size_t* (Returned)
+*     nmax = dim_t* (Returned)
 *        If specified, return the maximum theoretical number of samples that
 *        could be used for a map -- excluding only SMF__Q_PAD|SMF__Q_APOD
 *        (padding/apodization).
-*     tpad = size_t * (Returned)
+*     tpad = dim_t * (Returned)
 *        Number of slices of padding. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -125,35 +125,35 @@ static void smf1_qualstats( void *job_data_ptr, int *status );
 typedef struct smfQualStatsData {
    dim_t b1;
    dim_t b2;
-   size_t bstride;
-   size_t nqbits;
-   size_t numgoodbolo;
-   size_t nummap;
-   size_t nummax;
-   size_t qcount[SMF__NQBITS];
-   size_t slice_end;
-   size_t slice_start;
-   size_t tstride;
+   dim_t bstride;
+   dim_t nqbits;
+   dim_t numgoodbolo;
+   dim_t nummap;
+   dim_t nummax;
+   dim_t qcount[SMF__NQBITS];
+   dim_t slice_end;
+   dim_t slice_start;
+   dim_t tstride;
    const smf_qual_t *qual;
 } SmfQualStatsData;
 
 #define FUNC_NAME "smf_qualstats"
 
 void smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
-                    const smf_qual_t *qual, dim_t nbolo, size_t bstride,
-                    size_t ntslice, size_t tstride, size_t qcount[SMF__NQBITS],
-                    size_t *ngoodbolo, size_t *nmap, size_t *nmax,
-                    size_t *tpad, int *status ) {
+                    const smf_qual_t *qual, dim_t nbolo, dim_t bstride,
+                    dim_t ntslice, dim_t tstride, dim_t qcount[SMF__NQBITS],
+                    dim_t *ngoodbolo, dim_t *nmap, dim_t *nmax,
+                    dim_t *tpad, int *status ) {
 
   /* Local Variables */
   dim_t bolostep;               /* Number of bolos per thread */
-  size_t k;                     /* Loop counter */
-  size_t numgoodbolo=0;
-  size_t nummap=0;
-  size_t nummax=0;
-  size_t nqbits = 0;            /* Number of quality bits in this family */
-  size_t slice_start = 0;       /* First time slice to analyse */
-  size_t slice_end = 0;         /* last time slice */
+  dim_t k;                     /* Loop counter */
+  dim_t numgoodbolo=0;
+  dim_t nummap=0;
+  dim_t nummax=0;
+  dim_t nqbits = 0;            /* Number of quality bits in this family */
+  dim_t slice_start = 0;       /* First time slice to analyse */
+  dim_t slice_end = 0;         /* last time slice */
   int nw;                       /* Number of worker threads */
   int iw;                       /* Thread index */
   SmfQualStatsData *job_data;
@@ -258,7 +258,7 @@ void smf_qualstats( ThrWorkForce *wf, smf_qfam_t qfamily, int nopad,
       *tpad = slice_start +  ( (ntslice -1) - slice_end );
     } else {
       /* which bit is SMF__Q_PAD? */
-      size_t whichbit = smf_qual_to_bit( SMF__Q_PAD, status );
+      dim_t whichbit = smf_qual_to_bit( SMF__Q_PAD, status );
       *tpad = qcount[whichbit] / nbolo;
     }
   }
@@ -295,8 +295,8 @@ static void smf1_qualstats( void *job_data_ptr, int *status ) {
    SmfQualStatsData *pdata;
    dim_t ibolo;
    dim_t itime;
-   size_t ibase;
-   size_t k;
+   dim_t ibase;
+   dim_t k;
    const smf_qual_t *pq;
 
 /* Check inherited status */

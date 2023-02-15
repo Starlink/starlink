@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_filter_notch( smfFilter *filt, const double f_low[],
-*                       const double f_high[], size_t n, int *status );
+*                       const double f_high[], dim_t n, int *status );
 
 *  Arguments:
 *     filt = smfFilter * (Given and Returned)
@@ -23,7 +23,7 @@
 *        Array of n lower frequency edges (Hz) for the notches
 *     f_high = const double[] (Given)
 *        Array of n upper frequency edges (Hz) for the notches
-*     n = size_t (Given)
+*     n = dim_t (Given)
 *        Number of notches in the filter (elements in f_low/f_high)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -100,12 +100,12 @@
 #define FUNC_NAME "smf_filter_notch"
 
 void smf_filter_notch( smfFilter *filt, const double f_low[],
-                       const double f_high[], size_t n, int *status ) {
+                       const double f_high[], dim_t n, int *status ) {
 
-  size_t i;             /* Loop counter */
-  size_t iedge_high;    /* Index corresponding to lower edge frequency */
-  size_t iedge_low;     /* Index corresponding to upper edge frequency */
-  size_t len;           /* Length of memory to be zero'd */
+  dim_t i;             /* Loop counter */
+  dim_t iedge_high;    /* Index corresponding to lower edge frequency */
+  dim_t iedge_low;     /* Index corresponding to upper edge frequency */
+  dim_t len;           /* Length of memory to be zero'd */
 
   if (*status != SAI__OK) return;
 

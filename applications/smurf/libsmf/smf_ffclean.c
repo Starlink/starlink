@@ -131,6 +131,7 @@
 
 /* Data types */
 typedef struct smfFFCleanJobData {
+   const double *map;
    const double *mapvar;
    double *resid;
    double *smooth;
@@ -140,9 +141,9 @@ typedef struct smfFFCleanJobData {
    double sum2;
    int neg;
    int oper;
-   size_t nsum;
-   size_t pixhi;
-   size_t pixlo;
+   dim_t nsum;
+   dim_t pixhi;
+   dim_t pixlo;
 } smfFFCleanJobData;
 
 /* Prototypes for local functions */
@@ -161,14 +162,14 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
    double mean;
    double sum1;
    double sum2;
-   double variance;
+   double variance = 0.0;
    int iter;
    int iw;
    int nw;
-   size_t nel;
-   size_t nsum = 0;
-   size_t nsum_old;
-   size_t pixstep;
+   dim_t nel;
+   dim_t nsum = 0;
+   dim_t nsum_old;
+   dim_t pixstep;
    smfFFCleanJobData *job_data;
    smfFFCleanJobData *pdata;
 
@@ -315,7 +316,7 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
 
 /* No more iterations if the number of remaining samples has changed by
    fewer than 10. */
-         if( abs( nsum - nsum_old ) < 10 ) break;
+         if( labs( nsum - nsum_old ) < 10 ) break;
       }
    }
 
@@ -324,7 +325,7 @@ double *smf_ffclean( ThrWorkForce *wf, const double *map, const double *mapvar,
       for( iw = 0; iw < nw; iw++ ) {
          pdata = job_data + iw;
          pdata->oper = 3;
-         pdata->result = (double *) map;
+         pdata->map = map;
          pdata->resid = result;
          pdata->smooth = smoothed;
          thrAddJob( wf, 0, pdata, smf1_ffclean_job, 0, NULL, status );
@@ -372,7 +373,7 @@ static void smf1_ffclean_job( void *job_data, int *status ) {
    const double *p2;
    double *p0;
    double *p1;
-   size_t ipix;
+   dim_t ipix;
    smfFFCleanJobData *pdata;
 
 /* Check inherited status */
@@ -458,7 +459,7 @@ static void smf1_ffclean_job( void *job_data, int *status ) {
    } else if( pdata->oper == 3 ) {
       p0 = pdata->resid + pdata->pixlo;
       p1 = pdata->smooth + pdata->pixlo;
-      p2 = pdata->result + pdata->pixlo;
+      p2 = pdata->map + pdata->pixlo;
       for( ipix = pdata->pixlo; ipix <= pdata->pixhi; ipix++,p0++,p1++,p2++ ) {
          if( *p1 != VAL__BADD && *p2 != VAL__BADD ) {
             *p0 = *p2 - *p1;

@@ -14,7 +14,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     size_t smf_check_quality( ThrWorkForce *wf, smfData *data,
+*     dim_t smf_check_quality( ThrWorkForce *wf, smfData *data,
 *                               int showbad, int *status );
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *        Pointer to global status.
 
 * Return Value:
-*     size_t = count of inconsistent samples found.
+*     dim_t = count of inconsistent samples found.
 
 *  Description:
 *     Traverse the data and quality arrays. Any VAL__BADD encountered without
@@ -102,43 +102,43 @@
 
 /* Prototypes for local static functions. */
 static void smf1_check_quality( void *job_data_ptr, int *status );
-static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
-                                size_t *bolnum, size_t *tslice, int *status );
+static void smf__index_to_tbol( dim_t bstride, dim_t tstride, dim_t bufpos,
+                                dim_t *bolnum, dim_t *tslice, int *status );
 
 /* Local data types */
 typedef struct smfCheckQualityData {
    double *d;
    int showbad;
-   size_t bstride;
-   size_t d1;
-   size_t d2;
-   size_t nbad;
-   size_t ninf;
-   size_t nnan;
-   size_t nqualincon;
-   size_t tstride;
+   dim_t bstride;
+   dim_t d1;
+   dim_t d2;
+   dim_t nbad;
+   dim_t ninf;
+   dim_t nnan;
+   dim_t nqualincon;
+   dim_t tstride;
    smf_qual_t *qual;
 } SmfCheckQualityData;
 
 
 
-size_t smf_check_quality( ThrWorkForce *wf, smfData *data, int showbad,
+dim_t smf_check_quality( ThrWorkForce *wf, smfData *data, int showbad,
                           int *status ) {
 
   double *d=NULL;               /* Pointer to data array */
-  size_t nbad=0;                /* inconsistency counter */
-  size_t nnan = 0;              /* Number of nan values found */
-  size_t ninf = 0;              /* Number of inf values found */
-  size_t nqualincon = 0;        /* Number of inconsistent bad/qual */
+  dim_t nbad=0;                /* inconsistency counter */
+  dim_t nnan = 0;              /* Number of nan values found */
+  dim_t ninf = 0;              /* Number of inf values found */
+  dim_t nqualincon = 0;        /* Number of inconsistent bad/qual */
   dim_t ndata;                  /* Number of data points */
-  size_t bstride;               /* bol stride */
-  size_t tstride;               /* time slice stride */
+  dim_t bstride;               /* bol stride */
+  dim_t tstride;               /* time slice stride */
   smf_qual_t *qual=NULL;        /* Pointer to the QUALITY array */
   int nw;                       /* Number of worker threads */
   int iw;                       /* Thread index */
   SmfCheckQualityData *job_data = NULL;  /* Array of job descriptions */
   SmfCheckQualityData *pdata;   /* Pointer to next job description */
-  size_t sampstep;              /* Number of samples per thread */
+  dim_t sampstep;              /* Number of samples per thread */
 
   if ( *status != SAI__OK ) return 0;
 
@@ -238,11 +238,11 @@ size_t smf_check_quality( ThrWorkForce *wf, smfData *data, int showbad,
 }
 
 
-static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
-                                size_t *bolnum, size_t *tslice, int *status ) {
+static void smf__index_to_tbol( dim_t bstride, dim_t tstride, dim_t bufpos,
+                                dim_t *bolnum, dim_t *tslice, int *status ) {
 
-  size_t bol = 0;
-  size_t tpos = 0;
+  dim_t bol = 0;
+  dim_t tpos = 0;
 
   if (bolnum) *bolnum = 0;
   if (tslice) *tslice = 0;
@@ -267,7 +267,7 @@ static void smf__index_to_tbol( size_t bstride, size_t tstride, size_t bufpos,
 
   /* Sanity check */
   if (*status == SAI__OK) {
-    size_t ij;
+    dim_t ij;
     ij = bol * bstride + tpos * tstride;
 
     if (ij != bufpos) {
@@ -312,9 +312,9 @@ static void smf1_check_quality( void *job_data_ptr, int *status ) {
    double *pd;
    int badqual;
    int isbad;
-   size_t bolnum;
-   size_t i;
-   size_t tslice;
+   dim_t bolnum;
+   dim_t i;
+   dim_t tslice;
    smf_qual_t *pq;
 
 /* Check inherited status */

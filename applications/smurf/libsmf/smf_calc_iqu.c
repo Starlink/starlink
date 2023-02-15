@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
-*                       int block_end, int ipolcrd, int qplace, int uplace,
-*                       int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-*                       int pasign, double paoff, double angrot,
-*                       int submean, int harmonic, int *status );
+*     void smf_calc_iqu( ThrWorkForce *wf, smfData *data, dim_t block_start,
+*                        dim_t block_end, int ipolcrd, int qplace, int uplace,
+*                        int iplace, NdgProvenance *oprov, AstFitsChan *fc,
+*                        int pasign, double paoff, double angrot,
+*                        int submean, int harmonic, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -122,9 +122,9 @@
 *        Take account of focal plane rotation during the course of one
 *        stare position.
 *     21-AUG-2015 (DSB):
-*        - More mapping simplifications to overcome possible numerical 
+*        - More mapping simplifications to overcome possible numerical
 *        problems with focal plane distortion.
-*        - Calculate Q/U/I using matrix inversion rather than assuming 
+*        - Calculate Q/U/I using matrix inversion rather than assuming
 *        that sums of trig functions can be taken to be zero.
 *     {enter_further_changes_here}
 
@@ -167,31 +167,31 @@ typedef struct smfCalcIQUJobData {
    const JCMTState *allstates;
    dim_t b1;
    dim_t b2;
+   dim_t block_end;
+   dim_t bstride;
+   dim_t block_start;
    dim_t nbolo;
-   double fpr0;
-   double fprinc;
+   dim_t ncol;
+   dim_t tstride;
    double *dat;
+   double *ipiv;
    double *ipi;
+   double *ipqv;
    double *ipq;
    double *ipu;
-   double *ipiv;
-   double *ipqv;
    double *ipuv;
+   double *mean;
    double angfac;
    double angrot;
+   double fpr0;
+   double fprinc;
    double paoff;
-   int block_end;
-   int block_start;
-   int ipolcrd;
+   int action;
    int gotvar;
-   int ncol;
+   int ipolcrd;
    int old;
    int pasign;
-   size_t bstride;
-   size_t tstride;
    smf_qual_t *qua;
-   double *mean;
-   int action;
 } smfCalcIQUJobData;
 
 /* Prototypes for local functions */
@@ -214,31 +214,37 @@ static double smf1_det3x3( double a11, double a12, double a13,
 /* The angle in radians to be integrated over to produce a single Q/U pair. */
 #define ROT_PER_SAMPLE  4*AST__DPI
 
-void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
-                  int block_end, int ipolcrd, int qplace, int uplace,
-                  int iplace, NdgProvenance *oprov, AstFitsChan *fc,
-                  int pasign, double paoff, double angrot, int submean,
-                  int harmonic, int *status ){
+void smf_calc_iqu( ThrWorkForce *wf, smfData *data, dim_t block_start,
+                   dim_t block_end, int ipolcrd, int qplace, int uplace,
+                   int iplace, NdgProvenance *oprov, AstFitsChan *fc,
+                   int pasign, double paoff, double angrot, int submean,
+                   int harmonic, int *status ){
 
 /* Local Variables: */
    AstCmpMap *cm1;
    AstCmpMap *cm2;
    AstFrameSet *wcs;          /* WCS FrameSet for output NDFs */
+   AstMapping *cm3;
    AstMapping *fpmap1;
    AstMapping *fpmap2;
-   AstMapping *cm3;
    AstMapping *oskymap;
    AstMapping *totmap;
    AstSkyFrame *oskyfrm;
    AstWinMap *wm;             /* Mapping to reverse the X GRID axis */
    const JCMTState *state;    /* JCMTState info for current time slice */
    const char *usesys;        /* Used system string */
+   dim_t bstep;               /* Bolometer step between threads */
+   dim_t bstride;             /* Stride between adjacent bolometer values */
    dim_t itime;               /* Time slice index */
+   dim_t lbnd[ 2 ];           /* Lower pixel bounds of output NDF */
    dim_t nbolo;               /* No. of bolometers */
    dim_t ncol;                /* No. of columns of bolometers */
    dim_t nrow;                /* No. of rows of bolometers */
    dim_t ntime;               /* Time slices to check */
    dim_t ntslice;             /* Number of time-slices in data */
+   dim_t tstep;               /* Time slice step between threads */
+   dim_t tstride;             /* Stride between adjacent time slice values */
+   dim_t ubnd[ 2 ];           /* Upper pixel bounds of output NDF */
    double *ipi;               /* Pointer to output I array */
    double *ipiv;              /* Pointer to output I variance array */
    double *ipq;               /* Pointer to output Q array */
@@ -257,21 +263,15 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
    double inb[ 2 ];           /* Bolometer coords at top right */
    double outa[ 2 ];          /* NDF GRID coords at bottom left */
    double outb[ 2 ];          /* NDF GRID coords at top right */
-   int bstep;                 /* Bolometer step between threads */
-   int el;                    /* Number of mapped array elements */
    int gotvar;                /* Were any output variances created? */
    int indfi;                 /* Identifier for NDF holding I values */
    int indfq;                 /* Identifier for NDF holding Q values */
    int indfu;                 /* Identifier for NDF holding Q values */
    int iworker;               /* Index of a worker thread */
-   int lbnd[ 2 ];             /* Lower pixel bounds of output NDF */
    int moving;
    int nworker;               /* No. of worker threads */
    int old;                   /* Data has old-style POL_ANG values? */
-   int tstep;                 /* Time slice step between threads */
-   int ubnd[ 2 ];             /* Upper pixel bounds of output NDF */
-   size_t bstride;            /* Stride between adjacent bolometer values */
-   size_t tstride;            /* Stride between adjacent time slice values */
+   size_t el;                 /* Number of mapped array elements */
    smfCalcIQUJobData *job_data = NULL; /* Pointer to all job data */
    smfCalcIQUJobData *pdata = NULL;/* Pointer to next job data */
    smfHead *hdr;              /* Pointer to data header this time slice */
@@ -289,12 +289,12 @@ void smf_calc_iqu( ThrWorkForce *wf, smfData *data, int block_start,
                  &tstride, status );
 
 /* Report an error if the block of time slices extends off either end. */
-   if( block_start < 0 || block_end >= (int) ntslice ) {
+   if( block_start < 0 || block_end >= ntslice ) {
       if( *status == SAI__OK ) {
          *status = SAI__ERROR;
-         msgSeti( "S", block_start );
-         msgSeti( "E", block_end );
-         msgSeti( "N", ntslice );
+         msgSetk( "S", block_start );
+         msgSetk( "E", block_end );
+         msgSetk( "N", ntslice );
          errRep( " ", "smf_calc_iqu: invalid block of time slices - ^S to "
                  "^E (^N time slices are available).", status );
       }
@@ -644,9 +644,20 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    const JCMTState *state;    /* JCMTState info for current time slice */
    dim_t b1;                  /* First bolometer index */
    dim_t b2;                  /* Last bolometer index */
+   dim_t block_end;           /* Last time slice to process */
+   dim_t block_start;         /* First time slice to process */
+   dim_t bstride;             /* Stride between adjacent bolometer values */
    dim_t ibolo;               /* Bolometer index */
    dim_t ipix;                /* Pixel index */
+   dim_t itime;               /* Time slice index */
+   dim_t itime_start;         /* Time slice index at start of section */
+   dim_t limit2;              /* Min no of good i/p values for a good single estimate */
+   dim_t limit;               /* Min no of good i/p values for a good o/p value */
+   dim_t n;                   /* Number of contributing values in S1, S2 and S3 */
    dim_t nbolo;               /* Total number of bolometers */
+   dim_t ncol;                /* No. of bolometers in one row */
+   dim_t nn;                  /* Number of good bolometer values */
+   dim_t tstride;             /* Stride between adjacent time slice values */
    double *dat;               /* Pointer to start of input data values */
    double *din0;              /* Pointer to input data array for 1st time */
    double *din;               /* Pointer to input data array for bolo/time */
@@ -663,7 +674,6 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double angle_l;
    double angrot;             /* Angle from focal plane X axis to fixed analyser */
    double ca;
-   double sa;
    double cosval;             /* Cos of twice reference rotation angle */
    double dang;
    double den;
@@ -684,6 +694,7 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double s6;
    double s7;
    double s8;
+   double sa;
    double sinval;             /* Sin of twice reference rotation angle */
    double sum;                /* Sum of bolometer values */
    double sw;
@@ -703,21 +714,10 @@ static void smf1_calc_iqu_job( void *job_data, int *status ) {
    double vu0;
    double vu;
    double wplate;             /* Angle from fixed analyser to have-wave plate */
-   int block_end;             /* Last time slice to process */
-   int block_start;           /* First time slice to process */
    int ipolcrd;               /* Reference direction for pol_ang */
-   int itime;                 /* Time slice index */
-   int itime_start;           /* Time slice index at start of section */
-   int limit2;                /* Min no of good i/p values for a good single estimate */
-   int limit;                 /* Min no of good i/p values for a good o/p value */
-   int n;                     /* Number of contributing values in S1, S2 and S3 */
-   int ncol;                  /* No. of bolometers in one row */
-   int nn;                    /* Number of good bolometer values */
-   int nrot;
    int old;                   /* Data has old-style POL_ANG values? */
+   int nrot;
    int pasign;                /* +1 or -1 indicating sense of POL_ANG value */
-   size_t bstride;            /* Stride between adjacent bolometer values */
-   size_t tstride;            /* Stride between adjacent time slice values */
    smfCalcIQUJobData *pdata;  /* Pointer to job data */
    smf_qual_t *qin0;          /* Pointer to input quality array for 1st time */
    smf_qual_t *qin;           /* Pointer to input quality array for bolo/time */

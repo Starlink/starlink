@@ -148,10 +148,12 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status );
 typedef struct smfCalcModelComData {
    dim_t b1;
    dim_t b2;
+   dim_t gain_box;
    dim_t idx_hi;
    dim_t idx_lo;
    dim_t nb;
    dim_t nbolo;
+   dim_t nblock;
    dim_t ncol;
    dim_t nointslice;
    dim_t nrow;
@@ -170,9 +172,7 @@ typedef struct smfCalcModelComData {
    int fill;
    int flag;
    int freeze_flags;
-   int gain_box;
    int icom;
-   int nblock;
    int niter;
    int operation;
    smfArray *gai;
@@ -205,6 +205,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    dim_t idx_lo;
    dim_t itime;
    dim_t nb;
+   dim_t nblock;
    dim_t nbolo;
    dim_t ncol;
    dim_t nointslice;
@@ -225,7 +226,6 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
    int freeze_flags;
    int icom;
    int iw;
-   int nblock;
    int ncom;
    int niter;
    int nw;
@@ -466,7 +466,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
          msgOutif( MSG__VERB, "", "  Undoing separate COM models for each array.",
                    status );
       }
-      ncom = model->ndat;
+      ncom = (int) model->ndat;
       if( (int) res->ndat != ncom && *status == SAI__OK  ) {
          *status = SAI__ERROR;
          errRepf( "", "smf_calcmodel_com: COM model and residuals contain "
@@ -548,7 +548,7 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       if( perarray ) {
          msgOutif( MSG__VERB, "", "  Calculating separate COM models for each array.",
                    status );
-         ncom = model->ndat;
+         ncom = (int) model->ndat;
          if( (int) res->ndat != ncom && *status == SAI__OK  ) {
             *status = SAI__ERROR;
             errRep( "", "smf_calcmodel_com: COM model and residuals contain "
@@ -562,8 +562,8 @@ void smf_calcmodel_com( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* Loop round creating a new COM model for each sub-array. */
       for( idx = 0; idx < res->ndat && *status == SAI__OK; idx++ ) {
-         msgSeti( "I", idx + 1 );
-         msgSeti( "N", res->ndat );
+         msgSetk( "I", idx + 1 );
+         msgSetk( "N", res->ndat );
          msgOutif( MSG__VERB, "", "  Calculating common-mode signal for array ^I of ^N",
                    status );
 
@@ -844,9 +844,9 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
    int masked;
    int ns1;
    int state;
-   size_t gbstride;
-   size_t gcstride;
-   size_t izero;
+   dim_t gbstride;
+   dim_t gcstride;
+   dim_t izero;
    smf_qual_t *pq0[ 4 ];
    smf_qual_t *pq;
    smf_qual_t *qua_data;
@@ -1136,7 +1136,7 @@ static void smf1_calcmodel_com( void *job_data_ptr, int *status ) {
 
 /* Find the mean and sigma of the samples now in the buffer. */
             if( pb > resbuf ) {
-               *pm = smf_sigmaclipD( (int)( pb - resbuf ), resbuf, wgtbuf, 0.0,
+               *pm = smf_sigmaclipD( pb - resbuf, resbuf, wgtbuf, 0.0,
                                      1, &sigma, status );
 
 /* Update the thresholds for the next iteration. */

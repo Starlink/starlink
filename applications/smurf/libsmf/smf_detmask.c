@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_detmask( type, void *in, int len, int ndim, const hdsdim *dims_in,
-*                  int axis, int *index, int maxis, int *mask, void *out,
+*                  int axis, int *index, int maxis, dim_t *mask, void *out,
 *                  int *status );
 
 *  Arguments:
@@ -119,7 +119,7 @@
 #include "smf.h"
 
 void smf_detmask( const char *type, const void *in, int len, int ndim,
-                  const hdsdim *dims_in, int maxis, const int *mask,
+                  const hdsdim *dims_in, int maxis, const dim_t *mask,
                   void *out, int *status ){
 
 /* Check inherited status */

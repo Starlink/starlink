@@ -137,17 +137,17 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
                      const smfData * powref, const smfData * bolref,
                      const smfData * polyfit, const Grp * prvgrp, int * status ) {
 
-  size_t colsize;              /* number of columns */
+  dim_t colsize;              /* number of columns */
   double *dbuf = NULL;         /* input double buffer for mean data */
   double *dvar = NULL;         /* input double buffer for variance of data */
   char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int *ibuf = NULL;            /* int buffer for mean data */
   int indf = NDF__NOID;        /* NDF identifier for output file */
-  size_t ncards;               /* number of fits cards */
-  size_t numbols;              /* number of bolometers */
+  dim_t ncards;               /* number of fits cards */
+  dim_t numbols;              /* number of bolometers */
   double *outvar = NULL;       /* buffer for variance of data */
   int place = NDF__NOPL;       /* Dummy placeholder for NDF */
-  size_t rowsize;              /* number of rows */
+  dim_t rowsize;              /* number of rows */
   JCMTState *state = NULL;     /* State for this flatfield */
   sc2ast_subarray_t subnum;    /* subarray number */
 
@@ -157,10 +157,10 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
 
 
   int *dksquid;           /* pointer to dummy dark SQUID data */
-  size_t j;               /* loop counter */
+  dim_t j;               /* loop counter */
   int jig_vert[1][2];     /* dummy jiggle vertices */
   double jig_path[1][2];  /* dummy jiggle path */
-  size_t nframes = 0;     /* Number of frames in bolval */
+  dim_t nframes = 0;     /* Number of frames in bolval */
   int npath = 0;          /* size of jiggle path */
   int nvert = 0;          /* number of jiggle vertices */
   char *xmlfile = NULL;   /* dummy xmlfile name */
@@ -236,7 +236,7 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
   sc2store_setcompflag ( SC2STORE__NONE, status );
   sc2store_wrtstream ( flatname, subnum, ncards,
                        fitsrec, colsize, rowsize, nframes,
-                       (bolref->dims)[2], refres, 0, smf_flat_methstring( flatmeth, status ),
+                       (int) (bolref->dims)[2], refres, 0, smf_flat_methstring( flatmeth, status ),
                        bolval->hdr->allState, NULL,
                        ibuf, dksquid, (bolref->pntr)[0], (powref->pntr)[0],
                        "FLATCAL", NULL, NULL, jig_vert,
@@ -254,7 +254,7 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
 
   if (outvar) {
     void *pntr[3];
-    int el;
+    size_t el;
     ndfStype( "_DOUBLE", indf, "VARIANCE", status );
     ndfMap( indf, "VARIANCE", "_DOUBLE", "WRITE", pntr, &el, status );
     if (*status == SAI__OK) {
@@ -280,7 +280,7 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
 
   /* Create a simple frame for heater settings */
   heatfrm = astFrame( 1, "Domain=HEATER,Label(1)=Heater Setting" );
-  heatmap = astLutMap( nframes, bolval->da->heatval, 1.0, 1.0, " " );
+  heatmap = astLutMap( (int) nframes, bolval->da->heatval, 1.0, 1.0, " " );
 
   /* Append the heater axis to the spatial frameset */
   atlAddWcsAxis( result, (AstMapping *)heatmap, (AstFrame *) heatfrm,
@@ -292,7 +292,7 @@ void smf_flat_write( ThrWorkForce *wf, smf_flatmeth flatmeth, const char * flatn
 
   /* Write provenance information */
   if (prvgrp) {
-    size_t size = grpGrpsz( prvgrp, status );
+    dim_t size = grpGrpsz( prvgrp, status );
     char prvname[ 2 * PAR__SZNAM + 1];
 
     smf_get_taskname( NULL, prvname, status );

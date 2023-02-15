@@ -205,20 +205,20 @@ AstFitsChan *smf_jsatileheader( int itile, smfJSATiling *skytiling,
    AstFitsChan *fc = NULL;
    AstFrameSet *fs = NULL;
    char card[ 81 ];   /* FITS header card */
-   double dec_ref;    /* DEC at reference point */
-   double gx_ref;     /* X grid coord at reference point */
-   double gy_ref;     /* Y grid coord at reference point */
-   double ra_ref;     /* RA at reference point */
    double dec_cen;    /* DEC at tile centre */
+   double dec_ref;    /* DEC at reference point */
    double gx_cen;     /* X grid coord at tile centre */
+   double gx_ref;     /* X grid coord at reference point */
    double gy_cen;     /* Y grid coord at tile centre */
+   double gy_ref;     /* Y grid coord at reference point */
    double ra_cen;     /* RA at tile centre */
+   double ra_ref;     /* RA at reference point */
    int fi;            /* Zero-based facet index in range [0,11] */
    int m;             /* The number of pixels along one edge of a facet */
    int ng;            /* The number of tile along one edge of the FITS grid */
    int usexph;        /* Use an XPH projection? */
-   int xt;            /* X offset to the requested tile */
-   int yt;            /* Y offset to the requested tile */
+   int xt;          /* X offset to the requested tile */
+   int yt;          /* Y offset to the requested tile */
 
 /* Initialise */
    if( move ) *move = 0;

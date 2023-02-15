@@ -116,7 +116,6 @@ void smurf_fts2_removebse(int* status)
   int bseH              = 0; /* Height of the BSE calibration array */
   int bseN              = 0; /* Sample size of BSE */
   int bseW              = 0; /* Width of the BSE calibration array */
-  int fileIndex         = 0; /* File counter */
   int i                 = 0; /* Loop counter */
   int index             = 0; /* Index */
   int j                 = 0; /* Loop counter */
@@ -129,6 +128,7 @@ void smurf_fts2_removebse(int* status)
   size_t numBSEFile     = 0; /* BSE size */
   size_t numInputFile   = 0; /* Input size */
   size_t numOutputFile  = 0; /* Output size */
+  size_t fileIndex      = 0; /* File counter */
 
   double* bseIFG        = NULL; /* BSE interferogram */
   double* bseIFGNew     = NULL; /* New BSE interferogram */
@@ -169,9 +169,9 @@ void smurf_fts2_removebse(int* status)
   }
 
   // CALIBRATION FILE DIMENSIONS
-  bseW = bseData->dims[0];
-  bseH = bseData->dims[1];
-  bseN = bseData->dims[2];
+  bseW = (int) bseData->dims[0];
+  bseH = (int) bseData->dims[1];
+  bseN = (int) bseData->dims[2];
 
   // GET SUBARRAY ID
   smf_find_subarray(bseData->hdr, NULL, 0, &bseSubnum, status);
@@ -207,9 +207,9 @@ void smurf_fts2_removebse(int* status)
     }
 
     // INPUT FILE DIMENSIONS
-    srcW   = inputData->dims[0];
-    srcH   = inputData->dims[1];
-    srcN   = inputData->dims[2];
+    srcW   = (int) inputData->dims[0];
+    srcH   = (int) inputData->dims[1];
+    srcN   = (int) inputData->dims[2];
     numBol = srcW * srcH;
 
     // GET SOURCE SUBARRAY ID

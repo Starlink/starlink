@@ -15,8 +15,8 @@
  *  Invocation:
  *     sc2sim_ndfwrheat ( const struct sc2sim_obs_struct *inx,
  *                        const struct sc2sim_sim_struct *sinx,
- *                        const char file_name[], size_t numsamples,
- *                        size_t nflat, double refres, const char flatname[],
+ *                        const char file_name[], dim_t numsamples,
+ *                        dim_t nflat, double refres, const char flatname[],
  *                        const JCMTState *head, const int *dbuf,
  *                        const int *dksquid, const double *fcal,
  *                        const double *fpar, const char filter[], int *status )
@@ -28,9 +28,9 @@
  *        Pointer to struct with simulation parameters
  *     file_name = const char[] (Given)
  *        Output file name
- *     numsamples = size_t (Given)
+ *     numsamples = dim_t (Given)
  *        Number of samples
- *     nflat = size_t (Given)
+ *     nflat = dim_t (Given)
  *        Number of flat coeffs per bol
  *     refres = double (Given)
  *        Reference resistance used to calculate flatfield.
@@ -92,7 +92,7 @@
  *     2007-10-22 (TIMJ):
  *        Use new fitsrec definition for sc2store
  *     2007-10-31 (TIMJ):
- *        Use size_t following sc2store change. Use const.
+ *        Use dim_t following sc2store change. Use const.
 
  *  Copyright:
  *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -144,8 +144,8 @@ void sc2sim_ndfwrheat
  const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
  int subindex,            /* index into sinx->subname of subarray being written */
  const char file_name[],  /* output file name (given) */
- size_t numsamples,    /* number of samples (given) */
- size_t nflat,         /* number of flat coeffs per bol (given) */
+ dim_t numsamples,    /* number of samples (given) */
+ dim_t nflat,         /* number of flat coeffs per bol (given) */
  double refres,        /* reference resistance used to calculate flatfield (given) */
  const char flatname[],    /* name of flatfield algorithm (given) */
  const JCMTState *head,   /* header data for each frame (given) */
@@ -163,9 +163,9 @@ void sc2sim_ndfwrheat
   AstFitsChan *fitschan;           /* FITS headers */
   char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
-  size_t nrec = 0;                 /* number of FITS header records */
+  dim_t nrec = 0;                 /* number of FITS header records */
   sc2ast_subarray_t subnum;        /* subarray index */
-  size_t i, j;
+  dim_t i, j;
 
   /* Check status */
   if ( *status != SAI__OK ) return;

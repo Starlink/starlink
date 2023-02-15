@@ -15,9 +15,9 @@
 *  Invocation:
 *     void smf_median_smooth( dim_t box, smf_filt_t filter_type,
 *                             float wlim, dim_t el, const double *dat,
-*                             const smf_qual_t *qua, size_t stride,
+*                             const smf_qual_t *qua, dim_t stride,
 *                             smf_qual_t mask, double *out, double *w1,
-*                             size_t *w2, int *w3, int *status )
+*                             dim_t *w2, dim_t *w3, int *status )
 
 *  Arguments:
 *     box = dim_t (Given)
@@ -40,7 +40,7 @@
 *        The data array. Any VAL__BADD values are ignored.
 *     qua = const smf_qual_t * (given)
 *        The quality array associated with the data array. May be NULL.
-*     stride = size_t (Given)
+*     stride = dim_t (Given)
 *        The step between samples to use in the data and quality arrays.
 *     mask = smf_qual_t (Given)
 *        A mask specifying the samples that are to be includedin the
@@ -51,9 +51,9 @@
 *        flag values for which no median value could be calculated.
 *     w1 = double * (Given and Returned)
 *        A work array of length "box".
-*     w2 = size_t * (Given and Returned)
+*     w2 = dim_t * (Given and Returned)
 *        A work array of length "box".
-*     w3 = int * (Given and Returned)
+*     w3 = dim_t * (Given and Returned)
 *        A work array of length "box".
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -135,32 +135,32 @@
 
 void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
                         dim_t el, const double *dat, const smf_qual_t *qua,
-                        size_t stride, smf_qual_t mask, double *out,
-                        double *w1, size_t *w2, int *w3, int *status ){
+                        dim_t stride, smf_qual_t mask, double *out,
+                        double *w1, dim_t *w2, dim_t *w3, int *status ){
 
 /* Local Variables: */
    const double *pdat;         /* Pointer to next bolo data value */
    const smf_qual_t *pqua;     /* Pointer to next quality flag */
+   dim_t *pw2;                 /* Pointer to next sorted data index */
+   dim_t ibox;                 /* Index within box */
    dim_t ihi;                  /* Upper limit for which median can be found */
    dim_t inbox;                /* No. of values currently in the box */
    dim_t iold;                 /* Index of oldest value in "w2" */
    dim_t iout;                 /* Index within out array */
+   dim_t jbox;                 /* Index within box */
    dim_t jhi;                  /* Index of last element in search box */
    dim_t jlo;                  /* Index of first element in search box */
    dim_t jtest;                /* Index of element at centre of search box */
    dim_t minin;                /* Min no of valid i/p values for a valid o/p value */
+   dim_t newi;                 /* Index within "w1" at which to store new value */
    dim_t off;                  /* Vector index of ne wvalue */
+   dim_t offset;               /* Offset from next new value to central value */
+   dim_t oldi;                 /* Index within "w1" of the old value */
    double *pout;               /* Pointer to next output median value */
    double *pw1;                /* Pointer to next sorted data value */
    double dnew;                /* Data value being added into the filter box */
    double outval;              /* Main output filter value */
-   int ibox;                   /* Index within box */
-   int jbox;                   /* Index within box */
-   int newi;                   /* Index within "w1" at which to store new value */
-   int offset;                 /* Offset from next new value to central value */
-   int oldi;                   /* Index within "w1" of the old value */
    size_t *perm;               /* Initial permutation array */
-   size_t *pw2;                /* Pointer to next sorted data index */
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -205,10 +205,10 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
    values are in the range 0 to "box". */
    perm = astMalloc( box*sizeof( *perm ) );
    if( *status == SAI__OK ) {
-      gsl_sort_index( perm, dat, stride, (size_t) box );
+      gsl_sort_index( perm, dat, stride, (dim_t) box );
 
 /* Loop round each element in the first filter box. */
-      for( ibox = 0; ibox < (int) box; ibox++ ) {
+      for( ibox = 0; ibox < box; ibox++ ) {
 
 /* Get the vector index of the i'th largest value in the filter box
    (which may be a bad or flagged value since GSL does not recognise
@@ -248,7 +248,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 
 /* If there are any bad data values, pad out the w1 array with bad
    values, and w2 array with -1 values. */
-   for( ibox = inbox; ibox < (int) box; ibox++ ) {
+   for( ibox = inbox; ibox < box; ibox++ ) {
       w1[ ibox ] = VAL__BADD;
       w2[ ibox ] = -1;
    }
@@ -260,7 +260,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 
 /* Note the offset from the input value that is to be added into the filter
    box next, and the current central input value. */
-   offset = -stride*(int)( ( box + 1 )/2 );
+   offset = -stride*( ( box + 1 )/2 );
 
 /* Initialise pointers to the next data and quality value to enter the
    filter box. */
@@ -423,7 +423,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 /* If the new value is bad but the old value is good, shunt the higher
    values down to over-write the old value. */
       } else if( oldi >= 0 ) {
-         for( ibox = oldi + 1; ibox < (int) inbox; ibox++ ) {
+         for( ibox = oldi + 1; ibox < inbox; ibox++ ) {
             w1[ ibox - 1 ] = w1[ ibox ];
             w2[ ibox - 1 ] = w2[ ibox ];
             w3[ w2[ ibox - 1 ] ] = ibox - 1;
@@ -440,7 +440,7 @@ void smf_median_smooth( dim_t box, smf_filt_t filter_type, float wlim,
 /* If the new value is bad but the old value is also bad, do nothing. */
       }
 
-/* Increment the index of the oldest element int he filter box. If we hit
+/* Increment the index of the oldest element in the filter box. If we hit
    the end of the "w3" array, start again at the beginning. */
       if( ++iold == box ) iold = 0;
 

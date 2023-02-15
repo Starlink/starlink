@@ -104,11 +104,11 @@ void smf_flatten ( smfData *data, AstKeyMap * heateffmap, int *status ) {
 
   smfDA *da = NULL;            /* Pointer to struct containing flatfield info */
   double *dataArr = NULL;      /* Pointer to flatfielded data array */
-  size_t i;                    /* Loop counter */
-  size_t ndat;                 /* Total number of data points */
-  int nboll;                   /* Number of bolometers */
-  int nframes;                 /* Number of frames (timeslices) */
-  int ngood;                   /* Number of good bolometers in flatfield */
+  dim_t i;                     /* Loop counter */
+  dim_t ndat;                  /* Total number of data points */
+  dim_t nboll;                 /* Number of bolometers */
+  dim_t nframes;               /* Number of frames (timeslices) */
+  dim_t ngood;                 /* Number of good bolometers in flatfield */
   void *pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
   smf_qual_t *qual;         /* Pointer to quality array */
 

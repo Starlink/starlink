@@ -13,29 +13,28 @@
 *     C function
 
 *  Invocation:
-*     smf_store_outputbounds (int updatepars, const int lbnd_out[3],
-*                        const int ubnd_out[3], const AstFrameSet * wcsout,
-*                        const AstSkyFrame *oskyfrm,
-*                        const AstMapping * oskymap, int *status) {
+*     smf_store_outputbounds (int updatepars, const dim_t lbnd_out[3],
+*                        const dim_t ubnd_out[3], AstFrameSet * wcsout,
+*                        AstSkyFrame *oskyfrm, AstMapping * oskymap, int *status) {
 
 
 *  Arguments:
 *     updatepars = int (Given)
 *        If true, parameter system is updated in addition to screen output.
 *        If false, the bounds are only written to the screen.
-*     lbnd_out = const int[3] (Given)
+*     lbnd_out = const dim_t[3] (Given)
 *        Lower pixel bounds of the output map. Can have up to 3 values
 *        depending on the dimensionality of wcsout.
-*     lbnd_out = const int[3] (Given)
+*     lbnd_out = const dim_t[3] (Given)
 *        Upper pixel bounds of the output map. Can have up to 3 values
 *        depnding on the dimensionality of wcsout.
-*     wcsout = const AstFrameSet * (Given)
+*     wcsout = AstFrameSet * (Given)
 *        Output frameset. Can be 2d or 3d frameset. lbnd_out and ubnd_out
 *        must be the correct size.
-*     oskyfrm = const AstSkyFrame * (Given)
+*     oskyfrm = AstSkyFrame * (Given)
 *        Output sky frame (presumably split from wcsout). For a 2d wcsout
 *        this can be NULL since the frameset can be used as a frame.
-*     oskymap = const AstMapping * (Given)
+*     oskymap = AstMapping * (Given)
 *        Output sky mapping (presumably split from wcsout). For a 2d wcsout
 *        this can be NULL since the frame set can act as a mapping.
 *     status = int * (Given & Returned)
@@ -101,11 +100,10 @@
 #include "libsmf/smf.h"
 
 void
-smf_store_outputbounds (int updatepars, const int lbnd_out[3],
-                        const int ubnd_out[3],
-                        const AstFrameSet * wcsout,
-                        const AstSkyFrame *oskyfrm,
-                        const AstMapping * oskymap, int *status) {
+smf_store_outputbounds (int updatepars, const dim_t lbnd_out[3],
+                        const dim_t ubnd_out[3], AstFrameSet * wcsout,
+                        AstSkyFrame *oskyfrm, AstMapping * oskymap,
+                        int *status) {
 
   double corner[2];          /* WCS of a corner (SKY) */
   int i;                     /* loop counter */

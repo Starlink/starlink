@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArray *qua,
 *                        smfDIMMData *dat, const Grp *flagrootgrp,
-*                        size_t contchunk, const int *lbnd_out,
-*                        const int *ubnd_out, AstFrameSet *outfset,
+*                        dim_t contchunk, const dim_t *lbnd_out,
+*                        const dim_t *ubnd_out, AstFrameSet *outfset,
 *                        int *status )
 
 *  Arguments:
@@ -35,11 +35,11 @@
 *        Pointer to additional map-making data passed around in a struct
 *     flagrootgrp = const Grp* (Given)
 *        Root name for flagmaps. Can be path to HDS container.
-*     contchunk = size_t (Given)
+*     contchunk = dim_t (Given)
 *        Continuous chunk number
-*     lbnd_out = const int* (Given)
+*     lbnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
-*     ubnd_out = const int* (Given)
+*     ubnd_out = const dim_t * (Given)
 *        2-element array pixel coord. for the upper bounds of the output map
 *     outfset = AstFrameSet* (Given)
 *        Frameset containing the sky->output map mapping
@@ -128,8 +128,8 @@
 
 void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArray *qua,
                         smfDIMMData *dat, const Grp *flagrootgrp,
-                        size_t contchunk, const int *lbnd_out,
-                        const int *ubnd_out, AstFrameSet *outfset,
+                        dim_t contchunk, const dim_t *lbnd_out,
+                        const dim_t *ubnd_out, AstFrameSet *outfset,
                         int *status ) {
 
   AstFrameSet *tfset;          /* Temporary FrameSet pointer */
@@ -138,22 +138,22 @@ void smf_write_flagmap( ThrWorkForce *wf, smf_qual_t mask, smfArray *lut, smfArr
   char name[GRP__SZNAM+1];      /* Buffer for storing names */
   char tempstr[20];             /* Temporary string */
   char tmpname[GRP__SZNAM+1];   /* temp name buffer */
+  dim_t bstride;               /* Bolometer stride */
+  dim_t i;                     /* loop counter */
+  dim_t idx=0;                 /* index within subgroup */
+  dim_t ii;                    /* array offset index */
+  dim_t j;                     /* loop counter */
+  dim_t lbnd3d[3];              /* Lower bounds for 3D output */
   dim_t nbolo;                  /* Number of bolometers */
+  dim_t npix;                   /* Number of pixels per plane */
   dim_t ntslice;                /* Number of time slices */
+  dim_t tstride;               /* Time stride */
+  dim_t ubnd3d[3];              /* Upper bounds for 3D output */
   double shift[ 1 ];            /* Shift from GRID to bit number */
   int *flagmap=NULL;            /* pointer to flagmap data */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   int ibit;                     /* Quality bit number */
-  int lbnd3d[3];                /* Lower bounds for 3D output */
-  int npix;                     /* Number of pixels per plane */
   int target;                   /* Target value for incrementing pixel count */
-  int ubnd3d[3];                /* Upper bounds for 3D output */
-  size_t bstride;               /* Bolometer stride */
-  size_t i;                     /* loop counter */
-  size_t idx=0;                 /* index within subgroup */
-  size_t ii;                    /* array offset index */
-  size_t j;                     /* loop counter */
-  size_t tstride;               /* Time stride */
   smfData *mapdata=NULL;        /* smfData for new map */
   smf_qual_t *qua_data=NULL;    /* Pointer to DATA component of qua */
 

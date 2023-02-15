@@ -96,6 +96,10 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   char *receptor;         /* String holding receptor names */
   const char *cin;        /* Pointer to next input character */
   const char *fpntrn = NULL; /* mapped RECEPTOR */
+  dim_t lbnd[ 3 ];        /* NDF lower pixel bounds */
+  dim_t lower[ 3 ];      /* New array lower bounds */
+  dim_t ubnd[ 3 ];        /* NDF upper pixel bounds */
+  dim_t upper[ 3 ];      /* New array upper bounds */
   double * fplanex = NULL;/* X coordinates in radians */
   double * fplaney = NULL;/* Y coordinates in radians */
   double * fpntrr = NULL; /* mapped RECEPPOS */
@@ -112,16 +116,12 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   double trac1;           /* Frame TCS_TR_AC1 value */
   double trac2;           /* Frame TCS_TR_AC2 value */
   double trd;             /* Distance from receptor to TCS_TR_AC1/2 */
-  hdsdim lower[ 3 ];      /* New array lower bounds */
-  hdsdim upper[ 3 ];      /* New array upper bounds */
   int iframe;             /* Frame index */
-  int irec;               /* Receptor index */
-  int j;                  /* Character count */
-  int lbnd[ 3 ];          /* NDF lower pixel bounds */
   int ndim;               /* Number of used pixel axes */
   int ri;                 /* Index into receppos or TSYS array */
-  int ubnd[ 3 ];          /* NDF upper pixel bounds */
   size_t clen;            /* Character length */
+  size_t irec;            /* Receptor index */
+  size_t j;               /* Character count */
   size_t origu1;          /* Original upper bound on second pixel axis */
   size_t origu2;          /* Original upper bound on third pixel axis */
   size_t sizen;           /* Number of RECEPTOR list */
@@ -166,7 +166,7 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   /* Get slices of the extension arrays that match the pixel index
      bounds of the NDF. Only do this if the arrays do not already match
      the pixel index bounds. First do the 1D arrays. */
-  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ) {
+  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != (int) origu1 ) {
      lower[ 0 ] = lbnd[ 1 ];
      upper[ 0 ] = ubnd[ 1 ];
 
@@ -187,8 +187,8 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
   }
 
   /* Now do the 2D arrays. */
-  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != origu1 ||
-      lbnd[ 2 ] != 1 || ubnd[ 2 ] != origu2 ) {
+  if( lbnd[ 1 ] != 1 || ubnd[ 1 ] != (int) origu1 ||
+      lbnd[ 2 ] != 1 || ubnd[ 2 ] != (int) origu2 ) {
      lower[ 0 ] = lbnd[ 1 ];
      upper[ 0 ] = ubnd[ 1 ];
      lower[ 1 ] = lbnd[ 2 ];

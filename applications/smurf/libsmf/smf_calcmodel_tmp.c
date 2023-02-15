@@ -101,21 +101,20 @@ void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;               /* bolo stride */
   int docos;                    /* take the cos(template)? */
   int dosin;                    /* take the sin(template)? */
-  size_t i;                     /* loop counter */
-  size_t idx;                   /* Subarry index */
-  size_t j;                     /* loop counter */
+  dim_t i;                     /* loop counter */
+  dim_t idx;                   /* Subarry index */
+  dim_t j;                     /* loop counter */
   AstKeyMap *kmap=NULL;         /* Local keymap */
-  size_t mbstride;              /* model bolo stride */
-  size_t mcstride;              /* model component stride */
+  dim_t mbstride;              /* model bolo stride */
+  dim_t mcstride;              /* model component stride */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* model data array */
   dim_t nbolo;                  /* number of bolometers */
   dim_t ndata;                  /* number of samples */
   dim_t ntslice;                /* number of time slices */
-  int nw;                       /* Number of worker threads */
   AstObject *obj=NULL;          /* Used to avoid "type-punned" warnings */
   smfArray *qua=NULL;           /* Pointer to QUA at chunk */
   smf_qual_t *qua_data=NULL;    /* quality data array */
@@ -125,13 +124,10 @@ void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   double *template=NULL;        /* The template */
   const char *tempstr=NULL;     /* Temporary pointer to static char buffer */
   double trigoffset;            /* Offset to apply before trig functions */
-  size_t tstride;               /* time stride */
+  dim_t tstride;               /* time stride */
 
   /* Main routine */
   if (*status != SAI__OK) return;
-
-  /* How many threads do we get to play with */
-  nw = wf ? wf->nworker : 1;
 
   /* Obtain pointer to sub-keymap containing TMP parameters */
   astMapGet0A( keymap, "TMP", &obj );
@@ -313,7 +309,7 @@ void smf_calcmodel_tmp( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
       /* Report mean stats */
       if( msgIflev( NULL, status ) >= MSG__VERB ) {
         double mean_g, mean_o, mean_corr;
-        size_t n_g, n_o, n_corr;
+        dim_t n_g, n_o, n_corr;
 
         smf_stats1D( model_data + 0*mcstride, mbstride, nbolo,
                      NULL, 0, 0, &mean_g, NULL, NULL, &n_g, status );

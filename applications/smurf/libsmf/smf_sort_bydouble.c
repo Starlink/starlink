@@ -13,7 +13,7 @@
 *     SMURF subroutine (QSORT callback)
 
 *  Invocation:
-*     qsort( smfSortInfo* tobeSorted, size_t nel, sizeof(*tobeSorted),
+*     qsort( smfSortInfo* tobeSorted, dim_t nel, sizeof(*tobeSorted),
 *            smf_sort_bydouble );
 
 *  Description:

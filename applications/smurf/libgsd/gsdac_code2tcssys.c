@@ -72,6 +72,7 @@ const char * gsdac_code2tcssys ( gsdCoordType code, int * status ) {
     case COORD_EQ:
       *status = SAI__ERROR;
       errRep ( " ", "Equatorial coordinates not supported", status );
+      break;
     case COORD_RD:
       retval = "APP";
       break;

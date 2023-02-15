@@ -121,7 +121,7 @@ void smurf_checkcoords( int *status ) {
    for( i = 1; i <= size; i++ ) {
 
 /* Open the file. */
-      smf_open_file( NULL, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( NULL, igrp, (int) i, "READ", SMF__NOCREATE_DATA, &data, status );
 
 /* Check the detector positions (for ACSIS data). */
       msgBlank( status );

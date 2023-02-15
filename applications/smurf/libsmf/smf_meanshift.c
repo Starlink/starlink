@@ -12,8 +12,8 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_meanshift( double *indata, double *outdata, int nel,
-*                         int stride, int box1, double box2, smf_qual_t *qual,
+*     void smf_meanshift( double *indata, double *outdata, dim_t nel,
+*                         dim_t stride, int box1, double box2, smf_qual_t *qual,
 *                         smf_qual_t mask, float wlim, int *status )
 
 *  Arguments:
@@ -21,10 +21,10 @@
 *        Pointer to the input 1D array to be smoothed.
 *     outdata = double * (Returned)
 *        Pointer to the output 1D array containing the smoothed data.
-*     nel = int (Given)
+*     nel = dim_t (Given)
 *        Number of points to be filtered, each separated by "stride"
 *        elements.
-*     stride = int (Given)
+*     stride = dim_t (Given)
 *        The stride between samples in the "indata" array.
 *     box1 = int (Given)
 *        The size of the spatial top-hat filter box (in array elements).
@@ -93,11 +93,20 @@
 /* SMURF includes */
 #include "smf.h"
 
-void smf_meanshift( double *indata, double *outdata, int nel, int stride,
+void smf_meanshift( double *indata, double *outdata, dim_t nel, dim_t stride,
                     int box1, double box2, smf_qual_t *qual, smf_qual_t mask,
                     float wlim, int *status) {
 
 /* Local variables */
+   dim_t count;             /* Number of samples in box */
+   dim_t hb1;               /* Half width of box1 */
+   dim_t icentral;          /* Index of central element in current filter box */
+   dim_t iout;              /* Index of current output element */
+   dim_t isum;              /* Sum of index values in the box */
+   dim_t j;                 /* Index of box element */
+   dim_t jhi;               /* Highest index of elements in box*/
+   dim_t jlo;               /* Lowest index of elements in box*/
+   dim_t minin;             /* Min no of valid i/p values for a valid o/p value */
    double *pin;             /* Pointer to central input value */
    double *pout;            /* Pointer to next output value */
    double *pp;              /* Pointer to next input value */
@@ -106,16 +115,7 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride,
    double sum;              /* Sum of data values in the box */
    double vcentral;         /* Value of central element in current filter box */
    double vcentral_new;     /* Value of central element in new filter box */
-   int count;               /* Number of samples in box */
-   int hb1;                 /* Half width of box1 */
-   int icentral;            /* Index of central element in current filter box */
-   int iout;                /* Index of current output element */
-   int isum;                /* Sum of index values in the box */
    int iter;                /* Iteration count */
-   int j;                   /* Index of box element */
-   int jhi;                 /* Highest index of elements in box*/
-   int jlo;                 /* Lowest index of elements in box*/
-   int minin;               /* Min no of valid i/p values for a valid o/p value */
    smf_qual_t *pq;          /* Pointer to next input quality */
    smf_qual_t *qin;         /* Pointer to central input quality */
 
@@ -210,7 +210,7 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride,
 /* Form the new central pixel position and value. */
                if( count >= minin ) {
                   vcentral_new = sum/count;
-                  icentral_new = (int)( 0.5 + ((float)isum)/count);
+                  icentral_new = (dim_t)( 0.5 + ((float)isum)/count);
 
 /* If the process has converged, break. */
                   if( icentral_new == icentral &&
@@ -294,7 +294,7 @@ void smf_meanshift( double *indata, double *outdata, int nel, int stride,
 /* Form the new central pixel position and value. */
                if( count >= minin ) {
                   vcentral_new = sum/count;
-                  icentral_new = (int)( 0.5 + (float)isum/(float)count );
+                  icentral_new = (dim_t)( 0.5 + (float)isum/(float)count );
 
 /* If the process has converged, break. */
                   if( icentral_new == icentral &&

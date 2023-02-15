@@ -109,10 +109,10 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
 
   int have_fixed = 0;        /* Did we fix anything? */
   smfHead *hdr = NULL;       /* Data header struct */
-  size_t i;                  /* Loop counter */
-  size_t j;                  /* Loop counter */
-  size_t k;                  /* Loop counter */
-  size_t l;                  /* Loop counter */
+  dim_t i;                  /* Loop counter */
+  dim_t j;                  /* Loop counter */
+  dim_t k;                  /* Loop counter */
+  dim_t l;                  /* Loop counter */
   sc2ast_subarray_t subnum;  /* subarray number */
   int was_fixed = 0;         /* Were these data fixed before? */
 
@@ -198,13 +198,13 @@ int smf_fix_data ( msglev_t msglev, smfData * data, int * status ) {
     /* Proceed with fix if within date range */
     if( (*status == SAI__OK) && (dateobs >= datestartfix) &&
         (dateobs <= dateendfix) ) {
-      size_t targetbolo;
-      size_t sourcebolo;
-      size_t bstride;
+      dim_t targetbolo;
+      dim_t sourcebolo;
+      dim_t bstride;
       dim_t ncols;
       dim_t nrows;
       dim_t ntslice;
-      size_t tstride;
+      dim_t tstride;
 
       msgOutif( msglev, "", INDENT "Reparing row order readout error", status );
 

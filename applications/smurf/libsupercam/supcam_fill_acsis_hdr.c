@@ -384,7 +384,7 @@ supcam_fill_acsis_hdr( AstFitsChan * supcamhdr, AstFitsChan * acsishdr, int * st
 
     /* Copy the Supercam header to a new location skipping all the
        table headers and starting at CTYPE */
-    cleanhdr = astFitsChan( NULL, NULL, "" );
+    cleanhdr = astFitsChan( NULL, NULL, " " );
     astClear( supcamhdr, "Card" );
     while ( astFindFits( supcamhdr, "%f", card, 1 )) {
       if ( !docopy ) {

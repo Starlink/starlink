@@ -89,8 +89,8 @@ void smf_check_smfDA( const smfData *idata, smfData *odata, int * status ) {
   smfDA *oda = NULL;       /* Output smfDA */
   double *flatcal;         /* pointer to flatfield calibration */
   double *flatpar;         /* pointer to flatfield parameters */
-  int nbol;                /* Number of bolometers/pixels */
-  int nflat;               /* Number of flat coeffs per bol */
+  dim_t nbol;              /* Number of bolometers/pixels */
+  dim_t nflat;             /* Number of flat coeffs per bol */
 
   if (*status != SAI__OK) return;
 

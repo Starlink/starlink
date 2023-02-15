@@ -16,12 +16,12 @@
  *     sc2sim_ndfwrdata ( const struct sc2sim_obs_struct *inx,
  *                        const struct sc2sim_sim_struct *sinx,
  *                        double meanwvm, const char file_name[],
- *                        size_t numsamples, size_t nflat, double refres, const char flatname[],
+ *                        dim_t numsamples, dim_t nflat, double refres, const char flatname[],
  *                        const JCMTState *head, const int *dbuf, const int *dksquid,
  *                        const double *fcal, const double *fpar,
  *                        const char instrume[], const char filter[],
  *                        const char dateobs[], const char obsid[],
- *                        const double *posptr, size_t jigsamples,
+ *                        const double *posptr, dim_t jigsamples,
  *                        const double jigptr[][2], const int obsnum,
  *                        const int nsubscan,
  *                        const char utdate[], const double azstart,
@@ -42,9 +42,9 @@
  *        225 GHz tau
  *     file_name = const char[] (Given)
  *        Output file name
- *     numsamples = size_t (Given)
+ *     numsamples = dim_t (Given)
  *        Number of samples
- *     nflat = size_t (Given)
+ *     nflat = dim_t (Given)
  *        Number of flat coeffs per bol
  *     refres = double (Given)
  *        Resistance used to calculate flatfield
@@ -70,7 +70,7 @@
  *        Observation ID string
  *     posptr = const double* (Given)
  *        Pointing offsets from map centre
- *     jigsamples = size_t (Given)
+ *     jigsamples = dim_t (Given)
  *        Number of jiggle samples in DREAM pattern
  *     jigptr[][2] = double (Given)
  *        Array of jiggle X and Y positions
@@ -198,7 +198,7 @@
  *     2007-10-22 (TIMJ):
  *        Use new definition for fits header as required by sc2store.
  *     2007-10-31 (TIMJ):
- *        DA now uses size_t to count things. A read-only dateobs was being
+ *        DA now uses dim_t to count things. A read-only dateobs was being
  *        written to.
  *     2007-11-15 (AGG):
  *        Write sub-image FITS headers in the correct order, check old
@@ -301,8 +301,8 @@ void sc2sim_ndfwrdata
  int subindex,            /* index into sinx->subname of subarray being written */
  double meanwvm,          /* Mean 225 GHz tau */
  const char file_name[],  /* output file name (given) */
- size_t numsamples,       /* number of samples (given) */
- size_t nflat,            /* number of flat coeffs per bol (given) */
+ dim_t numsamples,        /* number of samples (given) */
+ dim_t nflat,             /* number of flat coeffs per bol (given) */
  double refres,           /* Resistance used to calculate flatfield */
  const char flatname[],   /* name of flatfield algorithm (given) */
  const JCMTState *head,   /* header data for each frame (given) */
@@ -315,7 +315,7 @@ void sc2sim_ndfwrdata
  const char dateobs[],    /* String representing UTC DATE-OBS (given) */
  const char obsid[],      /* unique obsid for this observation (given) */
  const double *posptr,    /* Pointing offsets from map centre (given) */
- size_t jigsamples,       /* Number of jiggle samples (given) */
+ dim_t jigsamples,        /* Number of jiggle samples (given) */
  double jigptr[][2],      /* Array of X, Y jiggle positions (given) */
  const int obsnum,        /* Observation number (given) */
  const double focposn,    /* Focus position */
@@ -347,22 +347,20 @@ void sc2sim_ndfwrdata
   int fitsfind;
   char fitsrec[SC2STORE__MAXFITS*SZFITSCARD+1]; /* Store for FITS records */
   int framesize;                  /* Number of points in a single `frame' */
-  size_t i;                       /* Loop counter */
+  dim_t i;                       /* Loop counter */
   double instap[2];               /* Instrument aperture */
-  size_t j;                       /* Loop counter */
+  dim_t j;                       /* Loop counter */
   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
-  size_t k;                       /* Loop counter */
+  dim_t k;                       /* Loop counter */
   int naver;                      /* Number of frames to average */
   int ndim;                       /* Dimensionality of output image */
-  size_t nrec;                    /* number of FITS header records */
+  dim_t nrec;                    /* number of FITS header records */
   int nsubim;                     /* Number of DREAM/STARE images */
   double map_hght;                /* Map height in arcsec */
   double map_pa;                  /* Map PA in degrees  */
   double map_wdth;                /* Map width in arcsec  */
   double map_x = 0;               /* Map X offset in arcsec */
   double map_y = 0;               /* Map Y offset in arcsec */
-  int midpt;                      /* RTS index of midpoint in range contributing
-                                     to output image */
   int ncoeff = 2;                 /* Number of coefficients in polynomial fit */
   char objectname[JCMT__SZTCS_SOURCE+1]; /* Name of object */
   double obsgeo[3];               /* Cartesian geodetic observatory coords. */
@@ -807,10 +805,6 @@ void sc2sim_ndfwrdata
       for ( i=0; i<framesize; i++ ) {
         coadd[i] /= (double)naver;
       }
-
-      /* Calculate the index nearest the middle of the block of
-         averaged frames for constructing WCS info */
-      midpt = (seqstart + seqend) / 2;
 
       state.tcs_az_ac1 = head[seqstart].tcs_az_ac1;
       state.tcs_az_ac2 = head[seqstart].tcs_az_ac2;

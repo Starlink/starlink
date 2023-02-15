@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_map_or_malloc( size_t nelem, smf_dtype type, int zero,
+*     pntr = smf_map_or_malloc( dim_t nelem, smf_dtype type, int zero,
 *                                int indf, const char * comp, int * status );
 
 *  Arguments:
-*     nelem = size_t (Given)
+*     nelem = dim_t (Given)
 *        Number of elements to allocate
 *     type = smf_dtype (Given)
 *        Data type to map.
@@ -97,11 +97,11 @@
 #include "smf_typ.h"
 #include "smf_err.h"
 
-void * smf_map_or_malloc (size_t nelem, smf_dtype type, int zero, int indf,
+void * smf_map_or_malloc (dim_t nelem, smf_dtype type, int zero, int indf,
                           const char * comp, int *status ) {
 
   void *pntr[3];     /* ndfMap pointers */
-  int nout = 0;      /* number of elements mapped */
+  size_t nout = 0;   /* number of elements mapped */
 
   if (*status != SAI__OK) return NULL;
 
@@ -117,12 +117,12 @@ void * smf_map_or_malloc (size_t nelem, smf_dtype type, int zero, int indf,
   ndfMap( indf, comp, smf_dtype_str(type, status),
           (zero ? "WRITE/ZERO" : "WRITE"), pntr, &nout, status);
 
-  if (nelem != (size_t)nout && *status == SAI__OK) {
+  if (nelem != (dim_t)nout && *status == SAI__OK) {
     ndfUnmap( indf, comp, status );
     *status = SAI__ERROR;
     msgSetc( "COMP", comp );
-    msgSeti( "ORI", nelem );
-    msgSeti( "NOUT", nout );
+    msgSetk( "ORI", nelem );
+    msgSetk( "NOUT", nout );
     errRep(" ", "Mapping ^COMP in NDF but size differs from that listed in smfData attributes (^ORI != ^NOUT)", status);
     pntr[0] = NULL;
   }

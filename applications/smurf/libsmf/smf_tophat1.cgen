@@ -12,16 +12,16 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_tophat1<X>( CGEN_TYPE *data, int nel,
-*                          int box, smf_qual_t *qual,
+*     void smf_tophat1<X>( CGEN_TYPE *data, dim_t nel,
+*                          dim_t box, smf_qual_t *qual,
 *                          smf_qual_t mask, float wlim, int *status )
 
 *  Arguments:
 *     data = CGEN_TYPE * (Given and Returned)
 *        Pointer to the 1D array to be smoothed.
-*     nel = const int (Given)
+*     nel = dim_t (Given)
 *        Number of points in the input data.
-*     box = int (Given)
+*     box = dim_t (Given)
 *        The size of the top-hat filter box (in array elements). If an
 *        even number is supplied, the next higher odd number is used.
 *     qual = smf_qual_t * (Given)
@@ -94,8 +94,8 @@
 /* SMURF includes */
 #include "smf.h"
 
-void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
-                                 int box, smf_qual_t *qual,
+void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, dim_t nel,
+                                 dim_t box, smf_qual_t *qual,
                                  smf_qual_t mask, float wlim,
                                  int *status) {
 
@@ -103,13 +103,13 @@ void CGEN_FUNCTION(smf_tophat1)( CGEN_TYPE *data, const int nel,
    CGEN_TYPE *in_data;      /* Copy of the time data */
    CGEN_TYPE *pin;          /* Pointer to central input value */
    CGEN_TYPE *pout;         /* Pointer to next output value */
+   dim_t count;             /* Number of samples in box */
+   dim_t goodin;            /* Is the central input value good? */
+   dim_t hb;                /* Half width of box */
+   dim_t iout;              /* Index of current output element */
+   dim_t j;                 /* Offset from central box element */
+   dim_t minin;             /* Min no of valid i/p values for a valid o/p value */
    double sum;              /* Sum of values in the box */
-   int count;               /* Number of samples in box */
-   int goodin;              /* Is the central input value good? */
-   int hb;                  /* Half width of box */
-   int iout;                /* Index of current output element */
-   int j;                   /* Offset from central box element */
-   int minin;               /* Min no of valid i/p values for a valid o/p value */
    smf_qual_t *qin;         /* Pointer to central input quality */
 
 /* Check the inherited status. */

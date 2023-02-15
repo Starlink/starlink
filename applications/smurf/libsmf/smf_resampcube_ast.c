@@ -24,10 +24,6 @@
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the template smfData structure.
-*     index = int (Given)
-*        Index of the current template within the group of templates.
-*     size = int (Given)
-*        Index of the last template within the group of templates.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in template.
 *     ndet = dim_t (Given)
@@ -151,21 +147,20 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    AstMapping *totmap = NULL;  /* Mapping between in and out spatial GRID coords */
    AstPermMap *pmap;           /* Mapping to rearrange sky cube axes */
    const char *name = NULL;    /* Pointer to current detector name */
+   dim_t idet;                 /* Detector index */
+   dim_t itime;                /* Index of current time slice */
+   dim_t lbnd_out[ 2 ];        /* Lower bounds on receptor axis */
+   dim_t ldim[ 3 ];            /* Sky cube array lower GRID bounds */
+   dim_t timeslice_size;       /* Number of elements in a time slice */
+   dim_t ubnd_out[ 2 ];        /* Upper time series bounds on receptor axis */
+   dim_t udim[ 3 ];            /* Sky cube array upper GRID bounds */
    double *detlut = NULL;      /* Work space for detector mask */
    double con;                 /* Constant value */
    float *tdata = NULL;        /* Pointer to start of output time slice data */
    int ast_flags;              /* Basic flags to use with astResample */
    int found;                  /* Was current detector name found in detgrp? */
-   dim_t idet;                 /* Detector index */
-   dim_t itime;                /* Index of current time slice */
-   int lbnd_out[ 2 ];          /* Lower bounds on receptor axis */
-   int ldim[ 3 ];              /* Sky cube array lower GRID bounds */
    int skyperm[ 3 ];           /* Sky cube axis permutation array */
-   int timeslice_size;         /* Number of elements in a time slice */
    int tsperm[ 3 ];            /* Time series axis permutation array */
-   int ubnd_out[ 2 ];          /* Upper time series bounds on receptor axis */
-   int uddim[ 1 ];             /* Detector array upper GRID bounds */
-   int udim[ 3 ];              /* Sky cube array upper GRID bounds */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Check the inherited status. */
@@ -183,9 +178,6 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    udim[ 0 ] = dim[ 0 ];
    udim[ 1 ] = dim[ 1 ];
    udim[ 2 ] = dim[ 2 ];
-
-/* Integer upper bounds of detector array. */
-   uddim[ 0 ] = ndet;
 
 /* Store the size of an template time slice. */
    timeslice_size = nel/nslice;
@@ -231,7 +223,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
    the name of the current detector. If not found, set the GRID coord bad.
    This will cause astResample to ignore data from the detector. */
          if( detgrp ) {
-            found = grpIndex( name, detgrp, 1, status );
+            found = (int) grpIndex( name, detgrp, 1, status );
             if( !found ) detlut[ idet ] = AST__BAD;
          }
 
@@ -240,7 +232,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
       }
 
 /* Create the LutMap. */
-      lutmap = (AstMapping *) astLutMap( ndet, detlut, 1.0, 1.0,
+      lutmap = (AstMapping *) astLutMap( (int) ndet, detlut, 1.0, 1.0,
                                          "LutInterp=1" );
 
 /* If we only have 1 detector, use a UnitMap instead of a LutMap (lutMaps
@@ -321,7 +313,7 @@ void smf_resampcube_ast( smfData *data, dim_t nchan,
       astInvert( fullmap );
 
 /* Resample the sky cube to get data for this time slice. */
-      astResampleF( fullmap, 3, ldim, udim, in_data, NULL, interp, NULL,
+      astResample8F( fullmap, 3, ldim, udim, in_data, NULL, interp, NULL,
                     params, ast_flags, 0.0, 50, VAL__BADR, 2, lbnd_out,
                     ubnd_out, lbnd_out, ubnd_out, tdata, NULL );
 

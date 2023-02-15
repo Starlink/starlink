@@ -87,10 +87,10 @@ float smf_calc_telres( AstFitsChan *hdr, int *status ) {
    double dlambda;
    double los;
    double loe;
-   float diam;
+   float diam = 1.0;
    float lambda = 0;
    float result;
-   int nc;
+   size_t nc;
 
 /* Initialise the returned value to a safe non-zero value. */
    result = 1.0;

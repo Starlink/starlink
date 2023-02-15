@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_calc_skyframe( const AstFrame *skyin, const char * system,
+*     void smf_calc_skyframe( AstFrame *skyin, const char * system,
 *                             const smfHead* hdr, int alignsys,
 *                             AstSkyFrame ** skyframe, double skyref[2],
 *                             int * moving, int * status )
 
 *  Arguments:
-*     skyin = const AstFrame * (Given)
+*     skyin = AstFrame * (Given)
 *        Input sky frame to use as reference.
 *     system = char* (Given)
 *        Specifies the celestial coordinate system which will be used to
@@ -118,7 +118,7 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 
-void smf_calc_skyframe( const AstFrame *skyin, const char * system,
+void smf_calc_skyframe( AstFrame *skyin, const char * system,
                         const smfHead* hdr, int alignsys,
                         AstSkyFrame ** skyframe, double skyref[2],
                         int * moving, int * status ) {

@@ -13,12 +13,12 @@
 *     Library routine
 
 *  Invocation:
-*     smf_despike_wvm(double* data, int n, int width, double tol, int* status);
+*     smf_despike_wvm(double* data, dim_t n, int width, double tol, int* status);
 
 *  Arguments:
 *     data = double* (Given)
 *        Pointer to data array (which is to be modified).
-*     n = int (Given)
+*     n = dim_t (Given)
 *        Length of data array.
 *     width = int (Given)
 *        Width of despiking box.
@@ -80,17 +80,17 @@
 #include <math.h>
 #include <gsl/gsl_sort.h>
 
-int smf_despike_wvm(double* data, int n, int width, double tol, int* status) {
-    int i, j;
-    int removed = 0;
+dim_t smf_despike_wvm(double* data, dim_t n, int width, double tol, int* status) {
+    dim_t i, j;
+    dim_t removed = 0;
     double* box;
-    int prev_box_start = -1;
-    int box_start;
-    int box_end;
-    int max_box_start;
-    int box_slop;
-    int box_n;
-    int half_width;
+    dim_t prev_box_start = -1;
+    dim_t box_start;
+    dim_t box_end;
+    dim_t max_box_start;
+    dim_t box_slop;
+    dim_t box_n;
+    dim_t half_width;
     double median = 0;
 
     if (*status != SAI__OK) {
@@ -129,7 +129,7 @@ int smf_despike_wvm(double* data, int n, int width, double tol, int* status) {
 
         /* If the box moved significantly, recalculate the median. */
         if ((prev_box_start == -1)
-                || (abs(box_start - prev_box_start) > box_slop)) {
+                || (labs(box_start - prev_box_start) > box_slop)) {
             prev_box_start = box_start;
             box_end = box_start + width;
             box_n = 0;

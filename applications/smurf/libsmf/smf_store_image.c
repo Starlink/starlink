@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
-*		       int dims[], int nsampcycle, int vxmin, int vymin,
+*		       dim_t dims[], int nsampcycle, int vxmin, int vymin,
 *		       double *image, double *zero, int *status);
 
 *  Arguments:
@@ -26,7 +26,7 @@
 *        DREAM cycle number
 *     ndim = int (Given)
 *        Number of dimensions in output image
-*     dims[] = int (Given)
+*     dims[] = dim_t (Given)
 *        Array of maximum dimensions for each axis
 *     nsampcycle = int (Given)
 *        Number of time slices per DREAM cycle
@@ -134,38 +134,37 @@
 #define FUNC_NAME "smf_store_image"
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
-		      int dims[], int nsampcycle, int vxmin, int vymin,
+		      dim_t dims[], int nsampcycle, int vxmin, int vymin,
 		      double *image, double *zero, int *status) {
 
-  smfHead *hdr = NULL;             /* Pointer to header struct */
-  HDSLoc *bz_imloc = NULL;         /* HDS locator */
-  int bzindf;                      /* NDF identifier for bolometer zero points */
-  double *bzptr = NULL;            /* Pointer to mapped space for zero points */
-  int el;                          /* Number of elements mapped */
-  int frame;                       /* Mean timeslice index for image */
   AstFitsChan *imfits=NULL;        /* FITS header for each reconstructed image */
-  char imname[DAT__SZNAM];         /* Name of structure for image */
-  double *imptr = NULL;            /* Pointer to mapped space for image */
-  int j;                           /* Loop counter */
-  int lbnd[2];                     /* Lower dimension bounds */
-  int ntot;                        /* Total number of elements */
-  int place;                       /* NDF placeholder */
-  char prvname[2*PAR__SZNAM +1];   /* Provenance creator */
-  int seqend;                      /* End index */
-  int seqstart;                    /* Starting index */
-  int slice;                       /* Index of current time slice */
-  int strnum;                      /* Structure element number */
-  sc2ast_subarray_t subnum;        /* Subarray index number */
-  int ubnd[2];                     /* Upper dimension bounds */
-  int uindf;                       /* NDF identifier */
   AstFrameSet *wcs = NULL;         /* WCS info */
+  HDSLoc *bz_imloc = NULL;         /* HDS locator */
+  char imname[DAT__SZNAM];         /* Name of structure for image */
+  char prvname[2*PAR__SZNAM +1];   /* Provenance creator */
+  dim_t lbnd[2];                   /* Lower dimension bounds */
+  dim_t seqend;                    /* End index */
+  dim_t seqstart;                  /* Starting index */
+  dim_t slice;                     /* Index of current time slice */
+  dim_t ubnd[2];                   /* Upper dimension bounds */
+  double *bzptr = NULL;            /* Pointer to mapped space for zero points */
+  double *imptr = NULL;            /* Pointer to mapped space for image */
+  int bzindf;                      /* NDF identifier for bolometer zero points */
+  int j;                           /* Loop counter */
+  int place;                       /* NDF placeholder */
+  int strnum;                      /* Structure element number */
+  int uindf;                       /* NDF identifier */
+  sc2ast_subarray_t subnum;        /* Subarray index number */
+  size_t el;                       /* Number of elements mapped */
+  size_t ntot;                     /* Total number of elements */
+  smfHead *hdr = NULL;             /* Pointer to header struct */
 
   if ( *status != SAI__OK ) return;
 
   seqstart = cycle * nsampcycle;
   seqend = seqstart + nsampcycle - 1;
 
-  slice = (int)( (seqstart + seqend ) /2);
+  slice = ( seqstart + seqend ) /2;
   smf_tslice_ast( data, slice, 1, NO_FTS, status);
 
   astBegin;
@@ -249,7 +248,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   }
 
   /* Store the FITS headers */
-  frame = (int)( (seqstart + seqend ) /2);
   /* Quick and dirty method - just copy the full FITS header */
   imfits = astCopy( hdr->fitshdr );
   astSetFitsI( imfits, "SUBSCAN", strnum,

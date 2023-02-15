@@ -215,9 +215,9 @@ void smurf_fts2_phasecorr(int* status)
     zpdData = inputData->fts->zpd;
 
     // SOURCE DATA DIMENSIONS
-    srcW   = inputData->dims[0];
-    srcH   = inputData->dims[1];
-    srcN   = inputData->dims[2];
+    srcW   = (int) inputData->dims[0];
+    srcH   = (int) inputData->dims[1];
+    srcN   = (int) inputData->dims[2];
     numBol = srcW * srcH;  // NUMBER OF BOLOMETERS IN THE SUBARRAY
     outN   = srcN - pcfLength + 1;
 

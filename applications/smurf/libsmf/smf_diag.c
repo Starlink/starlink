@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
-*               int power, int time, int isub, smfDIMMData *dat,
+*               int power, int time, dim_t isub, smfDIMMData *dat,
 *               smf_modeltype type, smfArray *model, int res,
 *               const char *root, int mask, double mingood, int cube,
 *               int map, int addqual, smfSampleTable *table,
@@ -43,7 +43,7 @@
 *        If non-zero, store the power spectrum for the data.
 *     time = int (Given)
 *        If non-zero, store the time series for the data.
-*     isub = int (Given)
+*     isub = dim_t (Given)
 *        The zero-based index of the smfData within the supplied smfArray
 *        to dump.
 *     dat = smfDIMMData * (Given)
@@ -180,16 +180,16 @@ typedef struct smfDiagData {
    int *imap;
    int *lut;
    int mask;
-   int oper;
-   size_t bstride;
-   size_t tstride;
+   dim_t oper;
+   dim_t bstride;
+   dim_t tstride;
    smf_qual_t *mapqual;
    smf_qual_t *qua;
    smf_qual_t *qua_out;
 } SmfDiagData;
 
-void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
-               int power, int time, int isub, smfDIMMData *dat,
+void smf_diag( ThrWorkForce *wf, HDSLoc *loc, dim_t *ibolo, int irow,
+               int power, int time, dim_t isub, smfDIMMData *dat,
                smf_modeltype type, smfArray *model, int res,
                const char *root, int mask, double mingood, int cube,
                int map, int addqual, smfSampleTable *table, double chunkfactor,
@@ -207,15 +207,25 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    char attr[ 50 ];
    const char *dom;
    const char *mode;
+   dim_t bstride;
+   dim_t bstrider;
    dim_t dsize;
    dim_t fdims[2];
+   dim_t idx;
+   dim_t idxhi;
+   dim_t idxlo;
    dim_t itime;
    dim_t jbolo;
-   dim_t ndata;
+   dim_t lbnd[ 3 ];
    dim_t nbolo;
    dim_t nbolor;
+   dim_t ndata;
    dim_t ngood;
+   dim_t nmap;
    dim_t ntslice;
+   dim_t tstride;
+   dim_t tstrider;
+   dim_t ubnd[ 3 ];
    double *buffer;
    double *ip;
    double *ipv;
@@ -224,24 +234,19 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    double *pd;
    double *var;
    double *wf_map;
-   double *wf_mapwgt;
-   double *wf_mapwgtsq;
    double *wf_mapvar;
+   double *wf_mapwgtsq;
+   double *wf_mapwgt;
    double scalevar;
-   int *index;
+   dim_t *index;
    int *wf_hitsmap;
-   int bolostep;
-   int el;
+   dim_t bolostep;
    int fax;
    int hits;
    int i;
    int iax;
-   int idx;
-   int idxhi;
-   int idxlo;
    int indf;
    int iw;
-   int lbnd[ 3 ];
    int nax;
    int nc;
    int ndim;
@@ -249,14 +254,9 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    int place;
    int rebinflags;
    int sorted;
-   int timestep;
-   int ubnd[ 3 ];
-   int usebolo;
-   size_t bstride;
-   size_t bstrider;
-   size_t nmap;
-   size_t tstride;
-   size_t tstrider;
+   dim_t timestep;
+   dim_t usebolo;
+   size_t el;
    smfArray *array;
    smfData *data = NULL;
    smfData *data_tmp;
@@ -319,7 +319,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
       data->pntr[0] = astMalloc( dsize*sizeof( *oldres ) );
 
 /* Number of samples per thread. */
-      size_t sampstep = dsize/nw;
+      dim_t sampstep = dsize/nw;
       if( sampstep == 0 ) sampstep = 1;
 
 /* Set up info for each worker thread. */
@@ -352,14 +352,14 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
    } else if( array->ndat == 1 ) {
       data = array->sdata[ 0 ];
 
-   } else if( isub >= 0 && isub < (int) array->ndat ) {
+   } else if( isub >= 0 && isub < array->ndat ) {
       data = array->sdata[ isub ];
 
    } else if( *status == SAI__OK ) {
       data = NULL;
       *status = SAI__ERROR;
       errRepf( "", "smf_diag: requested subarray index (%d) is invalid - %d "
-               "subarrays are available.", status, isub, (int) array->ndat );
+               "subarrays are available.", status, (int) isub, (int) array->ndat );
    }
 
 /* Get a pointer to the quality array. */
@@ -440,7 +440,7 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
             *status = SAI__ERROR;
             errRepf( "", "smf_diag: Failed to dump diagnostic data since "
                      "selected bolometer (%d) has too few good values (%d < %d).",
-                     status, usebolo, (int) ngood, (int) (mingood*ntslice) );
+                     status, (int) usebolo, (int) ngood, (int) (mingood*ntslice) );
          }
 
 /* Produce an ascii table of the bolometer values if required. */
@@ -953,8 +953,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* If required, add new columns to the table holding information about
    each sample that falls in a given map pixel. */
    if( table && loc ) {
-      int *pi0, *pi, jj, nc;
-      dim_t jcol, jrow;
+      int *pi0, *pi, nc;
+      dim_t jj, jcol, jrow;
       dim_t ibol, ipix, itime;
       char hdsname[ DAT__SZNAM + 1 ];
       char colname[ 128 ];
@@ -1027,8 +1027,8 @@ void smf_diag( ThrWorkForce *wf, HDSLoc *loc, int *ibolo, int irow,
 /* Store column values. */
          if( *status == SAI__OK ) {
             double *pd = (data->pntr)[0];
-            size_t *pt = table->times;
-            size_t *pb = table->bolos;
+            dim_t *pt = table->times;
+            dim_t *pb = table->bolos;
             if( nbolo > 1 ) {
                for( jrow = 0; jrow < table->nrow; jrow++ ) {
                   iel = (*(pb++))*bstride + (*(pt++))*tstride;
@@ -1115,14 +1115,17 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfDiagData *pdata;
-   const double *pd;
    const double *in;
+   const double *pd;
+   dim_t bstride;
    dim_t ibolo;
    dim_t idata;
    dim_t itime;
    dim_t nbolo;
+   dim_t oper;
    dim_t t1;
    dim_t t2;
+   dim_t tstride;
    double *out;
    double *po;
    double *var;
@@ -1132,13 +1135,10 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
    double wsum;
    int *pl;
    int n;
-   int oper;
-   size_t bstride;
-   size_t tstride;
-   smf_qual_t *qua_out;
-   smf_qual_t *qua;
    smf_qual_t *pq2;
    smf_qual_t *pq;
+   smf_qual_t *qua;
+   smf_qual_t *qua_out;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -1272,7 +1272,7 @@ static void smf1_diag( void *job_data_ptr, int *status ) {
    } else if( *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRepf( "", "smf1_diag: Illegal operation %d requested.",
-               status, oper );
+               status, (int) oper );
    }
 }
 

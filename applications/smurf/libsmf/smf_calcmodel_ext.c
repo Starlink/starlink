@@ -104,8 +104,8 @@ typedef struct smfCalcModelExtData {
    double *model_data;
    double *res_data;
    int flags;
-   size_t d1;
-   size_t d2;
+   dim_t d1;
+   dim_t d2;
    smf_qual_t *qua_data;
 } SmfCalcModelExtData;
 
@@ -129,7 +129,7 @@ void smf_calcmodel_ext( ThrWorkForce *wf,
   smf_qual_t *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t sampstep;              /* Samples per worker thread */
+  dim_t sampstep;              /* Samples per worker thread */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -169,7 +169,7 @@ void smf_calcmodel_ext( ThrWorkForce *wf,
       sampstep = ndata/nw;
       if( sampstep == 0 ) {
          sampstep = 1;
-         nw = ndata;
+         nw = (int) ndata;
       }
 
       /* Set up information describing the job to be done by each worker
@@ -230,7 +230,7 @@ static void smf1_calcmodel_ext( void *job_data_ptr, int *status ) {
    SmfCalcModelExtData *pdata;
    double *pm;
    double *pr;
-   size_t idata;
+   dim_t idata;
    smf_qual_t *pq;
 
 /* Check inherited status */

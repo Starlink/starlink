@@ -112,11 +112,11 @@ smf_flat_standardpow( const smfData * bolvald, double refohms,
   double *heatframe = NULL; /* Pointer to flatfield heater data  */
   double *heatframevar = NULL; /* Pointer to flatfield heatframe variance */
   double * heatref = NULL; /* local copy of heater settings */
-  size_t i;               /* loop counter */
-  size_t j;               /* loop counter */
-  size_t k;               /* loop counter */
-  size_t nheat;           /* Number of input frames */
-  size_t numbol;          /* Number of bolometers */
+  dim_t i;               /* loop counter */
+  dim_t j;               /* loop counter */
+  dim_t k;               /* loop counter */
+  dim_t nheat;           /* Number of input frames */
+  dim_t numbol;          /* Number of bolometers */
   double *powbol = NULL;  /* pointer to individual bolometer powers */
   double s;               /* interpolation slope factor */
 

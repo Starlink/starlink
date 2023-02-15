@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
-*                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
-*                           size_t *last_nmap,
-*                           int init, size_t * ngood_tslice,
-*                           size_t *numdata, double *exptime, int *status )
+*                           const smfArray *qua, dim_t last_qcount[SMF__NQBITS],
+*                           dim_t *last_nmap,
+*                           int init, dim_t * ngood_tslice,
+*                           dim_t *numdata, double *exptime, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -30,19 +30,19 @@
 *        If true padding will not be included in report.
 *     qua = const smfArray *qua (Given)
 *        Pointer to smfArray of smfData's containing quality
-*     last_qcount = size_t[SMF__NQBITS] (Given and Returned)
+*     last_qcount = dim_t[SMF__NQBITS] (Given and Returned)
 *        Pointer to array that countains number of occurences of each
 *        quality bit in qual from the last call. Updated to current counts
 *        upon return. Will only use the number of elements determined by
 *        the quality family.
-*     last_nmap = size_t* (Given and Returned)
+*     last_nmap = dim_t* (Given and Returned)
 *        Pointer to number of samples that would have gone into the map
 *        last iteration. Updated to current number upon return.
 *     init = int (Given)
 *        If set, first call so initialize the qcount buffers.
-*     ngood_tslice = size_t* (Returned)
+*     ngood_tslice = dim_t* (Returned)
 *        If non-null, contains the number of usable time slices.
-*     numdata = size_t* (Returned)
+*     numdata = dim_t* (Returned)
 *        If non-null, the maximum possible number of bolometers
 *     exptime = double * (Returned)
 *        If non-null, the total exposure time represented by the non-pad
@@ -141,24 +141,24 @@ static const char *smf1_qual_str( smf_qfam_t family, int usebit, int bit_or_val,
                                   const char **descr, char *buf, int *status );
 
 void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily, int nopad,
-                           const smfArray *qua, size_t last_qcount[SMF__NQBITS],
-                           size_t *last_nmap, int init, size_t *ngood_tslice,
-                           size_t *numdata, double *exptime, int *status ) {
+                           const smfArray *qua, dim_t last_qcount[SMF__NQBITS],
+                           dim_t *last_nmap, int init, dim_t *ngood_tslice,
+                           dim_t *numdata, double *exptime, int *status ) {
 
   /* Local Variables */
-  char buf[50];                 /* Buffer for quality name */
-  size_t i;                     /* loop counter */
-  size_t nbolo_tot;             /* total bolos in all subarrays */
-  size_t ndata;                 /* total number of data points */
-  size_t ntgood;                /* Number of good time slices */
-  size_t nmap;                  /* number of good map samples */
-  size_t nmax;                  /* theoretical maximum good map samples */
-  size_t nqbits = 0;            /* Number of quality bits in this family */
+  char buf[50];                /* Buffer for quality name */
+  int i;                       /* loop counter */
+  dim_t nbolo_tot;             /* total bolos in all subarrays */
+  dim_t ndata;                 /* total number of data points */
+  dim_t ntgood;                /* Number of good time slices */
+  dim_t nmap;                  /* number of good map samples */
+  dim_t nmax;                  /* theoretical maximum good map samples */
+  dim_t nqbits = 0;            /* Number of quality bits in this family */
   dim_t ntslice;                /* number of time slices */
-  size_t qcount[SMF__NQBITS];   /* total current quality bit counter */
+  dim_t qcount[SMF__NQBITS];   /* total current quality bit counter */
   double steptime=0.005;        /* length of sample -- assume 200 Hz data */
-  size_t tbound;                /* time slices in boundary */
-  size_t tpad;                  /* time slices in padding */
+  dim_t tbound;                /* time slices in boundary */
+  dim_t tpad;                  /* time slices in padding */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -229,7 +229,7 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
       } else {
          msgOutiff(msglev, "", "tslices: bnd:%zu(%.1lf min), map:%zu(%.1lf min), tot:%"
                    DIM_T_FMT "(%.1lf min)", status,
-                   (size_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
+                   (dim_t)ntslice-(nmax/nbolo_tot), tbound*steptime/60.,
                    nmax/nbolo_tot, ntgood*steptime/60.,
                    ntslice, ntslice*steptime/60.);
       }
@@ -250,13 +250,13 @@ void smf_qualstats_report( ThrWorkForce *wf, msglev_t msglev, smf_qfam_t qfamily
       switch( BIT_TO_VAL(i) ) {
       case SMF__Q_BADDA: /* flatfield or DA flagged -- bolo excluding padding*/
         sprintf( scalestr, "%7zu bolos  ",
-                 qcount[i] / ((size_t)ntslice-tpad) );
+                 qcount[i] / ((dim_t)ntslice-tpad) );
         break;
 
       case SMF__Q_BADB: /* Entire bolos */
       case SMF__Q_NOISE: /* Noisy bolometers are entire bolos */
         sprintf( scalestr, "%7zu bolos  ",
-                 qcount[i] / (size_t)ntslice );
+                 qcount[i] / (dim_t)ntslice );
         break;
 
       case SMF__Q_PAD: /* Padding is for all bolos at given tslice */

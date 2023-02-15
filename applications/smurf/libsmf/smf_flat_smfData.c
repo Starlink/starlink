@@ -116,7 +116,7 @@ void smf_flat_smfData ( const smfData *data, smf_flatmeth * flatmethod,
 
   /* flatpar is powval */
   if (*status == SAI__OK) {
-    size_t nelem = (*bolval)->dims[0] * (*bolval)->dims[1] * (*bolval)->dims[2];
+    dim_t nelem = (*bolval)->dims[0] * (*bolval)->dims[1] * (*bolval)->dims[2];
     memcpy( (*powval)->pntr[0], da->flatpar, da->nflat * sizeof(*(da->flatpar)) );
     memcpy( (*bolval)->pntr[0], da->flatcal, nelem * sizeof(*(da->flatcal)) );
   }

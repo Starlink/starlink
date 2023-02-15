@@ -98,7 +98,7 @@ void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filte
 
   /* Local variables */
   char decstr[8];             /* Dec as sDDMMSS where s is + or - */
-  size_t maxlen = 40;         /* Maximum length of DRGROUP string
+  dim_t maxlen = 40;         /* Maximum length of DRGROUP string
                                  This should really be a constant! */
   char sign[2];               /* Sign of declination */
   int iamsf[4];               /* Array containing H/D, M, S and .SS */

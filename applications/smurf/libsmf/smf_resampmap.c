@@ -15,10 +15,10 @@
 *  Invocation:
 *     smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
 *                     AstMapping *sky2map, int moving,
-*                     int slbnd[ 2 ], int subnd[ 2 ], int interp,
+*                     dim_t slbnd[ 2 ], dim_t subnd[ 2 ], int interp,
 *                     const double params[], double sigma, double perror,
 *                     double *in_data, double *out_data, double *ang_data,
-*                     int *ngood, int *status );
+*                     dim_t *ngood, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -39,9 +39,9 @@
 *        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky map.
-*     slbnd = int [ 2 ] (Given)
+*     slbnd = dim_t [ 2 ] (Given)
 *        The lower pixel index bounds of the sky map.
-*     subnd = int [ 2 ] (Given)
+*     subnd = dim_t [ 2 ] (Given)
 *        The upper pixel index bounds of the sky map.
 *     interp = int (Given)
 *        Specifies the scheme to be used for interpolating the sky map data
@@ -68,7 +68,7 @@
 *        the reference map to the focal plane Y axis, in radians, at each
 *        time slice. Positive rotation is in the same sense as rotation
 *        from focal plane X to focal plane Y. May be NULL.
-*     ngood = int * (Returned)
+*     ngood = dim_t * (Returned)
 *        Returned holding the number of good values in the output time
 *        series.
 *     status = int * (Given and Returned)
@@ -147,10 +147,10 @@ typedef struct smfResampMapData {
    double sigma;
    int interp;
    int moving;
-   int ngood;
-   int sky_dim[ 2 ];
-   size_t t1;
-   size_t t2;
+   dim_t ngood;
+   dim_t sky_dim[ 2 ];
+   dim_t t1;
+   dim_t t2;
    smfData *data;
    gsl_rng *r;
 } smfResampMapData;
@@ -160,10 +160,10 @@ static void smf1ResampMap( void *job_data_ptr, int *status );
 
 
 void smf_resampmap( ThrWorkForce *wf, smfData *data, AstSkyFrame *abskyfrm,
-                    AstMapping *sky2map, int moving, int slbnd[ 2 ],
-                    int subnd[ 2 ], int interp, const double params[],
+                    AstMapping *sky2map, int moving, dim_t slbnd[ 2 ],
+                    dim_t subnd[ 2 ], int interp, const double params[],
                     double sigma, double perror, double *in_data, double *out_data,
-                    double *ang_data, int *ngood, int *status ){
+                    double *ang_data, dim_t *ngood, int *status ){
 
 /* Local Variables */
    AstFrameSet *fset = NULL;
@@ -343,9 +343,13 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    const double *params;
    dim_t ibolo;
    dim_t itime;
+   dim_t lbnd_bolo[ 2 ];
+   dim_t lbnd_sky[ 2 ];
    dim_t nbolo;
    dim_t t1;
    dim_t t2;
+   dim_t ubnd_bolo[ 2 ];
+   dim_t ubnd_sky[ 2 ];
    double *in;
    double *out;
    double perror;
@@ -357,12 +361,8 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
    double yout[ 2 ];
    gsl_rng *r;
    int interp;
-   int lbnd_bolo[ 2 ];
-   int lbnd_sky[ 2 ];
    int moving;
-   int nbad;
-   int ubnd_bolo[ 2 ];
-   int ubnd_sky[ 2 ];
+   dim_t nbad;
    smfData *data;
    smfResampMapData *pdata;
 
@@ -434,10 +434,10 @@ static void smf1ResampMap( void *job_data_ptr, int *status ) {
 
 /* Resample the sky map at the positions of the bolometer samples in the
    current time slice, and store in the output array. */
-      nbad = astResampleD( fullmap, 2, lbnd_sky, ubnd_sky, in, NULL,
-                           interp, NULL, params, AST__USEBAD, 0.1, 100,
-                           VAL__BADD, 2, lbnd_bolo, ubnd_bolo,
-                           lbnd_bolo, ubnd_bolo,  out, NULL );
+      nbad = astResample8D( fullmap, 2, lbnd_sky, ubnd_sky, in, NULL,
+                            interp, NULL, params, AST__USEBAD, 0.1, 100,
+                            VAL__BADD, 2, lbnd_bolo, ubnd_bolo,
+                            lbnd_bolo, ubnd_bolo,  out, NULL );
 
 /* If required, get the angle from the Y pixel axis in the sky map to the
    focal plane Y axis, at the current time slice. Positive rotation is

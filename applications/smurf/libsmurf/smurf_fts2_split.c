@@ -144,7 +144,7 @@ void smurf_fts2_split(int* status)
   int hrStart               = 0;        /* Frame index where high resolution mirror limit starts */
   int lrStop                = 0;        /* Frame index where low resolution mirror limit stops */
   int lrCentre              = 0;        /* Frame index at centre of low resolution mirror positions */
-  int i                     = 0;        /* Counter */
+  dim_t i                   = 0;        /* Counter */
   int j                     = 0;        /* Counter */
   int k                     = 0;        /* Counter */
   int n                     = 0;        /* Counter */
@@ -156,25 +156,25 @@ void smurf_fts2_split(int* status)
   size_t nFiles             = 0;        /* Size of the input group */
   size_t nOutFiles          = 0;        /* Size of the output group */
   size_t fIndex             = 0;        /* File index */
-  size_t nWidth             = 0;        /* Data cube width */
-  size_t nHeight            = 0;        /* Data cube height */
-  size_t nFrames            = 0;        /* Data cube depth in input file */
-  size_t nFramesOut         = 0;        /* Data cube depth in output file */
-  size_t nFramesOutPrev     = 0;        /* Data cube depth in previous output file */
-  size_t hrFramesOut        = 0;        /* Data cube depth in high res output file */
-  size_t hrFramesOutPrev    = 0;        /* Data cube depth in previous high res output file */
-  size_t lrFramesOut        = 0;        /* Data cube depth in low res output file */
-  size_t lrFramesOutPrev    = 0;        /* Data cube depth in previous low res output file */
-  size_t nPixels            = 0;        /* Number of bolometers in the subarray */
+  dim_t nWidth              = 0;        /* Data cube width */
+  dim_t nHeight             = 0;        /* Data cube height */
+  dim_t nFrames             = 0;        /* Data cube depth in input file */
+  dim_t nFramesOut          = 0;        /* Data cube depth in output file */
+  dim_t nFramesOutPrev      = 0;        /* Data cube depth in previous output file */
+  dim_t hrFramesOut         = 0;        /* Data cube depth in high res output file */
+  dim_t hrFramesOutPrev     = 0;        /* Data cube depth in previous high res output file */
+  dim_t lrFramesOut         = 0;        /* Data cube depth in low res output file */
+  dim_t lrFramesOutPrev     = 0;        /* Data cube depth in previous low res output file */
+  dim_t nPixels             = 0;        /* Number of bolometers in the subarray */
 
   double scanVel            = 0.0;      /* Mirror speed in mm/sec */
   double stepTime           = 0.0;      /* RTS step time, average sample rate */
   double lrmmBandPass       = 0.0;      /* low res mm +/- offset from centre */
   int lrBandPassFrames      = 0;        /* Number of low res band pass frames from centre +/- length of lrmmBandPass */
   int nTmp                  = 0;
-  int bolIndex              = 0;
-  int indexIn               = 0;
-  int indexOut              = 0;
+  dim_t bolIndex            = 0;
+  dim_t indexIn             = 0;
+  dim_t indexOut            = 0;
   int done                  = 0;        /* Track completion of extracting multiple scans */
   int outDataCount          = 0;        /* The number of output data files being written */
 
@@ -240,7 +240,7 @@ void smurf_fts2_split(int* status)
     nPixels = nWidth * nHeight;
 
     /* Mirror positions in mm */
-    nTmp = nFrames;
+    nTmp = (int) nFrames;
     MIRPOS = astCalloc(nFrames, sizeof(*MIRPOS));
     MIRRTS = astCalloc(nFrames, sizeof(*MIRRTS));
     fts2_getmirrorpositions(inData, MIRPOS, MIRRTS, &nTmp, status); // (mm)
@@ -352,7 +352,7 @@ void smurf_fts2_split(int* status)
             /* Update FITS component */
             smf_fits_updateD(outData->hdr, "FNYQUIST", fNyquist, "Nyquist frequency (cm^-1)", status);
             smf_fits_updateI(outData->hdr, "MIRSTART", 1, "Frame index in which the mirror starts moving", status);
-            smf_fits_updateI(outData->hdr, "MIRSTOP", nFramesOut, "Frame index in which the mirror stops moving", status);
+            smf_fits_updateI(outData->hdr, "MIRSTOP", (int) nFramesOut, "Frame index in which the mirror stops moving", status);
             smf_fits_updateI(outData->hdr, "SCANDIR", scanDir, "Scan direction", status);
             smf_fits_updateD(outData->hdr, "OPDMIN", 0.0, "Minimum OPD", status);
             smf_fits_updateD(outData->hdr, "OPDSTEP", 0.0, "OPD step size", status);

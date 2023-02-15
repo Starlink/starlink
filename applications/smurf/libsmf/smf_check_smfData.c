@@ -113,11 +113,11 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   smfFts *fts = NULL;     /* New smfFts */
   smfFile *file = NULL;   /* New smfFile */
   smfHead *hdr = NULL;    /* New smfHead */
-  size_t i;               /* Loop counter */
-  size_t j;               /* Loop counter */
-  size_t nbytes;          /* Number of bytes in data type */
-  int npoly;              /* Number of points in the polynomial array */
-  size_t npts;            /* Number of data points */
+  dim_t i;                /* Loop counter */
+  dim_t j;                /* Loop counter */
+  dim_t nbytes;           /* Number of bytes in data type */
+  dim_t npoly;            /* Number of points in the polynomial array */
+  dim_t npts;             /* Number of data points */
   int ondf = NDF__NOID;   /* Output NDF identifier if set */
   double *opoly;          /* Polynomial coefficients */
   double *outdata = NULL; /* Pointer to output DATA */
@@ -185,9 +185,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   } else {
     for (i=0; i<odata->ndims; i++) {
       if ( (odata->dims)[i] != (idata->dims)[i] ) {
-        msgSeti( "ODIM", (odata->dims)[i] );
-        msgSeti( "IDIM", (idata->dims)[i] );
-        msgSeti( "I", i+1 );
+        msgSetk( "ODIM", (odata->dims)[i] );
+        msgSetk( "IDIM", (idata->dims)[i] );
+        msgSetk( "I", i+1 );
         *status = SAI__ERROR;
         errRep( FUNC_NAME,
                 "Size of axis ^I in output, ^ODIM, is not equal to size in input, ^IDIM", status);
@@ -269,9 +269,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     }
     if ( odata->poly == NULL) {
       npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
-      opoly = astMalloc( npoly*sizeof( double ) );
+      opoly = astMalloc( npoly*sizeof( *opoly ) );
       if ( *status == SAI__OK ) {
-        memcpy( opoly, idata->poly, npoly*sizeof( double ) );
+        memcpy( opoly, idata->poly, npoly*sizeof( *opoly ) );
         odata->poly = opoly;
       } else {
         errRep(FUNC_NAME,

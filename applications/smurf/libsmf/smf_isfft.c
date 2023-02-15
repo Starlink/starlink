@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     int smf_isfft( const smfData *indata, dim_t *rdims, dim_t *nbolo,
-*                    dim_t fdims[2], double df[2], size_t *ndims,
+*                    dim_t fdims[2], double df[2], int *ndims,
 *                    int *status );
 
 *  Arguments:
@@ -35,7 +35,7 @@
 *     df = double[2] (Returned)
 *        If requested, calculate frequency step sizes in the FFT (Hz if 1-d,
 *        1/arcsec is 2-d). Can be NULL.
-*     ndims = size_t* (Returned)
+*     ndims = int * (Returned)
 *        Number of real-space dimensions. Set to 1 if transformed
 *        time-series data, or 2 if transformed map data. Can be NULL.
 *     status = int* (Given and Returned)
@@ -134,12 +134,12 @@
 #define FUNC_NAME "smf_isfft"
 
 int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
-               dim_t fdims[2], double df[2], size_t *ndims, int *status ) {
+               dim_t fdims[2], double df[2], int *ndims, int *status ) {
 
   dim_t fdims0[2]={0,0};        /* Lengths of frequency axes */
-  size_t i;                     /* Loop counter */
+  dim_t i;                      /* Loop counter */
   dim_t nbolo0=0;               /* Number of detectors if time-series cube */
-  size_t ndims0=0;              /* Number of dimensions */
+  int   ndims0=0;               /* Number of dimensions */
   dim_t rdims0[2]={0,0};        /* Real space dimensions */
   int retval=0;                 /* The return value */
 
@@ -249,7 +249,7 @@ int smf_isfft( const smfData *indata, dim_t rdims[2], dim_t *nbolo,
 
   /* Debugging messages */
   msgOutiff( MSG__DEBUG, "", FUNC_NAME
-             ": isfft=%i ndims=%zu nbolo=%zu", status, retval, ndims0, nbolo0 );
+             ": isfft=%i ndims=%d nbolo=%zu", status, retval, ndims0, nbolo0 );
   for( i=0; i<ndims0; i++ ) {
     msgOutiff( MSG__DEBUG, "", FUNC_NAME
                ": dim(%zu) real_len=%zu freq_len=%zu", status,

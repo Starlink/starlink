@@ -13,11 +13,11 @@
  *     Library routine
 
  *  Invocation:
- *     smf_check_units( int count, char current[],
+ *     smf_check_units( dim_t count, char current[],
  *                      const smfHead *hdr, int * status );
 
  *  Arguments:
- *     count = int (Given)
+ *     count = dim_t (Given)
  *        If count equals 1 the units are read and stored in current.
  *        Else units are compared.
  *     current = char[] (Given & Returned)
@@ -79,7 +79,7 @@
 #include "smf.h"
 #include "smf_typ.h"
 
-void smf_check_units( int count, char current[],
+void smf_check_units( dim_t count, char current[],
 		      smfHead* hdr, int * status ) {
 
 
@@ -92,7 +92,7 @@ void smf_check_units( int count, char current[],
   } else {
     if (strcmp( current, hdr->units) != 0 ) {
       *status = SAI__ERROR;
-      msgSeti( "I", count);
+      msgSetk( "I", count);
       msgSetc( "PRV", current );
       msgSetc( "CUR", hdr->units );
       errRep( "", "Data units inconsistency. Previously got '^PRV'"

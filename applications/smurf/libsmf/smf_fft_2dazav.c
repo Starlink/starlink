@@ -101,15 +101,15 @@
 
 smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
 
-  size_t *count=NULL;           /* Count of data at this radius */
+  dim_t *count=NULL;            /* Count of data at this radius */
   double df_o=1;                /* Spatial freq. step of output */
   double df0[2]={1,1};          /* Spatial freq. step x/y-axes of map */
   dim_t fdims[2];               /* Frequency space dimensions */
-  size_t i;                     /* Loop counter */
+  dim_t i;                      /* Loop counter */
   double *idata=NULL;           /* Input 2d data pointer */
-  size_t j;                     /* Loop counter */
-  size_t nf_o=0;                /* Length output frequency axis (to Nyquist) */
-  size_t ndims;                 /* Number of real dimensions */
+  dim_t j;                      /* Loop counter */
+  dim_t nf_o=0;                 /* Length output frequency axis (to Nyquist) */
+  int ndims;                    /* Number of real dimensions */
   double *odata=NULL;           /* Output 1d data pointer */
   double pixsize;               /* Map pixel size */
   smfData *retdata=NULL;        /* Returned 1-d smfData */
@@ -182,7 +182,7 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
   if( *status == SAI__OK ) {
     double x;
     double y;
-    size_t d;
+    dim_t d;
 
     /* Pointers to input and output data*/
     idata = data->pntr[0];
@@ -202,7 +202,7 @@ smfData *smf_fft_2dazav( const smfData *data, double *df, int *status ) {
 
         /* The final distance is just truncated to an integer number of
            steps in the return array */
-        d = (size_t) (sqrt(x*x + y*y) / df_o);
+        d = (dim_t) (sqrt(x*x + y*y) / df_o);
 
         /* Only consider frequencies up to Nyquist */
         if( d < nf_o ) {

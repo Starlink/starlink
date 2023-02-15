@@ -92,12 +92,12 @@ void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap,
    HDSLoc *cloc = NULL;
    HDSLoc *xloc = NULL;
    const char *key = NULL;
-   hdsdim dim[ NDF__MXDIM ];
-   int idim[ NDF__MXDIM ];
+   dim_t dim[ NDF__MXDIM ];
+   dim_t idim[ NDF__MXDIM ];
+   dim_t ntime;
    int i;
    int ndim;
    int nentry;
-   int ntime;
    int prim;
    int there;
 

@@ -91,9 +91,9 @@ void smf_get_grp_metadata( const Grp *grp, const char *name, char *value,
 /* Local Variables: */
    Grp *slave;                   /* Slave group */
    char buff[ GRP__SZNAM  + 1 ]; /* Buffer for group element text */
-   size_t size;                  /* Size of slave group */
-   size_t i;                     /* Index of current group element */
-   size_t nlen;                  /* Length of supplied name */
+   dim_t size;                  /* Size of slave group */
+   dim_t i;                     /* Index of current group element */
+   dim_t nlen;                  /* Length of supplied name */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;

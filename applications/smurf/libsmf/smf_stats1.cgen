@@ -14,23 +14,23 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_stats1<X>( const CGEN_TYPE *data, size_t stride, size_t nsamp,
-*                         const smf_qual_t *qual, size_t qstride,
+*     void smf_stats1<X>( const CGEN_TYPE *data, dim_t stride, dim_t nsamp,
+*                         const smf_qual_t *qual, dim_t qstride,
 *                         smf_qual_t mask, double *mean, double *sigma,
-*                         double *median, size_t *ngood, int *status )
+*                         double *median, dim_t *ngood, int *status )
 
 *  Arguments:
 *     data = const CGEN_TYPE* (Given)
 *        Pointer to input data array
-*     stride = size_t (Given)
+*     stride = dim_t (Given)
 *        Index stride between elements
-*     nsamp = size_t (Given)
+*     nsamp = dim_t (Given)
 *        Length of the interval to analyze
 *     qual = const smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to CGEN_BAD.
-*     qstride = size_t (Given)
+*     qstride = dim_t (Given)
 *        Stride for qual. If 0 assumed to be stride.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
@@ -44,7 +44,7 @@
 *     median = double* (Given and Returned)
 *        Pointer to variable that will contain median of the data. If
 *        NULL this routine will not calculate the median and run faster.
-*     ngood = size_t* (Given and Returned)
+*     ngood = dim_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
 *     status = int* (Given and Returned)
@@ -89,7 +89,7 @@
 *     2009-12-03 (EC):
 *        Make this a generic function
 *     2010-02-04 (EC):
-*        Add qstride to interface, and switch to size_t from dim_t for
+*        Add qstride to interface, and switch to dim_t from dim_t for
 *        stride/nsamp
 *     2011-06-16 (EC):
 *        Add median
@@ -167,18 +167,18 @@ int smfStats1Compare( const void *arg1, const void *arg2 ) {
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
-                                size_t nsamp, const smf_qual_t *qual,
-                                size_t qstride, smf_qual_t mask, double *mean,
-                                double *sigma, double *median, size_t *ngood,
+void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, dim_t stride,
+                                dim_t nsamp, const smf_qual_t *qual,
+                                dim_t qstride, smf_qual_t mask, double *mean,
+                                double *sigma, double *median, dim_t *ngood,
                                 int *status ) {
 
   /* Local variables */
-  size_t count=0;             /* Number of samples in estimate */
+  dim_t count=0;             /* Number of samples in estimate */
   double delta;               /* Work variable for variance */
   int failed=0;               /* Flag indicating that we failed */
-  size_t i;                   /* Loop counter */
-  size_t j;                   /* Loop counter */
+  dim_t i;                   /* Loop counter */
+  dim_t j;                   /* Loop counter */
   double mu=0;                /* Estimate of the mean */
   double m2=0;                /* Work variable for variance */
 
@@ -254,7 +254,7 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
       sortbuf = astCalloc( count, sizeof(*sortbuf) );
 
       if( *status == SAI__OK ) {
-        size_t index = 0;
+        dim_t index = 0;
 
         j = 0;
         for( i=0; i<nsamp*stride; i+=stride ) {
@@ -308,7 +308,7 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
       sortbuf = astCalloc( count, sizeof(*sortbuf) );
 
       if( *status == SAI__OK ) {
-        size_t index = 0;
+        dim_t index = 0;
         for( i=0; i<nsamp*stride; i+=stride ) {
           if( data[i] != CGEN_BAD ) {
             sortbuf[index] = (double) data[i];
@@ -360,8 +360,8 @@ void CGEN_FUNCTION(smf_stats1)( const CGEN_TYPE *data, size_t stride,
   if( (*status == SAI__OK) && (count < SMF__MINSTATSAMP) ) {
     *status = SMF__INSMP;
     msgSeti("MIN",SMF__MINSTATSAMP);
-    msgSeti("N", count );
-    msgSeti("MX", nsamp );
+    msgSetk("N", count );
+    msgSetk("MX", nsamp );
     errRep( "", FUNC_NAME
             ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
             "statistics", status );

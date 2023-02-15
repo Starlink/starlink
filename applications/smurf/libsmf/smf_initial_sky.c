@@ -144,16 +144,16 @@ int smf_initial_sky( ThrWorkForce *wf, AstKeyMap *keymap, smfDIMMData *dat,
 /* Local Variables: */
    char refparam[ DAT__SZNAM ];/* Name for reference NDF parameter */
    const char *cval;          /* The IMPORTSKY string value */
+   dim_t i;                   /* Loop count */
+   dim_t junk;                /* Unused value */
    double *ptr;               /* Pointer to NDF Data array */
    double *vptr;              /* Pointer to NDF Variance array */
    int indf1;                 /* Id. for supplied reference NDF */
    int indf2;                 /* Id. for used section of reference NDF */
-   int nel;                   /* Number of mapped NDF pixels */
    int result;                /* Returned flag */
    int there;                 /* Is there a smurf extension in the NDF? */
    int update;                /* Was NDF opened for UPDATE access? */
-   size_t i;                  /* Loop count */
-   size_t junk;               /* Unused value */
+   size_t nel;                /* Number of mapped NDF pixels */
 
 /* Initialise the returned value to indicate no sky has been subtractred. */
    result = 0;

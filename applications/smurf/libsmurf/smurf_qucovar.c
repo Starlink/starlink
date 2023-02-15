@@ -139,8 +139,8 @@ typedef struct smfQUCovar {
    int *lut_q;
    int *lut_u;
    int operation;
-   size_t d1;
-   size_t d2;
+   dim_t d1;
+   dim_t d2;
    smf_qual_t *qua_q;
    smf_qual_t *qua_u;
 } SmfQUCovar;
@@ -161,10 +161,16 @@ void smurf_qucovar( int *status ) {
    ThrWorkForce *wf;
    char obsid[100];
    char obsidt[100];
+   dim_t bstride;
+   dim_t lbnd[3];
+   dim_t msize;
    dim_t nbolo;
    dim_t nbolot;
+   dim_t ndata;
    dim_t ntslice;
    dim_t ntslicet;
+   dim_t step;
+   dim_t ubnd[3];
    double *map;
    double *mapweight;
    double *mapweightsq;
@@ -172,15 +178,9 @@ void smurf_qucovar( int *status ) {
    int *hits;
    int indf0;
    int iw;
-   int lbnd[3];
    int ndim;
    int nw;
-   int ubnd[3];
-   size_t bstride;
-   size_t msize;
-   size_t ndata;
    size_t size;
-   size_t step;
    smfData *odata;
    smfData *prod_data;
    smfData *qlut_data;
@@ -478,6 +478,7 @@ static void smf1_qucovar( void *job_data_ptr, int *status ) {
 
 /* Local Variables: */
    SmfQUCovar *pdata;
+   dim_t idata;
    double *pm;
    double *pp;
    double *prq;
@@ -488,7 +489,6 @@ static void smf1_qucovar( void *job_data_ptr, int *status ) {
    int *ph;
    int *plq;
    int *plu;
-   size_t idata;
    smf_qual_t *pqq;
    smf_qual_t *pqu;
 

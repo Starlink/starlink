@@ -14,12 +14,12 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_apodize( smfData *data, size_t len, int forward, int * status );
+*     smf_apodize( smfData *data, dim_t len, int forward, int * status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will be modified.
-*     len = size_t (Given)
+*     len = dim_t (Given)
 *        Number of samples over which to apply apodization. Can be set to
 *        SMF__MAXAPLEN in which case the routine will automatically apodize
 *        the entire data stream (maximum valid value of len)
@@ -119,21 +119,21 @@
 #define LOWAP 1.0E-6
 #define FUNC_NAME "smf_apodize"
 
-void smf_apodize( smfData *data, size_t len, int forward, int *status ) {
+void smf_apodize( smfData *data, dim_t len, int forward, int *status ) {
 
   double ap;                    /* Apodization factor at this step */
-  size_t bstride;               /* Bolometer stride in data array */
+  dim_t bstride;               /* Bolometer stride in data array */
   double *dat=NULL;             /* Pointer to the DATA component */
-  size_t first;                 /* First sample apodization at start */
-  size_t i;                     /* index to bolometer start */
-  size_t j;                     /* index to sample */
-  size_t last;                  /* Last sample apodization at end */
+  dim_t first;                 /* First sample apodization at start */
+  dim_t i;                     /* index to bolometer start */
+  dim_t j;                     /* index to sample */
+  dim_t last;                  /* Last sample apodization at end */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
   smf_qual_t *qua=NULL;      /* Pointer to the QUALITY array */
-  size_t thelen=0;              /* apodization length */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t thelen=0;              /* apodization length */
+  dim_t tstride;               /* Time slice stride in data array */
 
   if ( *status != SAI__OK ) return;
 

@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
+*     int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, dim_t size,
 *                             smfJSATiling *tiling, int *ntile, int *status )
 
 *  Arguments:
@@ -22,7 +22,7 @@
 *     igrp = Grp * (Given)
 *        A group holding the paths to the data files. This can include
 *        non-science files.
-*     size = size_t (Given)
+*     size = dim_t (Given)
 *        The number of data files in "igrp".
 *     tiling = smfJSATiling * (Returned)
 *        Structure in which to return the parameters of the used tiling
@@ -101,8 +101,8 @@
 /* Prototypes for local functions. */
 static void smf1_jsatiles_data( void *job_data_ptr, int *status );
 static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
-                              dim_t istart, int ixstart, int iystart, dim_t iend,
-                              int ixend, int iyend, int nstep, int *dim,
+                              dim_t istart, dim_t ixstart, dim_t iystart, dim_t iend,
+                              dim_t ixend, dim_t iyend, int nstep, dim_t *dim,
                               dim_t *hits, int *status );
 
 
@@ -111,30 +111,30 @@ typedef struct smfJsaTilesDataData {
    AstFrameSet *fs;
    smfData *data;
    double search;
-   int *dim;
+   dim_t *dim;
    dim_t *hits;
 } SmfJsaTilesDataData;
 
 
-int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, size_t size,
+int *smf_jsatiles_data( ThrWorkForce *wf, Grp *igrp, dim_t size,
                         smfJSATiling *tiling, int *ntile, int *status ){
 
 /* Local Variables */
    AstFrameSet *fs;
+   SmfJsaTilesDataData pdata;
    dim_t *hits = NULL;
    dim_t *ph;
+   dim_t dim[ 2 ] = { 0, 0 };
+   int ix;
+   int iy;
+   dim_t lbnd[ 2 ];
+   dim_t ubnd[ 2 ];
    double fov = 0;
    double search;
    int *tiles = NULL;
-   int dim[ 2 ] = { 0, 0 };
-   int ix;
-   int iy;
-   int lbnd[ 2 ];
-   int ubnd[ 2 ];
-   size_t ifile;
+   int ifile;
    smfData *data = NULL;
    smfHead *hdr = NULL;
-   SmfJsaTilesDataData pdata;
 
 /* Initialise */
    *ntile = 0;
@@ -315,8 +315,8 @@ static void smf1_jsatiles_data( void *job_data_ptr, int *status ) {
 
 
 static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
-                              dim_t istart, int ixstart, int iystart, dim_t iend,
-                              int ixend, int iyend, int nstep, int *dim,
+                              dim_t istart, dim_t ixstart, dim_t iystart, dim_t iend,
+                              dim_t ixend, dim_t iyend, int nstep, dim_t *dim,
                               dim_t *hits, int *status ) {
 /*
 *  Name:
@@ -327,8 +327,8 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
 
 *  Invocation:
 *     smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
-*                       dim_t istart, int ixstart, int iystart, dim_t iend,
-*                       int ixend, int iyend, int nstep, int *dim, dim_t *hits,
+*                       dim_t istart, dim_t ixstart, dim_t iystart, dim_t iend,
+*                       dim_t ixend, dim_t iyend, int nstep, dim_t *dim, dim_t *hits,
 *                       int *status )
 
 *  Arguments:
@@ -390,10 +390,17 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
 
 /* Local Variables: */
    AstFrame *frm = NULL;
-   AstMapping *tmap = NULL;
    AstFrameSet *azeltogrid;
+   AstMapping *tmap = NULL;
+   dim_t i;
    dim_t iframe;
    dim_t ilast;
+   dim_t ix0;
+   dim_t ix;
+   dim_t ixlast;
+   dim_t iy0;
+   dim_t iy;
+   dim_t iylast;
    double azel1[ 5 ];
    double azel2[ 5 ];
    double delta;
@@ -401,14 +408,7 @@ static void smf1_checkslices( smfData *data, AstFrameSet *fs, double search,
    double gy[ 5 ];
    double point1[ 2 ];
    double point2[ 2 ];
-   int i;
    int istep;
-   int ix0;
-   int ix;
-   int ixlast;
-   int iy0;
-   int iy;
-   int iylast;
    smfHead *hdr = NULL;
 
 /* Check inherited status */

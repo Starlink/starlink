@@ -16,7 +16,7 @@
 *     smf_resampcube( smfData *data, AstSkyFrame *abskyfrm,
 *                     AstMapping *iskymap, AstFrame *ispecfrm,
 *                     AstMapping *ispecmap, Grp *detgrp, int moving,
-*                     int slbnd[ 3 ], int subnd[ 3 ], int interp,
+*                     dim_t slbnd[ 3 ], dim_t subnd[ 3 ], int interp,
 *                     const double params[], float *in_data,
 *                     float *out_data, int *overlap, int *status );
 
@@ -46,9 +46,9 @@
 *        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky cube.
-*     slbnd = int [ 3 ] (Given)
+*     slbnd = dim_t [ 3 ] (Given)
 *        The lower pixel index bounds of the sky cube.
-*     subnd = int [ 3 ] (Given)
+*     subnd = dim_t [ 3 ] (Given)
 *        The upper pixel index bounds of the sky cube.
 *     interp = int (Given)
 *        Specifies the scheme to be used for interpolating the sky cube data
@@ -132,8 +132,8 @@
 
 void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
                      AstFrame *ispecfrm, AstMapping *ispecmap,
-                     Grp *detgrp, int moving, int slbnd[ 3 ],
-                     int subnd[ 3 ], int interp, const double params[],
+                     Grp *detgrp, int moving, dim_t slbnd[ 3 ],
+                     dim_t subnd[ 3 ], int interp, const double params[],
                      float *in_data, float *out_data, int *overlap,
                      int *status ){
 
@@ -148,7 +148,6 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
    dim_t dim[ 3 ];             /* Output array dimensions */
    dim_t nchan;                /* Number of input spectral channels */
    dim_t nel;                  /* No. of pixels in output */
-   dim_t nout;                 /* Total number of elements in output cube */
    dim_t nslice;               /* No of time slices in the input */
    dim_t nxy;                  /* No of elements in an output spatial plane */
    int pixax[ 3 ];             /* Pixel axis indices */
@@ -180,9 +179,6 @@ void smf_resampcube( smfData *data, AstSkyFrame *abskyfrm, AstMapping *iskymap,
 
 /* Note the size of a spatial plane in the sky cube. */
    nxy = dim[ 0 ]*dim[ 1 ];
-
-/* Store the total number of elements in the sky cube. */
-   nout = nxy*dim[ 2 ];
 
 /* We want a description of the spectral WCS axis in the template. If the
    template has a WCS FrameSet containing a SpecFrame, use it, otherwise

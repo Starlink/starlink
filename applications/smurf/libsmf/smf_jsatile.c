@@ -15,7 +15,8 @@
 *  Invocation:
 *     void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 *                       smf_jsaproj_t proj, AstFitsChan **fc, AstFrameSet **fs,
-*                       AstRegion **region, int lbnd[2], int ubnd[2], int *status )
+*                       AstRegion **region, dim_t lbnd[2], dim_t ubnd[2],
+*                       int *status )
 
 *  Arguments:
 *     itile = int (Given)
@@ -50,9 +51,9 @@
 *        Address at which to return a pointer to a Region defining the
 *        extent of the tile. May be NULL. The Region will be defined
 *        defined within ICRS (RA,DEc).
-*     lbnd[ 2 ] = integer (Returned)
+*     lbnd[ 2 ] = dim_t (Returned)
 *        The lower bounds of the spatial axes of the tile in PIXEL indices.
-*     ubnd[ 2 ] = integer (Returned)
+*     ubnd[ 2 ] = dim_t (Returned)
 *        The upper bounds of the spatial axes of the tile in PIXEL indices.
 *     status = int * (Given)
 *        Pointer to the inherited status variable.
@@ -141,7 +142,7 @@
 
 void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
                   smf_jsaproj_t proj, AstFitsChan **fc, AstFrameSet **fs,
-                  AstRegion **region, int lbnd[2], int ubnd[2], int *status ) {
+                  AstRegion **region, dim_t lbnd[2], dim_t ubnd[2], int *status ) {
 
 /* Local Variables: */
    AstFitsChan *lfc = NULL;
@@ -149,6 +150,10 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    AstFrameSet *lfs = NULL;
    AstFrameSet *tfs = NULL;
    AstRegion *lregion = NULL;
+   dim_t icrpix1;
+   dim_t icrpix2;
+   dim_t offset;
+   dim_t tubnd[ 2 ];
    double crpix1;
    double crpix2;
    double crval1;
@@ -157,13 +162,10 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    double shift[ 2 ];
    double tmp;
    int edge_tile;
-   int icrpix1;
-   int icrpix2;
    int icur;
    int isky;
+   int ival[ 2 ];
    int move;
-   int offset;
-   int tubnd[ 2];
    smf_jsaproj_t tproj;
 
 /* Initialise the returned pointers. */
@@ -184,12 +186,15 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
 
 /* Store the upper bounds of the tile in GRID coords (later changed to
    PIXEL coords). */
-   if( ( !astGetFitsI( lfc, "NAXIS1", ubnd )  ||
-         !astGetFitsI( lfc, "NAXIS2", ubnd + 1 ) ) &&
+   if( ( !astGetFitsI( lfc, "NAXIS1", ival )  ||
+         !astGetFitsI( lfc, "NAXIS2", ival + 1 ) ) &&
          *status == SAI__OK ) {
       *status = SAI__ERROR;
       errRep( " ", "Failed to get a tile dimensions (programming error).",
                  status );
+   } else {
+      ubnd[ 0 ] = ival[ 0 ];
+      ubnd[ 1 ] = ival[ 1 ];
    }
 
 /* Get the GRID coords of the FITS reference point. */
@@ -322,12 +327,15 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
                                      NULL, status );
 
 /* Store the upper bounds of the tile in new GRID coords. */
-            if( ( !astGetFitsI( tfc, "NAXIS1", tubnd )  ||
-                  !astGetFitsI( tfc, "NAXIS2", tubnd + 1 ) ) &&
+            if( ( !astGetFitsI( tfc, "NAXIS1", ival )  ||
+                  !astGetFitsI( tfc, "NAXIS2", ival + 1 ) ) &&
                   *status == SAI__OK ) {
                *status = SAI__ERROR;
                errRep( " ", "Failed to get a tile dimensions (programming error).",
                           status );
+            } else {
+               tubnd[ 0 ] = ival[ 0 ];
+               tubnd[ 1 ] = ival[ 1 ];
             }
 
 /* Read a FrameSet from the FITS headers. */
@@ -349,18 +357,18 @@ void smf_jsatile( int itile, smfJSATiling *skytiling, int local_origin,
    midway values (i.e. xxx.5) are always rounded in the positive
    direction, regardless of whether CRPIX is positive or negative. */
    if( crpix1 >= 0.0 ) {
-      icrpix1 = (int)( crpix1 + 0.5 );
+      icrpix1 = (dim_t)( crpix1 + 0.5 );
    } else {
       tmp = crpix1 - 0.5;
-      icrpix1 = (int) tmp;
+      icrpix1 = (dim_t) tmp;
       if( icrpix1 == tmp ) icrpix1++;
    }
 
    if( crpix2 >= 0.0 ) {
-      icrpix2 = (int)( crpix2 + 0.5 );
+      icrpix2 = (dim_t)( crpix2 + 0.5 );
    } else {
       tmp = crpix2 - 0.5;
-      icrpix2 = (int) tmp;
+      icrpix2 = (dim_t) tmp;
       if( icrpix2 == tmp ) icrpix2++;
    }
 

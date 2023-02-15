@@ -83,16 +83,16 @@ smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
 
 /* Local Variables: */
    AstFrameSet *fs;
+   dim_t box_lbnd[2];
+   dim_t box_nel;
+   dim_t box_ubnd[2];
+   dim_t lbnd[2];
+   dim_t minnel = 0;
+   dim_t ubnd[2];
    double rd0[ 2];
    double xy0[ 2];
-   int box_lbnd[2];
-   int box_ubnd[2];
    int iproj;
    int itile;
-   int lbnd[2];
-   int ubnd[2];
-   size_t box_nel;
-   size_t minnel = 0;
    smf_jsaproj_t result;
    smf_jsaproj_t proj[ 4 ] = { SMF__JSA_HPX, SMF__JSA_HPX12,
                                SMF__JSA_XPHN, SMF__JSA_XPHS };
@@ -107,10 +107,10 @@ smf_jsaproj_t smf_jsaproj( int ntile, const int *tiles,
    for( iproj = 0; iproj < 4; iproj++ ) {
 
 /* Initialise the bounding box. */
-      box_lbnd[ 0 ] = INT_MAX;
-      box_lbnd[ 1 ] = INT_MAX;
-      box_ubnd[ 0 ] = -INT_MAX;
-      box_ubnd[ 1 ] = -INT_MAX;
+      box_lbnd[ 0 ] = INT64_MAX;
+      box_lbnd[ 1 ] = INT64_MAX;
+      box_ubnd[ 0 ] = -INT64_MAX;
+      box_ubnd[ 1 ] = -INT64_MAX;
 
 /* Loop over all the supplied tiles. */
       for( itile = 0; itile < ntile; itile++ ) {

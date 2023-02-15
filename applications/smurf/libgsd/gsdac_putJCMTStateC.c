@@ -109,7 +109,7 @@
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
 void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
-                           const char *backend, const dasFlag dasFlag,
+                           const char *backend, const dasFlag dasFlag __attribute__((unused)),
                            struct JCMTState *record, int *status )
 {
 

@@ -14,17 +14,17 @@
 
 *  Invocation:
 *     void smf_choose_darks( const smfArray *darks, const smfData *indata,
-*                            size_t *dark1, size_t *dark2, int * status );
+*                            dim_t *dark1, dim_t *dark2, int * status );
 
 *  Arguments:
 *     darks = const smfArray* (Given)
 *        Set of dark observations.
 *     indata = const smfData * (Given)
 *        Reference science observation to choose darks.
-*     dark1 = size_t * (Returned)
+*     dark1 = dim_t * (Returned)
 *        Index in smfArray for the previous dark associated with this sequence.
 *        SMF__BADIDX if none can be found.
-*     dark2 = size_t * (Returned)
+*     dark2 = dim_t * (Returned)
 *        Index in smfArray for the dark following the sequence of indata.
 *        SMF__BADIDX if none can be found.
 *     status = int* (Given and Returned)
@@ -88,8 +88,8 @@
 #include "libsmf/smf.h"
 
 void smf_choose_darks( const smfArray *darks, const smfData *indata,
-                       size_t *dark1, size_t *dark2, int * status ) {
-  size_t i;          /* loop counter */
+                       dim_t *dark1, dim_t *dark2, int * status ) {
+  dim_t i;          /* loop counter */
   int refseq;        /* Sequence count of input science data */
   sc2ast_subarray_t refsubnum;     /* Subarray number of science data */
 
@@ -102,14 +102,14 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
 
   /* get reference sequence counter and subarray number */
   smf_find_seqcount( indata->hdr, &refseq, status );
-  smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
+  smf_find_subarray( indata->hdr, NULL, (dim_t)0, &refsubnum, status );
 
   /* Loop through all the darks looking for ones that only differ
      from the reference sequence counter by 1 */
   for (i=0; i< darks->ndat; i++) {
     smfData *thisdark = (darks->sdata)[i];
     sc2ast_subarray_t thissubnum;
-    smf_find_subarray( thisdark->hdr, NULL, (size_t)0, &thissubnum, status );
+    smf_find_subarray( thisdark->hdr, NULL, (dim_t)0, &thissubnum, status );
 
     /* see if we even need to look at the sequence counter */
     if (thissubnum == refsubnum &&

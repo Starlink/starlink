@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_calc_smoothedwvm ( ThrWorkForce * wf, const smfArray * alldata,
-*                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
-*                            size_t *nframes, size_t *ngood, size_t *ngood_pre_despike,
+*                            smfData * adata, AstKeyMap* extpars, double **wvmtau,
+*                            dim_t *nframes, dim_t *ngood, dim_t *ngood_pre_despike,
 *                            int * status );
 
 *  Arguments:
@@ -25,7 +25,7 @@
 *        Related smfDatas assumed to cover the same time range. A
 *        single WVM tau will be calculated for all input smfDatas.
 *        IF supplied, "adata" must be NULL.
-*     adata = const smfData * (Given)
+*     adata = smfData * (Given)
 *        If alldata is NULL a single smfData can be supplied.
 *     extpars = AstKeyMap * (Given)
 *        Extinction parameters from the config file. Uses the
@@ -36,11 +36,11 @@
 *        Pointer to array of double to receive the WVM tau data.
 *        Will be malloced by this routine and should be freed
 *        by the caller.
-*     nframes = size_t * (Returned)
+*     nframes = dim_t * (Returned)
 *        Number of elements in "wvmtau" array.
-*     ngood = size_t * (Returned)
+*     ngood = dim_t * (Returned)
 *        Number of good values in the "wvmtau" array.
-*     ngood_pre_despike = size_t * (Returned)
+*     ngood_pre_despike = dim_t * (Returned)
 *        Number of good values prior to despiking.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -124,7 +124,7 @@
      data at this time slice */
 #define SELECT_DATA( ALLDATA, SMFDATA, BADVAL, ITEM, INDEX )     \
   {                                                              \
-    size_t _ii;                                                  \
+    dim_t _ii;                                                  \
     SMFDATA = NULL;                                              \
     for (_ii=0; _ii<nrelated; _ii++) {                           \
       smfData *DATA = (ALLDATA->sdata)[_ii];                     \
@@ -142,29 +142,29 @@ typedef struct {
   smfArray * thesedata;
   AstKeyMap * extpars;
   double *taudata;
-  size_t ngood;
-  size_t maxgap;
+  dim_t ngood;
+  dim_t maxgap;
   dim_t t1;
   dim_t t2;
   dim_t nframes;
 } smfCalcWvmJobData;
 
 void smf__print_wvm_data(FILE* fd, double* taudata, double* taudata_pre_despike, double* taudata_pre_smooth,
-                         smfHead *hdr, size_t nframes, int* status);
+                         smfHead *hdr, dim_t nframes, int* status);
 
 void smf__calc_wvm_job( void *job_data, int *status );
 
 #define FUNC_NAME "smf_calc_smoothedwvm"
 
 void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
-                            const smfData * adata, AstKeyMap* extpars, double **wvmtau,
-                            size_t *nelems, size_t *ngoodvals,
-                            size_t *ngoodvals_pre_despike, int * status ) {
-  size_t i;
-  size_t nrelated = 0;          /* Number of entries in smfArray */
-  size_t nframes = 0;           /* Number of timeslices */
-  size_t ngood = 0;             /* Number of elements with good tau */
-  size_t ngood_pre_despike = 0; /* Number of elements with good opacity before despking */
+                            smfData * adata, AstKeyMap* extpars, double **wvmtau,
+                            dim_t *nelems, dim_t *ngoodvals,
+                            dim_t *ngoodvals_pre_despike, int * status ) {
+  dim_t i;
+  dim_t nrelated = 0;          /* Number of entries in smfArray */
+  dim_t nframes = 0;           /* Number of timeslices */
+  dim_t ngood = 0;             /* Number of elements with good tau */
+  dim_t ngood_pre_despike = 0; /* Number of elements with good opacity before despking */
   double *taudata = NULL;       /* Local version of WVM tau */
   double *taudata_pre_despike = NULL;
   double *taudata_pre_smooth = NULL;
@@ -254,7 +254,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
   if (*status == SAI__OK) {
     double amprev = VAL__BADD;
     double steptime;
-    size_t maxgap;
+    dim_t maxgap;
     struct timeval tv1;
     struct timeval tv2;
     smfCalcWvmJobData *job_data = NULL;
@@ -264,7 +264,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
        in seconds and convert it to steps*/
 
     steptime = (thesedata->sdata)[0]->hdr->steptime;
-    maxgap = (size_t)( 5.0 / steptime );  /* 5 seconds is just larger than 2 WVM readings */
+    maxgap = (dim_t)( 5.0 / steptime );  /* 5 seconds is just larger than 2 WVM readings */
 
     /* Assume all files have the same airmass information */
     smf_find_airmass_interval( (thesedata->sdata)[0]->hdr, &amprev, NULL, NULL, NULL, status );
@@ -294,10 +294,10 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
          by assuming one every two seconds. */
       {
         smfData * curdata = NULL;
-        size_t nwvm = 0;
+        dim_t nwvm = 0;
         double prevtime = VAL__BADD;
         double curtime;
-        size_t *boundaries = astGrow(NULL, nframes*(size_t)(steptime/2.0), sizeof(*boundaries));
+        dim_t *boundaries = astGrow(NULL, nframes*(dim_t)(steptime/2.0), sizeof(*boundaries));
         for (i=0; i<nframes; i++) {
           if (!curdata) {
             SELECT_DATA( thesedata, curdata, VAL__BADD, wvm_time, i );
@@ -334,8 +334,8 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
         /* No point using too many threads */
         if (*status == SAI__OK) {
-          if (nworker >= (int)nwvm) {
-            nworker = nwvm;
+          if (nworker >= (int) nwvm) {
+            nworker = (int) nwvm;
 
             /* Allocate a measurement per thread */
             for( iworker = 0; iworker < nworker; iworker++ ) {
@@ -349,15 +349,15 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
           } else {
             /* Allocate the workers to slices of approximate size tstep */
-            size_t prevend = 0; /* End of previous slice */
-            size_t prevbnd = 0; /* Index into previous boundaries[] array selection */
+            dim_t prevend = 0; /* End of previous slice */
+            dim_t prevbnd = 0; /* Index into previous boundaries[] array selection */
             for( iworker = 0; iworker < nworker; iworker++ ) {
-              size_t belowidx = prevend+1;
-              size_t aboveidx = nframes;
-              size_t lbnd;
-              size_t ubnd;
-              size_t j;
-              size_t guess;
+              dim_t belowidx = prevend+1;
+              dim_t aboveidx = nframes;
+              dim_t lbnd;
+              dim_t ubnd;
+              dim_t j;
+              dim_t guess;
 
               pdata = job_data + iworker;
 
@@ -372,6 +372,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
               if (guess <= pdata->t1) guess = pdata->t1 + tstep;
 
               /* find nearest boundaries */
+              #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
               for (j=prevbnd; j<nwvm; j++) {
                 if ( boundaries[j] > guess ) {
                   aboveidx = boundaries[j];
@@ -385,6 +386,7 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
                   break;
                 }
               }
+              #pragma GCC diagnostic pop
 
               /* Choose the closest, making sure that we are not choosing t1 */
               if ( (guess - belowidx < aboveidx - guess) && belowidx > pdata->t1 ) {
@@ -570,8 +572,8 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
 
 /* Debugging routine to print out the raw WVM data. */
 void smf__print_wvm_data(FILE* fd, double* taudata, double* taudata_pre_despike, double* taudata_pre_smooth,
-                         smfHead *hdr, size_t nframes, int* status) {
-  size_t i;
+                         smfHead *hdr, dim_t nframes, int* status) {
+  dim_t i;
   double* tau[3] = {0, 0, 0};
   int ncol = 0;
   int j;
@@ -623,15 +625,15 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
   double prevtime = VAL__BADD;
   double prevtau = VAL__BADD;
   double lastgoodtau = VAL__BADD;   /* most recent good tau */
-  size_t lastgoodidx = SMF__BADSZT; /* index of most recent good value */
-  size_t nbadidx = 0;    /* number of time slices in the current gap */
-  size_t maxgap;
+  dim_t lastgoodidx = SMF__BADSZT; /* index of most recent good value */
+  dim_t nbadidx = 0;    /* number of time slices in the current gap */
+  dim_t maxgap;
   dim_t t1;
   dim_t t2;
-  size_t nrelated;
+  dim_t nrelated;
 
   double * taudata = NULL;
-  size_t ngood = 0;
+  dim_t ngood = 0;
   dim_t i;
   smfCalcWvmJobData *pdata;
   double amprev;
@@ -734,7 +736,7 @@ void smf__calc_wvm_job( void *job_data, int *status ) {
       if (i > 0 && lastgoodidx != (i-1) ) {
         /* the previous value was bad so we may have to patch up if small */
         if ( nbadidx < maxgap ) {
-          size_t j;
+          dim_t j;
           if (lastgoodidx == SMF__BADSZT) {
             /* gap is at the start so fill with current value */
             for (j=t1; j<i;j++) {

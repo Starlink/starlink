@@ -13,14 +13,14 @@
 *     C function
 
 *  Invocation:
-*     smf_checkmem_map( const int lbnd[2], const int ubnd[2], int rebin,
+*     smf_checkmem_map( const dim_t lbnd[2], const dim_t ubnd[2], int rebin,
 *                       int nw, size_t available, const char *epsout,
 *                       size_t *necessary, int *status );
 
 *  Arguments:
-*     lbnd = const int[2] (Given)
+*     lbnd = const dim_t[2] (Given)
 *        2-element array indices for lower bounds of the output map
-*     ubnd = const int[2] (Given)
+*     ubnd = const dim_t[2] (Given)
 *        2-element array indices for upper bounds of the output map
 *     rebin = int (Given)
 *        If set calculate memory for method=rebin. Otherwise method=iterate.
@@ -105,7 +105,7 @@
 
 #define FUNC_NAME "smf_checkmem_map"
 
-void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin, int nw,
+void smf_checkmem_map( const dim_t lbnd[], const dim_t ubnd[], int rebin, int nw,
 		       size_t available, const char *epsout, size_t *necessary,
                        int *status ) {
 
@@ -176,8 +176,8 @@ void smf_checkmem_map( const int lbnd[], const int ubnd[], int rebin, int nw,
     /* Set bad status if too big */
     if( total > available ) {
       *status = SMF__NOMEM;
-      msgSeti("REQ",total/SMF__MIB);
-      msgSeti("AVAIL",available/SMF__MIB);
+      msgSetk("REQ",total/SMF__MIB);
+      msgSetk("AVAIL",available/SMF__MIB);
       errRep("FUNC_NAME",
 	     "Requested memory ^REQ MiB for map exceeds available ^AVAIL MiB",
 	     status);

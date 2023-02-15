@@ -14,7 +14,7 @@
 *     C function
 
 *  Invocation:
-*     width = smf_spreadwidth( int spread, const double params[], int *status )
+*     int smf_spreadwidth( int spread, const double params[], int *status )
 
 *  Arguments:
 *     spread = int (Given)
@@ -119,7 +119,7 @@ int smf_spreadwidth( int spread, const double params[], int *status ){
 
       w = work + 1001;
       while( *w != VAL__BADR && *w != 0.0 ) w++;
-      result = ( w  - ( work + 1001 ) )*2 + 1;
+      result = (int)( ( w  - ( work + 1001 ) )*2 + 1 );
 
       umap = astAnnul( umap );
       work = astFree( work );

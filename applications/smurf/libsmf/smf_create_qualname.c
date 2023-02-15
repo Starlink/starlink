@@ -113,7 +113,7 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs,
                           int *status ) {
 
   int fixed;                 /* Flag to denote whether quality bit is fixed */
-  size_t i;                  /* loop counter */
+  int i;                     /* loop counter */
   int value;                 /* Value of current quality bit */
   int there = 0;             /* Flag to denote presence of NDF extension */
   HDSLoc *smurfloc = NULL;   /* HDS locator for the SMURF extension */

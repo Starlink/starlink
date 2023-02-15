@@ -121,7 +121,7 @@ void smf_check_coords( smfData *data, int *status ) {
    double smean;
    double svar;
    int ns;
-   size_t itime;
+   dim_t itime;
    smfHead *hdr;
 
 /* Check inherited status */

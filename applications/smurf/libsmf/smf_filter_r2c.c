@@ -84,8 +84,8 @@
 
 void smf_filter_r2c( smfFilter *filt, int *status ) {
 
-  size_t i;
-  size_t nfdata;
+  dim_t i;
+  dim_t nfdata;
 
   if (*status != SAI__OK) return;
 

@@ -13,14 +13,14 @@
  *     C function
 
  *  Invocation:
- *     size_t smf_get_freemem( double * mbytes, size_t *pagesize,
+ *     dim_t smf_get_freemem( double * mbytes, dim_t *pagesize,
  *                             int64_t *physsize, int *status );
 
  *  Arguments:
  *     mbytes = double * (Returned)
  *        Pointer to variable to hold the free memory in
  *        megabytes if required. Can be NULL.
- *     pagesize = size_t * (Returned)
+ *     pagesize = dim_t * (Returned)
  *        Pagesize in bytes. Can be NULL.
  *     physsize = int64_t * (Returned)
  *        Total physical memory in bytes. Can be NULL.
@@ -96,7 +96,7 @@
 
 
 
-size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
+dim_t smf_get_freemem ( double *mbytes, dim_t * pagesize,
                          int64_t * physsize, int * status ) {
   int64_t mem_used = 0;
   int64_t mem_free = 0;
@@ -110,7 +110,7 @@ size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
   {
     mach_port_t host_port;
     mach_msg_type_number_t host_size;
-    vm_size_t vmpagesize;
+    vm_dim_t vmpagesize;
     vm_statistics_data_t vm_stat;
 
     host_port = mach_host_self();
@@ -132,7 +132,7 @@ size_t smf_get_freemem ( double *mbytes, size_t * pagesize,
 #ifdef _SC_AVPHYS_PAGES
   /* Figure out available physical memory from sysconf */
   {
-    size_t mypagesize;
+    dim_t mypagesize;
     mypagesize = sysconf(_SC_PAGE_SIZE);
     mem_free = sysconf(_SC_AVPHYS_PAGES) * mypagesize;
     mem_total = sysconf(_SC_PHYS_PAGES) * mypagesize;

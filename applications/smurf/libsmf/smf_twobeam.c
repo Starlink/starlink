@@ -692,7 +692,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    that the beam is centred on the centre of a pixel. The fine grid has a
    pixel size of PSIZE arc-sec and the beam is centred on the centre of
    the fine grid. */
-   nxb = 2*(int)(params->beamrad/PSIZE) + 1;
+   nxb = 2*(params->beamrad/PSIZE) + 1;
    if( nxb < 100 ) nxb = 100;
 
 /* Set the constant row offset between the centre of the beam array and
@@ -724,7 +724,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
 /* Find how many LUT entries to process in each worker thread. */
       if( nxb <= nw ) {
          step = 1;
-         nw0 = nxb;
+         nw0 = (int) nxb;
       } else {
          step = nxb/nw;
          nw0 = nw;
@@ -763,7 +763,7 @@ static double smf1_f( const gsl_vector *v, void *pars ) {
    at (cx,cy) with the current beam, and add on the background. */
       if( ny <= nw ) {
          step = 1;
-         nw0 = ny;
+         nw0 = (int) ny;
       } else {
          step = ny/nw;
          nw0 = nw;
@@ -906,7 +906,7 @@ static double *smf1_beam( ThrWorkForce *wf, SmfTwoBeamData *job_data,
 /* How many array lines are to be processed by each worker thread. */
       if( nxb < nw ) {
          step = 1;
-         nw = nxb;
+         nw = (int) nxb;
       } else {
          step = nxb/nw;
       }
@@ -1032,6 +1032,7 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
 /* Local Variables: */
    AstLutMap *lutmap;
    SmfTwoBeamData *pdata;
+   dim_t nv;
    double *beam;
    double *pa;
    double *pb0;
@@ -1080,7 +1081,6 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    hdsdim nxs;
    hdsdim xoff;
    hdsdim yoff;
-   int nv;
 
 
 /* Check inherited status */
@@ -1190,7 +1190,7 @@ static void smf1_twobeam( void *job_data_ptr, int *status ) {
    interpolation for free. The first value in the LUT corresponds to zero
    separation between beam and source. Note, the spacing in the LUT is
    "PSIZE", not "pixsize". */
-      lutmap = astLutMap( pdata->nxb, pdata->lut, 0.0, PSIZE, " " );
+      lutmap = astLutMap( (int) pdata->nxb, pdata->lut, 0.0, PSIZE, " " );
       nv = ( l2 - l1 + 1 )*nx;
       pg = pdata->out + ( l1 - 1 )*nx;
       astTran1( lutmap, nv, pg, 1, pg );

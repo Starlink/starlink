@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     void smf_choose_flat( const smfArray *flats, const smfData *indata,
-*                            size_t *flatidx, int * status );
+*                            dim_t *flatidx, int * status );
 
 *  Arguments:
 *     flats = const smfArray* (Given)
 *        Set of flatfield observations. Can be NULL.
 *     indata = const smfData * (Given)
 *        Reference science observation to choose flatfield.
-*     flatidx = size_t * (Returned)
+*     flatidx = dim_t * (Returned)
 *        Index in smfArray for the closest previous (or later)
 *        flatfield that could be associated with indata.
 *        SMF__BADIDX if none can be found.
@@ -92,8 +92,8 @@
 #include "libsmf/smf.h"
 
 void smf_choose_flat( const smfArray *flats, const smfData *indata,
-                       size_t *flatidx, int * status ) {
-  size_t i;          /* loop counter */
+                       dim_t *flatidx, int * status ) {
+  dim_t i;          /* loop counter */
   int matchseq = 0;  /* Matching sequence counter */
   int refseq;        /* Sequence count of input science data */
   double refshut = 0.0;        /* Shutter values of science data */
@@ -108,7 +108,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
 
   /* get reference sequence counter, subarray number and shutter state */
   smf_find_seqcount( indata->hdr, &refseq, status );
-  smf_find_subarray( indata->hdr, NULL, (size_t)0, &refsubnum, status );
+  smf_find_subarray( indata->hdr, NULL, (dim_t)0, &refsubnum, status );
   smf_fits_getD( indata->hdr, "SHUTTER", &refshut, status );
   smf_fits_getI( indata->hdr, "UTDATE", &utdate, status );
 
@@ -125,7 +125,7 @@ void smf_choose_flat( const smfArray *flats, const smfData *indata,
     sc2ast_subarray_t thissubnum;
 
     smf_fits_getD( thisflat->hdr, "SHUTTER", &thisshut, status );
-    smf_find_subarray( thisflat->hdr, NULL, (size_t)0, &thissubnum, status );
+    smf_find_subarray( thisflat->hdr, NULL, (dim_t)0, &thissubnum, status );
 
     msgOutiff( MSG__DEBUG, "", "Checking against flatfield %s subarray %d shutter %g",
                status, thisflat->hdr->obsidss, thissubnum, thisshut);

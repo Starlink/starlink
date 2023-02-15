@@ -247,8 +247,8 @@ double data[]      /* complex signal transformed in-place - even indices
 
 void sc2sim_getast_wcs
 (
-size_t colsize,              /* number of bolometers in column (given) */
-size_t rowsize,              /* number of bolometers in row (given) */
+dim_t colsize,              /* number of bolometers in column (given) */
+dim_t rowsize,              /* number of bolometers in row (given) */
 const double *xbolo,         /* x-bolometer coordinates for array (given) */
 const double *ybolo,         /* y-bolometer coordinates for array (given) */
 AstCmpMap *bolo2map,         /* mapping bolo->sky image coordinates (given ) */
@@ -371,7 +371,7 @@ int jig_vert[][2],    /* Array with relative jiggle coordinates in units of
                          jiggle steps in case jiggle positions are
                          visited (given) */
 
-size_t *cycle_samples,   /* The number of samples per cycle (returned) */
+dim_t *cycle_samples,   /* The number of samples per cycle (returned) */
 
 double pattern[][2],  /* The array to hold the coordinates of the jiggle
                          offsets in arcsec. There are cycle_samples entries
@@ -506,7 +506,7 @@ int *status        /* global status (given and returned) */
 );
 
 void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
-			 size_t reclen, int *status );
+			 dim_t reclen, int *status );
 
 void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter,
 			  const char *object, char *drgroup, int *status );
@@ -573,8 +573,8 @@ const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (give
 int subindex,             /* index into sinx->subname of subarray being written */
 double meanwvm,           /* 225 GHz tau */
 const char file_name[],   /* output file name (given) */
-size_t numsamples,        /* number of samples (given) */
-size_t nflat,             /* number of flat coeffs per bol (given) */
+dim_t numsamples,         /* number of samples (given) */
+dim_t nflat,              /* number of flat coeffs per bol (given) */
 double refres,            /* reference resistance used to calculate flatfield (given) */
 const char flatname[],    /* name of flatfield algorithm (given) */
 const JCMTState *head,    /* header data for each frame (given) */
@@ -587,12 +587,12 @@ const char filter[],      /* String representing filter (e.g. "850") (given) */
 const char dateobs[],     /* DateObs string for FITS header */
 const char obsid[],       /* Observation ID string */
 const double *posptr,     /* Pointing offsets from map centre */
-size_t jigsamples,        /* Number of jiggle samples (given) */
-double jigptr[][2], /* Array of X, Y jiggle positions (given) */
+dim_t jigsamples,         /* Number of jiggle samples (given) */
+double jigptr[][2],       /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */
-const double focposn,    /* Focus position */
+const double focposn,     /* Focus position */
 const int nsubscan,       /* Sub-scan number (given) */
-const int obsend,        /* Flag to indicate whether this is the last file */
+const int obsend,         /* Flag to indicate whether this is the last file */
 const char utdate[],      /* UT date in YYYYMMDD form (given) */
 const double azstart,     /* Azimuth at start of sub-scan (given) */
 const double azend,       /* Azimuth at end of sub-scan (given) */
@@ -616,8 +616,8 @@ const struct sc2sim_obs_struct *inx,      /* structure for values from XML (give
 const struct sc2sim_sim_struct *sinx, /* structure for sim values from XML (given)*/
 int subindex,            /* index into sinx->subname of subarray being written */
 const char file_name[],  /* output file name (given) */
-size_t numsamples,    /* number of samples (given) */
-size_t nflat,         /* number of flat coeffs per bol (given) */
+dim_t numsamples,    /* number of samples (given) */
+dim_t nflat,         /* number of flat coeffs per bol (given) */
 double refres,        /* reference resistance used to calculate flatfield (given) */
 const char *flatname,    /* name of flatfield algorithm (given) */
 const JCMTState *head,   /* header data for each frame (given) */

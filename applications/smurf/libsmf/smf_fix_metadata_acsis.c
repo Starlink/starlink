@@ -172,7 +172,7 @@ typedef struct {
 /* Private routines */
 
 static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fitsvals, int * status );
-static int smf__fix_wrap( double *start, size_t stride, size_t nel, int have_fixed, int *status );
+static int smf__fix_wrap( double *start, dim_t stride, dim_t nel, int have_fixed, int *status );
 
 #define FUNC_NAME "smf_fix_metadata_acsis"
 
@@ -189,7 +189,7 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   struct FitsHeaderStruct fitsvals; /* Quick access Fits header struct */
   int has_dhsver = 0;        /* Do we have DHSVER header? */
   smfHead *hdr = NULL;       /* Data header struct */
-  size_t i;
+  dim_t i;
   int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
   int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
   double posn_tolerance;     /* Tolerance for TCS position validation */
@@ -1264,16 +1264,16 @@ static const ObsIdLUT * smf__find_obsidlut( const struct FitsHeaderStruct * fits
    2*PI. If so, it sets bad any values that fall in the middle of the
    wrap-around. */
 
-static int smf__fix_wrap( double *start, size_t stride, size_t nel,
+static int smf__fix_wrap( double *start, dim_t stride, dim_t nel,
                           int have_fixed, int *status ){
 
-  size_t hi;                 /* Index of last value to remove */
-  size_t hi0;                /* Index of first high azimuth value */
-  size_t hi1;                /* Index of last high azimuth value */
-  size_t i;                  /* Time slice index */
-  size_t lo;                 /* Index of first value to remove */
-  size_t lo0;                /* Index of first low azimuth value */
-  size_t lo1;                /* Index of last low azimuth value */
+  dim_t hi;                 /* Index of last value to remove */
+  dim_t hi0;                /* Index of first high azimuth value */
+  dim_t hi1;                /* Index of last high azimuth value */
+  dim_t i;                  /* Time slice index */
+  dim_t lo;                 /* Index of first value to remove */
+  dim_t lo0;                /* Index of first low azimuth value */
+  dim_t lo1;                /* Index of last low azimuth value */
   double *p;                 /* Pointer to next angle value */
 
   if( *status != SAI__OK ) return have_fixed;

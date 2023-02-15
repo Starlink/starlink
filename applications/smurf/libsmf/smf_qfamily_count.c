@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     size_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
+*     dim_t smf_qfamily_count( smf_qfam_t qfamily, int * status );
 
 *  Arguments:
 *     qfamily = smf_qfam_t (Given)
@@ -69,9 +69,9 @@
 #include "sae_par.h"
 #include "mers.h"
 
-size_t smf_qfamily_count( smf_qfam_t family, int * status ) {
+dim_t smf_qfamily_count( smf_qfam_t family, int * status ) {
 
-  size_t retval = 0;
+  dim_t retval = 0;
 
   if (*status != SAI__OK) return retval;
 
@@ -88,6 +88,7 @@ size_t smf_qfamily_count( smf_qfam_t family, int * status ) {
     break;
   case SMF__QFAM_NULL:
     retval = 0;
+    break;
   default:
     *status = SAI__ERROR;
     errRepf( "", "Unsupported quality family with value %d",

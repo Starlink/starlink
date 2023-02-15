@@ -86,8 +86,8 @@ static void smf1_convert_bad( void *job_data_ptr, int *status );
 /* Local data types */
 typedef struct smfConvertBadData {
    double *d;
-   size_t d1;
-   size_t d2;
+   dim_t d1;
+   dim_t d2;
 } smfConvertBadData;
 
 #define FUNC_NAME "smf_convert_bad"
@@ -100,7 +100,7 @@ void smf_convert_bad( ThrWorkForce *wf, smfData *data, int *status ) {
   int iw;                       /* Thread index */
   smfConvertBadData *job_data = NULL;  /* Array of job descriptions */
   smfConvertBadData *pdata;     /* Pointer to next job description */
-  size_t sampstep;              /* Number of samples per thread */
+  dim_t sampstep;              /* Number of samples per thread */
 
 
 
@@ -132,7 +132,7 @@ void smf_convert_bad( ThrWorkForce *wf, smfData *data, int *status ) {
   sampstep = ndata/nw;
   if( sampstep == 0 ) {
      sampstep = 1;
-     nw = ndata;
+     nw = (int) ndata;
   }
 
   /* Allocate job data for threads. */
@@ -195,7 +195,7 @@ static void smf1_convert_bad( void *job_data_ptr, int *status ) {
 /* Local Variables: */
    smfConvertBadData *pdata;
    double *pd;
-   size_t i;
+   dim_t i;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

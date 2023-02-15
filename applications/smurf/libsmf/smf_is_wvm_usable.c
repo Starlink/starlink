@@ -76,7 +76,7 @@ typedef struct {
 int
 smf_is_wvm_usable( const smfHead * hdr, int *status ) {
 
-  size_t i = 0;
+  dim_t i = 0;
   int utdate;           /* UTDATE FITS header */
   int isusable = 1;     /* Default to probably being usable */
 

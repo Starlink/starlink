@@ -13,18 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
+*     smf_checkmem_dimm( dim_t maxlen, inst_t instrument, dim_t nrelated,
 *                        smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
 *                        AstKeyMap *keymap, size_t available,
-*                        dim_t maxfilelen, size_t *necessary,
-*                        int *status );
+*                        dim_t maxfilelen, size_t *necessary, int *status );
 
 *  Arguments:
 *     maxlen = dim_t (Given)
 *        The longest chunk of data that will be handled by the DIMM (samples).
 *     instrument = inst_t (Given)
 *        For which instrument is the map-maker being run?
-*     nrelated = int (Given)
+*     nrelated = dim_t (Given)
 *        How many subarrays are being processed simultaneously
 *     modeltyps = smf_modeltype* (Given)
 *        Array indicating which model components are being solved for
@@ -167,7 +166,7 @@
 
 
 
-void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
+void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, dim_t nrelated,
 			smf_modeltype *modeltyps, dim_t nmodels, dim_t msize,
                         AstKeyMap *keymap, size_t available, dim_t maxfilelen,
                         size_t *necessary, int *status ) {
@@ -180,11 +179,11 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   dim_t gain_box;              /* Length of blocks for GAI/COM model */
   AstKeyMap *kmap=NULL;        /* Local keymap */
   dim_t nblock;                /* Number of blocks for GAI/COM model */
-  size_t ncol = 0;             /* Number of columns */
-  size_t ndet = 0;             /* Number of detectors each time step */
-  size_t ndks;                 /* dksquid samples in a subarray, ncol*maxlen */
-  size_t nrow;                 /* Number of rows */
-  size_t nsamp;                /* bolo samples in a subarray, ndet*maxlen */
+  dim_t ncol = 0;              /* Number of columns */
+  dim_t ndet = 0;              /* Number of detectors each time step */
+  dim_t ndks;                  /* dksquid samples in a subarray, ncol*maxlen */
+  dim_t nrow;                  /* Number of rows */
+  dim_t nsamp;                 /* bolo samples in a subarray, ndet*maxlen */
   const char *tempstr=NULL;    /* Temporary pointer to static char buffer */
   size_t total = 0;            /* Total bytes required */
 
@@ -200,7 +199,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
   }
 
   if( (nrelated < 1) || (nrelated > SMF__MXSMF) ) {
-    msgSeti("NREL",nrelated);
+    msgSetk("NREL",nrelated);
     msgSeti("MAXREL",SMF__MXSMF);
     *status = SAI__ERROR;
     errRep("", FUNC_NAME ": nrelated, ^NREL, must be in the range [1,^MAXREL]",
@@ -389,8 +388,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     /* Calculate temporary space here -------------------------------------- */
 
     if( *status == SAI__OK ) {
-      size_t temp=0;      /* current temp memory required */
-      size_t maxtemp=0;   /* max temp memory required */
+      dim_t temp=0;      /* current temp memory required */
+      dim_t maxtemp=0;   /* max temp memory required */
 
       /* Some temp space required when we initially read in the
          data. Normally smf_concat_smfGroup will
@@ -435,8 +434,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
     /* Set bad status if too big */
     if( (*status == SAI__OK) && (total > available) ) {
       *status = SMF__NOMEM;
-      msgSeti("REQ",total/SMF__MIB);
-      msgSeti("AVAIL",available/SMF__MIB);
+      msgSetk("REQ",total/SMF__MIB);
+      msgSetk("AVAIL",available/SMF__MIB);
       errRep("", FUNC_NAME
 	     ": Requested memory ^REQ MiB for map exceeds available ^AVAIL MiB",
 	     status);

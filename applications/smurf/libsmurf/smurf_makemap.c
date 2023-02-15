@@ -917,9 +917,10 @@ void smurf_makemap( int *status ) {
   char fts_port_name[10];    /* FTS-2 port name */
   int gotbadflat = 0;        /* Was one of the required flats bad? */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
-  int *histogram = NULL;     /* Histogram for calculating exposure statistics */
+  dim_t *histogram = NULL;   /* Histogram for calculating exposure statistics */
   int *hitsmap;              /* Hitsmap array calculated in ITERATE method */
-  dim_t i;                   /* Loop counter */
+  int i;                     /* Loop counter */
+  dim_t ii;                  /* Loop counter */
   int ifile;                 /* Input file index */
   Grp *igrp = NULL;          /* Group of input files */
   Grp *igrp4 = NULL;         /* Group holding output NDF names */
@@ -929,18 +930,18 @@ void smurf_makemap( int *status ) {
   int isjsa;                 /* Are we making a map on the JSA all-sky pixel grid? */
   int iterate=0;             /* Flag to denote ITERATE method */
   int iters;                 /* If interupted, the no. of completed iterations */
-  size_t itile;              /* Output tile index */
+  dim_t itile;               /* Output tile index */
   int ival;                  /* Integer parameter value */
   int jin;                   /* Input NDF index within igrp */
   int jsatiles;              /* Create JSA tiles? */
   int junk;                  /* Unused integer */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
-  int lbnd_out[2];           /* Lower pixel bounds for output map */
+  dim_t lbnd_out[2];         /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem=0;           /* Memory needed for output map */
   smf_qual_t *mapqual=NULL;  /* Map quality */
   size_t maxmem=0;           /* Max memory usage in bytes */
-  int maxmem_mib;             /* Max memory usage in MiB */
+  int maxmem_mib;            /* Max memory usage in MiB */
   int maxmem_default = 1000; /* Default value for maxmem */
   double maxtexp = 0.0;      /* Maximum exposure time */
   double meanstep = 0.0;     /* Mean steptime for output map */
@@ -948,16 +949,17 @@ void smurf_makemap( int *status ) {
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
-  size_t njsatile;           /* Number of output JSA tiles */
-  size_t ntile;              /* Number of output tiles */
+  int njsatile;              /* Number of output JSA tiles */
+  dim_t ntile;               /* Number of output tiles */
   int64_t nused;             /* No. of used input samples */
   int nval;                  /* Number of parameter values supplied */
-  size_t nxy;                /* Number of pixels in output image */
+  dim_t nxy;                 /* Number of pixels in output image */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   char oname[SMF_PATH_MAX+1];/* Name of output NDF */
   int ondf = NDF__NOID;      /* output NDF identifier */
-  size_t outsize;            /* Number of files in output group */
+  dim_t outsize;             /* Number of files in output group */
+  size_t temp;               /* Temp size_t value */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
@@ -965,7 +967,7 @@ void smurf_makemap( int *status ) {
   int ***ptime = NULL;       /* Holds time slice indices for each pol bin */
   int *pt = NULL;            /* Holds time slice indices for each pol bin */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
-  size_t size;               /* Number of files in input group */
+  int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
@@ -982,7 +984,7 @@ void smurf_makemap( int *status ) {
   int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
   AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
   struct timeval tv1, tv2;   /* Timers */
-  int ubnd_out[2];           /* Upper pixel bounds for output map */
+  dim_t ubnd_out[2];         /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
@@ -1007,7 +1009,8 @@ void smurf_makemap( int *status ) {
   wf = thrGetWorkforce( thrGetNThread( SMF__THREADS, status ), status );
 
   /* Get group of input files */
-  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &temp, status );
+  size = (int) temp;
 
   /* Filter out darks */
   smf_find_science( wf, igrp, &fgrp, 0, NULL, NULL, 1, 1, SMF__NULL, &darks,
@@ -1019,7 +1022,7 @@ void smurf_makemap( int *status ) {
 
   /* input group is now the filtered group so we can use that and
      free the old input group */
-  size = grpGrpsz( fgrp, status );
+  size = (int) grpGrpsz( fgrp, status );
   grpDelet( &igrp, status);
   igrp = fgrp;
   fgrp = NULL;
@@ -1237,8 +1240,8 @@ void smurf_makemap( int *status ) {
 
   /* Output the pixel bounds of the full size output array (not of an
      individual tile). */
-  parPut1i( "LBOUND", 2, lbnd_out, status );
-  parPut1i( "UBOUND", 2, ubnd_out, status );
+  parPut1k( "LBOUND", 2, lbnd_out, status );
+  parPut1k( "UBOUND", 2, ubnd_out, status );
 
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
@@ -1255,7 +1258,7 @@ void smurf_makemap( int *status ) {
      for "OUT". But we cannot do it here if we are creating JSA tiles
      since we only know how many JSA tiles are being created once the
      cube has been created. */
-  if( !jsatiles ) parPut0i( "NTILE", ntile, status );
+  if( !jsatiles ) parPut0k( "NTILE", ntile, status );
 
   /* Create a new group to hold the names of the output NDFs that have been
      created. This group does not include any NDFs that correspond to tiles
@@ -1264,7 +1267,8 @@ void smurf_makemap( int *status ) {
 
   /* Create an output smfData */
   if (*status == SAI__OK) {
-    kpg1Wgndf( "OUT", NULL, 1, 1, NULL, &ogrp, &outsize, status );
+    kpg1Wgndf( "OUT", NULL, 1, 1, NULL, &ogrp, &temp, status );
+    outsize = temp;
     /* If OUT is NULL annul the bad status but set a flag so that we
        know to skip memory checks and actual map-making */
     if( *status == PAR__NULL ) {
@@ -1305,8 +1309,8 @@ void smurf_makemap( int *status ) {
       /* Tell the user which tile is being produced. */
       if( ntile > 1 ) {
         if( !blank ) msgBlank( status );
-        msgSeti( "I", itile );
-        msgSeti( "N", ntile );
+        msgSetk( "I", itile );
+        msgSetk( "N", ntile );
         msgSeti( "XLO", (int) tile->lbnd[ 0 ] );
         msgSeti( "XHI", (int) tile->ubnd[ 0 ] );
         msgSeti( "YLO", (int) tile->lbnd[ 1 ] );
@@ -1556,15 +1560,15 @@ void smurf_makemap( int *status ) {
          note even if weights is a 3-D array we only use the first
          mapsize number of values which represent the `hits' per
          pixel */
-      for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
-        if ( map[i] == VAL__BADD) {
-          exp_time[i] = VAL__BADD;
-          weights[i] = VAL__BADD;
+      for (ii=0; (ii<nxy) && (*status == SAI__OK); ii++) {
+        if ( map[ii] == VAL__BADD) {
+          exp_time[ii] = VAL__BADD;
+          weights[ii] = VAL__BADD;
         } else {
-          exp_time[i] = meanstep * weights3d[i];
-          weights[i] = weights3d[i+nxy];
-          if ( exp_time[i] > maxtexp ) {
-            maxtexp = exp_time[i];
+          exp_time[ii] = meanstep * weights3d[ii];
+          weights[ii] = weights3d[ii+nxy];
+          if ( exp_time[ii] > maxtexp ) {
+            maxtexp = exp_time[ii];
           }
         }
       }
@@ -1608,9 +1612,9 @@ void smurf_makemap( int *status ) {
       /* Store the keywords holding the number of user-defined tiles generated
          and the index of the current tile. */
       if( !jsatiles ) {
-         atlPtfti( fchan, "NUMTILES", ntile,
+         atlPtfti( fchan, "NUMTILES", (int) ntile,
                    "No. of tiles covering the field", status );
-         atlPtfti( fchan, "TILENUM", itile,
+         atlPtfti( fchan, "TILENUM", (int) itile,
                    "Index of this tile (1->NUMTILES)", status );
       }
 
@@ -1675,10 +1679,10 @@ void smurf_makemap( int *status ) {
     Grp *cyclerootgrp = NULL;
     char tempfile[GRP__SZNAM+1];
     double nboloeff = 0.0;
-    size_t ncontchunks=0;
-    size_t ninsmp=0;
-    size_t ncnvg=0;
-    size_t ncontig=0;
+    dim_t ncontchunks=0;
+    dim_t ninsmp=0;
+    dim_t ncnvg=0;
+    dim_t ncontig=0;
     int memlow=0;
     NdgProvenance * oprov = NULL;
     double totexp;
@@ -1837,9 +1841,10 @@ void smurf_makemap( int *status ) {
          smoothed copy of the SNR mask. */
       } else if( nrun == 2 ) {
          snr_mask = smf_smoothmask( wf, SMF__MAPQ_AST, mapqual,
-                                    ubnd_out[0] - lbnd_out[0] + 1,
-                                    ubnd_out[1] - lbnd_out[1] + 1, outfset,
-                                    zero_snr_fwhm, zero_snr_low, status );
+                                    (int)(ubnd_out[0] - lbnd_out[0] + 1),
+                                    (int)(ubnd_out[1] - lbnd_out[1] + 1),
+                                    outfset, zero_snr_fwhm, zero_snr_low,
+                                    status );
 
         /* Store a pointer to the smoothed mask in the KeyMap so that
            smf_calcmodel_ast can pick it up and use it in the same way
@@ -1869,7 +1874,7 @@ void smurf_makemap( int *status ) {
     for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {
       smf_open_file( wf, igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
       if( *status != SAI__OK) {
-        msgSeti("I",i);
+        msgSetk("I",i);
         msgSeti("S",size);
         errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
       }
@@ -1915,8 +1920,8 @@ void smurf_makemap( int *status ) {
 
     /* Set array to BAD where we have no integration time (otherwise the
      median calculation will not work properly) */
-    for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
-      if ( map[i] == VAL__BADD ) exp_time[i] = VAL__BADD;
+    for (ii=0; (ii<nxy) && (*status == SAI__OK); ii++) {
+      if ( map[ii] == VAL__BADD ) exp_time[ii] = VAL__BADD;
     }
 
     /* Write WCS */
@@ -2077,7 +2082,7 @@ void smurf_makemap( int *status ) {
 
   /* Write the number of tiles being created to an output parameter,
      unless it was written earlier. */
-  if( jsatiles ) parPut0i( "NTILE", njsatile, status );
+  if( jsatiles ) parPut0k( "NTILE", njsatile, status );
 
   /* Arrive here if no output NDF is being created. */
  L998:;
@@ -2090,7 +2095,7 @@ void smurf_makemap( int *status ) {
   if( igrp4 != NULL) grpDelet( &igrp4, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   boxes = astFree( boxes );
-  if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
+  if( tiles ) tiles = smf_freetiles( tiles, (int) ntile, status );
   if( darks ) smf_close_related( wf, &darks, status );
   if( flatramps ) smf_close_related( wf, &flatramps, status );
   if (heateffmap) heateffmap = smf_free_effmap( heateffmap, status );

@@ -15,8 +15,8 @@
 *  Invocation:
 *     smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
 *                       const smfData *data, double *badfrac,
-*                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-*                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
+*                       int *dcfitbox, int *dcmaxsteps, double *dcthresh,
+*                       int *dcsmooth, int *dclimcorr, int *dkclean,
 *                       int *fillgaps, int *zeropad, double *filt_edgelow,
 *                       double *filt_edgehigh, double *filt_edge_smallscale,
 *                       double *filt_edge_largescale,
@@ -49,7 +49,7 @@
 *     badfrac = double* (Returned)
 *        Fraction of bad samples in order for entire bolometer to be
 *        flagged as bad (NULL:0)
-*     dcfitbox = dim_t* (Returned)
+*     dcfitbox = int * (Returned)
 *        Length of box (in samples) over which each linear fit is
 *        performed when detecting DC steps. If zero, no steps will be
 *        corrected.
@@ -61,7 +61,7 @@
 *        data stream.
 *     dcthresh = double* (Returned)
 *        N-sigma threshold at which to detect DC steps
-*     dcsmooth = dim_t * (Returned)
+*     dcsmooth = int * (Returned)
 *        Width of median filter for DC step detection.
 *     dclimcorr = int * (Returned)
 *        The detection threshold for steps that occur at the same time in
@@ -276,8 +276,8 @@
 
 void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
                        const smfData *data, double *badfrac,
-                       dim_t *dcfitbox, int *dcmaxsteps, double *dcthresh,
-                       dim_t *dcsmooth, int *dclimcorr, int *dkclean,
+                       int *dcfitbox, int *dcmaxsteps, double *dcthresh,
+                       int *dcsmooth, int *dclimcorr, int *dkclean,
                        int *fillgaps, int *zeropad, double *filt_edgelow,
                        double *filt_edgehigh, double *filt_edge_smallscale,
                        double *filt_edge_largescale, double *filt_notchlow,
@@ -293,6 +293,7 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
 
   char buf[255];                /* Buffer for qualified parameter names */
   const char *key;              /* Pointer to used parameter name */
+  dim_t temp2;
   int dofft=0;                  /* Flag indicating that filtering is required */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
@@ -314,11 +315,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
   }
 
   if( dcfitbox ) {
-    *dcfitbox = 0;
+    temp2 = 0;
     key = smf_keyname( keymap, "DCFITBOX", qualifier, buf, sizeof( buf ), status );
-    smf_get_nsamp( keymap, key, data, dcfitbox, status );
+    smf_get_nsamp( keymap, key, data, &temp2, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status,
-               key, *dcfitbox );
+               key, temp2 );
+    *dcfitbox = (int) temp2;
   }
 
   if( dcmaxsteps ) {
@@ -363,11 +365,12 @@ void smf_get_cleanpar( AstKeyMap *keymap, const char *qualifier,
   }
 
   if( dcsmooth ) {
-    *dcsmooth = 0;
+    temp2 = 0;
     key = smf_keyname( keymap, "DCSMOOTH", qualifier, buf, sizeof( buf ), status );
-    smf_get_nsamp( keymap, key, data, dcsmooth, status );
+    smf_get_nsamp( keymap, key, data, &temp2, status );
     msgOutiff( MSG__DEBUG, "", FUNC_NAME ": %s=%" DIM_T_FMT, status, key,
-               *dcsmooth );
+               temp2 );
+    *dcsmooth = (int) temp2;
   }
 
   if( dkclean ) {

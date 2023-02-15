@@ -462,14 +462,11 @@ static void map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
 			       int *status );
 
 static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
-				      int lbnd, int ubnd, int *prange,
+				      dim_t lbnd, dim_t ubnd, int *prange,
 				      int *status );
 
 static void convert_coord_to_pixel ( AstMapping **wcsmap, const double *coord,
 				     int nval, double *pixel, int *status );
-
-static void convert_pixel_to_coord ( AstMapping **wcsmap, const double *pixel,
-				     int nval, double *coord, int *status );
 
 static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
 				   int *parndfs, smfArray *pardata,
@@ -508,8 +505,8 @@ void smurf_fit1d( int * status )
   size_t   size;                 /* Number of files in input group */
   int      idim;                 /* Index of pixel axis */
 
-  int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
-  int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
+  dim_t    lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
+  dim_t    ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
   fitStruct fcntrl;              /* Pointer to fit control struct */
 
   /* File with user defined values for the function's parameters */
@@ -585,7 +582,7 @@ void smurf_fit1d( int * status )
     /*
     ** Re-open the output file for UPDATE using standard routine
     */
-    smf_open_file( NULL, ogrp, in, "UPDATE",
+    smf_open_file( NULL, ogrp, (int) in, "UPDATE",
 		   SMF__NOCREATE_DA | SMF__NOTTSERIES | SMF__NOCREATE_QUALITY,
 		   &data, status );
 
@@ -599,7 +596,7 @@ void smurf_fit1d( int * status )
       }
       if (axis == 0) axis = (int) data->ndims;
     } else {
-      msgSeti("F", in);
+      msgSetk("F", in);
       errRep( FUNC_NAME, "Error opening output file ^F for UPDATE.", status);
       goto CLEANUP;
     }
@@ -640,8 +637,8 @@ void smurf_fit1d( int * status )
 
     /* Convert user-specified range to pixels */
     int prange[2] = {VAL__BADI,VAL__BADI}; /* Range in pixel nrs 1..n */
-    convert_range_to_pixels( &wcsmap, range, (int) lbnd[iaxis],
-			     (int) ubnd[iaxis], prange, status );
+    convert_range_to_pixels( &wcsmap, range, lbnd[iaxis],
+			     ubnd[iaxis], prange, status );
     if ( *status != SAI__OK) {
       goto CLEANUP;
     }
@@ -1353,7 +1350,7 @@ static void  map_axis_to_wcs ( smfData *data, int axis, AstMapping **wcsmap,
 
 
 static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
-			   int lbnd, int ubnd, int *prange, int *status )
+			   dim_t lbnd, dim_t ubnd, int *prange, int *status )
 /*
 ** Convert given range to pixels (running 1..n) along the fit axis and return
 ** as prange. lbnd and ubnd are grid bounds along the fit axis.
@@ -1361,7 +1358,7 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
 */
 {
   double lrange[2];
-  int ndims;
+  dim_t ndims;
 
   /* Number of pixels along axis */
   ndims = ubnd-lbnd+1;
@@ -1403,35 +1400,10 @@ static void convert_range_to_pixels ( AstMapping **wcsmap, double *range,
   }
 
   if ( prange[0] >= (int) ndims || prange[1] <= 1 ) {
-    msgOutf( "", "Range results in a pixel range %d to %d that is beyond the input ndf axis %d to %d",
+    msgOutf( "", "Range results in a pixel range %" DIM_T_FMT " to %" DIM_T_FMT " that is beyond the input ndf axis %" DIM_T_FMT " to %" DIM_T_FMT "",
 	    status, prange[0]+lbnd-1, prange[1]+lbnd-1, lbnd, ubnd );
     *status = SAI__ERROR;
     errRep(TASK_NAME, "Invalid RANGE specified.", status);
-  }
-}
-
-
-static void convert_pixel_to_coord ( AstMapping **wcsmap, const double *pixel,
-				     int nval, double *coord, int *status )
-/*
-** Convert given pixels (running 1..n) to coordinate values along the
-** fit axis.
-*/
-{
-  int i;
-
-  /* Change pixels to array indices: if no mapping exists interpret
-     range as grid values */
-  if ( wcsmap ) {
-      astTran1( *wcsmap, nval, pixel, 1, coord );
-  } else {
-    msgOut("",
-	   "*WARNING* No valid axis mapping: returned values are pixels",
-	   status);
-    for ( i = 0; i < nval; i++ ) {
-      coord[i] = (double) pixel[i];
-    }
-
   }
 }
 
@@ -1473,14 +1445,14 @@ static void setup_parameter_ndfs ( smfData *data, int axis, int ncomp,
   /* Parameter NDFs */
   int icomp;                     /* Component index (0 for base-line fit) */
   int idim;                      /* Index of pixel axis */
-  int lbndp[ NDF__MXDIM ];       /* Lower NDF pixel bounds for par. NDFs */
-  int ubndp[ NDF__MXDIM ];       /* Upper NDF pixel bounds for par. NDFs */
+  dim_t lbndp[ NDF__MXDIM ];     /* Lower NDF pixel bounds for par. NDFs */
+  dim_t ubndp[ NDF__MXDIM ];     /* Upper NDF pixel bounds for par. NDFs */
 
   HDSLoc  *smurfloc=NULL;        /* HDS locator of SMURF extension */
-  char ndfnam[ 10 ];             /* Name for parameter NDF */
+  char ndfnam[ 20 ];             /* Name for parameter NDF */
   int place;                     /* Place holder for parameter NDF */
-  void *pntrs[2];       /* Generic pointers for Data and Variance arrays */
-  int el;                        /* No. of elements mapped in each array */
+  void *pntrs[2];                /* Generic pointers for Data and Variance arrays */
+  size_t el;                     /* No. of elements mapped in each array */
 
 
   if (*status != SAI__OK) return;
@@ -1640,7 +1612,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
     errRep(TASK_NAME, "Error reading PARNDF parameter", status);
   else {
 
-    int rsize = csize;
+    int rsize = (int) csize;
     if ( rsize == 0 &&  strcmp(parndf, "") != 0 ) {
       /* Try read any and all parameter files from NDF */
       rsize = MAXCOMPS;
@@ -1694,7 +1666,7 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
 
       /* Number of points in input data parameter files */
       pdata = pardata->sdata[icomp];
-      int dpts = 1;
+      dim_t dpts = 1;
       for ( idim = 0; idim < (int) pdata->ndims; idim++ ) {
 	dpts *= pdata->dims[idim];
       }
@@ -1724,15 +1696,15 @@ static void copy_parameter_ndfs ( smfArray *pardata, int *status )
       }
 
       /* Number of points in user-specified parameter file */
-      int cpts = 1;
+      dim_t cpts = 1;
       for ( int idim = 0; idim < (int) cdata->ndims; idim++ ) {
         cpts *= cdata->dims[idim];
       }
 
       if ( cpts != dpts || pdata->ndims != cdata->ndims ) {
 	msgOutf(" ", "NDF: '%s' %d axes %d points; %s: %d axes, %d points\n",
-		status, filename, (int) pdata->ndims, dpts,
-		filename, (int) cdata->ndims, cpts );
+		status, filename, (int) pdata->ndims, (int) dpts,
+		filename, (int) cdata->ndims, (int) cpts );
 	*status = SAI__ERROR;
 	errRep(" ",
 		"ERROR: IN ndf and %s differ in size or number of axes\n",
@@ -1779,10 +1751,8 @@ static void convert_parunits( int mode, smfData *data, int axis, int ncomp,
   int      iprof = 0;            /* Profile counter */
 
   int      iaxis = 0;            /* 0-based axis nr to fit along */
-  int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
-  int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
-  int      nprofiles = 1;        /* Number of profiles fitted */
-  size_t   dstride = 1;          /* Data stride: separation of
+  dim_t    nprofiles = 1;        /* Number of profiles fitted */
+  dim_t    dstride = 1;          /* Data stride: separation of
                                     pixels along AXIS in data cube */
   double  *inpval, *inperr;      /* Array for pixel values and errors*/
   double  *fidval, *fiderr;      /* Array for function id values and errors*/
@@ -1803,8 +1773,6 @@ static void convert_parunits( int mode, smfData *data, int axis, int ncomp,
   /* Get dimensions, number of profiles, and dstride */
   iaxis = axis - 1;
   for( idim = 0; idim < (int) data->ndims; idim++ ) {
-    lbnd[idim] = data->lbnd[idim];
-    ubnd[idim] = lbnd[idim] + data->dims[idim] - 1;
     nprofiles *= data->dims[idim];
     if ( idim < iaxis ) {
       dstride *= data->dims[idim];
@@ -1934,21 +1902,19 @@ static void ndf2array ( smfData *sdata, int axis,  int ipar, int write,
 ** errors arrays. If write = 1, the are read from the arrays to the planes.
 */
 {
-  size_t   k, l;                 /* Loop counters */
-  int      idim;                 /* Index of dimension */
-  int      iprof = 0;            /* Profile counter */
-  size_t   index;                /* Array index */
+  dim_t    k, l;                /* Loop counters */
+  int      idim;                /* Index of dimension */
+  int      iprof = 0;           /* Profile counter */
+  dim_t    index;               /* Array index */
 
-  int      iaxis = 0;            /* 0-based axis nr to fit along */
-  int      lbnd[ NDF__MXDIM ];   /* Lower NDF pixel bounds */
-  int      ubnd[ NDF__MXDIM ];   /* Upper NDF pixel bounds */
-  int      ndata = 1;            /* Number of elements in cube */
-  int      nplanes = 1;          /* Number of planes/subcubes in cube */
-  size_t   dstride = 1;          /* Data stride: separation of
-                                    pixels along AXIS in data cube */
-  size_t   pbase;                /* Data offset location for profile */
+  int      iaxis = 0;           /* 0-based axis nr to fit along */
+  dim_t    ndata = 1;           /* Number of elements in cube */
+  dim_t    nplanes = 1;         /* Number of planes/subcubes in cube */
+  dim_t    dstride = 1;         /* Data stride: separation of
+                                   pixels along AXIS in data cube */
+  dim_t    pbase;               /* Data offset location for profile */
 
-  double   *pdata, *pvari;       /* Pointer to data and variance */
+  double   *pdata, *pvari;      /* Pointer to data and variance */
 
   if (*status != SAI__OK) return;
 
@@ -1958,8 +1924,6 @@ static void ndf2array ( smfData *sdata, int axis,  int ipar, int write,
   /* Get dimensions, number of planes, and dstride */
   iaxis = axis - 1;
   for( idim = 0; idim < (int) sdata->ndims; idim++ ) {
-    lbnd[idim] = sdata->lbnd[idim];
-    ubnd[idim] = lbnd[idim] + sdata->dims[idim] - 1;
     ndata *= sdata->dims[idim];
     if ( idim < iaxis ) {
       dstride *= sdata->dims[idim];
@@ -1976,7 +1940,7 @@ static void ndf2array ( smfData *sdata, int axis,  int ipar, int write,
   */
 
   /* Number of subcubes to loop over */
-  size_t nsubcubes = (int) (nplanes/dstride+0.5);
+  dim_t nsubcubes = (int) (nplanes/dstride+0.5);
 
   /* Loop over subcubes */
   iprof = 0;

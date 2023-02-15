@@ -220,8 +220,8 @@ typedef struct smfCalcModelAstData {
    double chunkfactor;
    int *lut_data;
    int oper;
-   size_t bstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t tstride;
    smf_qual_t *mapqual;
    smf_qual_t *qua_data;
 } SmfCalcModelAstData;
@@ -235,7 +235,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int flags, double chunkfactor, int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
+  dim_t bstride;               /* bolo stride */
   int *hitsmap;                 /* Pointer to hitsmap data */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -258,7 +258,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   int skip;                     /* Number of iterations to skip */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t tstride;               /* Time slice stride in data array */
   smf_qual_t *mapqual = NULL;/* Quality map */
   double *mapvar = NULL;        /* Variance map */
   double *mapweight = NULL;     /* Weight map */
@@ -317,7 +317,6 @@ void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
      includes the noise models (COPM,FLT,etc), and so will be far removed
      from the data values implied by the map. */
   if( (mapspike > 0) && have_noi && !(flags&SMF__DIMM_PREITER) ) {
-    size_t nflagged;
 
 /* See if the spikes are now frozen. If so, we do not do any de-spiking on
    this iteration (but spikes from previous iterations remain flagged as
@@ -351,7 +350,7 @@ void smf_calcmodel_ast( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
 
 /* If we are de-spiking, do it. */
     } else {
-      size_t nflagged;
+      dim_t nflagged;
 
       for( idx=0; idx<res->ndat; idx++ ) {
         smf_map_spikes( wf, res->sdata[idx], noi->sdata[idx], lut->sdata[idx]->pntr[0],
@@ -493,7 +492,7 @@ static void smf1_calcmodel_ast( void *job_data_ptr, int *status ) {
    double cf;
    double m;
    int *pl;
-   size_t ibase;
+   dim_t ibase;
    smf_qual_t *pq;
 
 /* Check inherited status */

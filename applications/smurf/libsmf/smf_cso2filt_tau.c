@@ -99,7 +99,7 @@
 
 double smf_cso2filt_tau( const smfHead *hdr, double csotau, AstKeyMap * extpars, int *status) {
   double coeffs[3];        /* Tau relation coefficients */
-  size_t nvals;            /* Number of coefficients */
+  dim_t nvals;             /* Number of coefficients */
   double tau = VAL__BADD;  /* return filter tau */
 
   if (*status != SAI__OK) return tau;

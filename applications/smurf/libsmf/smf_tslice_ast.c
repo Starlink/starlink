@@ -192,8 +192,8 @@ void smf_tslice_ast (smfData * data, dim_t index, int needwcs,
   if ( index >= ntslice ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      msgSeti( "I", index );
-      msgSeti( "TMX", ntslice );
+      msgSetk( "I", index );
+      msgSetk( "TMX", ntslice );
       errRep( FUNC_NAME, "Index out of bounds ( 0 <= ^I < ^TMX )", status );
       return;
     }

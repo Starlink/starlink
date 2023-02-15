@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
-*                         const char * filename, const Grp * igrp, size_t grpindex,
+*                         const char * filename, const Grp * igrp, dim_t grpindex,
 *                         int provid, msglev_t msglev, int single,
 *                         void (*func)(ThrWorkForce *wf,int indf,void *info,int *status),
 *                         void *info, int * status );
@@ -37,7 +37,7 @@
 *     igrp = const Grp * (Given)
 *        Group containing the required filename. Can be NULL, in which
 *        case the explicitly supplied filename is used.
-*     grpindex = size_t (Given)
+*     grpindex = dim_t (Given)
 *        Index into group.
 *     provid = int (Given)
 *        NDF id to propagate provenance from. Can be NDF__NOID.
@@ -186,40 +186,40 @@
 #define FUNC_NAME "smf_write_smfData"
 
 void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *variance,
-                         const char * filename, const Grp * igrp, size_t grpindex,
+                         const char * filename, const Grp * igrp, dim_t grpindex,
                          int provid, msglev_t msglev, int single,
                          void (*func)( ThrWorkForce *wf, int indf, void *info, int *status ),
                          void *info, int * status ){
 
-  double *pd=NULL;              /* Pointer to DATA buffer */
-  size_t dbstride;              /* bolo stride of data */
-  size_t dtstride;              /* tstride of data */
-  size_t i;                     /* Loop counter */
-  int flags = 0;                /* Flags for open file */
-  size_t j;                     /* Loop counter */
-  int lbnd[NDF__MXDIM];         /* Lower pixel bounds */
+  Grp * ogrp = NULL;            /* Small group for output filename */
+  char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
+  const smf_qual_t *pq=NULL;    /* Pointer to next QUALITY value */
+  const smf_qual_t *qual=NULL;  /* Pointer to QUALITY buffer */
+  dim_t dbstride;               /* bolo stride of data */
+  dim_t dtstride;               /* tstride of data */
+  dim_t i;                      /* Loop counter */
   dim_t ibolo;                  /* bolo index */
   dim_t itime;                  /* time slice index */
-  int singlebolo = -1;          /* The index of the bolometer to use */
+  dim_t j;                      /* Loop counter */
+  dim_t lbnd[NDF__MXDIM];       /* Lower pixel bounds */
   dim_t nbolo;                  /* number of bolos */
   dim_t ncols;                  /* number of columns */
-  dim_t nrows;                  /* number of rows */
   dim_t nelem;                  /* total number of elements in data array */
+  dim_t nrows;                  /* number of rows */
   dim_t ntslice=0;              /* Number of time slices */
-  Grp * ogrp = NULL;            /* Small group for output filename */
-  smfData * outdata = NULL;     /* Mapped output file */
-  double *outvar = NULL;        /* pointer to output variance component */
-  char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
-  smf_qfam_t qfamily = SMF__QFAM_NULL; /* Quality family */
-  const smf_qual_t *qual=NULL;  /* Pointer to QUALITY buffer */
-  const smf_qual_t *pq=NULL;    /* Pointer to next QUALITY value */
-  int ubnd[NDF__MXDIM];         /* Upper pixel bounds */
-  double *var=NULL;             /* Pointer to VARIANCE buffer */
-  double *pv=NULL;              /* Pointer to next VARIANCE value */
-  size_t vbstride;              /* bolo stride of variance */
+  dim_t ubnd[NDF__MXDIM];       /* Upper pixel bounds */
+  dim_t vbstride;               /* bolo stride of variance */
   dim_t vnbolo;                 /* number of bolos in variance */
   dim_t vntslice;               /* number of bolos in variance */
-  size_t vtstride;              /* tstride of variance */
+  dim_t vtstride;               /* tstride of variance */
+  double *outvar = NULL;        /* pointer to output variance component */
+  double *pd=NULL;              /* Pointer to DATA buffer */
+  double *pv=NULL;              /* Pointer to next VARIANCE value */
+  double *var=NULL;             /* Pointer to VARIANCE buffer */
+  int flags = 0;                /* Flags for open file */
+  dim_t singlebolo = -1;        /* The index of the bolometer to use */
+  smfData * outdata = NULL;     /* Mapped output file */
+  smf_qfam_t qfamily = SMF__QFAM_NULL; /* Quality family */
 
   if (*status != SAI__OK) return;
   if (!data) return;
@@ -355,7 +355,7 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
   if (*status == SAI__OK) {
     smfFile * outfile = outdata->file;
     smfHead * inhdr = data->hdr;
-    size_t nbperel = 0;
+    dim_t nbperel = 0;
 
     /* provenance propagation - but only if we have provenance to propagate */
     if ( (data->file && data->file->ndfid && data->file->ndfid != NDF__NOID) ||
@@ -475,7 +475,7 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
       smfDA *da = data->da;
       HDSLoc *loc=NULL;
       int id;
-      int nmap;
+      size_t nmap;
       void *pntr[]={NULL,NULL};
       double *outdksquid=NULL;
 
@@ -504,7 +504,7 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
         /* Also do the quality if it exists. Map it as smf_qual_t, copy the
            quality, unmap it to force write to disk. */
         if( da->dksquid->qual ) {
-          size_t nqmap;
+          dim_t nqmap;
           smf_qual_t * outdkqual = smf_qual_map( wf, id, "WRITE", NULL, &nqmap, status );
           da->dksquid->qfamily = SMF__QFAM_TSERIES; /* always */
           if( (*status==SAI__OK) && outdkqual ) {
@@ -528,7 +528,7 @@ void smf_write_smfData ( ThrWorkForce *wf, const smfData *data, const smfData *v
         outdata->file->ndfid &&
         (outdata->file->ndfid != NDF__NOID) ) {
       int id            = 0;
-      int nmap          = 0;
+      size_t nmap       = 0;
       void* pntr        = NULL;
       int* outzpd       = NULL;
       double* outfpm    = NULL;

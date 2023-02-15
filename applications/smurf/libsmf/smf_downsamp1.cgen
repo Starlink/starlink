@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     void smf_downsamp1<X>( ThrWorkForce *wf, const CGEN_TYPE *in,
-*                            size_t instride, int inbytestride, size_t inlen,
-*                            void *out, size_t outstride, int outbytestride,
-*                            size_t outlen, int todouble, int init,
+*                            dim_t instride, int inbytestride, dim_t inlen,
+*                            void *out, dim_t outstride, int outbytestride,
+*                            dim_t outlen, int todouble, int init,
 *                            int isang, int *status )
 
 *  Arguments:
@@ -31,23 +31,23 @@
 *        until the resampling is completed.
 *     in = const CGEN_TYPE* (Given)
 *        Pointer to input data array
-*     instride = size_t (Given)
+*     instride = dim_t (Given)
 *        Index stride between elements in the input data
 *     inbytestride = int (Given)
 *        If set, assume instride is in bytes, rather than array elements of
 *        CGEN_TYPE
-*     inlen = size_t (Given)
+*     inlen = dim_t (Given)
 *        Number of elements in the input data
 *     out = const CGEN_TYPE* (Given)
 *        Pointer to output re-sampled data array. Has the same data type
 *        as in unless todouble is specified, in which case it is is
 *        converted to double.
-*     outstride = size_t (Given)
+*     outstride = dim_t (Given)
 *        Index stride between elements in the output data
 *     outbytestride = int (Given)
 *        If set, assume outstride is in bytes, rather than array elements of
 *        the same type as out
-*     outlen = size_t (Given)
+*     outlen = dim_t (Given)
 *        Number of elements in the output data
 *     todouble = int (Given)
 *        If set the output is typecast to double
@@ -148,13 +148,13 @@
 /* Local data types. */
 typedef struct CGEN_FUNCTION(smfDownSamp1Data) {
    const void *in;
-   size_t instride;
+   dim_t instride;
    int inbytestride;
-   size_t inlen;
+   dim_t inlen;
    void *out;
-   size_t outstride;
+   dim_t outstride;
    int outbytestride;
-   size_t outlen;
+   dim_t outlen;
    int todouble;
    int init;
    int isang ;
@@ -162,10 +162,10 @@ typedef struct CGEN_FUNCTION(smfDownSamp1Data) {
 
 /* Prototypes for local functions. */
 static void CGEN_FUNCTION(smf1_calldownsamp1)( void *job_data, int *status );
-static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
-                                          int inbytestride, size_t inlen,
-                                          void *out, size_t outstride,
-                                          int outbytestride, size_t outlen,
+static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
+                                          int inbytestride, dim_t inlen,
+                                          void *out, dim_t outstride,
+                                          int outbytestride, dim_t outlen,
                                           int todouble, int init, int isang,
                                           int *status );
 
@@ -179,17 +179,19 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
    offset*stride. PTROFFD is the same except casting the return
    pointer as as double*. */
 
+#define CPTROFF(base,offset,stride) ((const CGEN_TYPE *) (((const char *) base) + (offset)*(stride)))
+#define CPTROFFD(base,offset,stride) ((const double *) (((const char *) base) + (offset)*(stride)))
 #define PTROFF(base,offset,stride) ((CGEN_TYPE *) (((char *) base) + (offset)*(stride)))
-
 #define PTROFFD(base,offset,stride) ((double *) (((char *) base) + (offset)*(stride)))
+
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_downsamp1"
 
 void CGEN_FUNCTION(smf_downsamp1)( ThrWorkForce *wf, const CGEN_TYPE *in,
-                                   size_t instride, int inbytestride,
-                                   size_t inlen, void *out, size_t outstride,
-                                   int outbytestride, size_t outlen,
+                                   dim_t instride, int inbytestride,
+                                   dim_t inlen, void *out, dim_t outstride,
+                                   int outbytestride, dim_t outlen,
                                    int todouble, int init, int isang,
                                    int *status ) {
 
@@ -249,24 +251,24 @@ static void CGEN_FUNCTION(smf1_calldownsamp1)( void *job_data, int *status ) {
 
 
 /* This function does the actual downsampling, in the current thread. */
-static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
-                                          int inbytestride, size_t inlen,
-                                          void *out, size_t outstride,
-                                          int outbytestride, size_t outlen,
+static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
+                                          int inbytestride, dim_t inlen,
+                                          void *out, dim_t outstride,
+                                          int outbytestride, dim_t outlen,
                                           int todouble, int init, int isang,
                                           int *status ) {
 
   /* Local variables */
-  size_t i;                   /* High-res index */
-  size_t ibstride;            /* input strides in bytes */
+  dim_t i;                    /* High-res index */
+  dim_t ibstride;             /* input strides in bytes */
   double j1;                  /* Fractional low-res index lower edge */
   double j2;                  /* Fractional high-res index lower edge */
-  size_t jf1;                 /* low-res index lower edge */
-  size_t jf2;                 /* high-res index lower edge */
-  CGEN_TYPE *pi=NULL;         /* pointer to current input value */
+  dim_t jf1;                  /* low-res index lower edge */
+  dim_t jf2;                  /* high-res index lower edge */
+  const CGEN_TYPE *pi=NULL;   /* pointer to current input value */
   CGEN_TYPE *po=NULL;         /* pointer to current output value */
   double *pod=NULL;           /* pointer to current double output value */
-  size_t obstride;            /* output strides in bytes */
+  dim_t obstride;             /* output strides in bytes */
   CGEN_TYPE *outbuf=NULL;     /* output same type as the input */
   double *outbufd=NULL;       /* double precision output */
   double s;                   /* current sample */
@@ -341,7 +343,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
     /*outbuf[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
 
     po = PTROFF(outbuf,outlen-1,obstride);
-    pi = PTROFF(in,inlen-1,ibstride);
+    pi = CPTROFF(in,inlen-1,ibstride);
 
     if( *pi == CGEN_BAD ) {
       *po = CGEN_BAD;
@@ -362,7 +364,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf2 = floor(j2);
 
       /* val = in[i*instride]; */
-      pi = PTROFF(in,i,ibstride);
+      pi = CPTROFF(in,i,ibstride);
       val = *pi;
 
       if( val == CGEN_BAD ) {
@@ -379,7 +381,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
       } else {
 
-        if (isang && fabs(val-prevval) > M_PI) {
+        if (isang && fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
             val -= D2PI;
@@ -425,12 +427,12 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
        to the final measurement we need to correct the final
        measurement by D2PI */
     if (isang) {
-      pi = PTROFF(in,inlen-1,ibstride);
+      pi = CPTROFF(in,inlen-1,ibstride);
 
       if( *pi != CGEN_BAD ) {
         po = PTROFF(outbuf,outlen-1,obstride);
         val = *pi;
-        if (fabs(val-prevval) > M_PI) {
+        if (fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
             *po -= D2PI;
@@ -481,7 +483,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
     /*outbufd[(outlen-1)*outstride] += in[(inlen-1)*instride];*/
 
     pod = PTROFFD(outbufd,outlen-1,obstride);
-    pi = PTROFF(in,inlen-1,ibstride);
+    pi = CPTROFF(in,inlen-1,ibstride);
 
     if( *pi == CGEN_BAD ) {
       *pod = VAL__BADD;
@@ -500,7 +502,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
       jf2 = floor(j2);
 
       /*val = in[i*instride];*/
-      pi = PTROFF(in,i,ibstride);
+      pi = CPTROFF(in,i,ibstride);
       val = *pi;
 
       if( val == CGEN_BAD ) {
@@ -517,7 +519,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
 
       } else {
 
-        if (isang && fabs(val-prevval) > M_PI) {
+        if (isang && fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
             val -= D2PI;
@@ -566,11 +568,11 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, size_t instride,
        to the final measurement we need to correct the final
        measurement by D2PI */
     if (isang) {
-      pi = PTROFF(in,inlen-1,ibstride);
+      pi = CPTROFF(in,inlen-1,ibstride);
       if( *pi != CGEN_BAD ) {
         pod = PTROFFD(outbufd,outlen-1,obstride);
         val = (double)*pi;
-        if (fabs(val-prevval) > M_PI) {
+        if (fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
             *pod -= D2PI;

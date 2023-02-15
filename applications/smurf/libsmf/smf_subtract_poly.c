@@ -52,7 +52,7 @@
 *     2006-04-21 (AGG):
 *        Add history check, and update history if routine successful
 *     2008-02-19 (AGG):
-*        Minor comment/documentation changes, use size_t
+*        Minor comment/documentation changes, use dim_t
 *     2008-02-20 (AGG):
 *        Swap loop order to gain speed increase
 *     2008-02-26 (AGG):
@@ -115,13 +115,13 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   /* Local variables */
   double baseline = 0.0;      /* Baseline level to be subtracted */
   double *firstframe = NULL;  /* Pointer to array containing first frame data*/
-  size_t i;                   /* Bolometer index loop counter */
-  size_t j;                   /* Timeslice index loop counter */
+  dim_t i;                   /* Bolometer index loop counter */
+  dim_t j;                   /* Timeslice index loop counter */
   double jay;                 /* Double-precision version of j */
-  size_t k;                   /* Coefficient index loop counter */
-  size_t nbol;                /* Number of bolometers */
-  size_t ncoeff = 0;          /* Number of polynomial coefficients */
-  size_t nframes;             /* Number of time slices */
+  dim_t k;                   /* Coefficient index loop counter */
+  dim_t nbol;                /* Number of bolometers */
+  dim_t ncoeff = 0;          /* Number of polynomial coefficients */
+  dim_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
   smf_qual_t *qual=NULL;   /* Pointer to QUALITY component */

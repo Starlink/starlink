@@ -260,7 +260,7 @@
 #define SMF__MXNOTCH 64    /* Arbitrary maximum number of notch filters */
 #define SMF__F_WHITELO 2   /* Lower freq. over which to calculate NEP/NEFD */
 #define SMF__F_WHITEHI 10  /* Upper freq. over which to calculate NEP/NEFD */
-#define SMF__MAXAPLEN ((size_t) -2) /* tell smf_apodize to use maximum interval */
+#define SMF__MAXAPLEN ((dim_t) -2) /* tell smf_apodize to use maximum interval */
 #define SMF__DOWNSAMPLIMIT 0.8 /* Upper limit on usable downsampling factor */
 
 /* Minimum number of time samples for a data chunk to be useful*/
@@ -297,8 +297,8 @@ typedef enum smf_dtype {
 typedef unsigned short smf_qual_t;
 #define VAL__BADQ VAL__BADUW
 
-/* Define a bad size_t value - the wrap-around equivalent of -1 */
-#define SMF__BADSZT ((size_t) -1)
+/* Define a bad dim_t value - the wrap-around equivalent of -1 */
+#define SMF__BADSZT ((dim_t) -1)
 
 /* Different types of model components used by iterative map-maker. These are
    powers of 2 so they can be used in bit masks. */
@@ -439,7 +439,7 @@ typedef enum smf_flatmeth {
 } smf_flatmeth;
 
 /* Indicate a bad array index */
-static const size_t SMF__BADIDX = (size_t)-1;
+static const dim_t SMF__BADIDX = (dim_t)-1;
 
 /* suffix for simple binary files that store DIMM model components */
 #define SMF__DIMM_SUFFIX ".dimm"
@@ -693,8 +693,8 @@ typedef struct smfDA {
   double *heatval;           /* Heater values in DAC units for flatfield */
   double refres;             /* Reference resistor used to calculate flatfield */
   smf_flatmeth flatmeth;     /* Flatfield algorithm name */
-  size_t nflat;              /* number of flat coeffs per bol */
-  size_t nheat;              /* number of elements in heatval */
+  dim_t nflat;               /* number of flat coeffs per bol */
+  dim_t nheat;               /* number of elements in heatval */
   struct smfData *dksquid;   /* dark squid for each column */
 } smfDA;
 
@@ -719,15 +719,15 @@ typedef struct smfFts
 
 /* This struct stores DREAM parameters */
 typedef struct smfDream {
-  size_t nvert;              /* Number of jiggle vertices */
+  int nvert;                 /* Number of jiggle vertices */
   double jigscal;            /* SMU jiggle pattern scale factor (arcsec) */
   int jigvert[DREAM__MXVERT][2];   /* Jiggle vertex positions in DREAM
                                       pattern */
   double jigpath[DREAM__MXSAM][2]; /* X, Y SMU positions during a cycle, in
                                       arcsec */
-  size_t ncycles;            /* Number of DREAM cycles in the input file */
-  size_t nsampcycle;         /* Number of data samples per cycle */
-  size_t ngrid;              /* Number of grid points in reconstruction */
+  dim_t ncycles;             /* Number of DREAM cycles in the input file */
+  dim_t nsampcycle;          /* Number of data samples per cycle */
+  dim_t ngrid;               /* Number of grid points in reconstruction */
   int gridpts[DREAM__MXGRID][2];   /* X, Y positions for reconstruction grid */
   double gridstep;           /* Spacing of grid in arcsec */
   double *gridwts;           /* Pointer to grid weights array */
@@ -752,14 +752,14 @@ typedef struct smfData {
   smf_qfam_t qfamily;        /* Quality family used in "qual" */
   smf_qual_t qbits;          /* Quality bits to export to NDF */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
-  int lbnd[NDF__MXDIM];      /* Lower PIXEL bounds of data array */
-  int isFFT;                 /* -1=not fft,0=don't know,>0 if fft data*/
+  dim_t lbnd[NDF__MXDIM];    /* Lower PIXEL bounds of data array */
+  dim_t isFFT;               /* -1=not fft,0=don't know,>0 if fft data*/
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
-  size_t ndims;              /* Number of active dimensions in "dims" */
+  int ndims;                 /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */
   int virtual;               /* Flag for extracted timeslices */
   double *poly;              /* Polynomial scan fits */
-  size_t ncoeff;             /* Number of coefficients in polynomial */
+  int ncoeff;                /* Number of coefficients in polynomial */
   int * lut;                 /* Pointing lookup table */
   int onmap;                 /* Non-zero if the smfData overlaps the map */
   double * theta;            /* Scan direction each time slice */
@@ -783,11 +783,11 @@ typedef struct smfArray {
 
 typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
-  size_t **subgroups;        /* Indices into Grp [ngroups][nrelated] */
-  size_t *chunk;             /* Flag for continuous chunks in time [ngroups]*/
+  int **subgroups;           /* Indices into Grp [ngroups][nrelated] */
+  int *chunk;                /* Flag for continuous chunks in time [ngroups]*/
   dim_t *tlen;               /* Length in time slices each chunk [ngroups]*/
-  size_t ngroups;            /* Number of subgroups */
-  size_t nrelated;           /* Maximum number of related files */
+  int ngroups;               /* Number of subgroups */
+  int nrelated;              /* Maximum number of related files */
 } smfGroup;
 
 /* Structure containing pointers to data required for DIMM component
@@ -816,8 +816,8 @@ typedef struct smfDIMMData {
   double *wchisquared;       /* total weighted unnormalised chisquared at each chunk */
   double *wchisq;            /* total chisquared weights at each chunk */
   AstFrameSet *outfset;      /* contains map->sky transformation */
-  int *lbnd_out;             /* map lower bounds */
-  int *ubnd_out;             /* map upper bounds */
+  dim_t *lbnd_out;           /* map lower bounds */
+  dim_t *ubnd_out;           /* map upper bounds */
   unsigned char *ast_mask;   /* Map indicating region to be masked in ast */
   unsigned char *com_mask;   /* Map indicating region to be masked in com */
   unsigned char *flt_mask;   /* Map indicating region to be masked in flt */
@@ -849,34 +849,34 @@ typedef struct smfBox {
 
 /* Represents a single tile from a full size grid. */
 typedef struct smfTile {
-  int lbnd[ 3 ];
-  int ubnd[ 3 ];
-  int elbnd[ 3 ];
-  int eubnd[ 3 ];
-  int glbnd[ 3 ];
-  int gubnd[ 3 ];
-  int qlbnd[ 3 ];
-  int qubnd[ 3 ];
+  dim_t lbnd[ 3 ];
+  dim_t ubnd[ 3 ];
+  dim_t elbnd[ 3 ];
+  dim_t eubnd[ 3 ];
+  dim_t glbnd[ 3 ];
+  dim_t gubnd[ 3 ];
+  dim_t qlbnd[ 3 ];
+  dim_t qubnd[ 3 ];
   Grp *grp;
   int *jndf;
   int size;
   AstMapping *map2d;
   AstMapping *map3d;
-  int qxl;
-  int qxu;
-  int qyl;
-  int qyu;
+  dim_t qxl;
+  dim_t qxu;
+  dim_t qyl;
+  dim_t qyu;
 } smfTile;
 
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */
 typedef struct smfFilter {
-  size_t apod_length;   /* apodization length */
+  dim_t apod_length;    /* apodization length */
   double dateobs;       /* UTC MJD start of obs that filter corresponds to */
   double df[2];         /* frequency steps along each axis [Hz or 1/arcsec] */
   dim_t fdims[2];       /* filter frequency dimensions */
   double *imag;         /* Imaginary part of the filter */
   int isComplex;        /* Set if filter is fftw_complex, otherwise double */
-  size_t ndims;         /* Should be 1 for time-series, or 2 for maps */
+  int ndims;            /* Should be 1 for time-series, or 2 for maps */
   dim_t rdims[2];       /* corresponding real space dimensions */
   double *real;         /* Real part of the filter */
   AstFrameSet *wcs;     /* Frameset describing filter */
@@ -898,10 +898,10 @@ typedef struct smfRebinSeqArgs {
   AstMapping *this;
   double wlim;
   int ndim_in;
-  const int *lbnd_in;
-  const int *ubnd_in;
-  void *in;
-  void *in_var;
+  const dim_t *lbnd_in;
+  const dim_t *ubnd_in;
+  const void *in;
+  const void *in_var;
   int spread;
   const double *params;
   int flags;
@@ -910,10 +910,10 @@ typedef struct smfRebinSeqArgs {
   float badval_f;
   double badval_d;
   int ndim_out;
-  const int *lbnd_out;
-  const int *ubnd_out;
-  int *lbnd;
-  int *ubnd;
+  const dim_t *lbnd_out;
+  const dim_t *ubnd_out;
+  dim_t *lbnd;
+  dim_t *ubnd;
   void *out;
   void *out_var;
   double *weights;
@@ -927,14 +927,14 @@ typedef struct smfRebincubeNNArgs1 {
   int badmask;
   dim_t nchan;
   dim_t nchanout;
-  int *spectab;
-  int *specpop;
+  dim_t *spectab;
+  dim_t *specpop;
   dim_t nxy;
   int genvar;
   float *data_array;
   float *var_array;
   double *wgt_array;
-  int *pop_array;
+  dim_t *pop_array;
   dim_t nout;
   int is2d;
 } smfRebincubeNNArgs1;
@@ -944,14 +944,14 @@ typedef struct smfRebincubeNNArgs1 {
 typedef struct smfRebincubeNNArgs2 {
   smfRebincubeNNArgs1 *common;
   float *work;
-  int iv0;
+  dim_t iv0;
   double wgt;
   double invar;
   float *ddata;
-  int64_t nused;
-  int nreject;
-  int naccept;
-  int used;
+  dim_t nused;
+  dim_t nreject;
+  dim_t naccept;
+  dim_t used;
 } smfRebincubeNNArgs2;
 
 typedef struct smfRebinMapData {
@@ -962,7 +962,7 @@ typedef struct smfRebinMapData {
   int moving;
   int spread;
   const double *params;
-  int udim[ 2 ];
+  dim_t udim[ 2 ];
   double *map;
   double *variance;
   double *weights;
@@ -980,7 +980,7 @@ typedef struct smfRebinMapData {
 typedef struct {
   double sortval; /* Primary sort value. Generic double. Can be an MJD */
   void *misc;     /* Pointer to additional information */
-  int index;      /* an index that will be sorted with the sortval */
+  dim_t index;    /* an index that will be sorted with the sortval */
   char name [GRP__SZNAM+1]; /* string to carry around naming the item */
 } smfSortInfo;
 
@@ -988,11 +988,11 @@ typedef struct {
 /* Struct to store a description of a fixed step. */
 
 typedef struct smfStepFix {
-  int start;      /* Index of time slice at start of step */
-  int end;        /* Index of time slice at end of step */
-  int ibolo;      /* Index of bolometer containing step */
+  dim_t start;    /* Index of time slice at start of step */
+  dim_t end;      /* Index of time slice at end of step */
+  dim_t ibolo;    /* Index of bolometer containing step */
   double size;    /* The size of the step rise or fall */
-  int id;         /* Integer identifier for the step fix */
+  dim_t id;       /* Integer identifier for the step fix */
   int corr;       /* Was step fixed as a "correlated step"? */
 } smfStepFix;
 
@@ -1010,9 +1010,9 @@ typedef struct smfSampleTable {
   char *table;    /* The name of the ascii file to receive the table */
   int xpix;       /* X pixel index of the map pixel */
   int ypix;       /* X pixel index of the map pixel */
-  size_t nrow;    /* Number of rows in the table */
-  size_t *times;  /* A column of time slices indices */
-  size_t *bolos;  /* A column of bolometer indices */
+  dim_t nrow;    /* Number of rows in the table */
+  dim_t *times;  /* A column of time slices indices */
+  dim_t *bolos;  /* A column of bolometer indices */
   dim_t ncol;     /* Number of other columns */
   double **colvals;/* Columns of values */
   char **colnames; /* The name for each column */

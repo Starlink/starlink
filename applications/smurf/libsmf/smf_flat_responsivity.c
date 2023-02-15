@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
-*                                    size_t order, const smfData * powval, const smfData * bolval,
+*     dim_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
+*                                    dim_t order, const smfData * powval, const smfData * bolval,
 *                                    double refres, smfData ** polyfit, int *status );
 
 *  Arguments:
@@ -28,7 +28,7 @@
 *        Minimum acceptable signal-to-noise ratio for a responsivity fit.
 *        Below this value the fit will be treated as bad and the bolometer
 *        will be disabled. Only used when fitting TABLE data.
-*     order = size_t (Given)
+*     order = dim_t (Given)
 *        If the data are being fitted this is the order of polynomial
 *        to use. Ignored if method is POLYNOMIAL.
 *     powval = const smfData * (Given)
@@ -57,7 +57,7 @@
 *     evaluate the quality. Write the results to the supplied smfData.
 
 *  Returned Value:
-*     size_t = number of good responsivities.
+*     dim_t = number of good responsivities.
 
 *  Notes:
 *     - powval and bolval are calculated by smf_flat_standardpow.
@@ -151,20 +151,19 @@
 #include "prm_par.h"
 #include "sae_par.h"
 
-size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
-                               size_t order, const smfData * powvald, const smfData * bolvald,
+dim_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snrmin,
+                               dim_t order, const smfData * powvald, const smfData * bolvald,
                                double refres, smfData ** polyfit, int *status ) {
 
-  size_t bol;                  /* Bolometer offset into array */
+  dim_t bol;                  /* Bolometer offset into array */
   double * bolval = NULL;      /* pointer to data in smfData */
-  double * bolvalvar = NULL;   /* pointer to variance in smfData bolvald */
-  const size_t coffset = 2;    /* Offset into POLYNOMIAL for coefficients */
+  const dim_t coffset = 2;    /* Offset into POLYNOMIAL for coefficients */
   smfData * heateff = NULL;    /* Heater efficiency smfData */
   double * heateffdata = NULL; /* Pointer to efficiency data */
-  size_t k;                    /* loop counter */
-  size_t nbol;                 /* number of bolometers */
-  size_t ncoeffs = 0;
-  size_t ngood = 0;            /* number of valid responsivities */
+  dim_t k;                    /* loop counter */
+  dim_t nbol;                 /* number of bolometers */
+  dim_t ncoeffs = 0;
+  dim_t ngood = 0;            /* number of valid responsivities */
   double raw2current=VAL__BADD;/* Conversion from DAC --> current units */
   double *respdata = NULL;     /* responsivity data */
   double *respvar = NULL;      /* responsivity variance */
@@ -201,13 +200,11 @@ size_t smf_flat_responsivity ( smf_flatmeth method, smfData *respmap, double snr
                       polyfit, status );
 
     bolval = (tabbolval->pntr)[0];
-    bolvalvar = (tabbolval->pntr)[1];
     ncoeffs = (tabbolval->dims)[2];
 
   } else {
 
     bolval = (bolvald->pntr)[0];
-    bolvalvar = (bolvald->pntr)[1];
     ncoeffs = (bolvald->dims)[2];
 
   }

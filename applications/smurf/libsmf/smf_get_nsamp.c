@@ -95,7 +95,7 @@ double smf_get_nsamp( AstKeyMap *keymap, const char *name,
 
 
 /* Local Variables */
-   double dval;
+   double dval = 0.0;
    double result = 0.0;
    double steptime;
 
@@ -144,7 +144,7 @@ double smf_get_nsamp( AstKeyMap *keymap, const char *name,
       }
 
 /* Return the nearest integer number of times slices. */
-      if( *status == SAI__OK ) *nsamp = (int) ( dval + 0.5 );
+      if( *status == SAI__OK ) *nsamp = (dim_t) ( dval + 0.5 );
    }
 
 /* Return the raw value read from the KeyMap. */

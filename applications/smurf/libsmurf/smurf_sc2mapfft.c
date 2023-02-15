@@ -128,7 +128,7 @@ void smurf_sc2mapfft( int *status ) {
   Grp *igrp = NULL;         /* Input group of files */
   int inverse=0;            /* If set perform inverse transform */
   int isfft=0;              /* Are data fft or real space? */
-  size_t ndims;             /* Number of real space dimensions */
+  int ndims;                /* Number of real space dimensions */
   smfData *odata=NULL;      /* Pointer to output smfData to be exported */
   Grp *ogrp = NULL;         /* Output group of files */
   size_t outsize;           /* Number of files in output group */
@@ -201,8 +201,8 @@ void smurf_sc2mapfft( int *status ) {
     if( (*status==SAI__OK) && zerobad ) {
       double *d=NULL;
       smfData *tempdata=NULL;
-      size_t j;
-      size_t ndata;
+      dim_t j;
+      dim_t ndata;
 
       tempdata = smf_deepcopy_smfData( wf, idata, 0, 0, 0, 0, status );
       smf_close_file( wf, &idata, status );

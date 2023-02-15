@@ -182,16 +182,13 @@ void smf_calc_taufit( const smfData * data, smf_tausrc tausrc,
         errRepf("", "No %s fit data available for this observation", status, tausrc_name );
       }
     } else {
-      size_t i;
+      dim_t i;
       double curepoch;
-      csofit2_poly_t *polys;
       double coeffs[3];
-      size_t ncoeffs = 0;
+      dim_t ncoeffs = 0;
 
       /* Get the filter conversion factors */
       smf_cso2filt_coeff( data->hdr, extpars, 3, coeffs, &ncoeffs, status );
-
-      polys = &(subset->polys[0]);
 
       /* Do we really need to do this at 200 Hz? */
       taudata = astCalloc( *nframes, sizeof(*taudata) );

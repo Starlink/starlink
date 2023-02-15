@@ -13,17 +13,17 @@
 *     C function
 
 *  Invocation:
-*     double *smf_alignndf( int indf, AstFrameSet *outfset, int *lbnd_out,
-*                           int *ubnd_out, int *status )
+*     double *smf_alignndf( int indf, AstFrameSet *outfset, dim_t *lbnd_out,
+*                           dim_t *ubnd_out, int *status )
 
 *  Arguments:
 *     indf = int (Given)
 *        Identifier for the NDF to be aligned with the output map.
 *     outfset = AstFrameSet * (Given)
 *        The FrameSet describing the WCS associated with the output map.
-*     lbnd_out = int * (Given)
+*     lbnd_out = dim_t * (Given)
 *        A 2-element array - the lower pixel index bounds of the output map.
-*     ubnd_out = int * (Given)
+*     ubnd_out = dim_t * (Given)
 *        A 2-element array - the upper pixel index bounds of the output map.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -85,26 +85,26 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-double *smf_alignndf( int indf, AstFrameSet *outfset, int *lbnd_out,
-                      int *ubnd_out, int *status ){
+double *smf_alignndf( int indf, AstFrameSet *outfset, dim_t *lbnd_out,
+                      dim_t *ubnd_out, int *status ){
 
 /* Local Variables: */
    AstFrameSet *fs;
    AstFrameSet *iwcs;
    AstFrameSet *iwcsin;
    AstFrameSet *iwcsout;
+   dim_t glbnd_in[ 3 ];
+   dim_t glbnd_out[ 2 ];
+   dim_t gubnd_in[ 3 ];
+   dim_t gubnd_out[ 2 ];
+   dim_t lbnd_in[ 3 ];
+   dim_t ubnd_in[ 3 ];
    double *indata;
    double *result = NULL;
    double params[2];
-   int el;
-   int glbnd_in[ 3 ];
-   int glbnd_out[ 2 ];
-   int gubnd_in[ 3 ];
-   int gubnd_out[ 2 ];
    int iaxis;
-   int lbnd_in[ 3 ];
    int ndim_in;
-   int ubnd_in[ 3 ];
+   size_t el;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return result;
@@ -183,9 +183,9 @@ double *smf_alignndf( int indf, AstFrameSet *outfset, int *lbnd_out,
 /* Resample the NDF onto the output grid. */
    params[ 0 ] = 2.0;
    params[ 1 ] = 2.0;
-   astResampleD( fs, 2, glbnd_in, gubnd_in, indata, NULL, AST__SINCSINC,
-                 NULL, params, AST__USEBAD, 0.1, 100, VAL__BADD, 2,
-                 glbnd_out, gubnd_out, glbnd_out, gubnd_out, result, NULL );
+   astResample8D( fs, 2, glbnd_in, gubnd_in, indata, NULL, AST__SINCSINC,
+                  NULL, params, AST__USEBAD, 0.1, 100, VAL__BADD, 2,
+                  glbnd_out, gubnd_out, glbnd_out, gubnd_out, result, NULL );
 
 /* Free any returned array if an error occurred. */
    if( *status != SAI__OK ) result = astFree( result );

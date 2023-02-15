@@ -123,12 +123,14 @@ supcam_read_tabmetadata( fitsfile * fits, size_t maxRows, int * status ) {
     }                                                                   \
   }
 
+  #pragma GCC diagnostic ignored "-Wcast-qual"                          \
   READCOLUMN("CDELT2",offx);
   READCOLUMN("CDELT3",offy);
   READCOLUMN("TSYS",tsys);
   READCOLUMN("TRX",trx);
   READCOLUMN("INTTIME",inttime);
   READCOLUMN("IFPOWER",ifpower);
+  #pragma GCC diagnostic pop
 
   /* Fill in the receptor name */
   if (*status == SAI__OK) {

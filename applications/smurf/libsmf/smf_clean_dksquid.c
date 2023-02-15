@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData *model,
+*     smf_clean_dksquid( smfData *indata, smf_qual_t mask, dim_t window, smfData *model,
 *                        int calcdk, int nofit, int replacebad, int *status ) {
 
 *  Arguments:
@@ -21,7 +21,7 @@
 *        Pointer to the input smfData. Should be raw, un-flatfielded.
 *     mask = smf_qual_t (Given)
 *        Use to define which bits in quality are relevant to ignore indata
-*     window = size_t (Given)
+*     window = dim_t (Given)
 *        Width of boxcar smooth for squid before fitting and removing
 *     model = smfData * (Given)
 *        If supplied, dark squids stored in model created by smf_model_create
@@ -130,11 +130,11 @@
 
 #define FUNC_NAME "smf_clean_dksquid"
 
-void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData *model,
+void smf_clean_dksquid( smfData *indata, smf_qual_t mask, dim_t window, smfData *model,
                         int calcdk, int nofit, int replacebad, int *status ) {
 
   dim_t b;                /* Bolometer index */
-  size_t bstride;         /* Bolometer index stride */
+  dim_t bstride;         /* Bolometer index stride */
   double corr;            /* Linear correlation coefficient */
   double *corrbuf=NULL;   /* Array of correlation coeffs all bolos this col */
   int needDA=0;           /* Do we need dksquids from the DA? */
@@ -144,27 +144,27 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
   double firstdk;         /* First value in dksquid signal */
   double gain;            /* Gain parameter from template fit */
   double *gainbuf=NULL;   /* Array of gains for all bolos in this col */
-  size_t i;               /* Loop counter */
-  size_t jt1;
-  size_t jt2;
-  size_t jf1;             /* Starting tslice that should be fit */
-  size_t jf2;             /* Final tslice that should be fit */
-  size_t j;               /* Loop counter */
-  size_t k;               /* Loop counter */
-  size_t nbad=0;          /* Number of new bad bolos due to bad dark squid */
+  dim_t i;               /* Loop counter */
+  dim_t jt1;
+  dim_t jt2;
+  dim_t jf1;             /* Starting tslice that should be fit */
+  dim_t jf2;             /* Final tslice that should be fit */
+  dim_t j;               /* Loop counter */
+  dim_t k;               /* Loop counter */
+  dim_t nbad=0;          /* Number of new bad bolos due to bad dark squid */
   dim_t nbolo;            /* Number of bolometers */
   dim_t ncol;             /* Number of columns */
   dim_t ndata;            /* Number of data points */
-  size_t nfit;            /* number of samples over good range to fit */
-  size_t ngood=0;         /* number of good dark squids */
+  dim_t nfit;            /* number of samples over good range to fit */
+  dim_t ngood=0;         /* number of good dark squids */
   dim_t nrow;             /* Number of rows */
-  size_t ntot;
+  dim_t ntot;
   dim_t ntslice;          /* Number of time slices */
   double offset;          /* Offset parameter from template fit */
   double *offsetbuf=NULL; /* Array of offsets for all bolos in this col */
   int pass;               /* two passes over data to get estimate of average */
   smf_qual_t *qua=NULL;/* Pointer to quality array */
-  size_t tstride;         /* Time slice index stride */
+  dim_t tstride;         /* Time slice index stride */
 
   if (*status != SAI__OK) return;
 
@@ -394,8 +394,8 @@ void smf_clean_dksquid( smfData *indata, smf_qual_t mask, size_t window, smfData
               }
 
               if( msgFlevok( MSG__DEBUG1, status ) ) {
-                msgSeti( "COL", i );
-                msgSeti( "ROW", j );
+                msgSetk( "COL", i );
+                msgSetk( "ROW", j );
                 msgSetd( "GAI", gain );
                 msgSetd( "OFF", offset );
                 msgSetd( "CORR", corr );

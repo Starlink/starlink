@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_find_thetabins( const smfData *data, int nosign, double **bins,
-*                         double **bincen, dim_t *nbin, int **whichbin, status )
+*                         double **bincen, dim_t *nbin, dim_t **whichbin, status )
 
 *  Arguments:
 *     data = const smfData * (Given)
@@ -31,7 +31,7 @@
 *        "nbin" bin centres (the peak scan directions) (radians)
 *     nbin = dim_t * (Returned)
 *        Address of pointer that will be set to the number of bins.
-*     whichbin = int ** (Returned)
+*     whichbin = dim_t ** (Returned)
 *        Address of pointer that will be set to newly created array of
 *        length ntslices indicating which bin a given tslice falls in
 *     status = int* (Given and Returned)
@@ -107,17 +107,17 @@
 #define THETABINS_THRESH 0.1    /* Require at least this fraction of max */
 
 void smf_find_thetabins( const smfData *data, int nosign, double **bins,
-                         double **bincen, dim_t *nbin, int **whichbin,
+                         double **bincen, dim_t *nbin, dim_t **whichbin,
                          int *status ) {
 
   /* Local Variables */
   double *bc=NULL;              /* Bin centres */
   double *bin=NULL;             /* Bin edges */
   double dist;                  /* distance between local maxima */
-  size_t i;                     /* Loop counter */
-  size_t j;                     /* Loop counter */
-  int hist[THETABINS_MAXBINS];  /* Histogram of peak scan directions */
-  int maxcount;                 /* Maximum value of histogram */
+  dim_t i;                      /* Loop counter */
+  dim_t j;                      /* Loop counter */
+  hdsdim hist[THETABINS_MAXBINS];  /* Histogram of peak scan directions */
+  dim_t maxcount;               /* Maximum value of histogram */
   double max;                   /* Range of histogram */
   double min;                   /* Range of histogram */
   dim_t nb;                     /* Number of output bins */
@@ -165,8 +165,8 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   range = max - min;
 
   /* Calculate the histogram */
-  kpg1Ghstd( 1, ntslice, theta, NULL, 0.0, THETABINS_MAXBINS, 0, &max, &min, hist,
-             status );
+  kpg1Ghst8d( 1, ntslice, theta, NULL, 0.0, THETABINS_MAXBINS, 0, &max, &min, hist,
+              status );
 
   step = (max-min)/THETABINS_MAXBINS;
 
@@ -220,7 +220,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
   /* Finally, assign each time slice to the appropriate bin */
 
   if( whichbin && (*status==SAI__OK) ) {
-    int which;
+    dim_t which;
     int wrapstart=0;   /* flag if first bin is wrapped. Otherwise last */
 
     *whichbin = astCalloc( ntslice, sizeof(**whichbin) );
@@ -230,7 +230,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
 
       for( i=0; i<ntslice; i++ ) {
         if( theta[i] == VAL__BADD ) {
-          (*whichbin)[i] = VAL__BADI;
+          (*whichbin)[i] = VAL__BADK;
         } else {
           (*whichbin)[i] = 0;
         }
@@ -246,7 +246,7 @@ void smf_find_thetabins( const smfData *data, int nosign, double **bins,
         for( i=0; i<ntslice; i++ ) {
 
           if( theta[i] == VAL__BADD ) {
-            (*whichbin)[i] = VAL__BADI;
+            (*whichbin)[i] = VAL__BADK;
           } else {
 
             which = -1;

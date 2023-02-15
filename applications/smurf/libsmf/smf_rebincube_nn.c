@@ -16,7 +16,7 @@
 
 *  Invocation:
 *     smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
-*                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
+*                       dim_t *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
 *                       dim_t nxy, dim_t nout, dim_t dim[3],
 *                       int badmask, int is2d, AstMapping *ssmap,
 *                       AstSkyFrame *abskyfrm, AstMapping *oskymap,
@@ -24,7 +24,7 @@
 *                       double tfac, double fcon, float *data_array,
 *                       float *var_array, double *wgt_array,
 *                       float *texp_array, float *teff_array, int64_t *nused,
-*                       int *nreject, int *naccept, int *good_tsys,
+*                       dim_t *nreject, dim_t *naccept, int *good_tsys,
 *                       int *status );
 
 *  Arguments:
@@ -38,12 +38,12 @@
 *     last = int (Given)
 *        Is this the last call to this routine for the current output
 *        cube?
-*     ptime = int * (Given)
+*     ptime = dim_t * (Given)
 *        Pointer to an array of integers, each one being the index of a
 *        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
 *        should be monotonic increasing and should be terminated by a value
-*        of VAL__MAXI.
+*        of VAL__MAXK.
 *     nchan = dim_t (Given)
 *        Number of spectral channels in input cube.
 *     ndet = dim_t (Given)
@@ -140,11 +140,11 @@
 *     nused = int64_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
-*     nreject = int * (Given and Returned)
+*     nreject = dim_t * (Given and Returned)
 *        The number of input spectra that have been ignored becuase they
 *        either do not cover the full spectral range of the output or
 *        because they have a different bad pixel mask to the output.
-*     naccept = int * (Given and Returned)
+*     naccept = dim_t * (Given and Returned)
 *        The number of input spectra that have not been ignored.
 *     good_tsys = int * (Given and Returned)
 *        Returned set to 1 if any good Tsys values were found in the
@@ -243,7 +243,7 @@
 #define FUNC_NAME "smf_rebincube_nn"
 
 void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
-                       int *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
+                       dim_t *ptime, dim_t nchan, dim_t ndet, dim_t nslice,
                        dim_t nxy, dim_t nout, dim_t dim[3],
                        int badmask, int is2d, AstMapping *ssmap,
                        AstSkyFrame *abskyfrm, AstMapping *oskymap,
@@ -251,7 +251,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                        double tfac, double fcon, float *data_array,
                        float *var_array, double *wgt_array,
                        float *texp_array, float *teff_array, int64_t *nused,
-                       int *nreject, int *naccept, int *good_tsys,
+                       dim_t *nreject, dim_t *naccept, int *good_tsys,
                        int *status ){
 
 /* Local Variables */
@@ -259,12 +259,19 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    char *detflags = NULL;      /* Flags indicating if each detector was used */
    const char *name = NULL;    /* Pointer to current detector name */
    const double *tsys = NULL;  /* Pointer to Tsys value for first detector */
+   dim_t *nexttime;            /* Pointer to next time slice index to use */
+   dim_t *specpop = NULL;      /* Input channels per output channel */
+   dim_t *spectab = NULL;      /* I/p->o/p channel number conversion table */
    dim_t gxout;                /* Output X grid index */
    dim_t gyout;                /* Output Y grid index */
    dim_t ichan;                /* Input channel index */
    dim_t idet;                 /* detector index */
    dim_t itime;                /* Index of current time slice */
+   dim_t iv0;                  /* Offset for pixel in 1st o/p spectral channel */
+   dim_t jdet;                 /* Detector index */
+   dim_t naccept_old;          /* Previous number of accepted spectra */
    dim_t nchanout;             /* No of spectral channels in the output */
+   dim_t ochan;                /* Output channel index */
    dim_t timeslice_size;       /* No of detector values in one time slice */
    double *detxin = NULL;      /* Work space for input X grid coords */
    double *detxout = NULL;     /* Work space for output X grid coords */
@@ -279,24 +286,17 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    float rtsys;                /* Tsys value */
    float teff;                 /* Effective integration time */
    float texp;                 /* Total time ( = ton + toff ) */
-   int *nexttime;              /* Pointer to next time slice index to use */
-   int *specpop = NULL;        /* Input channels per output channel */
-   int *spectab = NULL;        /* I/p->o/p channel number conversion table */
    int first_ts;               /* Is this the first time slice? */
    int found;                  /* Was current detector name found in detgrp? */
    int ignore;                 /* Ignore this time slice? */
    int init_detector_data;     /* Should detector_data be initialised? */
-   int iv0;                    /* Offset for pixel in 1st o/p spectral channel */
-   int jdet;                   /* Detector index */
-   int naccept_old;            /* Previous number of accepted spectra */
-   int ochan;                  /* Output channel index */
    int use_threads;            /* Use multiple threads? */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
    drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
 
    static smfRebincubeNNArgs1 *common_data = NULL; /* Holds data common to all detectors */
    static smfRebincubeNNArgs2 *detector_data = NULL; /* Holds data for each detector */
-   static int *pop_array = NULL;/* I/p spectra pasted into each output spectrum */
+   static dim_t *pop_array = NULL;/* I/p spectra pasted into each output spectrum */
    static dim_t ndet_max = 0;  /* Max number of detectors */
 
 /* Check the inherited status. */
@@ -319,8 +319,8 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    number of input channels that contribute to the output channel. */
    nchanout = dim[ 2 ];
    if( is2d ) {
-      specpop = astMalloc( nchanout*sizeof( int ) );
-      memset( specpop, 0, nchanout*sizeof( int ) );
+      specpop = astMalloc( nchanout*sizeof( *specpop ) );
+      memset( specpop, 0, nchanout*sizeof( *specpop ) );
       for( ichan = 0; ichan < nchan; ichan++ ) {
          ochan = spectab[ ichan ];
          if( ochan != -1 ) specpop[ ochan ]++;
@@ -337,8 +337,8 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    not needed by the AST-based function and so has not been put into
    smf_rebincube_init. */
       if( is2d ) {
-         pop_array = astMalloc( nxy*sizeof( int ) );
-         memset( pop_array, 0, nxy*sizeof( int ) );
+         pop_array = astMalloc( nxy*sizeof( *pop_array ) );
+         memset( pop_array, 0, nxy*sizeof( *pop_array ) );
       }
    }
 
@@ -362,7 +362,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
    the name of the current detector. If not found, set the GRID coord
    bad. */
       if( *detgrp ) {
-         found = grpIndex( name, *detgrp, 1, status );
+         found = (int) grpIndex( name, *detgrp, 1, status );
          if( !found ) {
             detxin[ idet ] = AST__BAD;
             detyin[ idet ] = AST__BAD;
@@ -384,7 +384,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 /* Count the number of time slices to be processed. */
    if( ptime ) {
       itime = 0;
-      while( ptime[ itime ] != VAL__MAXI ) itime++;
+      while( ptime[ itime ] != VAL__MAXK ) itime++;
       if( data->file ) {
          msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Selecting %d time "
                     "slices from data file '%s'.", status, (int) itime,
@@ -409,7 +409,7 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
 
 /* If this time slice is not being pasted into the output cube, pass on. */
       if( nexttime ){
-         if( *nexttime != (int) itime ) continue;
+         if( *nexttime != itime ) continue;
          nexttime++;
       }
 
@@ -668,24 +668,20 @@ void smf_rebincube_nn( ThrWorkForce *wf, smfData *data, int first, int last,
                   }
 
                } else if( data->file ) {
-                  msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector "
-                          "%d at time slice %zu is being ignord when "
-                          "processing data file '%s'.", status, idet, (size_t) itime,
-                          data->file->name );
+                  msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %" DIM_T_FMT
+                             " at time slice %zu is being ignored when processing data file '%s'.",
+                             status, idet, (size_t) itime, data->file->name );
                }
 
             } else if( data->file ) {
-               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d at "
-                          "time slice %zu fell outside the output cube when "
-                          "processing data file '%s'.", status, idet, (size_t) itime,
-                          data->file->name );
-
+               msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %" DIM_T_FMT
+                          " at time slice %zu fell outside the output cube when processing "
+                          "data file '%s'.", status, idet, (size_t) itime, data->file->name );
             }
          } else if( data->file ) {
-            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %d at "
-                       "time slice %zu has an unknown position in the output "
-                       "cube when processing data file '%s'.", status, idet,
-                       (size_t) itime, data->file->name );
+            msgOutiff( MSG__DEBUG, " ", "smf_rebincube_nn: Detector %" DIM_T_FMT
+                       " at time slice %zu has an unknown position in the output cube when processing "
+                       "data file '%s'.", status, idet, (size_t) itime, data->file->name );
          }
       }
 

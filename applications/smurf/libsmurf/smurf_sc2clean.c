@@ -269,23 +269,23 @@
 void smurf_sc2clean( int *status ) {
   smfArray *array = NULL;    /* Data to be cleaned */
   Grp *basegrp=NULL;         /* Grp containing first file each chunk */
-  size_t basesize;           /* Number of files in base group */
+  dim_t basesize;            /* Number of files in base group */
   smfArray *bbms = NULL;     /* Bad bolometer masks */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
-  size_t contchunk;          /* Continuous chunk counter */
+  dim_t contchunk;           /* Continuous chunk counter */
   smfArray *darks = NULL;    /* Dark data */
   int ensureflat;            /* Flag for flatfielding data */
   smfArray *flatramps = NULL;/* Flatfield ramps */
   AstKeyMap *heateffmap = NULL;    /* Heater efficiency data */
   smfData *odata = NULL;     /* Pointer to output data struct */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
-  size_t gcount=0;           /* Grp index counter */
-  size_t idx;                /* Subarray counter */
+  dim_t gcount=0;            /* Grp index counter */
+  dim_t idx;                 /* Subarray counter */
   Grp *igrp = NULL;          /* Input group of files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   double maxlen=0;           /* Constrain maxconcat to this many seconds */
-  size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
+  dim_t ncontchunks=0;       /* Number continuous chunks outside iter loop */
   Grp *ogrp = NULL;          /* Output group of files */
   size_t osize;              /* Total number of NDF names in the output group */
   dim_t padStart=0;          /* How many samples padding at start */
@@ -489,8 +489,8 @@ void smurf_sc2clean( int *status ) {
 
       /* Report statistics (currently need a smfArray for that) */
       if (*status == SAI__OK) {
-        size_t last_qcount[SMF__NQBITS];
-        size_t last_nmap = 0;
+        dim_t last_qcount[SMF__NQBITS];
+        dim_t last_nmap = 0;
         smf_qualstats_report( wf, MSG__VERB, SMF__QFAM_TSERIES, 1, concat,
                               last_qcount, &last_nmap, 1, NULL, NULL, NULL,
                               status );

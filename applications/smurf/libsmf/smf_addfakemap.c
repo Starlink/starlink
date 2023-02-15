@@ -14,9 +14,9 @@
 
 *  Invocation:
 *     void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
-*                          smfArray *lut, int *lbnd_out, int *ubnd_out,
+*                          smfArray *lut, dim_t *lbnd_out, dim_t *ubnd_out,
 *                          AstKeyMap *keymap, double chunkfactor,
-*                          int contchunk, int *status )
+*                          dim_t contchunk, int *status )
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -31,9 +31,9 @@
 *     lut = smfArray * (Given)
 *        Pointer to a smfArray holding the map pixel index for each
 *        bolometer value in all scuba-2 subarrays.
-*     lbnd_out = int * (Given)
+*     lbnd_out = dim_t * (Given)
 *        A 2-element array - the lower pixel index bounds of the output map.
-*     ubnd_out = int * (Given)
+*     ubnd_out = dim_t * (Given)
 *        A 2-element array - the upper pixel index bounds of the output map.
 *     config = AstKeyMap * (Given)
 *        A KeyMap holding all configuration parameters.
@@ -42,7 +42,7 @@
 *        The values sampled from the fakemap are divided by this factor
 *        before being added onto the time-series data. This is in addition
 *        to any scaling specified by the "fakescale" config parameter.
-*     contchunk = int (Given)
+*     contchunk = dim_t (Given)
 *        Zero based index of current time series data chunk.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -101,13 +101,16 @@
 #include "libsmf/smf_err.h"
 
 void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
-                     smfArray *lut, int *lbnd_out, int *ubnd_out,
-                     AstKeyMap *keymap, double chunkfactor, int contchunk,
+                     smfArray *lut, dim_t *lbnd_out, dim_t *ubnd_out,
+                     AstKeyMap *keymap, double chunkfactor, dim_t contchunk,
                      int *status ){
 
 /* Local Variables: */
    char *fakemap;
    const char *tempstr;
+   dim_t dsize;
+   dim_t idx;
+   dim_t k;
    double *extptr;
    double *fakestream = NULL;
    double *fmapdata;
@@ -117,11 +120,8 @@ void smf_addfakemap( ThrWorkForce *wf, smfArray *res, smfArray *ext,
    int *lutptr;
    int fakemce;
    int fakendf;
-   int nmap;
    int tndf;
-   size_t idx;
-   dim_t k;
-   dim_t dsize;
+   size_t nmap;
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

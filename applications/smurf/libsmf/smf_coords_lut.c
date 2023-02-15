@@ -14,17 +14,17 @@
 *     C function
 
 *  Invocation:
-*     void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
+*     void smf_coords_lut( smfData *data, dim_t tstep, dim_t itime_lo,
 *                          dim_t itime_hi, AstSkyFrame *abskyfrm,
-*                          AstMapping *oskymap, int moving, int olbnd[ 2 ],
-*                          int oubnd[ 2 ], fts2Port fts_port, int *lut,
+*                          AstMapping *oskymap, int moving, dim_t olbnd[ 2 ],
+*                          dim_t oubnd[ 2 ], fts2Port fts_port, int *lut,
 *                          double *angle, double *lon, double *lat,
 *                          dim_t *onmap, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
 *        Pointer to the input smfData structure.
-*     tstep = int (Given)
+*     tstep = dim_t (Given)
 *        The increment in time slices between full Mapping calculations.
 *        The Mapping for intermediate time slices will be approximated.
 *     itime_lo = dim_t (Given)
@@ -46,9 +46,9 @@
 *        so, each time slice is shifted so that the position specified by
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        output map.
-*     olbnd[ 2 ] = int (Given)
+*     olbnd[ 2 ] = dim_t (Given)
 *        The lower pixel index bounds of the output map.
-*     oubnd[ 2 ] = int (Given)
+*     oubnd[ 2 ] = dim_t (Given)
 *        The upper pixel index bounds of the output map.
 *     fts_port = fts2Port (Given)
 *        FTS-2 port.
@@ -70,7 +70,7 @@
 *        latitude value (degs) at all samples between and including itime_lo
 *        and itime_hi. May be NULL.
 *     onmap = dim_t * (Returned)
-*        A pointer to a size_t in which to return the count of bolometer
+*        A pointer to a dim_t in which to return the count of bolometer
 *        samples that fell within the bounds of the map. Ignored if NULL.
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
@@ -147,10 +147,10 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_typ.h"
 
-void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
+void smf_coords_lut( smfData *data, dim_t tstep, dim_t itime_lo,
                      dim_t itime_hi, AstSkyFrame *abskyfrm,
-                     AstMapping *oskymap, int moving, int olbnd[ 2 ],
-                     int oubnd[ 2 ], fts2Port fts_port, int *lut,
+                     AstMapping *oskymap, int moving, dim_t olbnd[ 2 ],
+                     dim_t oubnd[ 2 ], fts2Port fts_port, int *lut,
                      double *angle, double *lon, double *lat, dim_t *onmap,
                      int *status ) {
 
@@ -169,12 +169,19 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    dim_t ilut;           /* Index of LUT element */
    dim_t itime0;         /* Time slice index at next full calculation */
    dim_t itime;          /* Time slice index */
+   dim_t lbnd_in[ 2 ];   /* Lower bounds of input array */
+   dim_t lutval;         /* Value of LUT element */
    dim_t nbolo;          /* Total number of bolometers */
+   dim_t odimx;          /* Output map X dimension in pixels */
+   dim_t odimy;          /* Output map Y dimension in pixels */
+   dim_t ox;             /* Output X GRID index (-1) containing current bolo */
+   dim_t oy;             /* Output Y GRID index (-1) containing current bolo */
+   dim_t ubnd_in[ 2 ];   /* Upper bounds of input array */
    double *outmapcoord;  /* Array holding output map GRID coords */
-   double *px;           /* Pointer to next output map X GRID coord */
-   double *py;           /* Pointer to next output map Y GRID coord */
    double *pgx;          /* Pointer to next X output grid coords */
    double *pgy;          /* Pointer to next Y output grid coords */
+   double *px;           /* Pointer to next output map X GRID coord */
+   double *py;           /* Pointer to next output map Y GRID coord */
    double *wgx = NULL;   /* Work space to hold X output grid coords */
    double *wgy = NULL;   /* Work space to hold Y output grid coords */
    double bsx0;          /* Boresight output map GRID X at previous full calc */
@@ -194,13 +201,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    double y;             /* Output GRID Y at current bolo in current row */
    double yin[ 2 ];      /* Input Y values */
    double yout[ 2 ];     /* Output Y values */
-   int lbnd_in[ 2 ];     /* Lower bounds of input array */
    int np;               /* Number of positions to transform */
-   int odimx;            /* Output map X dimension in pixels */
-   int odimy;            /* Output map Y dimension in pixels */
-   int ox;               /* Output X GRID index (-1) containing current bolo */
-   int oy;               /* Output Y GRID index (-1) containing current bolo */
-   int ubnd_in[ 2 ];     /* Upper bounds of input array */
 
 
 /* Initialise */
@@ -244,7 +245,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* We need to find the first good TCS index in order to get the
    tracking system (Which for SCUBA-2 won't be changing in the sequence) */
-      itime0 = VAL__BADI;
+      itime0 = VAL__BADK;
       for (itime = itime_lo; itime <= itime_hi; itime++) {
         JCMTState * slice = &((data->hdr->allState)[itime]);
         if (!(slice->jos_drcontrol >= 0 && slice->jos_drcontrol & DRCNTRL__POSITION)) {
@@ -253,7 +254,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
         }
       }
 
-      if ((int)itime0 != VAL__BADI) {
+      if( itime0 != VAL__BADK ) {
 
 /* We need a Frame describing absolute tracking system coords. Take a
    copy of the supplied skyframe (to inherit obslat, obslon, epoch,
@@ -297,7 +298,7 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
         tstep = 1;
         itime0 = itime_lo;
         msgOutiff(MSG__VERB, "", "All time slices from %zu -- %zu had bad TCS data.",
-                 status, (size_t)itime_lo, (size_t)itime_hi );
+                 status, itime_lo, itime_hi );
       }
    }
 
@@ -384,8 +385,8 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
    GRID coords to output map GRID coords. */
          if( fullmap ) {
             itime0 += tstep;
-            astTranGrid( fullmap, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
-                         2, nbolo, outmapcoord );
+            astTranGrid8( fullmap, 2, lbnd_in, ubnd_in, 0.1, 1000000, 1,
+                          2, nbolo, outmapcoord );
             fullmap = astAnnul( fullmap );
 
 /* Record the boresight grid coords at this time slice. */
@@ -468,7 +469,15 @@ void smf_coords_lut( smfData *data, int tstep, dim_t itime_lo,
 
 /* Find the 1-dimensional vector index into the output array for this
    pixel and store in the next element of the returned LUT. */
-               lut[ ilut++ ] = ox + oy*odimx;
+               lutval = ox + oy*odimx;
+               if( lutval > VAL__MAXI || lutval < VAL__MINI ){
+                  if( *status == SAI__OK ) {
+                     errRep( " ", "smf_coords_lut: Output map is too big", status );
+                  }
+                  break;
+               } else {
+                  lut[ ilut++ ] = (int) lutval;
+               }
 
 /* Store a bad value for points that are off the edge of the output map. */
             } else {

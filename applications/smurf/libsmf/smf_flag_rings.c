@@ -12,31 +12,31 @@
 *     Subroutine
 
 *  Invocation:
-*     int smf_flag_rings( double *data, size_t stride, int nel, int box1,
-*                         int box2, double nsigma, int wing, int minsize,
-*                         smf_qual_t *qual, smf_qual_t qmask,
-*                         const unsigned char *mask, const int *lut,
-*                         int *status )
+*     dim_t smf_flag_rings( double *data, dim_t stride, dim_t nel, dim_t box1,
+*                           dim_t box2, double nsigma, dim_t wing, dim_t minsize,
+*                           smf_qual_t *qual, smf_qual_t qmask,
+*                           const unsigned char *mask, const int *lut,
+*                           int *status )
 
 *  Arguments:
 *     data = double * (Given and Returned)
 *        Pointer to the 1D array to be checked for ringing.
 *     stride = (Given)
 *        Stride between elements in the data array.
-*     nel = int (Given)
+*     nel = dim_t (Given)
 *        Number of points in the input data.
-*     box1 = int (Given)
+*     box1 = dim_t (Given)
 *        The size of the first filter (in array elements). This should
 *        normally correspond to the FLT filter width.
-*     box2 = int (Given)
+*     box2 = dim_t (Given)
 *        The size of the second filter (in array elements). This should
 *        be several times the value of "box1".
 *     nsigma = double (Given)
 *        The number of standard deviations at which to flag samples.
-*     wing = int (Given)
+*     wing = dim_t (Given)
 *        The number of extra samples to flag on either side of a section
 *        flagged as oscillatory.
-*     minsize = int (Given)
+*     minsize = dim_t (Given)
 *        The minimum number of samples in a section of contiguous ringing
 *        samples that will be flagged. Section shorter than this size
 *        will never be flagged.
@@ -111,13 +111,19 @@
 /* SMURF includes */
 #include "smf.h"
 
-int smf_flag_rings( double *data, size_t stride, int nel, int box1,
-                    int box2, double nsigma, int wing, int minsize,
-                    smf_qual_t *qual, smf_qual_t qmask,
-                    const unsigned char *mask, const int *lut, int *status ){
+dim_t smf_flag_rings( double *data, dim_t stride, dim_t nel, dim_t box1,
+                      dim_t box2, double nsigma, dim_t wing, dim_t minsize,
+                      smf_qual_t *qual, smf_qual_t qmask,
+                      const unsigned char *mask, const int *lut, int *status ){
 
 /* Local variables */
    const int *pl;
+   dim_t end;
+   dim_t endl;
+   dim_t i;
+   dim_t j;
+   dim_t result;
+   dim_t start;
    double *p1;
    double *p2;
    double *work1;
@@ -125,12 +131,6 @@ int smf_flag_rings( double *data, size_t stride, int nel, int box1,
    double mean;
    double stddev;
    double thresh;
-   int end;
-   int endl;
-   int i;
-   int j;
-   int result;
-   int start;
    int state;
    smf_qual_t *pq;
 

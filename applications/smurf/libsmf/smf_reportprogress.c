@@ -13,10 +13,10 @@
 *     C function
 
 *  Invocation:
-*     void smf_reportprogress( int max, int *status )
+*     void smf_reportprogress( dim_t max, int *status )
 
 *  Arguments:
-*     max = int (Given)
+*     max = dim_t (Given)
 *        Should be supplied non-zero only on the first call to this
 *        function. It gives the number of calls to this function that
 *        corresponds to 100% of the job done. On subsequent calls it
@@ -80,11 +80,11 @@
 
 #include "smf.h"
 
-void smf_reportprogress( int max, int *status ){
+void smf_reportprogress( dim_t max, int *status ){
 
 /* Local Variables */
-   static int count = 0.0;
-   static int maxcount = 1;
+   static dim_t count = 0.0;
+   static dim_t maxcount = 1;
    static int perc_last = 0;
    int perc;
 

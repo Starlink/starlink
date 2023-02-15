@@ -16,8 +16,8 @@
 *     smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 *                     int autogrid, int usedetpos, AstFrameSet *spacerefwcs,
 *                     AstFrameSet *specrefwcs, double par[ 7 ],
-*                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ],
-*                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos,
+*                     Grp *detgrp, int moving, int specunion, dim_t lbnd[ 3 ],
+*                     dim_t ubnd[ 3 ], AstFrameSet **wcsout, int *npos,
 *                     int *hasoffexp, smfBox **boxes, int *polobs,
 *                     double *aref, double *bref, int *status );
 
@@ -81,9 +81,9 @@
 *        If non-zero, then the output spectral range is the union of the
 *        input spectral ranges. Otherwise it is the intersection of the input
 *        spectral ramges.
-*     lbnd = int [ 3 ] (Returned)
+*     lbnd = dim_t [ 3 ] (Returned)
 *        The lower pixel index bounds of the output cube.
-*     ubnd = int [ 3 ] (Returned)
+*     ubnd = dim_t [ 3 ] (Returned)
 *        The upper pixel index bounds of the output cube.
 *     wcsout = AstFrameSet ** (Returned)
 *        A pointer to a location at which to return a pointer to an AST
@@ -293,8 +293,8 @@
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
                      int autogrid, int usedetpos, AstFrameSet *spacerefwcs,
                      AstFrameSet *specrefwcs, double par[ 7 ],
-                     Grp *detgrp, int moving, int specunion, int lbnd[ 3 ],
-                     int ubnd[ 3 ], AstFrameSet **wcsout, int *npos,
+                     Grp *detgrp, int moving, int specunion, dim_t lbnd[ 3 ],
+                     dim_t ubnd[ 3 ], AstFrameSet **wcsout, int *npos,
                      int *hasoffexp, smfBox **boxes, int *polobs,
                      double *aref, double *bref, int *status ){
 
@@ -302,6 +302,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstCmpFrame *cmpfrm = NULL;  /* Current Frame for output FrameSet */
    AstCmpMap *cmpmap = NULL;    /* Base -> Current Mapping for output FrameSet */
    AstCmpMap *ssmap = NULL;     /* I/p GRID-> o/p PIXEL Mapping for spectral axis */
+   AstCmpMap *tmap = NULL;      /* Temporary Mapping */
    AstCmpMap *totmap = NULL;    /* WCS->GRID Mapping from input WCS FrameSet */
    AstFitsChan *fc = NULL;      /* FitsChan used to construct spectral WCS */
    AstFitsChan *fct = NULL;     /* FitsChan used to construct time slice WCS */
@@ -310,20 +311,23 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    AstFrame *sf1 = NULL;        /* Pointer to copy of input current Frame */
    AstFrame *skyin = NULL;      /* Pointer to current Frame in input WCS FrameSet */
    AstFrame *specframe = NULL;  /* Spectral Frame in input FrameSet */
+   AstFrameSet *azel2usesys_fs = NULL;/* FrameSet from AZEL to the output sky frame */
    AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;  /* FrameSet describing spatial input WCS */
-   AstFrameSet *azel2usesys_fs = NULL;/* FrameSet from AZEL to the output sky frame */
    AstMapping *azel2usesys = NULL;/* Mapping from AZEL to the output sky frame */
    AstMapping *fsmap = NULL;    /* Base->Current Mapping extracted from a FrameSet */
    AstMapping *oskymap = NULL;  /* Sky <> PIXEL mapping in output FrameSet */
    AstMapping *oskymap2 = NULL; /* Sky offsets <> PIXEL mapping in output FrameSet */
    AstMapping *ospecmap = NULL; /* Spec <> PIXEL mapping in output FrameSet */
    AstMapping *specmap = NULL;  /* PIXEL -> Spec mapping in input FrameSet */
-   AstCmpMap *tmap = NULL;      /* Temporary Mapping */
    const char *name;     /* Pointer to current detector name */
    dim_t irec;           /* Index of current input detector */
+   dim_t ishift;         /* Shift to put pixel origin at centre */
    dim_t ispec;          /* Index of current spectral sample */
    dim_t itime;          /* Index of current time slice */
+   dim_t itmp;           /* Temporary storage */
+   dim_t lbnd0[ 2 ];     /* Defaults for LBND parameter */
+   dim_t ubnd0[ 2 ];     /* Defaults for UBND parameter */
    double *xin = NULL;   /* Workspace for detector input grid positions */
    double *xout = NULL;  /* Workspace for detector output pixel positions */
    double *yin = NULL;   /* Workspace for detector input grid positions */
@@ -343,18 +347,14 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    drcntrl_bits drcntrl_mask = DRCNTRL__TCS_POSN_BIT; /* Mask to use for DRCONTROL */
    float *pdata;         /* Pointer to next data sample */
    int actval;           /* Number of parameter values supplied */
-   int found;            /* Was the detector name found in the supplied group? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
    int ifile;            /* Index of current input file */
-   int ishift;           /* Shift to put pixel origin at centre */
-   int itmp;             /* Temporary storage */
-   int lbnd0[ 2 ];       /* Defaults for LBND parameter */
    int nval;             /* Number of values supplied */
    int pixax[ 3 ];       /* The output fed by each selected mapping input */
    int specax;           /* Index of spectral axis in input FrameSet */
    int trim;             /* Trim borders of bad pixels from o/p cube? */
-   int ubnd0[ 2 ];       /* Defaults for UBND parameter */
+   size_t found;         /* Was the detector name found in the supplied group? */
    smfBox *box;          /* Pointer to bounding box for next input file */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
@@ -1132,16 +1132,16 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Allow the user to override the output pixel bounds calculated above. */
    lbnd0[ 0 ] = lbnd[ 0 ];
    lbnd0[ 1 ] = lbnd[ 1 ];
-   parDef1i( "LBND", 2, lbnd0, status );
+   parDef1k( "LBND", 2, lbnd0, status );
 
    ubnd0[ 0 ] = ubnd[ 0 ];
    ubnd0[ 1 ] = ubnd[ 1 ];
-   parDef1i( "UBND", 2, ubnd0, status );
+   parDef1k( "UBND", 2, ubnd0, status );
 
-   parGet1i( "LBND", 2, lbnd, &actval, status );
+   parGet1k( "LBND", 2, lbnd, &actval, status );
    if( actval == 1 ) lbnd[ 1 ] = lbnd[ 0 ];
 
-   parGet1i( "UBND", 2, ubnd, &actval, status );
+   parGet1k( "UBND", 2, ubnd, &actval, status );
    if( actval == 1 ) ubnd[ 1 ] = ubnd[ 0 ];
 
 /* Ensure the bounds are the right way round. */
@@ -1180,12 +1180,12 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
 /* Report the pixel bounds of the cube. */
    if( *status == SAI__OK ) {
       msgOutif( MSG__NORM, " ", " ", status );
-      msgSeti( "XL", lbnd[ 0 ] );
-      msgSeti( "YL", lbnd[ 1 ] );
-      msgSeti( "ZL", lbnd[ 2 ] );
-      msgSeti( "XU", ubnd[ 0 ] );
-      msgSeti( "YU", ubnd[ 1 ] );
-      msgSeti( "ZU", ubnd[ 2 ] );
+      msgSetk( "XL", lbnd[ 0 ] );
+      msgSetk( "YL", lbnd[ 1 ] );
+      msgSetk( "ZL", lbnd[ 2 ] );
+      msgSetk( "XU", ubnd[ 0 ] );
+      msgSetk( "YU", ubnd[ 1 ] );
+      msgSetk( "ZU", ubnd[ 2 ] );
       msgOutif( MSG__NORM, " ", "   Output cube pixel bounds: ( ^XL:^XU, ^YL:^YU, ^ZL:^ZU )",
                 status );
 

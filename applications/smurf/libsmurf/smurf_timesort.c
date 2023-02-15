@@ -340,9 +340,33 @@ void smurf_timesort( int *status ) {
    const char *key = NULL;
    const char *lab = NULL;
    const double *tsys;
+   dim_t *first = NULL;
+   dim_t *index = NULL;
+   dim_t *mask = NULL;
+   dim_t dims[ 3 ];
+   dim_t ichan;
+   dim_t idet;
+   dim_t idims[ 3 ];
+   dim_t iii;
    dim_t irec;
+   dim_t j;
    dim_t jrec;
+   dim_t k;
+   dim_t lbnd[ 3 ];
+   dim_t lchan;
+   dim_t ldet;
+   dim_t nchan;
+   dim_t ndet;
+   dim_t ndet_out;
+   dim_t nout;
+   dim_t nrem;
    dim_t nslice;
+   dim_t slbnd[ 3 ];
+   dim_t subnd[ 3 ];
+   dim_t tslimit;
+   dim_t ubnd[ 3 ];
+   dim_t uchan;
+   dim_t udet;
    double *grid = NULL;
    double *tai = NULL;
    double *tai_ptr = NULL;
@@ -363,12 +387,9 @@ void smurf_timesort( int *status ) {
    float texp;
    int **sysrts = NULL;
    int *file_index = NULL;
-   int *first = NULL;
    int *good_det = NULL;
    int *good_dets = NULL;
-   int *index = NULL;
    int *itimeout = NULL;
-   int *mask = NULL;
    int *ndfid = NULL;
    int *nsysrts = NULL;
    int *rts = NULL;
@@ -376,19 +397,13 @@ void smurf_timesort( int *status ) {
    int conform;
    int detbit;
    int detpurge;
-   int ii;
-   int idims[ 3 ];
-   hdsdim dims[ 3 ];
-   int el;
    int found;
    int genvar;
    int hasqual;
    int hasvar;
    int i;
-   int ichan;
-   int idet;
-   int iel;
    int ifile;
+   int ii;
    int indf1;
    int indf1s;
    int indf2;
@@ -400,25 +415,14 @@ void smurf_timesort( int *status ) {
    int isubscan;
    int isubsys;
    int j0;
-   int j;
-   int jel;
-   int k;
    int l;
-   int lbnd[ 3 ];
-   int lchan;
-   int ldet;
    int maxsyspop;
    int merge;
    int nbaddet;
-   int nchan;
    int ncomp;
-   int ndet;
-   int ndet_out;
    int ndim;
    int nnout[ NDF__MXDIM ];
    int nobs;
-   int nout;
-   int nrem;
    int nsubscan;
    int nsubsys;
    int nts_in;
@@ -429,27 +433,23 @@ void smurf_timesort( int *status ) {
    int rts_num0;
    int rts_num;
    int rts_num_last;
+   int size;
    int sizelimit;
-   int slbnd[ 3 ];
    int sorted;
-   int subnd[ 3 ];
    int there;
    int totout;
-   int tslimit;
-   int ubnd[ 3 ];
-   int uchan;
-   int udet;
+   size_t el;
+   size_t iel;
+   size_t jel;
    size_t len;
    size_t ndetgrp;
-   size_t ntai;
+   dim_t ntai;
    size_t outsize;
-   size_t size;
+   size_t temp;
    smfData *data = NULL;
    void *ipin;
    void *ipout;
    void *ptr[2];
-
-
 
 /* NDF array component names */
    static const char *comp[2] = {"DATA", "VARIANCE"};
@@ -465,7 +465,8 @@ void smurf_timesort( int *status ) {
    ndfBegin();
 
 /* Get a group of input files */
-   kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp1, &size, status );
+   kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp1, &temp, status );
+   size = (int) temp;
 
 /* Report observation details early */
    smf_summarize_obs( igrp1, status );
@@ -522,7 +523,7 @@ void smurf_timesort( int *status ) {
 
 /* See if the label for the current detector is present in the group holding
    the detectors to be included in the output cube. */
-         found = grpIndex( lab, detgrp, 1, status );
+         found = (int) grpIndex( lab, detgrp, 1, status );
 
 /* If it is, pass on to the next detector. Otherwise we modify the
    detector mask to exclude the current detector. */
@@ -531,7 +532,7 @@ void smurf_timesort( int *status ) {
 /* Create a new detector mask if needed, initialising it so that all
    detectors are included. */
             if( !mask ) {
-               mask = astMalloc( sizeof( int )*(data->dims)[ 1 ] );
+               mask = astMalloc( sizeof( *mask )*(data->dims)[ 1 ] );
                if( mask ) {
                   for( jrec = 0; jrec < (data->dims)[ 1 ]; jrec++ ) mask[ jrec ] = 1;
                }
@@ -604,7 +605,8 @@ void smurf_timesort( int *status ) {
 
 /* Map the TCS_TAI array in the JCMTSTATE extension. */
          datFind( loc1, "TCS_TAI", &loc1c, status );
-         datMapV( loc1c, "_DOUBLE", "READ", (void *) &tai_ptr, &ntai, status );
+         datMapV( loc1c, "_DOUBLE", "READ", (void *) &tai_ptr, &temp, status );
+         ntai = (dim_t) temp;
 
 /* Obtain a sorted index for the TCS_TAI values in the JCMTSTATE
    extension. */
@@ -676,7 +678,7 @@ void smurf_timesort( int *status ) {
 
 /* Pass on if the component is scalar, or if the last dimension is not of
    the same length as the TCS_TAI array. */
-               if( ndim > 0 && dims[ ndim - 1 ] == (int) ntai ) {
+               if( ndim > 0 && dims[ ndim - 1 ] == ntai ) {
 
 /* Map the input and output arrays. */
                   datMap( loc1c, type, "READ", ndim, dims, &ipin, status );
@@ -686,7 +688,7 @@ void smurf_timesort( int *status ) {
    - currently - contain any arrays that are indexed by detector number. */
                   for( ii = 0; ii < ndim; ii++ ) idims[ii] = dims[ii];
                   datLen( loc1c, &len, status );
-                  smf_reorder( type, ipin, len, ndim, idims, ndim - 1, index,
+                  smf_reorder( type, ipin, (int) len, ndim, idims, ndim - 1, index,
                                0, NULL, ipout, status );
 
 /* Unmap the mapped arrays. */
@@ -738,7 +740,7 @@ void smurf_timesort( int *status ) {
 /* Re-order the array. */
                datLen( loc1c, &len, status );
                for( ii = 0; ii < ndim; ii++ ) idims[ii] = dims[ii];
-               smf_reorder( type, ipin, len, ndim, idims, ndim - 1,
+               smf_reorder( type, ipin, (int) len, ndim, idims, ndim - 1,
                             index, 0, NULL, ipout, status );
 
 /* Unmap the mapped arrays. */
@@ -773,13 +775,13 @@ void smurf_timesort( int *status ) {
 
 /* Get a table of time values for every grid index, in order of increasing
    time value. */
-               grid = astMalloc( sizeof( double )*ntai );
-               tai = astMalloc( sizeof( double )*ntai );
-               for( i = 0; i < (int) ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
-               astTran1( tmap, ntai, grid, 1, tai );
+               grid = astMalloc( sizeof( *grid )*ntai );
+               tai = astMalloc( sizeof( *tai )*ntai );
+               for( i = 0; i < ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
+               astTran18( tmap, ntai, grid, 1, tai );
 
 /* Create a LutMap holding these sorted time values. */
-               lut = (AstMapping *) astLutMap( ntai, tai, 1.0, 1.0, " " );
+               lut = (AstMapping *) astLutMap( (int) ntai, tai, 1.0, 1.0, " " );
 
 /* Split off a Mapping for the other two axes. */
                axes[ 0 ] = 1;
@@ -883,8 +885,8 @@ void smurf_timesort( int *status ) {
          nsubsys = astMapSize( subsys_map );
 
 /* Allocate memory to hold the RTS_NUM values used for this sub-system. */
-         nsysrts = astMalloc( sizeof( int )*nsubsys );
-         sysrts = astMalloc( sizeof( int * )*nsubsys );
+         nsysrts = astMalloc( sizeof( *nsysrts )*nsubsys );
+         sysrts = astMalloc( sizeof( *sysrts )*nsubsys );
          if( sysrts ) {
             for( isubsys = 0; isubsys < nsubsys; isubsys++ ) {
                sysrts[ isubsys ] = NULL;
@@ -917,10 +919,10 @@ void smurf_timesort( int *status ) {
    name of the corresponding JCMTSTATE or ACSIS extension item). Allocate
    an array to store the index of the first time slice within these lists
    for each input file. */
-            first = astMalloc( sizeof( int )*nsubscan );
+            first = astMalloc( sizeof( *first )*nsubscan );
 
 /* Allocate an array to store the NDF identifier for each input file. */
-            ndfid = astMalloc( sizeof( int )*nsubscan );
+            ndfid = astMalloc( sizeof( *ndfid )*nsubscan );
 
 /* Create a KeyMap to hold JCMTSTATE data values. */
             km1 = astKeyMap( " " );
@@ -1092,14 +1094,14 @@ void smurf_timesort( int *status ) {
                first[ isubscan ] = nts_in;
 
 /* Increment the total number of time slices recorded. */
-               nts_in += dims[ 2 ];
+               nts_in += (int) dims[ 2 ];
 
 /* Extend the "file_index" array and store the file index in every new
    element. */
-               file_index = astGrow( file_index, nts_in, sizeof( int ) );
+               file_index = astGrow( file_index, nts_in, sizeof( *file_index ) );
                if( *status == SAI__OK ) {
-                  for( i = nts_in - dims[ 2 ]; i < nts_in; i++ ) {
-                     file_index[ i ] = isubscan;
+                  for( j = nts_in - dims[ 2 ]; j < nts_in; j++ ) {
+                     file_index[ j ] = isubscan;
                   }
                }
 
@@ -1185,12 +1187,12 @@ void smurf_timesort( int *status ) {
                if( tmap && astGetI( tmap, "Nout" ) == 1 ) {
 
 /* Get an array holding the time axis grid indices in the current input NDF. */
-                  grid = astGrow( grid, dims[ 2 ], sizeof( double ) );
+                  grid = astGrow( grid, dims[ 2 ], sizeof( *grid ) );
                   for( i = 0; i < dims[ 2 ]; i++ ) grid[ i ] = i + 1;
 
 /* Expand the table of time values so that there is room for the time
    values from the current input NDF. */
-                  tai = astGrow( tai, nts_in, sizeof( double ) );
+                  tai = astGrow( tai, nts_in, sizeof( *grid ) );
 
 /* Transform the grid indices to get the time axis values, appending them
    to the end of the "tai" array. */
@@ -1210,8 +1212,8 @@ void smurf_timesort( int *status ) {
 
 /* Get an array holding the list of concatenated RTS_NUM values read from
    the input NDFs. */
-            rts = astMalloc( sizeof(int)*nts_in );
-            if( !astMapGet1I( km1, "RTS_NUM", nts_in, &nts_in, rts ) ) {
+            rts = astMalloc( sizeof(*rts)*nts_in );
+            if( !astMapGet1I( km1, "RTS_NUM", (int) nts_in, &nts_in, rts ) ) {
                if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
                   errRep( "", "The first input NDF (and maybe others) did "
@@ -1230,21 +1232,21 @@ void smurf_timesort( int *status ) {
             if( index ) {
                rts_num_last = -INT_MAX;
                for( j = 0; j < nts_in; j++ ) {
-                  i = index[ j ];
-                  rts_num = rts[ i ];
+                  iii = index[ j ];
+                  rts_num = rts[ iii ];
                   if( rts_num > rts_num_last ) nts_out++;
                   rts_num_last = rts_num;
                }
             }
 
 /* Allocate an array to hold the output RTS_NUM values. */
-            sysrts[ isubsys ] = astMalloc( sizeof( int )*nts_out );
+            sysrts[ isubsys ] = astMalloc( sizeof( **sysrts )*nts_out );
 
 /* Allocate an array to hold flags indicating which detectors have any
    good input data in a specific time slice. There is one integer for
    each time slice, and each integer is a bit mask in which the least
    significant bit is set if detector 0 has any good data, etc. */
-            good_dets = astMalloc( sizeof( int )*nts_in );
+            good_dets = astMalloc( sizeof( *good_dets )*nts_in );
             good_det = good_dets;
 
 /* Initialise the number of output time slices created for this
@@ -1356,9 +1358,13 @@ void smurf_timesort( int *status ) {
                if( conform ) {
                   sprintf( fullname, "%.4d", iout + 1 );
                   pname = fullname;
+
+                  #pragma GCC diagnostic ignored "-Wcast-qual"
                   match = astChrSub( basename,
                                      "a\\d{8}_\\d{5}_\\d{2}_(\\d{4})_?",
                                      (const char **) &pname, 1 );
+                  #pragma GCC diagnostic pop
+
                   if( match ) {
                      one_strlcpy( fullname, match, sizeof(fullname), status );
                      match = astFree( match );
@@ -1398,14 +1404,14 @@ void smurf_timesort( int *status ) {
 
 /* Ensure we have arrays large enough to hold the input time slice
    index and tai for each output time slice. */
-               itimeout = astGrow( itimeout, ubnd[ 2 ], sizeof( int ) );
-               taiout = astGrow( taiout, ubnd[ 2 ], sizeof( double ) );
+               itimeout = astGrow( itimeout, ubnd[ 2 ], sizeof( *itimeout ) );
+               taiout = astGrow( taiout, ubnd[ 2 ], sizeof( *taiout ) );
 
 /* Get the RTS_NUM value from the next input time slice. This value is
    also the RTS_NUM value for the next output time slice. */
-               i = index[ j ];
-               rts_num = rts[ i ];
-               j0 = j;
+               iii = index[ j ];
+               rts_num = rts[ iii ];
+               j0 = (int) j;
 
 /* Loop round each output time slice. */
                for( k = 0; k < ubnd[ 2 ]  && *status == SAI__OK; k++ ) {
@@ -1430,10 +1436,10 @@ void smurf_timesort( int *status ) {
                   }
 
 /* Store the input time slice index for this output time slice. */
-                  itimeout[ k ] = i;
+                  itimeout[ k ] = (int) iii;
 
 /* Store the input time slice tai for this output time slice. */
-                  taiout[ k ] = tai[ i ];
+                  taiout[ k ] = tai[ iii ];
 
 /* Store the RTS_NUM value for this output time slice. */
                   sysrts[ isubsys ][ l++ ] = rts_num;
@@ -1445,12 +1451,12 @@ void smurf_timesort( int *status ) {
 
 /* Get the zero-based index of the input NDF from which the current RTS_NUM
    value was read. */
-                     isubscan = file_index[ i ];
+                     isubscan = file_index[ iii ];
 
 /* Get a section of the input NDF covering this time slice. */
                      slbnd[ 1 ] = 1;
                      subnd[ 1 ] = ndet;
-                     slbnd[ 2 ] = i  - first[ isubscan ] + 1;
+                     slbnd[ 2 ] = iii  - first[ isubscan ] + 1;
                      subnd[ 2 ] = slbnd[ 2 ];
                      ndfSect( ndfid[ isubscan ], 3, slbnd, subnd, &indf1s,
                               status );
@@ -1494,7 +1500,7 @@ void smurf_timesort( int *status ) {
 
 /* If the input data value is good, copy it to the output, plus any
    associated quality and variance values. Report an error if the output
-   has already been assigned a good value at this poiint. */
+   has already been assigned a good value at this point. */
                               if( dts_in[ iel ] != VAL__BADR ) {
 
                                  if( init || dts_out[ jel ] == VAL__BADR ) {
@@ -1504,7 +1510,7 @@ void smurf_timesort( int *status ) {
 
                                  } else if( *status == SAI__OK ) {
                                     *status = SAI__ERROR;
-                                    msgSeti( "D", idet + 1 );
+                                    msgSetk( "D", idet + 1 );
                                     msgSeti( "R", rts_num0 );
                                     errRep( "", "More than one good input "
                                             "spectrum found for detector "
@@ -1539,10 +1545,10 @@ void smurf_timesort( int *status ) {
 
 /* Move on to the next input time slice. */
                      if( ++j < nts_in ) {
-                        i = index[ j ];
-                        rts_num = rts[ i ];
+                        iii = index[ j ];
+                        rts_num = rts[ iii ];
                         init = 0;
-                        good_det = good_dets + i;
+                        good_det = good_dets + iii;
                      } else {
                         break;
                      }
@@ -1563,10 +1569,10 @@ void smurf_timesort( int *status ) {
    the last but one axis in the extension item (the last axis being the
    time slice axis). Extension items are set bad for any detector that
    has no good data values in its spectrum. */
-               smf_kmmerge( "JCMTSTATE", km1, index, ndet, good_dets, nts_in,
-                            rts, j0, j - 1, status );
-               smf_kmmerge( "ACSIS", km2, index, ndet, good_dets, nts_in,
-                            rts, j0, j - 1, status );
+               smf_kmmerge( "JCMTSTATE", km1, index, (int) ndet, good_dets, nts_in,
+                            rts, j0, (int) j - 1, status );
+               smf_kmmerge( "ACSIS", km2, index, (int) ndet, good_dets, nts_in,
+                            rts, j0, (int) j - 1, status );
 
 /* Copy input JCMTSTATE values to the current output NDF. */
                smf_km2ext( indf2, "JCMTSTATE", km1, itimeout, status );
@@ -1582,7 +1588,7 @@ void smurf_timesort( int *status ) {
    maps 1.0 onto the time-slice's tai value will do. For consistency with
    the input WCS, we choose a WinMap. */
                if( ubnd[ 2 ] > 1 ) {
-                  lut = (AstMapping *) astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0,
+                  lut = (AstMapping *) astLutMap( (int) ubnd[ 2 ], taiout, 1.0, 1.0,
                                                   " " );
                } else {
                   ina = 1.0;

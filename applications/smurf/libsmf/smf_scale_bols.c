@@ -119,8 +119,8 @@ typedef struct smfScaleBolsJobData {
    smf_qual_t *qua;
    int div;
    int newbad;
-   size_t bstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t tstride;
 } smfScaleBolsJobData;
 
 /* Prototypes for local functions. */
@@ -131,23 +131,23 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
                      const char *path, const char *param, int div, int *status ){
 
 /* Local Variables */
+   dim_t bstride;
    dim_t dcols = 0;
    dim_t drows = 0;
+   dim_t lbnd[ 2 ];
    dim_t nbolo;
    dim_t ntslice;
    dim_t tstep;
+   dim_t tstride;
+   dim_t ubnd[ 2 ];
    double *corr = NULL;
    double *dat = NULL;
-   int el;
    int indf = NDF__NOID;
    int iworker;
-   int lbnd[ 2 ];
    int ndim;
    int nworker;
    int place;
-   int ubnd[ 2 ];
-   size_t bstride;
-   size_t tstride;
+   size_t el;
    smfScaleBolsJobData *job_data = NULL;
    smfScaleBolsJobData *pdata = NULL;
    smf_qual_t *qua = NULL;
@@ -189,8 +189,8 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
          smf_smfFile_msg( scaledata->file, "F", 1, "" );
          errRepf( "", "Dimensions of scaling file ^F are (%zu, %zu)"
                   " but flatfield has dimensions (%zu, %zu)",
-                  status, (size_t)scrows, (size_t)sccols,
-                  (size_t)drows, (size_t)dcols);
+                  status, (dim_t)scrows, (dim_t)sccols,
+                  (dim_t)drows, (dim_t)dcols);
        }
      }
 
@@ -205,10 +205,10 @@ void smf_scale_bols( ThrWorkForce *wf, smfData *data, const smfData * scaledata,
      if( ( lbnd[ 0 ] != 0 || ubnd[ 0 ] != 31 ||
            lbnd[ 1 ] != 0 || ubnd[ 1 ] != 39 ) && *status == SAI__OK ){
        *status = SAI__ERROR;
-       msgSeti( "L1", lbnd[ 0 ] );
-       msgSeti( "U1", ubnd[ 0 ] );
-       msgSeti( "L2", lbnd[ 1 ] );
-       msgSeti( "U2", ubnd[ 1 ] );
+       msgSetk( "L1", lbnd[ 0 ] );
+       msgSetk( "U1", ubnd[ 0 ] );
+       msgSetk( "L2", lbnd[ 1 ] );
+       msgSetk( "U2", ubnd[ 1 ] );
        errRep( " ", "The corrections NDF has incorrect pixel bounds "
                "(^L1:^U1,^L2:^U2) - should be (0:31,0:39).", status );
      }
@@ -333,8 +333,8 @@ static void smf1_scale_bols_job( void *job_data, int *status ) {
    double *p1;
    double *p2;
    int newbad;
-   size_t bstride;
-   size_t tstride;
+   dim_t bstride;
+   dim_t tstride;
    smfScaleBolsJobData *pdata;
    smf_qual_t *qua;
    smf_qual_t *q1;

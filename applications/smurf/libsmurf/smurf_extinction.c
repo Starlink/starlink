@@ -367,12 +367,12 @@ void smurf_extinction( int * status ) {
   for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( wf, igrp, ogrp, i, darks, flatramps, heateffmap,
+    smf_open_and_flatfield( wf, igrp, ogrp, (int) i, darks, flatramps, heateffmap,
                             &odata, status );
 
     if (*status != SAI__OK) {
       /* Error flatfielding: tell the user which file it was */
-      msgSeti("I",i);
+      msgSetk("I",i);
       errRep(TASK_NAME, "Unable to open the ^I th file", status);
     }
 
@@ -387,7 +387,7 @@ void smurf_extinction( int * status ) {
 
       if ( !has_been_sky_removed && *status == SAI__OK ) {
         *status = SAI__ERROR;
-        msgSeti("I",i);
+        msgSetk("I",i);
         errRep("", "Input data from file ^I are not sky-subtracted", status);
       }
     }

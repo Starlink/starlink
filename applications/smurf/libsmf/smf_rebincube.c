@@ -15,15 +15,15 @@
 
 *  Invocation:
 *     smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
-*                    int *ptime, int badmask, int is2d,
+*                    dim_t *ptime, int badmask, int is2d,
 *                    AstSkyFrame *abskyfrm, AstMapping *oskymap,
 *                    AstFrame *ospecfrm, AstMapping *ospecmap,
 *                    Grp **detgrp, int moving, int usewgt, int spread,
-*                    const double params[], int lbnd_out[ 3 ],
-*                    int ubnd_out[ 3 ], int genvar, float *data_array,
+*                    const double params[], dim_t lbnd_out[ 3 ],
+*                    dim_t ubnd_out[ 3 ], int genvar, float *data_array,
 *                    float *var_array, double *wgt_array, float *texp_array,
 *                    float *teff_array, double *fcon, int64_t *nused,
-*                    int *nreject, int *naccept, int *status );
+*                    dim_t *nreject, int *naccept, int *status );
 
 *  Arguments:
 *     wf = ThrWorkForce * (Given)
@@ -36,12 +36,12 @@
 *     last = int (Given)
 *        Is this the last call to this routine for the current output
 *        cube?
-*     ptime = int * (Given)
+*     ptime = dim_t * (Given)
 *        Pointer to an array of integers, each one being the index of a
 *        time slice that is to be pasted into the output cube. If this is
 *        NULL, then all time slices are used. The values in the array
 *        should be monotonic increasing and should be terminated by a value
-*        of VAL__MAXI.
+*        of VAL__MAXK.
 *     badmask = int (Given)
 *        Indicates how the bad pixel mask for each output spectrum is
 *        determined. A value of zero causes the bad pixel mask for each
@@ -147,12 +147,12 @@
 *     nused = int64_t * (Given and Returned)
 *        Use to accumulate the total number of input data samples that
 *        have been pasted into the output cube.
-*     nreject = int * (Given and Returned)
+*     nreject = dim_t * (Given and Returned)
 *        The number of input spectra that have been ignored becuase they
 *        either do not cover the full spectral range of the output or
 *        because they have a different bad pixel mask to the output.
 *        Only used if "badmask==0" (it is left unchanged otherwise).
-*     naccept = int * (Given and Returned)
+*     naccept = dim_t * (Given and Returned)
 *        The number of input spectra that have not been ignored. Only used
 *        if "badmask==0" (it is left unchanged otherwise).
 *     status = int * (Given and Returned)
@@ -238,15 +238,15 @@
 #define FUNC_NAME "smf_rebincube"
 
 void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
-                     int *ptime, int badmask, int is2d,
+                     dim_t *ptime, int badmask, int is2d,
                      AstSkyFrame *abskyfrm, AstMapping *oskymap,
                      AstFrame *ospecfrm, AstMapping *ospecmap,
-                     Grp **detgrp, int moving, int usewgt, int lbnd_out[ 3 ],
-                     int ubnd_out[ 3 ], int spread,
+                     Grp **detgrp, int moving, int usewgt, dim_t lbnd_out[ 3 ],
+                     dim_t ubnd_out[ 3 ], int spread,
                      const double params[], int genvar, float *data_array,
                      float *var_array, double *wgt_array, float *texp_array,
                      float *teff_array, double *fcon, int64_t *nused,
-                     int *nreject, int *naccept, int *status ){
+                     dim_t *nreject, dim_t *naccept, int *status ){
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
@@ -267,16 +267,12 @@ void  smf_rebincube( ThrWorkForce *wf, smfData *data, int first, int last,
    double tfac;                /* Factor describing spectral overlap */
    int good_tsys;              /* Flag indicating some good Tsys values found */
    int64_t nused_orig;         /* Supplied value of *nused */
-   smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
 
 /* Begin an AST context.*/
    astBegin;
-
-/* Store a pointer to the input NDFs smfHead structure. */
-   hdr = data->hdr;
 
 /* Store the dimensions of the output array. */
    dim[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;

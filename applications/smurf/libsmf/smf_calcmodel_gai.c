@@ -105,10 +105,10 @@ void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* bolometer stride */
+  dim_t bstride;               /* bolometer stride */
   dim_t gain_box=0;             /* No. of time slices in a block */
-  size_t gbstride;              /* GAIn bolo stride */
-  size_t gcstride;              /* GAIn coeff stride */
+  dim_t gbstride;              /* GAIn bolo stride */
+  dim_t gcstride;              /* GAIn coeff stride */
   int gflat=0;                  /* correct flatfield using GAI */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
@@ -121,9 +121,9 @@ void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t ndata;                  /* Number of data points */
   smfArray *noi=NULL;           /* Pointer to NOI at chunk */
   double *noi_data=NULL;        /* Pointer to DATA component of model */
-  size_t noibstride;            /* bolo stride for noise */
+  dim_t noibstride;            /* bolo stride for noise */
   dim_t nointslice;             /* number of time slices for noise */
-  size_t noitstride;            /* Time stride for noise */
+  dim_t noitstride;            /* Time stride for noise */
   dim_t npar;                   /* No. of parameters per bolometer */
   dim_t ntslice;                /* Number of time slices */
   int oldalg = 1;               /* Is the old COM algorithm being used? */
@@ -132,7 +132,7 @@ void smf_calcmodel_gai( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DAT */
   double *scale;                /* Pointer to scale factor */
-  size_t tstride;               /* time slice stride */
+  dim_t tstride;               /* time slice stride */
   double *wg;                   /* Workspace holding time slice gains */
   double *woff;                 /* Workspace holding time slice offsets */
 

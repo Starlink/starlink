@@ -14,25 +14,25 @@
 *     Subroutine
 
 *  Invocation:
-*     void smf_weightstats1<X>( const CGEN_TYPE *data, size_t stride,
-*                               size_t nsamp, const smf_qual_t *qual,
-*                               size_t qstride,  smf_qual_t mask,
-*                               const double *weights, size_t wstride,
-*                               double *mean, double *sigma, size_t *ngood,
+*     void smf_weightstats1<X>( const CGEN_TYPE *data, dim_t stride,
+*                               dim_t nsamp, const smf_qual_t *qual,
+*                               dim_t qstride,  smf_qual_t mask,
+*                               const double *weights, dim_t wstride,
+*                               double *mean, double *sigma, dim_t *ngood,
 *                               int *status )
 
 *  Arguments:
 *     data = const CGEN_TYPE* (Given)
 *        Pointer to input data array
-*     stride = size_t (Given)
+*     stride = dim_t (Given)
 *        Index stride between elements
-*     nsamp = size_t (Given)
+*     nsamp = dim_t (Given)
 *        Length of the interval to analyze
 *     qual = const smf_qual_t* (Given)
 *        If specified, use this QUALITY array to decide which samples
 *        to use (provided mask). Otherwise data are only ignored if set
 *        to CGEN_BAD.
-*     qstride = size_t (Given)
+*     qstride = dim_t (Given)
 *        Stride for qual. If 0 assumed to be stride.
 *     mask = smf_qual_t (Given)
 *        Use with qual to define which bits in quality are relevant to
@@ -40,7 +40,7 @@
 *     weights = const double * (Given)
 *        Pointer to array containing nsamp weights for each data point (with
 *        stride wstride). If NULL smf_stats1 will be called.
-*     wstride = size_t (Given)
+*     wstride = dim_t (Given)
 *        Stride for weight values in weights array (if 0 assumed to be same
 *        as stride)
 *     mean = double* (Given and Returned)
@@ -49,7 +49,7 @@
 *        Pointer to variable that will contain the standard deviation of
 *        the data. If NULL this routine will run faster and not calculate
 *        the standard deviation.
-*     ngood = size_t* (Given and Returned)
+*     ngood = dim_t* (Given and Returned)
 *        Pointer to variable that will indicate how many samples were used
 *        to calculate the statistics.
 *     status = int* (Given and Returned)
@@ -120,17 +120,17 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_stats1"
 
-void CGEN_FUNCTION(smf_weightstats1)( const CGEN_TYPE *data, size_t stride,
-                                      size_t nsamp, const smf_qual_t *qual,
-                                      size_t qstride,  smf_qual_t mask,
-                                      const double *weights, size_t wstride,
+void CGEN_FUNCTION(smf_weightstats1)( const CGEN_TYPE *data, dim_t stride,
+                                      dim_t nsamp, const smf_qual_t *qual,
+                                      dim_t qstride,  smf_qual_t mask,
+                                      const double *weights, dim_t wstride,
                                       double *mean, double *sigma,
-                                      size_t *ngood, int *status ) {
+                                      dim_t *ngood, int *status ) {
 
   /* Local variables */
-  size_t count=0;             /* Number of samples in estimate */
+  dim_t count=0;             /* Number of samples in estimate */
   double d;                   /* Temporary data value */
-  size_t i;                   /* Loop counter */
+  dim_t i;                   /* Loop counter */
   double mu=0;                /* Estimate of the mean */
   smf_qual_t q;               /* Temporary quality value */
   double sumwd=0;             /* Sum of the weights time data */
@@ -246,8 +246,8 @@ void CGEN_FUNCTION(smf_weightstats1)( const CGEN_TYPE *data, size_t stride,
   if( count < SMF__MINSTATSAMP ) {
     *status = SMF__INSMP;
     msgSeti("MIN",SMF__MINSTATSAMP);
-    msgSeti("N", count );
-    msgSeti("MX", nsamp );
+    msgSetk("N", count );
+    msgSetk("MX", nsamp );
     errRep( "", FUNC_NAME
             ": Insufficient number of good samples (^N<^MIN out of ^MX) for "
             "statistics", status );

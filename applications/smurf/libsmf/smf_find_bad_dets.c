@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
+*     dim_t *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 
 *  Arguments:
 *     igrp = Grp * (Given)
@@ -77,20 +77,20 @@
 #include "sae_par.h"
 #include "smf.h"
 
-int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
+dim_t *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
 
 /* Local Variables */
+   dim_t *result;
+   dim_t dims[ 3 ];
+   dim_t i;
+   dim_t j;
+   dim_t k;
+   dim_t outlen;
    float *p = NULL;
-   int *result;
-   int dims[ 3 ];
-   int el;
-   int i;
    int ifile;
    int indf;
-   int j;
-   int k;
    int ndim;
-   int outlen;
+   size_t el;
 
 /* Initialise returned values. */
    *nbaddet = 0;
@@ -113,7 +113,7 @@ int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status ){
    NDF, extend the returned array and initialise the new elements to
    zero. */
       if( outlen < dims[ 1 ] ) {
-         result = astGrow( result, dims[ 1 ], sizeof( int ) );
+         result = astGrow( result, dims[ 1 ], sizeof( *result ) );
          if( astOK ) {
             for( i = outlen; i < dims[ 1 ]; i++ ) result[ i ] = 0;
             outlen = dims[ 1 ];

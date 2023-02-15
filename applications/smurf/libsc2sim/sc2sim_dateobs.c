@@ -104,12 +104,11 @@ void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status ) {
   double df;                  /* Day fraction for output file start time */
   int ihmsf[4];               /* Array containing H, M, S and .SS */
   char sign[2];               /* Sign of day fraction */
-  int date_status;            /* status of mjd->calendar date conversion*/
 
   if ( *status != SAI__OK) return;
 
   /* Convert this MJD to something more readable */
-  date_status = iauJd2cal( DJM0, mjdaystart, &yy, &mm, &dd, &df );
+  (void) iauJd2cal( DJM0, mjdaystart, &yy, &mm, &dd, &df );
 
   /* Convert day fraction to hh:mm:ss */
   iauD2tf( 3, df, sign, ihmsf );

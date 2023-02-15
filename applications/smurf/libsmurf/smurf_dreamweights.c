@@ -175,7 +175,7 @@ void smurf_dreamweights ( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;        /* Group containing configuration file */
   smfData *data = NULL;       /* Input data */
-  const int defgridminmax[] = { -4, 4, -4, 4 }; /* Default extent xmin,xmax,ymin,ymax */
+  int defgridminmax[] = { -4, 4, -4, 4 }; /* Default extent xmin,xmax,ymin,ymax */
   int gridminmax[4];          /* Extent of grid points array */
   int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
   double gridstep;            /* Size of reconstruction grid in arcsec */
@@ -207,7 +207,7 @@ void smurf_dreamweights ( int *status ) {
       errAnnul( status );
       msgOutif(MSG__VERB, " ", "No config file specified - assuming default configuration parameters", status);
       keymap = astKeyMap(" " );
-      astMapPut1I( keymap, "GRIDMINMAX", 4, (int*)defgridminmax, " " );
+      astMapPut1I( keymap, "GRIDMINMAX", 4, defgridminmax, " " );
       astMapPut0D( keymap, "GRIDSTEP", 6.28, " " );
     } else {
       kpg1Kymap( confgrp, &keymap, status );
@@ -223,16 +223,16 @@ void smurf_dreamweights ( int *status ) {
   /* Loop over number of files */
   for ( i=1; (i<= size) && (*status == SAI__OK); i++) {
     /* Open file */
-    smf_open_file( NULL, igrp, i, "READ", 0, &data, status );
+    smf_open_file( NULL, igrp, (int) i, "READ", 0, &data, status );
 
     /* Calculate weights based on this file */
-    smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax,
+    smf_dream_calcweights( data, ogrp, (int) i, gridstep, ngrid, gridminmax,
                            &(gridpts[0]), status);
 
     /* Immediately check status on return and abort if an error occured */
     if ( *status != SAI__OK ) {
-      msgSeti("I",i);
-      msgSeti("N",size);
+      msgSetk("I",i);
+      msgSetk("N",size);
       errRep(FUNC_NAME, "Unable to determine DREAM weights for file ^I of ^N",
              status);
     }

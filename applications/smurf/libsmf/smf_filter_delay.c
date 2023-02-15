@@ -89,7 +89,7 @@
 
 void smf_filter_delay( smfFilter *filt, double delay, int *status ) {
   double delay_samp;     /* Delay in samples */
-  size_t i;              /* Loop counter */
+  dim_t i;              /* Loop counter */
   smfData *sfunc=NULL;   /* delayed sinc function resampling kernel */
   smfData *sfunc_ft=NULL;/* FFT of sfunc */
   double tstep;          /* Length of sample in seconds */

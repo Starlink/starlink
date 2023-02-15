@@ -16,7 +16,7 @@
 *     pntr = smf_construct_smfDA( smfDA * tofill, smfData *dksquid,
 *                    double * flatcal, double * flatpar,
 *                    smf_flatmeth flatmeth, int nflat, double refres,
-*                    double * heatval, int nheat, int * status );
+*                    double * heatval, dim_t nheat, int * status );
 
 *  Arguments:
 *     tofill = smfDA* (Given)
@@ -36,7 +36,7 @@
 *        Reference resistance used to calculate the flatfield
 *     heatval = double * (Given)
 *        Pointer to array of heater values used for flatfield calculations.
-*     nheat = int (Given)
+*     nheat = dim_t (Given)
 *        Number of elements in heatval.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -122,7 +122,8 @@
 smfDA *
 smf_construct_smfDA( smfDA * tofill, smfData * dksquid, double * flatcal,
 		     double * flatpar, smf_flatmeth flatmeth,
-                     int nflat, double refres, double * heatval, int nheat, int * status ) {
+                     int nflat, double refres, double * heatval,
+                     dim_t nheat, int * status ) {
 
   smfDA * da = NULL;   /* File components */
 

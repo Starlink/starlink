@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     void smf_inbeam_str( smf_inbeam_t inbeam, char * inbeamstr,
-*              size_t lenstr, int * status );
+*              dim_t lenstr, int * status );
 
 *  Arguments:
 *     inbeam = smf_inbeam_t (Given)
 *        Bit mask indicating which systems are in the beam
 *     inbeamstr = char * (Given & Returned)
 *        Buffer to receive string.
-*     lenstr = size_t (Given)
+*     lenstr = dim_t (Given)
          Length of inbeamstr.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -75,7 +75,7 @@ typedef struct {
 } smfBeamPair;
 
 void
-smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, size_t lenstr, int * status ) {
+smf_inbeam_str ( smf_inbeam_t inbeam, char *inbeamstr, dim_t lenstr, int * status ) {
 
   #define NPAIRS 3
   const smfBeamPair beampairs[] = {

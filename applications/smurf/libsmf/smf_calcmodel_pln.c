@@ -95,8 +95,8 @@ void smf_calcmodel_pln( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
                         int *status) {
 
   /* Local Variables */
-  size_t bstride;               /* bolo stride */
-  size_t i;                     /* Loop counter */
+  dim_t bstride;               /* bolo stride */
+  dim_t i;                     /* Loop counter */
   dim_t idx=0;                  /* Index within subgroup */
   AstKeyMap *kmap=NULL;         /* Pointer to PLN-specific keys */
   smfArray *model=NULL;         /* Pointer to model at chunk */
@@ -112,7 +112,7 @@ void smf_calcmodel_pln( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  size_t tstride;               /* Time slice stride in data array */
+  dim_t tstride;               /* Time slice stride in data array */
 
   /* Main routine */
   if (*status != SAI__OK) return;

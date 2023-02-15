@@ -13,21 +13,21 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calc_mmapsize( size_t headsize, const smfData * data,
-*                        size_t * headlen, size_t *datalen,
-*                        size_t * buflen, int * status );
+*     smf_calc_mmapsize( dim_t headsize, const smfData * data,
+*                        dim_t * headlen, dim_t *datalen,
+*                        dim_t * buflen, int * status );
 
 *  Arguments:
-*     headsize = size_t (Given)
+*     headsize = dim_t (Given)
 *        Minimum size of header chunk. Will be rounded up to the nearest
 *        page.
 *     data = const smfData * (Given)
 *        smfData to analyze to determine size of data chunk.
-*     headlen = size_t * (Returned)
+*     headlen = dim_t * (Returned)
 *        Required size of header that matches the pagesize.
-*     datalen = size_t * (Returned)
+*     datalen = dim_t * (Returned)
 *        Required size of data segment.
-*     buflen = size_t * (Returned)
+*     buflen = dim_t * (Returned)
 *        Size of full buffer (datalen + headlen)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -78,13 +78,13 @@
 
 #include "smf.h"
 
-void smf_calc_mmapsize( size_t headsize, const smfData * data,
-                        size_t *headlen, size_t *datalen,
-                        size_t *buflen, int * status ) {
-  size_t pagesize;
-  size_t remainder;
-  size_t ndata;
-  size_t i;
+void smf_calc_mmapsize( dim_t headsize, const smfData * data,
+                        dim_t *headlen, dim_t *datalen,
+                        dim_t *buflen, int * status ) {
+  dim_t pagesize;
+  dim_t remainder;
+  dim_t ndata;
+  dim_t i;
 
   *datalen = 0;
   *headlen = 0;
@@ -104,7 +104,7 @@ void smf_calc_mmapsize( size_t headsize, const smfData * data,
   /* Length of data array buffer */
   ndata = 1;
   for( i=0; i < data->ndims; i++ ) {
-    ndata *= (size_t) (data->dims)[i];
+    ndata *= (dim_t) (data->dims)[i];
   }
   *datalen = ndata * smf_dtype_sz(data->dtype,status);
 

@@ -122,8 +122,8 @@ int smf_check_detpos( smfData *data, float mxerr, int report, int *status ){
    int done;             /* Has a test been performed yet? */
    int ibase;            /* Original index of Base Frame in WCS FrameSet */
    int result;           /* The result of the check */
-   size_t irec;          /* Index of current input detector */
-   size_t itime;         /* Index of current time slice */
+   dim_t irec;          /* Index of current input detector */
+   dim_t itime;         /* Index of current time slice */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
 
 /* Initialise. */
@@ -240,7 +240,7 @@ int smf_check_detpos( smfData *data, float mxerr, int report, int *status ){
                      if( ! result && report ) {
                         smf_smfFile_msg( data->file, "FILE", 1, "<unknown file>" );
                         msgSetr( "MAX", (float)( max_dist*AST__DR2D*3600.0) );
-                        msgSeti( "T", itime + 1 );
+                        msgSetk( "T", itime + 1 );
 
                         if( report > 0 ) {
                            msgOutif( MSG__QUIET, " ", "   WARNING: The detector "

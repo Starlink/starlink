@@ -310,7 +310,7 @@ sc2astCache *fts2ast_createwcs2
     /* Flips the "real" 450/850 image from (Right, UP) coordinates to (Right, Down),
      * as the following polynomial includes a correction for a vertical mirroring.
      */
-	flipmap = astMatrixMap(2,2,0,flip,"");
+	flipmap = astMatrixMap(2,2,0,flip," ");
     cache->map[ subnum ] = (AstMapping *) astCmpMap( cache->map[ subnum ], flipmap, 1, " " );
 
 

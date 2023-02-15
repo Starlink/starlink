@@ -137,7 +137,7 @@
 
 #define FUNC_NAME "smf_flatfield"
 
-void smf_flatfield ( ThrWorkForce *wf, const smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
+void smf_flatfield ( ThrWorkForce *wf, smfData *idata, const smfArray * flats, AstKeyMap * heateffmap,
                      smfData **odata, const int flags, int *status ) {
 
   if ( *status != SAI__OK ) return;

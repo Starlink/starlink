@@ -612,7 +612,6 @@ void smurf_sc2sim( int *status ) {
   double digcurrent;              /* digitisation mean current */
   double digmean;                 /* digitisation mean value */
   double digscale;                /* digitisation scale factore */
-  int dreamstare = 0;             /* Flag for running a DREAM/STARE observation */
   double elevation;               /* telescope elevation (radians) */
   char filter[8];                 /* string to hold filter name */
   double *heater = NULL;          /* bolometer heater ratios */
@@ -620,7 +619,7 @@ void smurf_sc2sim( int *status ) {
   int hitsonly = 0;               /* Flag to indicate hits-only simulation */
   int maxwrite;                   /* file close time */
   obsMode mode;                   /* what type of observation are we doing? */
-  int nbol;                       /* total number of bolometers */
+  dim_t nbol;                     /* total number of bolometers */
   Grp *obsGrp = NULL;             /* Group containing obs parameter file */
   AstKeyMap *obskeymap = NULL;    /* AstKeyMap for obs parameters */
   size_t osize = 0;               /* Size of obsGrp */
@@ -648,17 +647,17 @@ void smurf_sc2sim( int *status ) {
   int ardFlag=0;                  /* Flag for ARD description */
   Grp *ardGrp = NULL;             /* Group containing ARD description */
   int *bolos = NULL;              /* Array of all bolometers */
-  int lbnd[2];                    /* Lower pixel bounds for bad pixel mask */
-  int lbnde[2];                   /* Lower pixel bounds encompassing all
+  dim_t lbnd[2];                  /* Lower pixel bounds for bad pixel mask */
+  dim_t lbnde[2];                 /* Lower pixel bounds encompassing all
                                      external pixels */
-  int lbndi[2];                   /* Lower pixel bounds encompassing all
+  dim_t lbndi[2];                 /* Lower pixel bounds encompassing all
                                      internal pixels */
   int regval=0;                   /* First keyword in ARD description */
   float trcoeff;                  /* Coefficients for ARD mapping */
-  int ubnd[2];                    /* Upper pixel bounds for bad pixel mask */
-  int ubnde[2];                   /* Upper pixel bounds encompassing all
+  dim_t ubnd[2];                  /* Upper pixel bounds for bad pixel mask */
+  dim_t ubnde[2];                 /* Upper pixel bounds encompassing all
                                      external pixels */
-  int ubndi[2];                   /* Upper pixel bounds encompassing all
+  dim_t ubndi[2];                 /* Upper pixel bounds encompassing all
                                      internal pixels */
 
   /* Get input parameters */
@@ -673,7 +672,7 @@ void smurf_sc2sim( int *status ) {
   if ( *status == PAR__NULL ) {
     errAnnul ( status );
     gettimeofday ( &time, NULL );
-    rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+    rseed = (int)( ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 ) );
     msgOutif(MSG__VERB," ",
              "Seeding random numbers with clock time", status);
   } else {
@@ -699,7 +698,7 @@ void smurf_sc2sim( int *status ) {
 
   nbol = inx.colsize * inx.rowsize;
   /* Bad bolometer mask */
-  bolos = astCalloc( (size_t)(nbol), sizeof(int) );
+  bolos = astCalloc( (dim_t)(nbol), sizeof(int) );
   lbnd[0] = 1;
   lbnd[1] = 1;
   ubnd[SC2STORE__COL_INDEX] = inx.rowsize;
@@ -710,8 +709,8 @@ void smurf_sc2sim( int *status ) {
   } else {
     ardGrpex ( ard, NULL, &ardGrp, &ardFlag, status );
     trcoeff = VAL__BADR;
-    ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
-              lbndi, ubndi, lbnde, ubnde, status );
+    ardWork8 ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
+               lbndi, ubndi, lbnde, ubnde, status );
   }
 
   /* String for the wavelength of the filter */
@@ -731,15 +730,12 @@ void smurf_sc2sim( int *status ) {
     break;
   case MODE__STARE:
     msgSetc("M","STARE");
-    dreamstare = 1;
     break;
   case MODE__NOISE:
     msgSetc("M","NOISE");
-    dreamstare = 1;
     break;
   case MODE__DREAM:
     msgSetc("M","DREAM");
-    dreamstare = 1;
     break;
   case MODE__PONG:
     if ( strncmp(inx.pong_type, "CURV", 4) == 0 ) {
@@ -794,7 +790,7 @@ void smurf_sc2sim( int *status ) {
   if ( heatrun ) {
     /* Do a heatrun/flatfield simulation */
     sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
-                     heater, nbol, pzero, inx.steptime, status );
+                     heater, (int) nbol, pzero, inx.steptime, status );
 
   } else {
 
@@ -822,7 +818,7 @@ void smurf_sc2sim( int *status ) {
     parGet0l("OVERWRITE", &overwrite, status);
 
     sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale,
-                      filter, heater, maxwrite, mode, coordframe, nbol,
+                      filter, heater, maxwrite, mode, coordframe, (int) nbol,
                       pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc,
                       ybolo, hitsonly, overwrite, simstats, status);
   }

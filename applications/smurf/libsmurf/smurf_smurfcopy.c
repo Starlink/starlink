@@ -143,26 +143,25 @@
 void smurf_smurfcopy ( int * status ) {
 
   smfData * data = NULL;     /* input file struct */
-  size_t dtypsz;             /* Number of bytes in data type */
+  dim_t dtypsz;              /* Number of bytes in data type */
   Grp *fgrp = NULL;          /* Filtered group, no darks */
   fts2Port fts_port;         /* FTS-2 port */
   char fts_port_name[10];    /* FTS-2 port name */
   size_t i;                  /* Loop counter */
-  smfFile * ifile = NULL;    /* Input smfFile */
   Grp *igrp = NULL;          /* Input group */
   unsigned char * inptr = NULL; /* Pointer to start of section to copy */
-  int islice;                /* int time slice from parameter */
-  int lbnd[2];               /* Lower coordinate bounds of output file */
-  size_t nelem;              /* Number of elements to copy */
+  dim_t islice;              /* int time slice from parameter */
+  dim_t lbnd[2];             /* Lower coordinate bounds of output file */
+  dim_t nelem;               /* Number of elements to copy */
   smfData * odata = NULL;    /* output file struct */
-  size_t offset;             /* offset into data array */
+  dim_t offset;              /* offset into data array */
   smfFile * ofile = NULL;    /* output smfFile */
   Grp *ogrp = NULL;          /* Output group */
   size_t outsize;            /* Total number of NDF names in the output group */
   smf_qual_t *qua;           /* Pointer to input quality array */
   dim_t slice;               /* Time index to extract */
   size_t size;               /* Number of files in input group */
-  int ubnd[2];               /* Upper coordinate bounds of output file */
+  dim_t ubnd[2];             /* Upper coordinate bounds of output file */
 
   if (*status != SAI__OK) return;
 
@@ -220,10 +219,10 @@ void smurf_smurfcopy ( int * status ) {
        slices in a single file but only one file.
      */
 
-    msgSeti( "MAX", (data->dims)[2] );
+    msgSetk( "MAX", (data->dims)[2] );
     msgOutif( MSG__NORM, " ", "File has ^MAX slices.", status );
 
-    parGdr0i( "SLICE",1, 0, (data->dims)[2], 1, &islice, status);
+    parGdr0k( "SLICE",1, 0, (data->dims)[2], 1, &islice, status);
     slice = islice;
     if (slice == 0) slice = (data->dims)[2];
 
@@ -256,7 +255,6 @@ void smurf_smurfcopy ( int * status ) {
     smf_open_newfile( NULL, ogrp, i, data->dtype, 2, lbnd, ubnd,
                       qua?SMF__MAP_QUAL:0, &odata, status );
     ofile = odata->file;
-    ifile = data->file;
 
     /* protect against null pointer smfFile */
     if (*status == SAI__OK) {

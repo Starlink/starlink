@@ -137,8 +137,8 @@ void smf_reduce_dark( const smfData *indark, smf_dtype dtype,
   if (indark->da && indark->da->flatcal
       && indark->hdr->obstype != SMF__TYP_FLATFIELD
       && indark->da->flatmeth != SMF__FLATMETH_NULL ) {
-    size_t nbols = (indark->dims)[0] * (indark->dims)[1];
-    size_t i;
+    dim_t nbols = (indark->dims)[0] * (indark->dims)[1];
+    dim_t i;
     double *flatcal = indark->da->flatcal;
     int *idata = NULL;
     int *ivar  = NULL;

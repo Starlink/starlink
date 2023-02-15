@@ -82,8 +82,8 @@
 
 #define FUNC_NAME "smf_get_findex"
 
-size_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
-  size_t retval=0;
+dim_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
+  dim_t retval=0;
 
    /* Check the inherited status */
    if( *status != SAI__OK ) return retval;
@@ -107,7 +107,7 @@ size_t smf_get_findex( double f, double df, dim_t nf, int *status ) {
    }
 
    /* If we get here, retval is guaranteed to be >= 0, and not infinity */
-   retval = (size_t) round( f/df );
+   retval = (dim_t) round( f/df );
 
    if( retval > nf ) {
      msgOutiff( MSG__DEBUG, "", FUNC_NAME

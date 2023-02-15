@@ -13,11 +13,9 @@
 *     Library routine
 
 *  Invocation:
-*     smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status )
+*     smf_fix_pol2( smfArray *array, int *status )
 
 *  Arguments:
-*     wf = ThrWorkForce * (Given)
-*        Pointer to a pool of worker threads.
 *     array = smfArray * (Given and Returned)
 *        The data that will be fixed.
 *     status = int* (Given and Returned)
@@ -96,7 +94,7 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
                          const double *tgaps, int *status );
 
 /* Main entry point . */
-void smf_fix_pol2( ThrWorkForce *wf,  smfArray *array, int *status ){
+void smf_fix_pol2( smfArray *array, int *status ){
 
 /* Local Variables: */
    JCMTState *state;
@@ -377,6 +375,10 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
 #define LBOX 5
 
 /* Local Variables: */
+   dim_t ia;
+   dim_t ihit;
+   dim_t ilot;
+   dim_t it;
    double cor;
    double cormax;
    double sa2;
@@ -384,10 +386,6 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
    double sat;
    double st2;
    double st;
-   int ia;
-   int ihit;
-   int ilot;
-   int it;
    int lag;
    int laghi;
    int laglo;
@@ -432,8 +430,7 @@ static int smf1_findlag( dim_t iframe, int curlag, dim_t nframe, const double *a
          ia = it - lag;
 
 /* Check they are both within the bounds of the arrays. */
-         if( ia > 0 && ia < (int) nframe &&
-             it > 0 && it < (int) nframe ) {
+         if( ia > 0 && ia < nframe && it > 0 && it < nframe ) {
 
 /* If neither is bad, update the running sums needed to find the
    correlation. */

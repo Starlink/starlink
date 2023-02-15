@@ -160,8 +160,8 @@ smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old, const int rawconvert
                       const int flags, int assertOrder, int isTordered,
                       int * status ) {
 
-  size_t bstr1=0;             /* bolometer index stride input */
-  size_t bstr2=0;             /* bolometer index stride output */
+  dim_t bstr1=0;              /* bolometer index stride input */
+  dim_t bstr2=0;              /* bolometer index stride output */
   int create[3];              /* Flag for copying each component (D,V,Q) */
   smfDA *da = NULL;           /* New smfDA */
   smfFts* fts = NULL;         /* FTS2 data */
@@ -169,29 +169,29 @@ smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old, const int rawconvert
   smf_dtype oldtype;          /* Data type for original smfData */
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
-  size_t i;                   /* Loop counter */
-  int isFFT;                  /* ISFFT FITS header */
-  size_t j;                   /* Loop counter */
-  int lbnd[NDF__MXDIM];       /* lower bounds of each axis of data array */
+  int i;                      /* Loop counter */
+  dim_t isFFT;                /* ISFFT FITS header */
+  dim_t j;                    /* Loop counter */
+  dim_t lbnd[NDF__MXDIM];     /* lower bounds of each axis of data array */
   dim_t nbolo;                /* number of bolometers */
-  size_t nbytes;              /* Number of bytes in data type */
-  dim_t ncoeff = 0;           /* Number of coefficients */
-  size_t ndims;               /* Number of dimensions in data array */
+  dim_t nbytes;               /* Number of bytes in data type */
+  int ncoeff = 0;             /* Number of coefficients */
+  int ndims;                  /* Number of dimensions in data array */
   smfData *new = NULL;        /* New smfData */
   int newOrder;               /* Data order in new data buffer */
   smf_dtype newtype;          /* Data type for new smfData */
-  size_t nrdims;              /* Number of used real-space dimensions */
+  int nrdims;                 /* Number of used real-space dimensions */
   int oldOrder;               /* Data order in old data buffer */
   double *outdata;            /* Pointer to output DATA */
-  size_t npts;                /* Number of data points */
+  dim_t npts;                 /* Number of data points */
   dim_t ntslice;              /* Number of time slices */
   void *pntr[2];              /* Data and variance arrays */
   double *poly = NULL;        /* Polynomial coefficients */
   smf_qual_t *qual = NULL;    /* Quality array */
   int reOrder=0;              /* If set we are re-ordering the data */
   smfData * sidequal = NULL;  /* Sidecar quality */
-  size_t tstr1=0;             /* time index stride input */
-  size_t tstr2=0;             /* time index stride output */
+  dim_t tstr1=0;              /* time index stride input */
+  dim_t tstr2=0;              /* time index stride output */
   int *tstream;               /* Pointer to raw time series data */
   int virtual;                /* Is it a virtual smfData? */
   AstKeyMap *history = NULL;  /* Pointer to history */
@@ -377,7 +377,7 @@ smf_deepcopy_smfData( ThrWorkForce *wf, const smfData *old, const int rawconvert
 
   /* Copy over polynomial coefficients */
   if ( ncoeff != 0 ) {
-    size_t npolypts;
+    dim_t npolypts;
     if( oldOrder ) {
       npolypts = old->dims[0]*old->dims[1]*ncoeff;
     } else {

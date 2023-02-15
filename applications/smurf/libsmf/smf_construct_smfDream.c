@@ -13,16 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     dream = smf_construct_smfDream( smfData *data, size_t nvert,
-*                                     size_t nsampcycle, const int *jigvert,
+*     dream = smf_construct_smfDream( smfData *data, int nvert,
+*                                     dim_t nsampcycle, const int *jigvert,
 *                                     const double *jigpath, int * status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        smfData struct for the input raw DREAM data
-*     nvert = size_t (Given)
+*     nvert = int (Given)
 *        Number of vertices in the DREAM jiggle pattern
-*     nsampcycle = size_t (Given)
+*     nsampcycle = dim_t (Given)
 *        Number of data samples in a single DREAM cycle
 *     jigvert = const int * (Given)
 *        Array of positions in the DREAM jiggle pattern
@@ -68,7 +68,7 @@
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
 *     2007-10-31 (TIMJ):
-*        Consistently use size_t
+*        Consistently use dim_t
 *     2008-07-11 (AGG):
 *        Allow for lower-case SAM_MODE
 *     2008-07-24 (TIMJ):
@@ -123,8 +123,8 @@
 
 #define FUNC_NAME "smf_construct_smfDream"
 
-smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
-				  size_t nsampcycle, const int *jigvert,
+smfDream *smf_construct_smfDream( smfData *data, int nvert,
+				  dim_t nsampcycle, const int *jigvert,
 				  const double *jigpath, int * status ) {
 
   /* Local variables */
@@ -140,12 +140,12 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
   int gridymin;              /* Minimum pixel value in Y for reconstruction grid */
   smfHead *hdr = NULL;       /* Header info */
   double *invmatx = NULL;    /* Pointer to the inverse matrix */
-  size_t i;                  /* Loop counter */
+  dim_t i;                  /* Loop counter */
   int ix;                    /* X pixel counter */
   int jy;                    /* Y pixel counter */
-  size_t k;                  /* Index into gridpts array */
+  dim_t k;                  /* Index into gridpts array */
   int ndfid;                 /* NDf identifier for current component */
-  size_t nelem;              /* Size of data array to be allocated */
+  dim_t nelem;              /* Size of data array to be allocated */
   char weightsfile[SZFITSTR]; /* Name of weights file */
   smfData *wtdata = NULL;    /* smfData for weights file */
   smfFile *wtfile = NULL;    /* smfFile for weights file */
@@ -172,9 +172,9 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
     if ( jigpath != NULL && jigvert != NULL ) {
       dream = smf_create_smfDream( status );
       if ( dream != NULL ) {
-	dream->nvert = (size_t)nvert;
-	dream->nsampcycle = (size_t)nsampcycle;
-	dream->ncycles = (size_t)(data->dims)[2] / dream->nsampcycle;
+	dream->nvert = nvert;
+	dream->nsampcycle = (dim_t)nsampcycle;
+	dream->ncycles = (dim_t)(data->dims)[2] / dream->nsampcycle;
 	/* Retrieve jiggle positions */
 	for (i=0; i<nvert; i++) {
 	  (dream->jigvert)[i][0] = jigvert[i];
@@ -214,11 +214,11 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 		smf_open_ndf( ndfid, "READ", SMF__DOUBLE,
                               &griddata, status);
 		if ( griddata != NULL ) {
-		  nelem = (size_t)((griddata->dims)[0] * (griddata->dims)[1]);
-		  gridwts = astCalloc( nelem, sizeof(double) );
+		  nelem = (dim_t)((griddata->dims)[0] * (griddata->dims)[1]);
+		  gridwts = astCalloc( nelem, sizeof(*gridwts) );
 		  if ( gridwts != NULL ) {
 		    gridptr = (griddata->pntr)[0];
-		    memcpy( gridwts, gridptr, nelem*sizeof(double) );
+		    memcpy( gridwts, gridptr, nelem*sizeof(*gridwts) );
 		    dream->gridwts = gridwts;
 		  }
 		  smf_close_file( NULL, &griddata, status);
@@ -229,11 +229,11 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 				      NULL, NULL, status);
 		smf_open_ndf( ndfid, "READ", SMF__DOUBLE, &griddata, status);
 		if ( griddata != NULL ) {
-		  nelem = (size_t)((griddata->dims)[0]);
-		  invmatx = astCalloc( nelem, sizeof(double) );
+		  nelem = (dim_t)((griddata->dims)[0]);
+		  invmatx = astCalloc( nelem, sizeof(*invmatx) );
 		  if ( invmatx != NULL ) {
 		    gridptr = (griddata->pntr)[0];
-		    memcpy( invmatx, gridptr, nelem*sizeof(double) );
+		    memcpy( invmatx, gridptr, nelem*sizeof(*invmatx) );
 		    dream->invmatx = invmatx;
 		  }
 		  smf_close_file( NULL, &griddata, status);

@@ -115,21 +115,21 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
 			smf_qual_t mask, int *status ) {
 
   /* Local variables */
-  size_t bstride;               /* Stride between bolometers */
+  dim_t bstride;               /* Stride between bolometers */
   double *dat=NULL;             /* Pointer to bolo data */
   double goodfrac;              /* Fraction of good samples */
   dim_t i;                      /* Loop counter */
-  size_t istart;                /* Start of the good range */
-  size_t iend;                  /* End of the good range */
+  dim_t istart;                /* Start of the good range */
+  dim_t iend;                  /* End of the good range */
   dim_t len;                    /* Length of interval including starts */
   double minsig;                /* Minimum measured r.m.s. */
   dim_t nbolo;                  /* Number of bolometers */
-  size_t ngood;                 /* Number of good samples in r.m.s. check */
+  dim_t ngood;                 /* Number of good samples in r.m.s. check */
   dim_t ntslice;                /* Number of time slices */
   const smf_qual_t *qua=NULL;   /* Pointer to quality flags */
   double retval=0;              /* Return value */
   double sig;                   /* r.m.s. of this chunk */
-  size_t tstride;               /* Stride between time slices */
+  dim_t tstride;               /* Stride between time slices */
 
   /* Check status */
   if (*status != SAI__OK) return retval;
@@ -147,8 +147,8 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   /* Check for reasonable bolo/nsamp/nchunk */
   if( bolo >= nbolo ) {
     *status = SAI__ERROR;
-    msgSeti("BOLO",bolo);
-    msgSeti("NBOLO",nbolo-1);
+    msgSetk("BOLO",bolo);
+    msgSetk("NBOLO",nbolo-1);
     errRep(FUNC_NAME, "Invalid bolo: ^BOLO, must be in range [0,^NBOLO]",
 	   status);
     return retval;
@@ -157,7 +157,7 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   if( nsamp < SMF__MINSTATSAMP ) {
     *status = SAI__ERROR;
     msgSeti("MIN",SMF__MINSTATSAMP);
-    msgSeti("NSAMP",nsamp);
+    msgSetk("NSAMP",nsamp);
     errRep(FUNC_NAME,
 	   "Invalid nsamp: ^NSAMP, must be > ^MIN",
 	   status);
@@ -165,8 +165,8 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
   }
 
   if( nsamp > ntslice ) {
-    msgSeti("NSAMP",nsamp);
-    msgSeti("NTSLICE",ntslice);
+    msgSetk("NSAMP",nsamp);
+    msgSetk("NTSLICE",ntslice);
     msgOutif( MSG__VERB, " ",
 	   "SMF_QUICK_NOISE: Shortening nsamp ^NSAMP to file length ^NTSLICE",
 	   status);
@@ -175,13 +175,13 @@ double smf_quick_noise( const smfData *data, dim_t bolo, dim_t nsamp, dim_t nchu
 
   if( nchunk < 1 ) {
     *status = SAI__ERROR;
-    msgSeti("NCHUNK",nchunk);
+    msgSetk("NCHUNK",nchunk);
     errRep(FUNC_NAME, "Invalid nchunk: ^NCHUNK, must be >= 1", status);
     return retval;
   }
 
   if( nchunk > ntslice) {
-    msgSeti("NCHUNK",nchunk);
+    msgSetk("NCHUNK",nchunk);
     msgOutif( MSG__VERB, " ",
 	      "SMF_QUICK_NOISE: Shortening nchunk ^NCHUNK to 1", status);
     nchunk = 1;

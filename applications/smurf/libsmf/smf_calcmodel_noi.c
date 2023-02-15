@@ -215,11 +215,11 @@ typedef struct smfCalcModelNoiData {
    int chisq;
    int *lut_data;
    int operation;
-   size_t bstride;
-   size_t mbstride;
-   size_t mtstride;
-   size_t nchisq;
-   size_t tstride;
+   dim_t bstride;
+   dim_t mbstride;
+   dim_t mtstride;
+   dim_t nchisq;
+   dim_t tstride;
    smf_qual_t *qua_data;
 } SmfCalcModelNoiData;
 
@@ -238,13 +238,13 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   dim_t boxsize;                /* No. of time slices in each noise box */
   smfData *box = NULL;          /* SmfData holding one box of input data */
   int box_type;                 /* How to calculate the noise */
-  size_t bstride;               /* bolometer stride */
+  dim_t bstride;                /* bolometer stride */
   int calcfirst=0;              /* Were bolo noises already measured? */
   int dclimcorr;                /* Min number of correlated steps */
   int dcmaxsteps;               /* Maximum allowed number of dc jumps */
-  dim_t dcfitbox;               /* Width of box for DC step detection */
+  int dcfitbox;                 /* Width of box for DC step detection */
   double dcthresh;              /* Threshold for DC step detection */
-  dim_t dcsmooth;               /* Width of median filter in DC step detection*/
+  int dcsmooth;                 /* Width of median filter in DC step detection*/
   double *din;                  /* Pointer to next input value */
   double *dout;                 /* Pointer to next output value */
   int fillgaps;                 /* If set perform gap filling */
@@ -259,35 +259,35 @@ void smf_calcmodel_noi( ThrWorkForce *wf, smfDIMMData *dat, int chunk,
   AstKeyMap *kmap=NULL;         /* Local keymap */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
-  size_t mbstride;              /* model bolometer stride */
+  dim_t mbstride;               /* model bolometer stride */
   dim_t mntslice;               /* Number of model time slices */
-  size_t mtstride;              /* model time slice stride */
+  dim_t mtstride;               /* model time slice stride */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
-  int nbox = 0;                 /* Number of noise boxes */
-  size_t nchisq;                /* Number of data points in chisq calc */
+  dim_t nbox = 0;               /* Number of noise boxes */
+  dim_t nchisq;                 /* Number of data points in chisq calc */
   dim_t nelbox;                 /* Number of data points in a noise box */
   dim_t ndata;                  /* Total number of data points */
-  size_t nflag;                 /* Number of new flags */
-  int nleft;                    /* Number of samples not in a noise box */
+  dim_t nflag;                  /* Number of new flags */
+  dim_t nleft;                  /* Number of samples not in a noise box */
   dim_t ntslice;                /* Number of time slices */
   int nw;                       /* Number of worker threads */
-  size_t pend;                  /* Last non-PAD sample */
-  size_t pstart;                /* First non-PAD sample */
+  dim_t pend;                   /* Last non-PAD sample */
+  dim_t pstart;                 /* First non-PAD sample */
   smf_qual_t *qin;              /* Pointer to next input quality value */
   smf_qual_t *qout;             /* Pointer to next output quality value */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
-  smf_qual_t *qua_data=NULL; /* Pointer to RES at chunk */
+  smf_qual_t *qua_data=NULL;    /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   dim_t spikebox=0;             /* Box size for spike detection */
   double spikethresh=0;         /* Threshold for spike detection */
-  size_t tend;                  /* Last input sample to copy */
-  size_t tstart;                /* First input sample to copy */
-  size_t tstride;               /* time slice stride */
+  dim_t tend;                   /* Last input sample to copy */
+  dim_t tstart;                 /* First input sample to copy */
+  dim_t tstride;                /* time slice stride */
   double *var=NULL;             /* Sample variance */
-  size_t xbstride;              /* Box bolometer stride */
+  dim_t xbstride;               /* Box bolometer stride */
   int zeropad;                  /* Pad with zeros? */
   SmfCalcModelNoiData *pdata;   /* Pointer to data for a single job */
 
@@ -768,7 +768,7 @@ static void smf1_calcmodel_noi( void *job_data_ptr, int *status ) {
    double vval;
    double wgt;
    int *pl;
-   size_t ibase;
+   dim_t ibase;
    smf_qual_t *pq;
 
 /* Check inherited status */

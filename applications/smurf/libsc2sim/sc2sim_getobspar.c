@@ -87,7 +87,7 @@
  *        - Set targetpow based on wavelength if not specified
  *        - Introduce flag to denote an 850 or 450 um simulation
  *     2007-10-31 (TIMJ):
- *        astMapGet0I uses int not size_t
+ *        astMapGet0I uses int not dim_t
  *     2008-03-19 (AGG):
  *        Add obstype, limit map size, scan speed & duration for a
  *        pointing or focus observation

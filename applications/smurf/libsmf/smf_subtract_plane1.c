@@ -162,30 +162,29 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
   double angle0 = 0;        /* Initial angle */
   gsl_matrix *azel = NULL;  /* Matrix of input positions */
   double b[2];              /* Coordinates for point B */
-  size_t base;              /* Starting point for index into arrays */
+  dim_t base;              /* Starting point for index into arrays */
   double c[2];              /* Coordinates for point C (zenith) */
   double chisq = 0;         /* Chi-squared from the linear regression fit */
   double cosalpha;          /* Cosine alpha */
   double dalpha;            /* Change in focal plane angle (radians) */
-  double delta;             /* Change in angle */
   double dskyaz;            /* Sky power fit - azimuth gradient */
   double dskyel;            /* Sky power fit - elev gradient */
-  size_t fitmean = 0;       /* Flag to specify if the fit type is mean */
-  size_t fitslope = 0;      /* Flag to specify if the fit is a 1-D elev slope */
-  size_t fitplane = 0;      /* Flag to specify if the fit is a 2-D plane */
+  dim_t fitmean = 0;       /* Flag to specify if the fit type is mean */
+  dim_t fitslope = 0;      /* Flag to specify if the fit is a 1-D elev slope */
+  dim_t fitplane = 0;      /* Flag to specify if the fit is a 2-D plane */
   smfHead *hdr = NULL;      /* Pointer to full header struct */
   dim_t i;                  /* Loop counter */
   double *indata = NULL;    /* Pointer to data array */
   dim_t index;              /* index into vectorized data array */
-  size_t *indices = NULL;
+  dim_t *indices = NULL;
   dim_t j;                  /* Loop counter */
   dim_t k;                  /* Loop counter */
   gsl_matrix *mcov = NULL;  /* Covariance matrix */
-  size_t ncoeff = 2;        /* Number of coefficients to fit for; default straight line */
-  size_t needast = 0;       /* Flag to specify if astrometry is needed for fit */
-  size_t nframes = 0;       /* Number of frames */
-  size_t npts;              /* Number of data points */
-  size_t numgood;           /* Number of pixels with non-BAD values */
+  dim_t ncoeff = 2;        /* Number of coefficients to fit for; default straight line */
+  dim_t needast = 0;       /* Flag to specify if astrometry is needed for fit */
+  dim_t nframes = 0;       /* Number of frames */
+  dim_t npts;              /* Number of data points */
+  dim_t numgood;           /* Number of pixels with non-BAD values */
   const char *origsystem = NULL;  /* Character string to store the coordinate
                                      system on entry */
   gsl_vector *psky = NULL;  /* Vector containing sky brightness */
@@ -354,7 +353,6 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
       dalpha = hdr->state->tcs_az_ang - angle0;
       angle0 = hdr->state->tcs_az_ang;
       alpha += dalpha;
-      delta = (alpha - hdr->state->tcs_az_ang) *180/M_PI;
       /* Calculate new `effective' elevation values. Factor sin/cos
          calculation outside loop */
       cosalpha = cos( alpha );
@@ -444,7 +442,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
     /* Debugging info - do not set all the tokens unless we
        actually need to print them out */
     if (msgFlevok( MSG__DEBUG, status )) {
-      msgSeti("K",k+1);
+      msgSetk("K",k+1);
       msgSetc("F",fittype);
       msgOutif(MSG__DEBUG," ",
                " Fit results for timeslice ^K (fit type = ^F)", status );
