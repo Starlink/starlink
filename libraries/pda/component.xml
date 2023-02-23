@@ -9,7 +9,7 @@
   <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><build>generic</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>ems</build><build>sae</build><build>cnf</build><build>generic</build><link>ems</link><link>cnf</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

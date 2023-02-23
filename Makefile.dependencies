@@ -2310,6 +2310,7 @@ $(MANIFESTS)/pcs: \
 
 $(MANIFESTS)/pda: \
 		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
