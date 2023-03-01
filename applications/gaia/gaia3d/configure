@@ -9170,8 +9170,6 @@ fi
 
 
 
-# VTK is always available, but keep this option to use another version.
-
 
 # Check whether --with-vtk was given.
 if test "${with_vtk+set}" = set; then :
@@ -9217,7 +9215,7 @@ $as_echo_n "checking if VTK is installed in $VTK_PREFIX... " >&6; }
    if test -z "$vtkFound"; then
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-
+      have_vtk="no"
    else
       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -9250,25 +9248,30 @@ $as_echo_n "checking if VTK version is at least $maj.$min.$rel... " >&6; }
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-
+            have_vtk="yes"
          else
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-
+            have_vtk="no"
          fi
       else
                                     CFLAGS="$VTK_CFLAGS $CFLAGS"
          CXXFLAGS="$VTK_CXXFLAGS $CXXFLAGS"
          LDFLAGS="$VTK_LDFLAGS $LDFLAGS"
-
+         have_vtk="yes"
       fi
    fi
 fi
 
-LDFLAGS_DEFAULT="$LDFLAGS_DEFAULT $LDFLAGS"
+if test "$have_vtk" = "yes"; then
+   LDFLAGS_DEFAULT="$LDFLAGS_DEFAULT $LDFLAGS"
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
 
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No VTK libraries so GAIA3D will be disabled" >&5
+$as_echo "$as_me: WARNING: No VTK libraries so GAIA3D will be disabled" >&2;}
+fi
 
 #--------------------------------------------------------------------
 # Prefer to include a config.h file.
