@@ -142,7 +142,7 @@ itcl::class gaia::GaiaAstTransform {
       #  positions. Most of the controls are disabled and only the
       #  Marker menu is used in this case.
       itk_component add trantable {
-         GaiaPosTable $w_.trantable \
+         gaia::GaiaPosTable $w_.trantable \
             -title "Transformed positions (image coordinates)" \
             -editmenu {} \
             -markmenu $Markers \

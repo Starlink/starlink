@@ -181,7 +181,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
 #  Called after options have been evaluated
 #  ---------------------------------------
    protected method init {} {
-      DialogWidget::init
+      util::DialogWidget::init
       destroy $itk_component(top)
    }
 

@@ -201,7 +201,7 @@ itcl::class gaia::StarArdLine {
       if { ! [create_properties_window $name] } {
 
          #  Now add the entry  for the description.
-         set Endpoints_ [ETable $Frame_.table -columns 2 -rows 2 \
+         set Endpoints_ [gaia::ETable $Frame_.table -columns 2 -rows 2 \
                             -action [code $this update_from_table] \
                          -scrollbarplaces {none none} ]
          $Endpoints_ setlabel 0 X

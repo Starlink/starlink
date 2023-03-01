@@ -109,7 +109,7 @@ itcl::class gaia::GaiaCubeChanmap {
    protected method add_controls_ {} {
 
       #  Use default controls (range and combination method).
-      GaiaCubeApps::add_controls_
+      gaia::GaiaCubeApps::add_controls_
 
       #  The number of channels to create.
       itk_component add nchan {

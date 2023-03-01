@@ -1597,7 +1597,7 @@ itcl::class gaia::GaiaCube {
       if { $fitsheaders_ == {} } {
          set fitsheaders_ $w_.fitsheaders_
       }
-      utilReUseWidget GaiaFITSHeader $fitsheaders_ -accessor $cubeaccessor_
+      utilReUseWidget gaia::GaiaFITSHeader $fitsheaders_ -accessor $cubeaccessor_
       $fitsheaders_ activate
    }
 
@@ -1618,7 +1618,7 @@ itcl::class gaia::GaiaCube {
          if { $hdu_list_ == {} } {
             set hdu_list_ $w_.hdulist
          }
-         utilReUseWidget GaiaCubeHduChooser $hdu_list_ -gaiacube $this
+         utilReUseWidget gaia::GaiaCubeHduChooser $hdu_list_ -gaiacube $this
       }
    }
 
@@ -1901,7 +1901,7 @@ itcl::class gaia::GaiaCube {
    #  ===========================
    protected method show_builtin_toolbox_ {} {
       if { $cubeaccessor_ != {} } {
-         utilReUseWidget GaiaCubeAstDomain $w_.domainchooser \
+         utilReUseWidget gaia::GaiaCubeAstDomain $w_.domainchooser \
             -gaiacube $this \
             -notify_cmd [code $this coords_changed_]
       }
@@ -1921,7 +1921,7 @@ itcl::class gaia::GaiaCube {
    #  one importer for each instance of this. Any 3D uses query the importer
    #  for catalogues.
    public method make_cupid_importer {} {
-      utilReUseWidget GaiaCupidImporter $w_.cupidimporter -gaiacube $this
+      utilReUseWidget gaia::GaiaCupidImporter $w_.cupidimporter -gaiacube $this
       renderers_set_cupid_importer_
    }
 

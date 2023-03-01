@@ -104,7 +104,7 @@ itcl::class gaia::GaiaSearch {
 
       #  The catalogue may be accessed during construction (and converted
       #  to native format), catch any errors and dispose of this object.
-      if { [catch {SkySearch::init} msg] } {
+      if { [catch {skycat::SkySearch::init} msg] } {
          catch {::delete object $this}
          error $msg
       }
@@ -237,7 +237,7 @@ itcl::class gaia::GaiaSearch {
    #  given command which will be called immediately after the catalogue
    #  is opened.
    public method open_catalog {} {
-      AstroCat::open_catalog
+      cat::AstroCat::open_catalog
       if { $itk_option(-open_cmd) != {} } {
          eval $itk_option(-open_cmd)
       }
@@ -311,7 +311,7 @@ itcl::class gaia::GaiaSearch {
       set_origin
       if { $allow_searches_ } {
          set_wcs_type
-         AstroCat::search $args
+         cat::AstroCat::search $args
          restore_equinox_
       }
 
@@ -406,7 +406,7 @@ itcl::class gaia::GaiaSearch {
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 0
       }
-      SkySearch::plot
+      skycat::SkySearch::plot
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 1
       }
@@ -686,7 +686,7 @@ itcl::class gaia::GaiaSearch {
          }
       } else {
          #  Let SkySearch restore from catalogue.
-         SkySearch::apply_history $skycat $filename
+         skycat::SkySearch::apply_history $skycat $filename
       }
    }
 

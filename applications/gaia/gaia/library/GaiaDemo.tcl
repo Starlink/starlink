@@ -137,7 +137,7 @@ itcl::class gaia::GaiaDemo {
       #  Create a text area for describing the demo. XXX must be bug
       #  in ScrollText as configuration can only be done after creation.
       itk_component add text {
-         ScrollText $w_.text
+         gaia::ScrollText $w_.text
       }
       set_font_ [lindex $fonts_ 1]
       $itk_component(text) configure -width 70 -height 15 -foreground blue

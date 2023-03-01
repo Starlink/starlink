@@ -124,7 +124,7 @@ itcl::class gaia::MultiGraphPrint {
    #  Use PrintDialog::ok to get the file descriptor (CanvasPrint::ok
    #  returns filename)
    public method ok {args} {
-      PrintDialog::ok $args
+      util::PrintDialog::ok $args
    }
 
    #  Configuration options: (public variables)

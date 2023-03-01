@@ -381,7 +381,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Interactive tab positioning widget.
       itk_component add tabstop {
-         GaiaTabStops $parent.tabstop \
+         gaia::GaiaTabStops $parent.tabstop \
             -change_cmd [code $this update_fixed_ from] \
             -text "No information, press update"
       }

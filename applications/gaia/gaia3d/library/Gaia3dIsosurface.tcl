@@ -301,7 +301,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
             $colour_menu_($i) add_custom_colour $new_colour $index
          }
       }
-      Gaia3dTool::add_custom_colour $new_colour $index
+      gaia3d::Gaia3dTool::add_custom_colour $new_colour $index
    }
 
    #  Get the level and attributes as a single string.
@@ -604,7 +604,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
    #  Create objects to manage a contour.
    protected method create_iso_contour_ {index} {
       if { $imagedata_ != {} } {
-         set contour_($index) [Gaia3dVtkIso \#auto \
+         set contour_($index) [gaia3d::Gaia3dVtkIso \#auto \
                                   -stencil [$imagedata_ get_stencil] \
                                   -imagedata [$imagedata_ get_imagedata] \
                                   -renwindow $renwindow_]

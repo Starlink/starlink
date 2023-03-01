@@ -101,7 +101,7 @@ itcl::class gaia::GaiaCubeAstDomain {
 
    #  Called after realisation, do any tweaks to the UI.
    public method init {} {
-      GaiaAstDomain::init
+      gaia::GaiaAstDomain::init
       set m [get_menu Help]
       $m entryconfigure "On Window..." \
          -command [code $this show_help cubedomain]

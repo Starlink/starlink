@@ -164,7 +164,7 @@ itcl::class gaia::GaiaConvertTable {
          #  Start up external filter.
          if { $to_filter_($type) == {} } {
             global env
-            set to_filter_($type) [GaiaForeignExec \#auto \
+            set to_filter_($type) [gaia::GaiaForeignExec \#auto \
                                       -application $to_app_($type) \
                                       -show_output 0]
          }
@@ -206,7 +206,7 @@ itcl::class gaia::GaiaConvertTable {
       #  Start up external filter.
       if { $from_filter_($type) == {} } {
          global env
-         set from_filter_($type) [GaiaForeignExec \#auto \
+         set from_filter_($type) [gaia::GaiaForeignExec \#auto \
                                      -application $from_app_($type) \
                                      -show_output 0]
       }

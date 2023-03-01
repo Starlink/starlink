@@ -2361,7 +2361,7 @@ itcl::class gaia::GaiaSextractor {
                   #  Establish a control object for this foreign task,
                   #  if not already done.
                   if { $foreign_sex_ == {} } {
-                     set foreign_sex_ [GaiaForeignExec \#auto \
+                     set foreign_sex_ [gaia::GaiaForeignExec \#auto \
                                           -show_output $itk_component(status) \
                                           -use_error 1 \
                                           -preprocess [code $this clean_] \

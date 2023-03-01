@@ -60,7 +60,7 @@ itcl::class gaia::SampSearch {
 
    #  Initialise widget.
    public method init {} {
-      GaiaSearch::init
+      gaia::GaiaSearch::init
 
       set samp_client_ [gaia::Gaia::get_samp_client]
       if {$samp_client_ != ""} {
@@ -167,7 +167,7 @@ itcl::class gaia::SampSearch {
    #  Override select_symbol to perform additional SAMP-related
    #  row highlighting activities.
    public method select_symbol {id toggle {rownum -1}} {
-      SkySearch::select_symbol $id $toggle $rownum
+      skycat::SkySearch::select_symbol $id $toggle $rownum
       activate_selected_row
    }
 

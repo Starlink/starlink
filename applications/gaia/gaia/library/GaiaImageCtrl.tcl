@@ -908,7 +908,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  works for FITS images.
    public method set_bias {} {
       if { [$image_ isfits] } {
-         RtdImageCtrl::set_bias
+         rtd::RtdImageCtrl::set_bias
          return
       }
       warning_dialog "Only enabled for FITS data"
@@ -1006,7 +1006,7 @@ itcl::class gaia::GaiaImageCtrl {
    # locally or just by the filename convention).
    public method add_history {filename} {
       if { ! $itk_option(-temporary) && ! [string match {*GaiaTemp*} $filename] } {
-         SkyCatCtrl::add_history $filename
+         skycat::SkyCatCtrl::add_history $filename
       }
    }
 
@@ -1260,7 +1260,7 @@ itcl::class gaia::GaiaImageCtrl {
          if { [winfo exists $w_.ndfhdu] } {
             after idle [code destroy $w_.ndfhdu]
          }
-         RtdImageCtrl::update_fits_hdus
+         rtd::RtdImageCtrl::update_fits_hdus
       } else {
 
          #  Displaying NDF now, if FITS last time remove popup.
@@ -1321,7 +1321,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  the main image and non-zero for a rapid frame. Override so that
    #  GAIA tools may be informed of these events.
    protected method camera_post_command {frameid} {
-      RtdImage::camera_post_command $frameid
+      rtd::RtdImage::camera_post_command $frameid
       if { $frameid == 0 } {
          if { $itk_option(-real_time_command) != {} } {
             eval $itk_option(-real_time_command)

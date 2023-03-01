@@ -993,7 +993,7 @@ itcl::class gaia::GaiaAstReference {
 
    #  Create a toplevel windows displaying additional options.
    protected method make_additional_ {} {
-      set add_ [TopLevelWidget $w_.add \
+      set add_ [util::TopLevelWidget $w_.add \
                    -transient $itk_option(-transient) \
                    -withdraw 1 \
                    -center 0]
@@ -1104,7 +1104,7 @@ itcl::class gaia::GaiaAstReference {
    protected method start_transfer_ {} {
       blt::busy hold $w_
       if { ! [winfo exists $trantop_] } {
-         set trantop_ [GaiaAstTransfer $w_.trantop \
+         set trantop_ [gaia::GaiaAstTransfer $w_.trantop \
                           -rtdimage $itk_option(-rtdimage) \
                           -canvas $itk_option(-canvas) \
                           -image $itk_option(-image) \

@@ -221,7 +221,7 @@ itcl::class gaia::StarArdRect {
       if { ! [create_properties_window $name] } {
 
          #  Now add the entry  for the description.
-         set Corners_ [ETable $Frame_.table -columns 2 -rows 2 \
+         set Corners_ [gaia::ETable $Frame_.table -columns 2 -rows 2 \
                           -scrollbarplaces {none none} \
                           -action [code $this update_from_table]]
          $Corners_ setlabel 0 X

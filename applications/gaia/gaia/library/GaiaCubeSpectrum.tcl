@@ -385,7 +385,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          #  window to save real estate.
          set cube $itk_option(-gaiacube)
          set spectrum_ \
-            [GaiaSpectralPlot $w_.specplot \
+            [gaia::GaiaSpectralPlot $w_.specplot \
                 -number [$itk_option(-gaia) cget -number] \
                 -gaiacubespectrum $this \
                 -spec_coords $itk_option(-spec_coords) \
@@ -745,7 +745,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          if { $itk_option(-show_splatdisp) } {
             set use_error_dialog 0
          }
-         set splat_disp_ [GaiaForeignExec \#auto \
+         set splat_disp_ [gaia::GaiaForeignExec \#auto \
                              -application $splat_dir_/splatdisp \
                              -show_output $itk_option(-show_splatdisp) \
                              -show_traceback $itk_option(-show_splatdisp) \

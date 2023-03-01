@@ -192,12 +192,12 @@ itcl::class gaia::GaiaQueryResult {
       if { ! $formats_flag_ } {
          configure -sizes [{*}$astrocat csize $itk_option(-info)]
       }
-      TableList::new_info
+      util::TableList::new_info
    }
 
    #  Override print to avoid bug. This method shouldn't exist.
    public method print {fd} {
-      TableList::print $fd
+      util::TableList::print $fd
    }
 
    #  Save the results to a named file.

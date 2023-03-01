@@ -108,7 +108,7 @@ itcl::class gaia::GaiaMask {
       set GoMenu [add_menubutton "Go" \
                      "Go: menu with shortcuts to view previous images"]
       configure_menubutton "Go" -underline 0
-      set history_ [GaiaHistory \#auto -gaiatoplevel $this]
+      set history_ [gaia::GaiaHistory \#auto -gaiatoplevel $this]
       $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
 
       #  Add window help.

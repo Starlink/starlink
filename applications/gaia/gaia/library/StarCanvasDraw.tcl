@@ -104,7 +104,7 @@ itcl::class gaia::StarCanvasDraw {
    # This method is called after the constructor have completed.
 
    method init {} {
-      CanvasDraw::init
+      util::CanvasDraw::init
 
       # Set some options in the base class.
       # (Since we have reimplemented rotation in C, we don't need the inherited Tcl version.)
@@ -148,7 +148,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Create the canvas item menu, adds a lower command to control the
    #  selection of overlaid items that obscure each other.
    method make_object_menu {} {
-      CanvasDraw::make_object_menu
+      util::CanvasDraw::make_object_menu
       $object_menu_ add command -label "Lower Selected Item(s)" \
          -command [code $this lower_selected_objects]
    }
@@ -161,7 +161,7 @@ itcl::class gaia::StarCanvasDraw {
 
    #  Delete an object from the canvas.
    method delete_object {id} {
-      CanvasDraw::delete_object $id
+      util::CanvasDraw::delete_object $id
       catch {unset types_($id)}
    }
 
@@ -184,7 +184,7 @@ itcl::class gaia::StarCanvasDraw {
       if { ! [info exists obj_id_] } {
          set obj_id_ {}
       }
-      CanvasDraw::set_drawing_mode $type $create_cmd
+      util::CanvasDraw::set_drawing_mode $type $create_cmd
       switch -exact $drawing_mode_ {
          ellipse -
          rotbox {
@@ -314,7 +314,7 @@ itcl::class gaia::StarCanvasDraw {
       if { $obj_id_ == "" } {
          return
       }
-      CanvasDraw::create_done $x $y
+      util::CanvasDraw::create_done $x $y
    }
 
    #  Select the given object by drawing little grips on it.
@@ -352,13 +352,13 @@ itcl::class gaia::StarCanvasDraw {
                $canvas_ addtag $w_.selected withtag $id
             }
             default {
-               CanvasDraw::select_object $id $any
+               util::CanvasDraw::select_object $id $any
             }
          }
       } else {
          #  We have no knowledge of this object so just pass on
          #  responsibility.
-         CanvasDraw::select_object $id $any
+         util::CanvasDraw::select_object $id $any
       }
 
       #  Notify that object is selected, if asked.
@@ -523,7 +523,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Deselect the given object.
 
    method deselect_object {id} {
-      CanvasDraw::deselect_object $id
+      util::CanvasDraw::deselect_object $id
       if {[info exists notify_selected_($id)]} {
          eval "$notify_selected_($id) deselected"
       }
@@ -537,7 +537,7 @@ itcl::class gaia::StarCanvasDraw {
             eval "$notify_selected_($id) deselected"
          }
       }
-      CanvasDraw::deselect_objects
+      util::CanvasDraw::deselect_objects
    }
 
    #  Adjust the selection handles for the given object to fit the new size/pos.
@@ -556,7 +556,7 @@ itcl::class gaia::StarCanvasDraw {
       } elseif { [info exists types_($id)] && $types_($id) == "pointpoly" } {
          adjust_pointpoly_selection $id
       } else {
-         CanvasDraw::adjust_object_selection $id
+         util::CanvasDraw::adjust_object_selection $id
       }
    }
 
@@ -821,7 +821,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Override add_object_bindings to deal with the case when a canvas
    #  item is created directly (in which case we do not know the id).
    method add_object_bindings {id {target_id ""} } {
-      CanvasDraw::add_object_bindings $id $target_id
+      util::CanvasDraw::add_object_bindings $id $target_id
       if { ! [info exists types_($id)] } {
 
          #  This is an item we don't know about. Add it to the lists.
@@ -1266,7 +1266,7 @@ itcl::class gaia::StarCanvasDraw {
    #  Redefine select only the given object to update the pointpoly
    #  when required (trap for only moving mouse stopped this at v2.0.7).
    method select_only_object {id x y} {
-      CanvasDraw::select_only_object $id $x $y
+      util::CanvasDraw::select_only_object $id $x $y
       if { [info exists types_($id)] && $types_($id) == "pointpoly" } {
          adjust_pointpoly_selection $id
       }

@@ -166,7 +166,7 @@ itcl::class gaia::StarArdPrim {
    method create_properties_window {name} {
       set exists 0
       if { ! [winfo exists $Properties_] } {
-         set Properties_ [TopLevelWidget $name]
+         set Properties_ [util::TopLevelWidget $name]
          wm title $name "ARD Properties ($this)"
 
          if { [info exists mode] } {
@@ -245,12 +245,12 @@ itcl::class gaia::StarArdPrim {
    #  event as well as the user of the class.
    method create_and_resize {cmd} {
       if { $notify_created_cmd_ == {} } {
-         StarCanvasObject::create_and_resize $cmd
+         gaia::StarCanvasObject::create_and_resize $cmd
       } else {
          if { $cmd == {} } {
-            StarCanvasObject::create_and_resize "$notify_created_cmd_"
+            gaia::StarCanvasObject::create_and_resize "$notify_created_cmd_"
          } else {
-            StarCanvasObject::create_and_resize "$notify_created_cmd_;$cmd"
+            gaia::StarCanvasObject::create_and_resize "$notify_created_cmd_;$cmd"
          }
       }
    }
@@ -258,12 +258,12 @@ itcl::class gaia::StarArdPrim {
    #  Create an item using the current coordinates.
    method create_no_resize {cmd tcoords} {
       if { $notify_created_cmd_ == {} } {
-         StarCanvasObject::create_no_resize $cmd $coords
+         gaia::StarCanvasObject::create_no_resize $cmd $coords
       } else {
          if { $cmd == {} } {
-            StarCanvasObject::create_no_resize "$notify_created_cmd_" $coords
+            gaia::StarCanvasObject::create_no_resize "$notify_created_cmd_" $coords
          } else {
-            StarCanvasObject::create_no_resize "$notify_created_cmd_;$cmd" $coords
+            gaia::StarCanvasObject::create_no_resize "$notify_created_cmd_;$cmd" $coords
          }
       }
    }

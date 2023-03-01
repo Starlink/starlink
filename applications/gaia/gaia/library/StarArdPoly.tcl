@@ -216,7 +216,7 @@ itcl::class gaia::StarArdPoly {
       if { ! [create_properties_window $name] } {
 
          #  Now add the entry  for the description.
-         set Vertices_ [ETable $Frame_.table -columns 2 -rows 4\
+         set Vertices_ [gaia::ETable $Frame_.table -columns 2 -rows 4\
                            -action [code $this update_from_table]]
          $Vertices_ setlabel 0 X
          $Vertices_ setlabel 1 Y

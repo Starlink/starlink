@@ -205,7 +205,7 @@ itcl::class gaia::GaiaAstRefine {
       #  Create a GaiaAstTable to display the positions that we are using
       #  to refine the WCS.
       itk_component add table {
-          GaiaAstTable $w_.table \
+          gaia::GaiaAstTable $w_.table \
              -editmenu $Edit \
              -markmenu $Marker \
              -rtdimage $itk_option(-rtdimage) \

@@ -609,7 +609,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
          if { ! $itk_option(-quiet_exit) } {
-            OptionDialog $w_.dialog \
+            gaia::OptionDialog $w_.dialog \
                -title {Unsaved apertures} \
                -text {There are unsaved apertures, are you sure you want to quit?} \
                -buttons [list Yes No] \

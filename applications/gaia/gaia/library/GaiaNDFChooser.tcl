@@ -262,7 +262,7 @@ itcl::class gaia::GaiaNDFChooser {
 
    #  Add a short help window
    protected method make_short_help_ {} {
-      TopLevelWidget::make_short_help
+      util::TopLevelWidget::make_short_help
 
       add_short_help $itk_component(table) \
          {Table: Click to select NDF, double-click to display image}

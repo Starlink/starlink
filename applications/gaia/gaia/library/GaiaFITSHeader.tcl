@@ -294,7 +294,7 @@ itcl::class gaia::GaiaFITSHeader {
          }
          set lastblank 0
 
-         set triple [GaiaFITSHeader::get_kvc $line]
+         set triple [gaia::GaiaFITSHeader::get_kvc $line]
          if { [lempty $triple] } {
             set triple [list INVALID {} $line]
          }

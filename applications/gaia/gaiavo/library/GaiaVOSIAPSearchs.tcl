@@ -188,7 +188,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
 
    #  Complete interface.
    public method init {} {
-      FrameWidget::init
+      util::FrameWidget::init
       set_from_image
    }
 
@@ -438,7 +438,7 @@ itcl::class gaiavo::GaiaVOSIAPSearchs {
             -activate_cmd [code $this changed_registry_] \
             -blacklist $itk_option(-blacklist)
       } else {
-         GaiaVOCatRegistry $w_.voregistry \
+         gaia::GaiaVOCatRegistry $w_.voregistry \
             -catalog [$itk_option(-astrocat) longname] \
             -service SIAP \
             -activate_cmd [code $this changed_registry_] \

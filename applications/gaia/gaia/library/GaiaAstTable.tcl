@@ -354,7 +354,7 @@ itcl::class gaia::GaiaAstTable {
 
          #  Create a Name chooser to display the possible catalogues
          #  and allow a choice.
-         NameChooser $w_.chooser \
+         gaia::NameChooser $w_.chooser \
             -title "Select a catalogue" \
             -textvariable [scope catalogue_($this)] \
             -width 40
@@ -720,7 +720,7 @@ itcl::class gaia::GaiaAstTable {
          error_dialog "No rows are selected" $w_
          return
       }
-      GaiaEnterObject $w_.ef \
+      gaia::GaiaEnterObject $w_.ef \
          -title {Please edit the data for the object below:} \
          -image $itk_option(-image) \
          -labels [$itk_component(table) cget -headings] \
@@ -812,7 +812,7 @@ itcl::class gaia::GaiaAstTable {
          catch {destroy $enter_object_}
       }
       set enter_object_ \
-         [GaiaEnterObject $w_.ef \
+         [gaia::GaiaEnterObject $w_.ef \
              -title {Please enter the data for a new object below:} \
              -image $itk_option(-image) \
              -labels [$itk_component(table) cget -headings] \

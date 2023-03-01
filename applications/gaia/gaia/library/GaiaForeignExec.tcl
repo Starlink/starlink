@@ -131,7 +131,7 @@ itcl::class gaia::GaiaForeignExec {
    constructor  {args} {
 
       #  Create the command queue.
-      set command_queue_ [Queue \#auto]
+      set command_queue_ [gaia::Queue \#auto]
 
       #  And evaluate any configuration options.
       if { $args != {} } {
@@ -350,7 +350,7 @@ itcl::class gaia::GaiaForeignExec {
    public variable show_output {0} {
       if { $show_output == "1" } {
          set show_output_ 1
-         set Top_ [TopLevelWidget .\#auto]
+         set Top_ [util::TopLevelWidget .\#auto]
          wm title $Top_ "Output from application \"$this\""
          set Scrollbox_ [gaia::Scrollbox $Top_.output]
          pack $Scrollbox_ -fill both -expand true

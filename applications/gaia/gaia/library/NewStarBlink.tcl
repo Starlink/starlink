@@ -143,7 +143,7 @@ itcl::class gaia::StarBlink {
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -226,7 +226,7 @@ itcl::class gaia::StarBlink {
 
       #  Label for identifying the current clone.
       itk_component add Name {
-         LabelMessage $itk_component(Iframe).name \
+         util::LabelMessage $itk_component(Iframe).name \
             -text {Clone:} -value {}
       }
 
@@ -340,7 +340,7 @@ itcl::class gaia::StarBlink {
       set n_ 0
       foreach w $clones {
          itk_component add image$n_ {
-            RtdImage $itk_component(Frame).image$n_ -graphics 0 \
+            rtd::RtdImage $itk_component(Frame).image$n_ -graphics 0 \
                -scrollbars 0
          }
          set canvas_($n_) [$itk_component(image$n_) get_canvas]

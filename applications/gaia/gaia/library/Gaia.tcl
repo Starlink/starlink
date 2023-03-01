@@ -377,7 +377,7 @@ itcl::class gaia::Gaia {
       set curcats $itk_option(-catalog)
       set itk_option(-cat) 0
       set itk_option(-catalog) {}
-      SkyCat::init
+      skycat::SkyCat::init
       set itk_option(-cat) $curval
       set itk_option(-catalog) $curcats
 
@@ -488,7 +488,7 @@ itcl::class gaia::Gaia {
    #  in user's .Xdefaults file.
    protected method setXdefaults {} {
       util::setXdefaults
-      SkyCat::setXdefaults
+      skycat::SkyCat::setXdefaults
       gaia::setXdefaults
    }
 
@@ -1304,7 +1304,7 @@ itcl::class gaia::Gaia {
 
    #  Blink any displayed images.
    public method make_blink_toolbox {name {cloned 0}} {
-      if { [llength [SkyCat::get_skycat_images] ] > 1 } {
+      if { [llength [skycat::SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
             gaia::GaiaBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
@@ -1758,7 +1758,7 @@ itcl::class gaia::Gaia {
 
    #  Make the "Filters" menu.
    public method make_filters_menu {} {
-      StarAppFilter \#auto $w_
+      gaia::StarAppFilter \#auto $w_
    }
 
    #  Open a new file using a filebrowser. The filebrowser will open
@@ -2279,7 +2279,7 @@ window gives you access to this."
          ::close $fd
 
          #  Finally force this to be loaded.
-         AstroCat::reload_config_file $w_
+         cat::AstroCat::reload_config_file $w_
       }
       delete object $w_.bg_proc
       if { $after_id_ != {} } {

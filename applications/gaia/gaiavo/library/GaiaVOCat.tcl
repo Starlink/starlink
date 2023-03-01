@@ -587,7 +587,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Pop up a dialog to set or change the HTTP proxy server.
    public proc proxies {} {
-      utilReUseWidget ProxyDialog .proxy \
+      utilReUseWidget cat::ProxyDialog .proxy \
          -configfile $::env(HOME)/.skycat/proxies
    }
 

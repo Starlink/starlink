@@ -285,7 +285,7 @@ itcl::class gaia::GaiaQuery {
    # Overridden to increase default number of objects from 1000 to
    # 20000.
    public method set_default_values {} {
-      SkyQuery::set_default_values
+      skycat::SkyQuery::set_default_values
 
       # Use the given default equinox.
       if { $default_equinox_ != "notset" } {

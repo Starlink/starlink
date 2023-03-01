@@ -101,7 +101,7 @@ itcl::class gaia::GaiaPositions {
       #  adds to the edit menu and the markers menu which controls the
       #  appearance of the graphics markers.
       itk_component add table {
-         GaiaPosTable $w_.table \
+         gaia::GaiaPosTable $w_.table \
             -editmenu [get_menu Edit] \
             -markmenu [get_menu Markers] \
             -labelmenu [get_menu Labels] \

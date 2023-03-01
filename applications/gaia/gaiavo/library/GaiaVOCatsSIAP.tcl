@@ -87,7 +87,7 @@ itcl::class gaiavo::GaiaVOCatsSIAP {
 
    #  Add additional menu items. Nameserver.
    public method init {} {
-      GaiaVOCats::init
+      gaiavo::GaiaVOCats::init
 
       wm title $w_ "Query VO Simple Image Access servers"
 

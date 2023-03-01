@@ -424,7 +424,7 @@ itcl::class gaia::GaiaAstTransferTable {
    #  Override clear_table to also clear the RA/Dec marker.
    public method clear_table {} {
       remove_radec
-      GaiaAstTable::clear_table
+      gaia::GaiaAstTable::clear_table
    }
 
    #  Configuration options: (public variables)

@@ -214,7 +214,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  If WCS source isn't the image, then we need some parameters.
       itk_component add racentre {
-         FITSLabelEntry $position_page.racentre \
+         gaia::FITSLabelEntry $position_page.racentre \
             -text "RA centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(racentre)] \
@@ -225,7 +225,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(racentre) "00:00:00"
 
       itk_component add deccentre {
-         FITSLabelEntry $position_page.deccentre \
+         gaia::FITSLabelEntry $position_page.deccentre \
             -text "Dec centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(deccentre)] \
@@ -236,7 +236,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(deccentre) "00:00:00"
 
       itk_component add imagescale {
-         FITSLabelEntry $position_page.imagescale \
+         gaia::FITSLabelEntry $position_page.imagescale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(imagescale)] \
@@ -247,7 +247,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(imagescale) "1.0"
 
       itk_component add angle {
-         FITSLabelEntry $position_page.angle \
+         gaia::FITSLabelEntry $position_page.angle \
             -text "Position Angle:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(angle)] \
@@ -271,7 +271,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Date of observation:
          itk_component add date {
-            FITSLabelEntry $observation_page.date \
+            gaia::FITSLabelEntry $observation_page.date \
                -text "Date:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(date)] \
@@ -282,7 +282,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the observation wavelength.
          itk_component add wavelength {
-            FITSLabelEntry $observation_page.wavelength \
+            gaia::FITSLabelEntry $observation_page.wavelength \
                -text "Wavelength (nm):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(wavelength)] \
@@ -293,7 +293,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the telescope temperature.
          itk_component add temperature {
-            FITSLabelEntry $observation_page.temperature \
+            gaia::FITSLabelEntry $observation_page.temperature \
                -text "Temperature (K):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(temperature)] \
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the atmospheric pressure.
          itk_component add pressure {
-            FITSLabelEntry $observation_page.pressure \
+            gaia::FITSLabelEntry $observation_page.pressure \
                -text "Pressure (milliBar):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(pressure)] \
@@ -668,7 +668,7 @@ itcl::class gaia::GaiaAutoAstrom {
          #  Establish a control object for this foreign task,
          #  if not already done.
          if { $autoastrom_ == {} } {
-            set autoastrom_ [GaiaForeignExec \#auto \
+            set autoastrom_ [gaia::GaiaForeignExec \#auto \
                                 -use_error 1 \
                                 -keepnewlines 0 \
                                 -show_output $itk_component(status) \

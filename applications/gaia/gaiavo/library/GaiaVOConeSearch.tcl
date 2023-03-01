@@ -205,7 +205,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
    #  Complete interface.
    public method init {} {
-      FrameWidget::init
+      util::FrameWidget::init
       set_from_image
    }
 

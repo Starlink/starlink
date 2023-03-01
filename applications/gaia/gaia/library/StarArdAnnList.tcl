@@ -87,7 +87,7 @@ itcl::class gaia::StarArdAnnList {
    constructor {args} {
       regsub {\-scale[\ ]+[^\ ]+} "$args" {} safeargs
       regsub {\-show_annuli[\ ]+[^\ ]+} "$args" {} safeargs
-      eval StarArdList::constructor -routine_prefix StarArdAnn $safeargs
+      eval gaia::StarArdList::constructor -routine_prefix StarArdAnn $safeargs
    } {
       #  Initialise the tag for annular objects.
       set tag_annuli_ "${this}ann_tag"

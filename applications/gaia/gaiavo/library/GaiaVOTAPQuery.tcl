@@ -165,7 +165,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
 
    #  Complete interface.
    public method init {} {
-      FrameWidget::init
+      util::FrameWidget::init
    }
 
    #  Do the query as a background job.
