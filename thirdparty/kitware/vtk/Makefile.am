@@ -2,6 +2,8 @@
 
 @SET_MAKE@
 
+MAIN_TARGET = @MAIN_TARGET@
+
 ##  Extension for shared libraries.
 SHLIB_EXT = @TCL_SHLIB_EXT@
 
@@ -17,6 +19,8 @@ else
 
 endif
 
+all-local: $(MAIN_TARGET)
+
 ##  First build CMake, then use that to configure VTK and finall build it.
 ##  Note need a softlink so that include files are located using <vtk/>
 ##  (this will need updating for new major versions of VTK).
@@ -25,7 +29,7 @@ endif
 ##  so that searches for them are not made (this picks up libraries from
 ##  non-standard places quite often). If managled Mesa is required for
 ##  offscreen rendering this will need a better fix (create local version).
-all:
+vtk-src:
 	( cd cmake && $(MAKE) )
 	( PATH=`pwd`/cmake/bin:${PATH}; export PATH; \
 	  pwd=`pwd`; \
@@ -65,6 +69,11 @@ all:
 	        -D VTK_USE_VIEWS:BOOL=OFF \
 		. && \
 	  $(MAKE) )
+
+vtk-stamp:
+	rm -f $@
+	{ date; \
+	  echo "VTK build omitted"; } >$@
 
 ##  Automake really requires local versions for these targets.
 distclean-local:

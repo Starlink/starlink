@@ -48,22 +48,41 @@ dnl    API, but that's a stub on machines with hardware OpenGL or Mesa
 dnl    already installed. Tcl and Tk are needed for the Tcl support.
 STAR_DECLARE_DEPENDENCIES([build], [mesa tcl tk])
 
-dnl    VTK and CMake do not use any autotools, so most of this is a
-dnl    complete fudge. Configuration consists of running bootstrap in CMake
-dnl    (this also does a basic build). Make runs the local cmake and then
-dnl    make in the VTK directory. Remove cmConfigure.h file as that
-dnl    maybe from a full build and include components that are not to be
-dnl    used during a bootstrap (cmELF for instance).
-(
-   cmd="cd cmake && rm -f Source/cmConfigure.h && ./bootstrap";\
-   echo $cmd; \
-   eval $cmd
-)
+_star_build_vtk=:
+AC_ARG_WITH(vtk,
+   AS_HELP_STRING(
+      [--without-vtk],
+      [Do not build VTK and associated software (default --with)]),
+   [if test "X$withval" = "Xno"; then
+       _star_build_vtk=false
+    fi])
+
+if $_star_build_vtk; then
+   MAIN_TARGET="vtk-src"
+
+   dnl    VTK and CMake do not use any autotools, so most of this is a
+   dnl    complete fudge. Configuration consists of running bootstrap in CMake
+   dnl    (this also does a basic build). Make runs the local cmake and then
+   dnl    make in the VTK directory. Remove cmConfigure.h file as that
+   dnl    maybe from a full build and include components that are not to be
+   dnl    used during a bootstrap (cmELF for instance).
+   (
+      cmd="cd cmake && rm -f Source/cmConfigure.h && ./bootstrap";\
+      echo $cmd; \
+      eval $cmd
+   )
+else
+   AC_MSG_RESULT([omitting VTK build])
+   MAIN_TARGET="vtk-stamp"
+fi
+AC_SUBST(MAIN_TARGET)
 
 STAR_SPECIAL_INSTALL_COMMAND([
-   ( cd VTK; $(MAKE) DESTDIR=$$DESTDIR install ); \
-   ( cd $$DESTDIR$(libdir) && rm -f vtk-6.1 && mv tcltk/vtk-6.1 . ); \
-   ( cd $$DESTDIR$(prefix)/include && rm -rf vtk && $(LN_S) vtk-6.1 vtk )
+   if test $(MAIN_TARGET) = "vtk-src"; then
+      ( cd VTK; $(MAKE) DESTDIR=$$DESTDIR install ); \
+      ( cd $$DESTDIR$(libdir) && rm -f vtk-6.1 && mv tcltk/vtk-6.1 . ); \
+      ( cd $$DESTDIR$(prefix)/include && rm -rf vtk && $(LN_S) vtk-6.1 vtk )
+   fi
 ])
 
 AC_CONFIG_FILES([Makefile component.xml])
