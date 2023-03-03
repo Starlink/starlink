@@ -223,6 +223,14 @@ applications star2html and the latex classes provided in latexsupport.
 
       % ./configure -C --without-stardocs
 
+ - Disabling build of VTK and associated software
+
+   By default VTK is built as a requirement of GAIA 3D and mesa is built
+   if OpenGL libraries are not present.  These components may be omitted
+   using the following option:
+
+      % ./configure -C --without-vtk
+
  - Building a single library or application
 
    If you wish to build only as far as a given component, then specify
