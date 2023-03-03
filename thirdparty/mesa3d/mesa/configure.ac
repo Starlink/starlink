@@ -14,25 +14,39 @@ STAR_DEFAULTS
 AC_PROG_MAKE_SET
 AC_PATH_XTRA
 
+_star_build_vtk=:
+AC_ARG_WITH(vtk,
+   AS_HELP_STRING(
+      [--without-vtk],
+      [Do not build VTK and associated software (default --with)]),
+   [if test "X$withval" = "Xno"; then
+       _star_build_vtk=false
+    fi])
+
 dnl    Do not check for an existing OpenGL if requested.
 AC_ARG_ENABLE([opengl-check], [  --enable-opengl-check    check for existing OpenGL],
               [opengl_check=$enableval], [opengl_check=yes])
 
-dnl    Check for OpenGL libraries, if these are present and we've
-dnl    not been told to proceed regardless, then this component
-dnl    will not build anything (its purpose is to provide 3D
-dnl    software rendering on platforms without hardware support).
-if test "$opengl_check" = "yes"; then
-   sinclude(mdl_have_opengl.m4)
-   MDL_HAVE_OPENGL
+if $_star_build_vtk; then
+   dnl    Check for OpenGL libraries, if these are present and we've
+   dnl    not been told to proceed regardless, then this component
+   dnl    will not build anything (its purpose is to provide 3D
+   dnl    software rendering on platforms without hardware support).
+   if test "$opengl_check" = "yes"; then
+      sinclude(mdl_have_opengl.m4)
+      MDL_HAVE_OPENGL
+   else
+      have_GL=no
+      AC_MSG_RESULT([not checking for OpenGL])
+   fi
+   if test "$have_GL" = "yes"; then
+      MAIN_TARGET="mesa-stamp"
+   else
+      MAIN_TARGET="mesa-src"
+   fi
 else
-   have_GL=no
-   AC_MSG_RESULT([not checking for OpenGL])
-fi
-if test "$have_GL" = "yes"; then
+   AC_MSG_RESULT([not checking for OpenGL (VTK support disabled)])
    MAIN_TARGET="mesa-stamp"
-else
-   MAIN_TARGET="mesa-src"
 fi
 AC_SUBST(MAIN_TARGET)
 
