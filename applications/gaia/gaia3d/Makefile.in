@@ -203,7 +203,14 @@ LTLINK       = $(LIBTOOL) --mode=link --tag=CXX $(CXX) $(CFLAGS) $(CXXFLAGS)
 # for the BINARIES that you specified above have already been done.
 #========================================================================
 
-all: binaries libraries doc tclIndex
+all: @MAIN_TARGET@
+
+gaia3d-src: binaries libraries doc tclIndex
+
+gaia3d-stamp:
+	rm -f $@
+	{ date; \
+	  echo "gaia3d build omitted"; } >$@
 
 #========================================================================
 # The binaries target builds executable programs, Windows .dll's, unix
@@ -238,7 +245,12 @@ cleandoc:
 
 
 
-install: all install-binaries install-libraries install-doc
+install: install-@MAIN_TARGET@
+
+install-gaia3d-src: all install-binaries install-libraries install-doc
+
+install-gaia3d-stamp:
+	@echo gaia3d build omitted
 
 install-binaries: binaries install-lib-binaries install-bin-binaries
 

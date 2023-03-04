@@ -619,6 +619,7 @@ ac_includes_default="\
 #endif"
 
 ac_subst_vars='LTLIBOBJS
+MAIN_TARGET
 SHLIB_LD_CXX_LIBS
 OS
 WISH_PROG
@@ -9268,10 +9269,13 @@ if test "$have_vtk" = "yes"; then
 
 $as_echo "#define HAVE_VTK 1" >>confdefs.h
 
+   MAIN_TARGET="gaia3d-src"
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No VTK libraries so GAIA3D will be disabled" >&5
 $as_echo "$as_me: WARNING: No VTK libraries so GAIA3D will be disabled" >&2;}
+   MAIN_TARGET="gaia3d-stamp"
 fi
+
 
 #--------------------------------------------------------------------
 # Prefer to include a config.h file.

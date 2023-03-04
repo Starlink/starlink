@@ -207,9 +207,12 @@ AM_PATH_VTK([6.1.0],[have_vtk="yes"],[have_vtk="no"])
 if test "$have_vtk" = "yes"; then
    LDFLAGS_DEFAULT="$LDFLAGS_DEFAULT $LDFLAGS"
    AC_DEFINE([HAVE_VTK],[1],[Have suitable VTK libraries and headers])
+   MAIN_TARGET="gaia3d-src"
 else
    AC_WARN([No VTK libraries so GAIA3D will be disabled])
+   MAIN_TARGET="gaia3d-stamp"
 fi
+AC_SUBST(MAIN_TARGET)
 
 #--------------------------------------------------------------------
 # Prefer to include a config.h file.
