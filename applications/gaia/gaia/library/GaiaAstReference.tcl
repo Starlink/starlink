@@ -1019,11 +1019,14 @@ itcl::class gaia::GaiaAstReference {
       $add_ itk_component add space1 {
          gaia::LabelRule $add_.space1 -text "Additional parameters:"
       }
-      #  Reference pixels
+      #  Reference pixels. Scope of lwidth_ and vwidth_ is not initially found
+      #  in itk classes, so eval locally.
+      set lw [set [scope lwidth_]]
+      set vw [set [scope vwidth_]]
       $add_ itk_component add crpix1 {
          util::LabelEntry $add_.crpix1 \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -text "X Reference pixel:" \
             -textvariable [scope values_($this,crpix1)]
       }
@@ -1032,8 +1035,8 @@ itcl::class gaia::GaiaAstReference {
 
       $add_ itk_component add crpix2 {
          util::LabelEntry $add_.crpix2 \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -text "Y Reference pixel:" \
             -textvariable [scope values_($this,crpix2)]
       }
@@ -1044,8 +1047,8 @@ itcl::class gaia::GaiaAstReference {
       $add_ itk_component add longpole {
          util::LabelEntry $add_.longpole \
             -text "Longpole:" \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -textvariable [scope values_($this,longpole)]
       }
       $add_ add_short_help $add_.longpole \
@@ -1053,8 +1056,8 @@ itcl::class gaia::GaiaAstReference {
       $add_ itk_component add latpole {
          util::LabelEntry $add_.latpole \
             -text "Latpole:" \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -textvariable [scope values_($this,latpole)]
       }
       $add_ add_short_help $add_.latpole \

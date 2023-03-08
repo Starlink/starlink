@@ -374,14 +374,15 @@ itcl::class gaia::GaiaAstTable {
             tkwait window $w_.chooser
          }
          #  If catalogue_ is set then start to take over its objects.
-         if { $catalogue_($this) != {} } {
-            set grabbed $table($catalogue_($this))
+         set catalogue [set [scope catalogue_($this)]]
+         if { $catalogue != {} } {
+            set grabbed $table($catalogue)
             set size [$grabbed total_rows]
             if { $size < 1 } {
                error_dialog {The choosen catalogue contains no entries}
             } else {
                #  All ready to go.
-               grab_table_ $grabbed $equinox($catalogue_($this))
+               grab_table_ $grabbed $equinox($catalogue)
             }
          }
       } else {
