@@ -63,6 +63,7 @@ all:
 	        -D VTK_USE_INFOVIS:BOOL=OFF \
 	        -D VTK_USE_MANGLED_MESA:BOOL=OFF \
 	        -D VTK_USE_VIEWS:BOOL=OFF \
+		-D CMAKE_CXX_STANDARD=11 \
 		. && \
 	  $(MAKE) )
 
