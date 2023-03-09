@@ -620,6 +620,8 @@ F77_SUBROUTINE(atl2_rdfil)( CHARACTER(FILNAM), POINTER(VFS),
                line[ nch++ ] = c;
             }
          }
+
+         fclose( fd );
       }
 
 /* Append any remaining characters (i.e. a final line that does not end
