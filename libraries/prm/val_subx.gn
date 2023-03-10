@@ -123,7 +123,7 @@
          VAL_SUB<T> = NUM_SUB<T>( ARG1, ARG2 )
 
 *  Check if the numerical error flag is set.  If so, return the result
-*  VAL__BAD<T> and set STATUS to NUM__FPERR.
+*  VAL__BAD<T> and set STATUS to PRM__FPERR.
          IF( NUM_TEST() ) THEN
             VAL_SUB<T> = VAL__BAD<T>
             STATUS = PRM__FPERR

@@ -131,7 +131,7 @@
 
 *  If an error handler is established, check if the numerical error
 *  flag is set.  If so, return the result VAL__BADUW and set STATUS to
-*  NUM__FPERR.
+*  PRM__FPERR.
          IF( .FALSE. ) THEN
             IF( NUM_TEST() ) THEN
                VAL_SIGNUW = VAL__BADUW
