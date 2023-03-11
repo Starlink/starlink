@@ -223,9 +223,6 @@
       CALL PSX_CALLOC( GRP__INITN*GRP__SZNAM, '_CHAR',
      :                  CMN_NMPNT( SLOT ), STATUS )
 
-*  Convert the pointer to the character array into a pointer to a
-*  character descriptor which can be passed using %VAL.
-      CALL GRP1_CDESC( GRP__SZNAM, CMN_NMPNT( SLOT ), STATUS )
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Set the contents of NAMES blank.  NB, the final argument specifies

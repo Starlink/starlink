@@ -104,17 +104,8 @@
       SIZE = MAX( 1, CMN_GSIZE( SLOT ) )
 
 *  NAMES array...
-*  Convert the pointer to the character descriptor into a pointer to
-*  the character data.
-      CALL GRP1_CPOIN( CMN_NMPNT( SLOT ), STATUS )
-
-*  Reduce the memory mapped to the character data.
       CALL PSX_REALLOC( SIZE*GRP__NBC*GRP__SZNAM,
      :                  CMN_NMPNT( SLOT ), STATUS )
-
-*  Convert the pointer to the character data back into a pointer to
-*  a character descriptor.
-      CALL GRP1_CDESC( GRP__SZNAM, CMN_NMPNT( SLOT ), STATUS )
 
 *  MOD_GROUP array...
       CALL PSX_REALLOC( SIZE*GRP__NBI, CMN_MGPNT( SLOT ),

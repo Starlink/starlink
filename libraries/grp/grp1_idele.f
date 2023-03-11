@@ -107,10 +107,6 @@
 *  If the FILES array was created (see routine GRP1_PTIND)...
       IF( CMN_FLSIZ( SLOT ) .GT. 0 ) THEN
 
-*  ... convert the pointer to the character descriptor for the FILES
-*  array into a pointer to the actual character array.
-         CALL GRP1_CPOIN( CMN_FLPNT( SLOT ), STATUS )
-
 *  Unmap the array.
          CALL PSX_FREE( CMN_FLPNT( SLOT ), STATUS )
 
@@ -118,10 +114,6 @@
          CMN_FLSIZ( SLOT ) = 0
 
       END IF
-
-*  Convert the pointer to the character descriptor for the NAMES array
-*  into a pointer to the actual character array.
-      CALL GRP1_CPOIN( CMN_NMPNT( SLOT ), STATUS )
 
 *  Unmap the five remaining temporary arrays.
       CALL PSX_FREE( CMN_NMPNT( SLOT ), STATUS )

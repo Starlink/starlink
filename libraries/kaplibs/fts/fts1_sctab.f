@@ -359,9 +359,6 @@
          CALL AIF_GETVM( '_BYTE', 1, DIMS( 1 ) + 1, WKPNTR( 1 ), WKLOC,
      :                   STATUS)
 
-*  Create a character descriptor to this workspace
-         CALL GRP1_CDESC( DIMS( 1 ) + 1, WKPNTR( 1 ), STATUS )
-
          IF ( STATUS .NE. SAI__OK ) THEN
 
             CALL ERR_REP( 'FITSIN_WSP',

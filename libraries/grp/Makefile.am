@@ -39,7 +39,7 @@ PRIVATE_INCLUDES = GRP_CONST GRP_COM grp1.h
 BASIC_C_ROUTINES = grp.c
 
 #  List of Fortran routines required by both ADAM and standalone libraries.
-BASIC_F_ROUTINES = grp1_cdesc.f grp1_conc.f grp1_cpoin.f grp1_eledt.f \
+BASIC_F_ROUTINES = grp1_conc.f grp1_eledt.f \
   grp1_elems.f grp1_expan.f grp1_expid.f grp1_fchk.f grp1_find.f \
   grp1_fkern.f grp1_getc.f grp1_grapp.f grp1_gsupp.f grp1_gtelm.f \
   grp1_gtind.f grp1_gtslt.f grp1_ihead.f grp1_idele.f grp1_id2sl.f \

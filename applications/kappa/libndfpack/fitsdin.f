@@ -660,8 +660,6 @@
 
       BFPNTD = BFPNTR
       RCPNTD = RCPNTR
-      CALL GRP1_CDESC( 80, BFPNTD, STATUS )
-      CALL GRP1_CDESC( 80, RCPNTD, STATUS )
 
 *    Is automatic mode required?
 

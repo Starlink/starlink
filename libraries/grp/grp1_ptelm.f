@@ -163,17 +163,9 @@
          NEWSIZ = INDX + GRP__INCN
 
 *  NAMES...
-*  Convert the pointer to the character descriptor into a pointer to
-*  the character data.
-         CALL GRP1_CPOIN( CMN_NMPNT( SLOT ), STATUS )
-
 *  Extend the memory mapped to the character data.
          CALL PSX_REALLOC( NEWSIZ*GRP__NBC*GRP__SZNAM,
      :                     CMN_NMPNT( SLOT ), STATUS )
-
-*  Convert the pointer to the character data back into a pointer to
-*  a character descriptor.
-         CALL GRP1_CDESC( GRP__SZNAM, CMN_NMPNT( SLOT ), STATUS )
 
 *  Initialize the new names to be blank.
          CALL GRP1_SETC( FSTNEW, NEWSIZ, NEWSIZ,

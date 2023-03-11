@@ -115,25 +115,14 @@
          CALL PSX_CALLOC( GRP__SZNAM, '_CHAR', CMN_FLPNT( SLOT ),
      :                    STATUS )
 
-*  Convert the pointer to the character array into a pointer to a
-*  character descriptor which can be passed using %VAL.
-         CALL GRP1_CDESC( GRP__SZNAM, CMN_FLPNT( SLOT ), STATUS )
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  If the array already exists, increase its size by 1.
       ELSE
 
-*  Convert the pointer to the character descriptor into a pointer to
-*  the character data.
-         CALL GRP1_CPOIN( CMN_FLPNT( SLOT ), STATUS )
-
 *  Extend the memory mapped to the character data.
          CALL PSX_REALLOC( INDEX*GRP__NBC*GRP__SZNAM,
      :                     CMN_FLPNT( SLOT ), STATUS )
-
-*  Convert the pointer to the character data back into a pointer to
-*  a character descriptor.
-         CALL GRP1_CDESC( GRP__SZNAM, CMN_FLPNT( SLOT ), STATUS )
 
       END IF
 
