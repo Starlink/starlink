@@ -439,7 +439,6 @@
      :  BF,                    ! number of complete FITS records per
                                ! block
      :  BFPNTR,                ! Pointer to FITS block buffer
-     :  BFPNTD,                ! Descriptor for FITS block buffer
      :  CONTEXT,               ! Used in expanding wildcard entries
      :  DIMS( MXAXIS ),        ! The size of each axis
      :  FD,                    ! File description of logfile
@@ -487,7 +486,6 @@
      :  PCOUNT,                ! The number of parameter values
                                ! preceeding each data array
      :  RCPNTR,                ! Pointer to FITS record
-     :  RCPNTD,              ! Descriptor for FITS record
      :  SIZE,                  ! Total size of the data array
      :  SUBFIL,                ! Number of the FITS sub file
      :  UDFITS,                ! I/O unit for input disc-FITS files
@@ -652,14 +650,6 @@
      :     /'table.', STATUS )
          GOTO 990
       END IF
-
-*    Get a descriptor for these character arrays using the GRP routines
-*    These convert the mapped array pointer into a character array
-*    descriptor. NB. this only happens on the VAX; on UNIX, the same
-*    pointer is used.
-
-      BFPNTD = BFPNTR
-      RCPNTD = RCPNTR
 
 *    Is automatic mode required?
 
@@ -1001,7 +991,7 @@
          END IF
 
 *       Process the header blocks.  OFFSET is updated.
-         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( CNF_PVAL( RCPNTD ) ),
+         CALL FTS1_PHEAD( BFPNTR, RCPNTR, %VAL( CNF_PVAL( RCPNTR ) ),
      :                    'DISK',
      :                    UDFITS, TLOC, BLKSIZ, MAXHDR, .NOT. AUTO,
      :                    ACTSIZ, OFFSET, CURREC, HSTART, HDNUM, EXTEND,
@@ -1373,7 +1363,7 @@
      :                       %VAL( CNF_PVAL( RCPNTR ) ),
      :                       STATUS )
 
-            IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTD ) ) ) .AND.
+            IF ( .NOT. FTS1_BLCAR( %VAL( CNF_PVAL( RCPNTR ) ) ) .AND.
      :           STATUS .EQ. SAI__OK ) THEN
 
 *             There is a sub file, so process its header like for
