@@ -358,9 +358,6 @@
                END IF
             END IF
 
-*  Release workspace for clipped data.
-            CALL PSX_FREE( CPNTR, STATUS )
-
 *  Clipping did not reject any elements, so the statistics are unchanged.
          ELSE
             MEDIAN( 2 ) = MEDIAN( 1 )
@@ -370,6 +367,10 @@
                END DO
             END IF
          END IF
+
+*  Release workspace for clipped data.
+         CALL PSX_FREE( CPNTR, STATUS )
+
       END IF
 
 *  Release index workspace.
