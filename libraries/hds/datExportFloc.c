@@ -142,7 +142,11 @@ void datExportFloc ( HDSLoc **clocator, int free, int loc_length, char flocator[
        scheme does not work, we could try assigning the clone to the caller and
        the original to the fortran locator but this requires some thought. */
 
-    one_snprintf(flocator, loc_length, "%p", status, *clocator );
+    int n_written = one_snprintf(flocator, loc_length, "%p", status, *clocator );
+
+    if (loc_length > 1 + n_written) {
+      memset(flocator + n_written + 1, '\0', loc_length - (n_written + 1));
+    }
 
   } else {
     strncpy( flocator, DAT__NOLOC, DAT__SZLOC );
