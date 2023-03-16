@@ -257,6 +257,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Initialize pointers.
+      IPDAT = 0
+      IPVAR = 0
+      IPWORK = 0
+
 *  Begin AST and NDF contexts.
       CALL AST_BEGIN( STATUS )
       CALL NDF_BEGIN
