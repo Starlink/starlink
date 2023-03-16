@@ -132,7 +132,7 @@ F77_SUBROUTINE(add)( INTEGER(STATUS) ){
    GENPTR_INTEGER(STATUS)
 
 /* Local Variables: */
-   AddData *job_data;    /* Array of structs used to pass info to workers */
+   AddData *job_data = NULL;       /* Array of structs used to pass info to workers */
    AddData *pdata;       /* A single struct used to pass info to a worker */
    ThrWorkForce *wf;     /* Pointer to pool of worker threads */
    char dtype[ NDF__SZFTP + 1 ];   /* Data type for output components */
@@ -316,6 +316,8 @@ F77_SUBROUTINE(add)( INTEGER(STATUS) ){
 /* Obtain the output title and insert it into the output NDF. */
       ndfCinp( "TITLE", ndf3, "Title", STATUS );
    }
+
+   job_data = astFree(job_data);
 
 /* End the NDF context. */
    ndfEnd( STATUS );
