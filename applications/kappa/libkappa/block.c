@@ -272,7 +272,7 @@ F77_SUBROUTINE(block)( INTEGER(status) ){
    int ndf1;             /* Identifier for input NDF */
    int ndf2;             /* Identifier for output NDF */
    int ndim;             /* Number of dimensions in the NDF */
-   int nlim;             /* Minimum good pixel limit */
+   int nlim = 0;         /* Minimum good pixel limit */
    int nval;             /* Number of values obtained */
    int sambad;           /* Propagate bad pixels to same place? */
    int state;            /* State of BOX parameter */
