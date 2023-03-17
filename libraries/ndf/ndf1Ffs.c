@@ -171,13 +171,13 @@ void *ndf1Ffs( NdfBlockType type, int *status ) {
       }
 
 /* If no free slot could be found, extend the array of block block
-   pointers by 100%, enforcing an initial size of 100. */
+   pointers by 100%, enforcing an initial size of 16. */
       if( !result ) {
          oldsize = *pn;
          if( oldsize ) {
             *pn *= 2;
          } else {
-            *pn = 100;
+            *pn = 16;
          }
 
          parray = astGrow( parray, *pn, sizeof(*parray) );
