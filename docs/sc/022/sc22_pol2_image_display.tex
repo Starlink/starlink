@@ -34,8 +34,8 @@ in this file will be automatically overlaid on the main image window
 \end{figure}
 
 In order to filter the number of overlaid vectors down to a more
-useful number and size, the various options in the
-\guithing{GAIA: Polarimetry} toolbox can be used. First, select the
+useful number and size, you can use various options in the
+\guithing{GAIA: Polarimetry} toolbox. First, select the
 \guithing{Rendering} tab on the
 left hand side. This will reveal a panel that will indicate which
 quantities are currently being used for the vector overlays. In this
@@ -50,7 +50,7 @@ meaningful. To filter out most of the extraneous vectors, click on the
 $I/$DI<10
 \end{terminalv}
 
-\emph{Ensure that ``Return'' is pressed after entering the above expression}.
+\emph{ensuring that you press ``Return'' after entering in the above expression}.
 
 The above expression selects the data points in the polarimetry table
 that have an associated total intensity (Column~\catcol{I}) less than 10 times
@@ -72,7 +72,7 @@ might actually further improve some selections, as it makes use of the
   to display via the expression \texttt{\$I/\$DI$>$10}. This will only plot
   vectors with an intensity signal-to-noise
   ratio greater than 10 in \GAIA. To ensure that this is specified,
-  ensure that ``Return'' is pressed after entering the expression.
+  ensure that you press ``Return'' after entering the expression.
   Right: After selection, the selected vectors are shown in blue.
 }
 \label{fig:gaiavectorssecond}
@@ -118,7 +118,7 @@ that only the vectors to be plotted are included in the file
 
 There are two main ways to do this\ ---\ either by saving the output
 catalogue from \GAIAref\ or using the Starlink package \POLPACK\ to manipulate
-the catalogue produced by the user.  To use \POLPACK, simply run:
+the catalogue you produced.  To use \POLPACK, simply run:
 
 \begin{terminalv}
 % polpack
@@ -341,8 +341,8 @@ format(2)=dms
 
 
 The following function is used to reduce the dynamic range in the map. This
-allows the user to be able to see structure in the fainter parts, without saturating the
-brightest regions):
+allows you to be able to see structure in the fainter parts, without saturating the
+brightest regions).
 
 \begin{terminalv}
 maths "'((ia+0.0003)/0.14)**0.2'" ia=iext out=tmp1
@@ -414,12 +414,12 @@ instance:
 
 Unlike the other tools described above, \textsc{Topcat} cannot produce a
 visualisation of the catalogue as a set of vectors. However, it goes well beyond
-the facilities of the other tools in allowing the user to explore correlations
+the facilities of the other tools in allowing you to explore correlations
 between different quantities in the catalogue via two- and three-dimensional
 scatter plots---see \cref{Figure}{fig:topcat}{}. It can also be used to cross-correlate
 two different catalogues, create subsets of a catalogue, create new columns
 containing related quantities, \emph{etc}. It also allows the modified
-catalogue to be saved to a new catalogue file on disk. However, users should be
+catalogue to be saved to a new catalogue file on disk. However, you should be
 aware that any such new catalogue will not contain the WCS information required
 by other Starlink applications to perform WCS-related operations, such as
 displaying annotated axes and aligning data-sets. This WCS

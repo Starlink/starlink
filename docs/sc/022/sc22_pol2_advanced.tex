@@ -227,7 +227,7 @@ FrameSet to any new output catalogues. Unfortunately, the popular
 \emph{not} copy the WCS FrameSet to any output catalogues.
 
 For this reason, \POLPACK\ contains a command that can be used to copy the
-WCS FrameSet from one catalogue to another.  For example: a user creates
+WCS FrameSet from one catalogue to another.  For example: you create
 the catalogue \file{mycat.FIT} using \poltwomap, uses \textsc{Topcat}
 to remove low signal-to-noise vectors, and then saves the results to a new catalogue
 called \file{selcat.FIT}. The WCS FrameSet would then be missing from \file{selcat.FIT},
@@ -291,7 +291,7 @@ error and increasing the errors in the neighbouring background pixels.
 An alternative to smoothing is to split the total noise up into
 several different components, create a model of each component, and
 then add the models together. The \task{pol2noise} script in \smurf\
-enables the user to re-model the noise estimates in a vector catalogue
+enables you to re-model the noise estimates in a vector catalogue
 using such an approach. This facility is used by setting
 \texttt{MODE=REMODEL} on the \task{pol2noise} command line:
 
@@ -431,7 +431,7 @@ listed above.
 \section{\xlabel{smooth450}Smoothing 450-\SI{}{\textbf{\micro\metre}}
 POL-2 maps to 850-\SI{}{\textbf{\micro\metre}}-map resolution}
 
-The \poltwomap\ script has a parameter, \param{SMOOTH450}, to enable the user to smooth
+The \poltwomap\ script has a parameter, \param{SMOOTH450}, to enable you to smooth
 \SI{450}{\micro\metre} POL-2 maps to the same resolution as their \SI{850}{\micro\metre}
 counterparts. It is only accessed when processing \SI{450}{\micro\metre} data, and defaults
 to \texttt{False}, which results in no changes to the behaviour of \poltwomap. If
