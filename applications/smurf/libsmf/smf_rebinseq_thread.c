@@ -70,6 +70,8 @@
 #include "smf_typ.h"
 #include "smf.h"
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* Local Variables: */
@@ -90,7 +92,6 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
 
 /* And finally call astRebinSeqF or astRebinSeqD to paste the input data
    into the output array. */
-   #pragma GCC diagnostic ignored "-Wcast-qual"
    if( data->is_double ) {
       astRebinSeq8D( data->this, data->wlim, data->ndim_in, data->lbnd_in,
                      data->ubnd_in, (double *)data->in, (double *)data->in_var,
@@ -108,7 +109,6 @@ void smf_rebinseq_thread( void *data_ptr, int *status ){
                      (float *) data->out, (float *) data->out_var,
                      data->weights, &(data->nused) );
    }
-   #pragma GCC diagnostic pop
 
 /* Unlock the Mapping so that the parent thread can lock it and then
    annul it. */

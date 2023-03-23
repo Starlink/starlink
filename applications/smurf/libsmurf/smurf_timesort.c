@@ -295,6 +295,8 @@
 /* Number of ACSIS extension components that need to be re-ordered. */
 #define NACSIS 3
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 void smurf_timesort( int *status ) {
 
 /* Local Variables */
@@ -1359,11 +1361,9 @@ void smurf_timesort( int *status ) {
                   sprintf( fullname, "%.4d", iout + 1 );
                   pname = fullname;
 
-                  #pragma GCC diagnostic ignored "-Wcast-qual"
                   match = astChrSub( basename,
                                      "a\\d{8}_\\d{5}_\\d{2}_(\\d{4})_?",
                                      (const char **) &pname, 1 );
-                  #pragma GCC diagnostic pop
 
                   if( match ) {
                      one_strlcpy( fullname, match, sizeof(fullname), status );

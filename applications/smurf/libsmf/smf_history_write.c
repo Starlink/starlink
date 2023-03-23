@@ -107,6 +107,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_history_write"
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 void smf_history_write( const smfData* data, int *status) {
 
   smfFile *file = NULL;  /* data->file */
@@ -172,9 +174,7 @@ void smf_history_write( const smfData* data, int *status) {
 	/* Create new history array and copy in the values */
 	datNew1C( sloc, SMURF__HISTEXT, maxlen, nrec, status );
 	datFind( sloc, SMURF__HISTEXT, &shloc, status );
-        #pragma GCC diagnostic ignored "-Wcast-qual"
 	datPut1C( shloc, nrec, (const char**)array, status );
-        #pragma GCC diagnostic pop
 
 	/* free everything */
 	for ( i=0; i<nrec; i++ ) {

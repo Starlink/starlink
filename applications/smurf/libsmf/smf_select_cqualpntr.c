@@ -84,6 +84,8 @@
 
 #include "sae_par.h"
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 const smf_qual_t * smf_select_cqualpntr( const smfData * data,
                                         smf_qfam_t *qfamily, int * status ) {
   smf_qual_t * retval = NULL;
@@ -91,9 +93,7 @@ const smf_qual_t * smf_select_cqualpntr( const smfData * data,
   /* horrible hack so that we do not need to duplicate code from
      smf_select_qualpntr */
 
-  #pragma GCC diagnostic ignored "-Wcast-qual"
   retval = smf_select_qualpntr( (smfData*)data, qfamily, status );
-  #pragma GCC diagnostic pop
 
   return (const smf_qual_t *) retval;
 }

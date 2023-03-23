@@ -120,6 +120,8 @@
 
 static void nanten__close_ts ( AstFitsChan * fc, int * status );
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 void smurf_nanten2acsis( int *status ) {
 
   /* Local variables */
@@ -270,10 +272,8 @@ void smurf_nanten2acsis( int *status ) {
 
       detectors = astKeyMap( "SortBy=KeyUp,KeyCase=0" );
 
-      #pragma GCC diagnostic ignored "-Wcast-qual"
       CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char*)"TELESCOP", &colnum, &fitsStatus),
                    "Error getting number of TELESCOP column" );
-      #pragma GCC diagnostic pop
 
       for (rownum=1; rownum<=nRows; rownum++) {
         char telname[12];
@@ -349,10 +349,8 @@ void smurf_nanten2acsis( int *status ) {
       double cdelt2;
       double cdelt3;
 
-      #pragma GCC diagnostic ignored "-Wcast-qual"
       CALLCFITSIO( fits_get_colnum(fits, CASEINSEN, (char*)"SPECTRUM", &colnum, &fitsStatus ),
                    "Error getting SPECTRUM column number");
-      #pragma GCC diagnostic pop
       CALLCFITSIO( fits_get_coltype(fits, colnum, &typecode, &nChans, &dummy, &fitsStatus ),
                    "Error getting SPECTRUM column information" );
 

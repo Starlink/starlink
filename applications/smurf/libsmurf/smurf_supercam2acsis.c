@@ -121,6 +121,8 @@
 
 static void supcam__close_ts ( AstFitsChan * fc, int * status );
 
+#pragma GCC diagnostic ignored "-Wcast-qual"
+
 void smurf_supercam2acsis( int *status ) {
 
   /* Local variables */
@@ -394,11 +396,9 @@ void smurf_supercam2acsis( int *status ) {
       astGetFitsI( acsisfits, "OBSNUM", &obsnum );
       astGetFitsI( acsisfits, "UTDATE", &utdate );
 
-      #pragma GCC diagnostic ignored "-Wcast-qual"
       acsSpecOpenTS( directory, utdate, obsnum, nrecep, NSUBSYS,
                      (char**)recepnames, "DIRECT", fplanex, fplaney,
                      "<OCSCONFIG />", status );
-      #pragma GCC diagnostic pop
       if (*status == SAI__OK) isopen = 1;
     }
 

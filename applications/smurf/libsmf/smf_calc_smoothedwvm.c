@@ -156,6 +156,8 @@ void smf__calc_wvm_job( void *job_data, int *status );
 
 #define FUNC_NAME "smf_calc_smoothedwvm"
 
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+
 void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
                             smfData * adata, AstKeyMap* extpars, double **wvmtau,
                             dim_t *nelems, dim_t *ngoodvals,
@@ -372,7 +374,6 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
               if (guess <= pdata->t1) guess = pdata->t1 + tstep;
 
               /* find nearest boundaries */
-              #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
               for (j=prevbnd; j<nwvm; j++) {
                 if ( boundaries[j] > guess ) {
                   aboveidx = boundaries[j];
@@ -386,7 +387,6 @@ void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
                   break;
                 }
               }
-              #pragma GCC diagnostic pop
 
               /* Choose the closest, making sure that we are not choosing t1 */
               if ( (guess - belowidx < aboveidx - guess) && belowidx > pdata->t1 ) {

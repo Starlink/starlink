@@ -96,6 +96,12 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
+/* Need to suppress warnings about bad pragmas temporarily since
+   "-Wstringop-truncation" (used below0 was not recognised by earlier
+   versions of gcc */
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+
 void smf_fits_export2DA ( AstFitsChan *fitschan, dim_t *ncards,
                           char *fitsrec,
                           int *status ) {
@@ -147,15 +153,8 @@ void smf_fits_export2DA ( AstFitsChan *fitschan, dim_t *ncards,
          if (isblank && prevblank) continue;
          prevblank = isblank;
 
-         /* Need to suppress warnings about bad pragmas temporarily since
-            "-Wstringop-truncation" (used below0 was not recognised by earlier
-            versions of gcc */
-         #pragma GCC diagnostic ignored "-Wpragmas"
-
          /* Now copy in the card and increment the pointer */
-         #pragma GCC diagnostic ignored "-Wstringop-truncation"
          strncpy ( outpos, card, SZFITSCARD );
-         #pragma GCC diagnostic pop
 
          ncopied++;
          outpos += SZFITSCARD;
