@@ -443,9 +443,9 @@ itcl::class gaia::GaiaNDFChooser {
          for {set i 0} {$i < $num_images_} {incr i} {
             if {[info exists ext_($i,frame)]} {
                if {"$ext_($i,ndf)" == "$ndf"} {
-                  $ext_($i,frame) configure -relief sunken
+                  {*}$ext_($i,frame) configure -relief sunken
                } else {
-                  $ext_($i,frame) configure -relief raised
+                  {*}$ext_($i,frame) configure -relief raised
                }
             }
          }

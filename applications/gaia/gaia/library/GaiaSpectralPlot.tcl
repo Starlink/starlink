@@ -1435,7 +1435,7 @@ itcl::class gaia::GaiaSpectralPlot {
             set axis [$itk_component(canvas) itemcget $spectrum_ -axis]
             set coordunit [gaiautils::astget $frameset "unit($axis)"]
 
-            $sender send_spectrum $filename $shortname \
+            {*}$sender send_spectrum $filename $shortname \
                $coordunit $dataunit $recipient_id
          }
       } msg]} {
