@@ -253,6 +253,9 @@ itcl::class gaia::Gaia {
       } else {
          set about_skycat "$about_ukirt_ql $about_gaia $ukirt_ql_bugs"
       }
+
+      #  Make sure our HelpWin class is used by TopLevelWidget.
+      set util::TopLevelWidget::help_window_class gaia::HelpWin
    }
 
    #  Destructor:
@@ -3063,9 +3066,6 @@ window gives you access to this."
 
 #  End of class definition.
 }
-
-#  Make sure our HelpWin class is used by TopLevelWidget.
-set util::TopLevelWidget::help_window_class gaia::HelpWin
 
 #  Need to override this proc so we use the browser version of the open dialog
 #  for local catalogues (and we need it here so that it is used in preference
