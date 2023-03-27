@@ -187,7 +187,7 @@ itcl::class gaia::StarArdRotBox {
       $canvas itemconfigure $canvas_id_ \
          -semimajor [expr $major/2.0] -semiminor [expr $minor/2.0] -angle $angle
       if { [lindex $args 0] != {} } {
-         eval $args
+         eval {*}$args
       }
    }
 

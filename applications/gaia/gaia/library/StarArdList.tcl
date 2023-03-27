@@ -367,7 +367,7 @@ itcl::class gaia::StarArdList {
    #  Method to deal with object creation confirmation.
    method created_object {index id} {
        if { $notify_created_cmd != {} } {
-	   eval $notify_created_cmd $index $id
+          eval {*}$notify_created_cmd $index $id
        }
    }
 
@@ -376,7 +376,7 @@ itcl::class gaia::StarArdList {
    #  for a StarArdPrim object.
    method apply_cmd {index args} {
       if { [info exists objects_($index)] } {
-         eval $objects_($index) $args
+         eval {*}$objects_($index) $args
       }
    }
 

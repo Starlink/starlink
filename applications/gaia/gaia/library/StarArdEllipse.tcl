@@ -169,7 +169,7 @@ itcl::class gaia::StarArdEllipse {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $semimajor -semiminor $semiminor -angle $angle
       if { [lindex $args 0] != {} } {
-         eval $args
+         eval {*}$args
       }
    }
 

@@ -200,7 +200,7 @@ itcl::class gaia::StarArdTool {
                                  -canvas $canvas \
                                  -rtdimage $rtdimage \
                                  -notify_created_cmd \
-                                    [code $this created_object_] \
+                                 [code $this created_object_] \
                                  -selected_colour $selected_colour \
                                  -deselected_colour $deselected_colour \
                                  -continuous_updates $continuous_updates]]

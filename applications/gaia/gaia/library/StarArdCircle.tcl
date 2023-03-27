@@ -160,7 +160,7 @@ itcl::class gaia::StarArdCircle {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $rad -semiminor $rad -angle 0
       if { [lindex $args 0] != {} } {
-         eval $args
+         eval {*}$args
       }
    }
 

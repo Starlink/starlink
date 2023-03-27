@@ -220,7 +220,7 @@ itcl::class gaia::StarArdPrim {
    method properties_changed {} {
       update_properties
       if { $notify_update_cmd_ != {} } {
-         eval $notify_update_cmd_
+         eval {*}$notify_update_cmd_
       }
    }
 
