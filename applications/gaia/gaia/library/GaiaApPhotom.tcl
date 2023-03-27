@@ -246,11 +246,11 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Add controls for viewing all measurements (do this now to get
       #  name).
-      set view_($this) 0
+      set view_ 0
       itk_component add ViewAll {
          checkbutton $child_(results).viewall  \
             -text {View all measurements:} \
-            -variable [scope view_($this)] \
+            -variable [scope view_] \
             -onvalue 1 \
             -offvalue 0 \
             -command [code $this view]
@@ -355,10 +355,10 @@ itcl::class gaia::GaiaApPhotom {
       add_menu_short_help $File {Exit} {Close this window}
 
       #  Determine how sky positions will be indicated.
-      set skymethod_($this) 1
+      set skymethod_ 1
       $Options add checkbutton \
          -label {Use annular sky regions} \
-         -variable [scope skymethod_($this)] \
+         -variable [scope skymethod_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this sky_method_changed]
@@ -366,10 +366,10 @@ itcl::class gaia::GaiaApPhotom {
          {Toggle to define sky in detached apertures}
 
       #  Get shape of apertures (sky and object must be the same).
-      set shape_($this) 1
+      set shape_ 1
       $Options add checkbutton \
          -label {Use circular apertures} \
-         -variable [scope shape_($this)] \
+         -variable [scope shape_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this set_shape]
@@ -748,7 +748,7 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Toggle the define sky button to reflect the current state.
    private method toggle_sky_button_ {} {
-      if { $skymethod_($this) } {
+      if { $skymethod_ } {
          $itk_component(DefineSky) configure -state disabled
       } else {
          $itk_component(DefineSky) configure -state normal
@@ -775,12 +775,12 @@ itcl::class gaia::GaiaApPhotom {
    private method sky_method_changed {args} {
       if { $args != {} } {
          if { [lindex $args 0] == "annulus" } {
-            set skymethod_($this) 1
+            set skymethod_ 1
          } else {
-            set skymethod_($this) 0
+            set skymethod_ 0
          }
       } else {
-         if { $skymethod_($this) } {
+         if { $skymethod_ } {
             configure -annulus 1
          } else {
             configure -annulus 0
@@ -793,19 +793,19 @@ itcl::class gaia::GaiaApPhotom {
    #  GaiaPhotomList).
    method view {{value ""}} {
       if { $value != "" } {
-         set view_($this) $value
+         set view_ $value
       }
-      $object_list_ configure -show_list $view_($this)
+      $object_list_ configure -show_list $view_
    }
 
    #  Set shape configuration option and disabled unwanted controls.
    private method set_shape {} {
-      if { $shape_($this) } {
+      if { $shape_ } {
          configure -shape circle
       } else {
          configure -shape ellipse
       }
-      $itk_component(ObjectDetails) set_for_circles $shape_($this)
+      $itk_component(ObjectDetails) set_for_circles $shape_
    }
 
    #  Sky zero point may have changed, remeasure objects if so.
@@ -988,19 +988,18 @@ itcl::class gaia::GaiaApPhotom {
    #  Whether apertures are automatically measured when created, or not.
    protected variable auto_measure_ 0
 
+   #  Shape of aperture.
+   protected variable shape_ 1
+
+   #  Methods of estimating sky.
+   protected variable skymethod_ 1
+
+   #  Whether to view all measurements or not.
+   protected variable view_ 0
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Methods of estimating sky (this is a global array visible
-   #  in this namespace only and indexed by $this to resolve between
-   #  different instances).
-   common skymethod_
-
-   #  Shape of aperture.
-   common shape_
-
-   #  Whether to view all measurements or not.
-   common view_
 
 #  End of class definition.
 }

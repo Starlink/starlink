@@ -218,9 +218,9 @@ itcl::class gaia::GaiaPhotomExtras {
             -text "Perform centroiding:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
-            -variable [scope state_($this,centroid)]
+            -variable [scope state_(centroid)]
       }
-      set state_($this,centroid) TRUE
+      set state_(centroid) TRUE
       add_short_help $itk_component(Centroid) \
          {Centroid initial aperture positions}
       itk_component add Maxiterations {
@@ -260,11 +260,11 @@ itcl::class gaia::GaiaPhotomExtras {
             -text "Positive features:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
-            -variable [scope state_($this,positive)]
+            -variable [scope state_(positive)]
       }
       add_short_help $itk_component(Positive) \
          {Look for positive features}
-      set state_($this,positive) TRUE
+      set state_(positive) TRUE
 
       #  Measurement parameters.
       itk_component add Label4 {
@@ -377,11 +377,11 @@ itcl::class gaia::GaiaPhotomExtras {
    #  menu buttons do not need updating.
    method update_state {} {
       configure -bias_level [$itk_component(Biaslevel) get]
-      configure -centroid $state_($this,centroid)
+      configure -centroid $state_(centroid)
       configure -max_iterations [$itk_component(Maxiterations) get]
       configure -max_shift [$itk_component(Maxshift) get]
       configure -photons_per_adu [$itk_component(Photons) get]
-      configure -positive_objects $state_($this,positive)
+      configure -positive_objects $state_(positive)
       configure -saturation_value [$itk_component(Saturation) get]
       configure -search_box_size [$itk_component(Search) get]
       configure -sky_value [$itk_component(Sky) get]
@@ -656,11 +656,12 @@ itcl::class gaia::GaiaPhotomExtras {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  Variable to decouple check button states.
+   protected variable state_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Global variable to decouple check button states.
-   common state_
 
 #  End of class definition.
 }
