@@ -141,9 +141,9 @@ itcl::class gaia::GaiaAstDefine {
       #  Only option is "relax" mode. Using this all state =
       #  disabled functions are disabled (so that for instance two
       #  rotations can be given .
-      set offstate_($this) disabled
+      set offstate_ disabled
       $Options add checkbutton  -label {Relax} \
-         -variable [scope offstate_($this)] \
+         -variable [scope offstate_] \
          -onvalue normal \
          -offvalue disabled
 
@@ -169,7 +169,7 @@ itcl::class gaia::GaiaAstDefine {
             -text "Date of observation:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,dateobs)]
+            -textvariable [scope values_(dateobs)]
       }
       add_short_help $itk_component(dateobs) \
          {Format ccyy-mm-ddThh:mm:ss[.sss...]Z (post 2000 dd/mm/yy pre)}
@@ -206,7 +206,7 @@ itcl::class gaia::GaiaAstDefine {
       }
       itk_component add crpix1 {
          util::LabelEntry $itk_component(f1).crpix1 \
-            -textvariable [scope values_($this,crpix1)]
+            -textvariable [scope values_(crpix1)]
       }
       add_short_help $itk_component(crpix1) \
          {X coordinate of reference pixel (1,1 is centre of first pixel)}
@@ -215,7 +215,7 @@ itcl::class gaia::GaiaAstDefine {
       }
       itk_component add crval1 {
          util::LabelEntry $itk_component(f1).crval1 \
-            -textvariable [scope values_($this,crval1)]
+            -textvariable [scope values_(crval1)]
       }
       add_short_help $itk_component(crval1) \
          {World coordinate of reference pixel (hh/dd:mm:ss or degrees)}
@@ -224,7 +224,7 @@ itcl::class gaia::GaiaAstDefine {
       }
       itk_component add cdelt1 {
          util::LabelEntry $itk_component(f1).cdelt1 \
-            -textvariable [scope values_($this,cdelt1)]
+            -textvariable [scope values_(cdelt1)]
       }
       add_short_help $itk_component(cdelt1) \
          {World coordinate increment at reference pixel (arcsecs)}
@@ -265,19 +265,19 @@ itcl::class gaia::GaiaAstDefine {
       }
       itk_component add crpix2 {
          util::LabelEntry $itk_component(f1).crpix2 \
-            -textvariable [scope values_($this,crpix2)]
+            -textvariable [scope values_(crpix2)]
       }
       add_short_help $itk_component(crpix2) \
          {Y coordinate of reference pixel (1,1 is centre of first pixel)}
       itk_component add crval2 {
          util::LabelEntry $itk_component(f1).crval2 \
-            -textvariable [scope values_($this,crval2)]
+            -textvariable [scope values_(crval2)]
       }
       add_short_help $itk_component(crval2) \
          {World coordinate of reference pixel (hh/dd:mm:ss or degrees)}
       itk_component add cdelt2 {
          util::LabelEntry $itk_component(f1).cdelt2 \
-            -textvariable [scope values_($this,cdelt2)]
+            -textvariable [scope values_(cdelt2)]
       }
       add_short_help $itk_component(cdelt2) \
          {World coordinate increment at reference pixel (arcsecs)}
@@ -301,7 +301,7 @@ itcl::class gaia::GaiaAstDefine {
          util::LabelEntry $itk_component(f1).longpole \
             -text "Longpole:" \
             -labelwidth $lwidth_ \
-            -textvariable [scope values_($this,longpole)]
+            -textvariable [scope values_(longpole)]
       }
       add_short_help $itk_component(longpole) \
          {Longitude of system northpole}
@@ -309,7 +309,7 @@ itcl::class gaia::GaiaAstDefine {
          util::LabelEntry $itk_component(f1).latpole \
             -text "Latpole:" \
             -labelwidth $lwidth_ \
-            -textvariable [scope values_($this,latpole)]
+            -textvariable [scope values_(latpole)]
       }
       add_short_help $itk_component(latpole) \
          {Latitude of system northpole}
@@ -341,7 +341,7 @@ itcl::class gaia::GaiaAstDefine {
             -text "Equinox:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,equinox)]
+            -textvariable [scope values_(equinox)]
       }
       add_short_help $itk_component(equinox) \
          {Epoch of mean equator and equinox (decimal years)}
@@ -378,7 +378,7 @@ itcl::class gaia::GaiaAstDefine {
             -text "projp1:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,projp1)]
+            -textvariable [scope values_(projp1)]
       }
       add_short_help $itk_component(projp1) \
          {First projection parameter (PROJP1)}
@@ -388,7 +388,7 @@ itcl::class gaia::GaiaAstDefine {
             -text "projp2:" \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,projp2)]
+            -textvariable [scope values_(projp2)]
       }
       add_short_help $itk_component(projp2) \
          {Second projection parameter (PROJP2)}
@@ -528,39 +528,39 @@ itcl::class gaia::GaiaAstDefine {
       set_angle_ 1 0.0
       set_ctype_ 1 {RA--}
 
-      set values_($this,crpix1) [expr [$itk_option(-rtdimage) width]/2]
-      $itk_component(crpix1) configure -value  $values_($this,crpix1)
-      set values_($this,crpix2) [expr [$itk_option(-rtdimage) height]/2]
-      $itk_component(crpix2) configure -value  $values_($this,crpix2)
+      set values_(crpix1) [expr [$itk_option(-rtdimage) width]/2]
+      $itk_component(crpix1) configure -value  $values_(crpix1)
+      set values_(crpix2) [expr [$itk_option(-rtdimage) height]/2]
+      $itk_component(crpix2) configure -value  $values_(crpix2)
 
-      set values_($this,crval1) 0.0
+      set values_(crval1) 0.0
       $itk_component(crval1) configure -value 0.0
-      set values_($this,crval2) 0.0
+      set values_(crval2) 0.0
       $itk_component(crval2) configure -value 0.0
 
-      set values_($this,cdelt1) 1.0
+      set values_(cdelt1) 1.0
       $itk_component(cdelt1) configure -value 1.0
-      set values_($this,cdelt2) 1.0
+      set values_(cdelt2) 1.0
       $itk_component(cdelt2) configure -value 1.0
 
       set_proj_ -TAN
       $itk_component(proj) configure -value -TAN
 
       set_system_ FK5 1
-      set values_($this,equinox) {}
+      set values_(equinox) {}
 
-      set values_($this,projp1) {}
+      set values_(projp1) {}
       $itk_component(projp1) configure -value {}
-      set values_($this,projp2) {}
+      set values_(projp2) {}
       $itk_component(projp2) configure -value {}
 
-      set values_($this,longpole) {}
+      set values_(longpole) {}
       $itk_component(longpole) configure -value {}
-      set values_($this,latpole) {}
+      set values_(latpole) {}
       $itk_component(latpole) configure -value {}
 
       #  The date defaults.
-      set values_($this,dateobs) {}
+      set values_(dateobs) {}
 
       #  Restore WCS system to the original (if available).
       if { $itk_option(-rtdimage) != {} } {
@@ -581,47 +581,47 @@ itcl::class gaia::GaiaAstDefine {
       if { $itk_option(-rtdimage) != {} } {
          set image $itk_option(-rtdimage)
          set chan [$image astcreate]
-         $image aststore $chan CTYPE1 "'$values_($this,ctype1)$values_($this,proj)'"
-         $image aststore $chan CTYPE2 "'$values_($this,ctype2)$values_($this,proj)'"
-         $image aststore $chan CRVAL1 [wcs_convert_ $values_($this,ctype1) \
-                                          $values_($this,crval1)]
-         $image aststore $chan CRVAL2 [wcs_convert_ $values_($this,ctype2) \
-                                          $values_($this,crval2)]
-         $image aststore $chan CDELT1 [expr $values_($this,cdelt1)/3600.0]
-         $image aststore $chan CDELT2 [expr $values_($this,cdelt2)/3600.0]
-         $image aststore $chan CRPIX1 $values_($this,crpix1)
-         $image aststore $chan CRPIX2 $values_($this,crpix2)
-         $image aststore $chan CROTA1 $values_($this,crota1)
-         $image aststore $chan CROTA2 $values_($this,crota2)
-         if { $values_($this,dateobs) != {} } {
-            $image aststore $chan DATE-OBS "'$values_($this,dateobs)'"
+         $image aststore $chan CTYPE1 "'$values_(ctype1)$values_(proj)'"
+         $image aststore $chan CTYPE2 "'$values_(ctype2)$values_(proj)'"
+         $image aststore $chan CRVAL1 [wcs_convert_ $values_(ctype1) \
+                                          $values_(crval1)]
+         $image aststore $chan CRVAL2 [wcs_convert_ $values_(ctype2) \
+                                          $values_(crval2)]
+         $image aststore $chan CDELT1 [expr $values_(cdelt1)/3600.0]
+         $image aststore $chan CDELT2 [expr $values_(cdelt2)/3600.0]
+         $image aststore $chan CRPIX1 $values_(crpix1)
+         $image aststore $chan CRPIX2 $values_(crpix2)
+         $image aststore $chan CROTA1 $values_(crota1)
+         $image aststore $chan CROTA2 $values_(crota2)
+         if { $values_(dateobs) != {} } {
+            $image aststore $chan DATE-OBS "'$values_(dateobs)'"
          }
-         if { $values_($this,system) != {} } {
-            $image aststore $chan RADECSYS "'$values_($this,system)'"
-            if { $values_($this,equinox) != {} } {
-               $image aststore $chan EQUINOX $values_($this,equinox)
+         if { $values_(system) != {} } {
+            $image aststore $chan RADECSYS "'$values_(system)'"
+            if { $values_(equinox) != {} } {
+               $image aststore $chan EQUINOX $values_(equinox)
             }
          }
 
          #  If needed for this projection, and available add the PROJP
          #  values.
-         if { $projpmap_($values_($this,proj),1) } {
-            if { $values_($this,projp1) != {} } {
-               $image aststore $chan PROJP1 $values_($this,projp1)
+         if { $projpmap_($values_(proj),1) } {
+            if { $values_(projp1) != {} } {
+               $image aststore $chan PROJP1 $values_(projp1)
             }
          }
-         if { $projpmap_($values_($this,proj),2) } {
-            if { $values_($this,projp2) != {} } {
-               $image aststore $chan PROJP2 $values_($this,projp2)
+         if { $projpmap_($values_(proj),2) } {
+            if { $values_(projp2) != {} } {
+               $image aststore $chan PROJP2 $values_(projp2)
             }
          }
 
          #  If set add LONGPOLE and LATPOLE.
-         if { $values_($this,longpole) != {} } {
-            $image aststore $chan LONGPOLE $values_($this,longpole)
+         if { $values_(longpole) != {} } {
+            $image aststore $chan LONGPOLE $values_(longpole)
          }
-         if { $values_($this,latpole) != {} } {
-            $image aststore $chan LATPOLE $values_($this,longpole)
+         if { $values_(latpole) != {} } {
+            $image aststore $chan LATPOLE $values_(longpole)
          }
 
          #  Read the channel to create an AST object and then replace
@@ -636,11 +636,11 @@ itcl::class gaia::GaiaAstDefine {
    #  Record the value of the selected RADECSYS and configure the
    #  equinox entry window appropriately.
    protected method set_system_ {value needequinox} {
-      set values_($this,system) $value
+      set values_(system) $value
       $itk_component(system) configure -value $value
       if { ! $needequinox } {
          $itk_component(equinox) configure -value {}
-         $itk_component(equinox) configure -state $offstate_($this)
+         $itk_component(equinox) configure -state $offstate_
       } else {
          $itk_component(equinox) configure -state normal
       }
@@ -652,34 +652,34 @@ itcl::class gaia::GaiaAstDefine {
    #  unless the ctype is "RA--", "DEC-".
    protected method set_ctype_ {axis value} {
 
-      set values_($this,ctype$axis) $value
+      set values_(ctype$axis) $value
       if { $axis == 1 } {
-         set values_($this,ctype2) $ctypepairs_($value)
+         set values_(ctype2) $ctypepairs_($value)
          $itk_component(ctype2) configure -value $ctypepairs_($value)
          if { $ctypepairs_($value,type) == "lat" } {
             $itk_component(crota2) configure -value 0.0
-            set values_($this,crota2) 0.0
+            set values_(crota2) 0.0
             $itk_component(crota1) configure -state normal
-            $itk_component(crota2) configure -state $offstate_($this)
+            $itk_component(crota2) configure -state $offstate_
          } else {
             $itk_component(crota1) configure -value 0.0
-            set values_($this,crota1) 0.0
-            $itk_component(crota1) configure -state $offstate_($this)
+            set values_(crota1) 0.0
+            $itk_component(crota1) configure -state $offstate_
             $itk_component(crota2) configure -state normal
          }
       } else {
-         set values_($this,ctype1) $ctypepairs_($value)
+         set values_(ctype1) $ctypepairs_($value)
          $itk_component(ctype1) configure -value $ctypepairs_($value)
          if { $ctypepairs_($value,type) == "lat" } {
             $itk_component(crota1) configure -value 0.0
-            set values_($this,crota1) 0.0
-            $itk_component(crota1) configure -state $offstate_($this)
+            set values_(crota1) 0.0
+            $itk_component(crota1) configure -state $offstate_
             $itk_component(crota2) configure -state normal
          } else {
             $itk_component(crota2) configure -value 0.0
-            set values_($this,crota2) 0.0
+            set values_(crota2) 0.0
             $itk_component(crota1) configure -state normal
-            $itk_component(crota2) configure -state $offstate_($this)
+            $itk_component(crota2) configure -state $offstate_
          }
       }
       if { $value == {RA--} || $value == {DEC-} } {
@@ -695,13 +695,13 @@ itcl::class gaia::GaiaAstDefine {
 	  } else {
 	      [$itk_component(system) component mb] configure -text Galactic
 	  }
-	  set values_($this,system) {}
+	  set values_(system) {}
       }
    }
 
    #  Set the value of the equinox entry window.
    protected method set_equinox_ {value} {
-      set values_($this,equinox) $value
+      set values_(equinox) $value
       $itk_component(equinox) configure -value $value
    }
 
@@ -735,12 +735,12 @@ itcl::class gaia::GaiaAstDefine {
    #  Set the value of the rotation of the latitude axis (AIPS
    #  convention for now).
    protected method set_angle_ {axis value} {
-      set values_($this,crota$axis) $value
+      set values_(crota$axis) $value
       if { $axis == 1 } {
-         set values_($this,crota2) 0.0
+         set values_(crota2) 0.0
          $itk_component(crota2) configure -value 0.0
       } else {
-         set values_($this,crota1) 0.0
+         set values_(crota1) 0.0
          $itk_component(crota1) configure -value 0.0
       }
    }
@@ -748,18 +748,18 @@ itcl::class gaia::GaiaAstDefine {
    #  Set the projection type. Also enables the PROJP section if
    #  necessary.
    protected method set_proj_ {proj} {
-      set values_($this,proj) $proj
+      set values_(proj) $proj
       if { $projpmap_($proj,1) } {
          $itk_component(projp1) configure -state normal
       } else {
 	 $itk_component(projp1) configure -value {}
-         $itk_component(projp1) configure -state $offstate_($this)
+         $itk_component(projp1) configure -state $offstate_
       }
       if { $projpmap_($proj,2) } {
          $itk_component(projp2) configure -state normal
       } else {
 	 $itk_component(projp2) configure -value {}
-         $itk_component(projp2) configure -state $offstate_($this)
+         $itk_component(projp2) configure -state $offstate_
       }
    }
 
@@ -910,6 +910,12 @@ itcl::class gaia::GaiaAstDefine {
    #  Names of sensible some equinoxes.
    protected variable equinoxmap_ {2000.0 1950.0}
 
+   #  Values of various widget settings.
+   protected variable values_
+
+   #  Relax mode. State of potentially disabled functions.
+   protected variable offstate_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
@@ -919,12 +925,6 @@ itcl::class gaia::GaiaAstDefine {
    #  Which PROJP parameters are required for which projections.
    common projpmap_
 
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
-
-   #  Relax mode. State of potentially disabled functions.
-   common offstate_
 
 #  End of class definition.
 }

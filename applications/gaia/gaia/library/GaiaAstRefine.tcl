@@ -171,12 +171,12 @@ itcl::class gaia::GaiaAstRefine {
          $m.fittype add radiobutton \
             -value $i \
             -label $fithelp($i) \
-            -variable [scope values_($this,fittype)] \
+            -variable [scope values_(fittype)] \
             -command [code $this configure -fittype $i]
       }
 
       #  Add option to define a different centroid maxshift/search box.
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       $m add cascade -label {Centroid search box} -menu [menu $m.isize]
       $short_help_win_ add_menu_short_help $m {Centroid search box} \
          {Change the search box used when locating centroids (pixels)}
@@ -184,10 +184,10 @@ itcl::class gaia::GaiaAstRefine {
          $m.isize add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,isize)] \
+            -variable [scope values_(isize)] \
             -command [code $this configure -isize $i]
       }
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       $m add cascade -label {Centroid max shift} -menu [menu $m.maxshift]
       $short_help_win_ add_menu_short_help $m {Centroid max shift} \
          {Change the maximum shift from initial position (pixels)}
@@ -195,7 +195,7 @@ itcl::class gaia::GaiaAstRefine {
          $m.maxshift add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,maxshift)] \
+            -variable [scope values_(maxshift)] \
             -command [code $this configure -maxshift $i]
       }
 
@@ -226,7 +226,7 @@ itcl::class gaia::GaiaAstRefine {
             -text "Move markers individually:" \
             -onvalue 0 \
             -offvalue 1 \
-            -variable [scope values_($this,coupled)] \
+            -variable [scope values_(coupled)] \
             -command [code $this set_coupled_]
       }
       set default_(coupled) 0
@@ -652,7 +652,7 @@ itcl::class gaia::GaiaAstRefine {
 	   set_ycentre_ $default_(ycentre)
        }
        if { $ignore != "coupled" } {
-	   set values_($this,coupled) $default_(coupled)
+	   set values_(coupled) $default_(coupled)
 	   set_coupled_
        }
    }
@@ -721,7 +721,7 @@ itcl::class gaia::GaiaAstRefine {
 
    #  Set marker movement policy.
    protected method set_coupled_ {} {
-       $itk_component(table) configure -coupled $values_($this,coupled)
+       $itk_component(table) configure -coupled $values_(coupled)
    }
 
    #  Public variables: (configuration options).
@@ -741,7 +741,7 @@ itcl::class gaia::GaiaAstRefine {
 
    #  The type of fit to be used when refining the coordinate system.
    itk_option define -fittype fittype Fittype 5 {
-      set values_($this,fittype) $itk_option(-fittype)
+      set values_(fittype) $itk_option(-fittype)
    }
 
    #  Command to execute when the WCS is changed.
@@ -756,7 +756,7 @@ itcl::class gaia::GaiaAstRefine {
    #  The centroid search box and maximum shift.
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
@@ -766,7 +766,7 @@ itcl::class gaia::GaiaAstRefine {
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
@@ -787,11 +787,12 @@ itcl::class gaia::GaiaAstRefine {
    #  Degrees to radians factor.
    protected variable d2r_ 0.017453292
 
+   #  Communication with widgets.
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Communication with widgets.
-   common values_
 
    #  End of class definition.
 }

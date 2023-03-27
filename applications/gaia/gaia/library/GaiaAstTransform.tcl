@@ -512,9 +512,5 @@ itcl::class gaia::GaiaAstTransform {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
-
 #  End of class definition.
 }

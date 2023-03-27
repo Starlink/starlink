@@ -510,10 +510,10 @@ itcl::class gaia::GaiaBlink {
 
          $menu add checkbutton \
             -label "$names_($n_)($clone_num_($n_))" \
-            -variable [scope view_($this,$n_)] \
+            -variable [scope view_($n_)] \
             -onvalue 1 \
             -offvalue 0
-         set view_($this,$n_) 1
+         set view_($n_) 1
 
          incr n_
       }
@@ -555,7 +555,7 @@ itcl::class gaia::GaiaBlink {
 
       incr top_
       if { $top_ >= $n_ } { set top_ 0 }
-      if { $view_($this,$top_) } {
+      if { $view_($top_) } {
          if { $itk_option(-classic_view) } {
             $canvas_ raise $backbox_
          } else {
@@ -577,13 +577,13 @@ itcl::class gaia::GaiaBlink {
       if { $top_ >= $n_ } {
          set top_ 0
       }
-      if { ! $view_($this,$top_) } {
+      if { ! $view_($top_) } {
          #  Look for next image that can be displayed.
          for { set i 0} { $i < $n_ } { incr i; incr top_ } {
             if { $top_ >= $n_ } {
                set top_ 0
             }
-            if { $view_($this,$top_) } {
+            if { $view_($top_) } {
                break
             }
          }
@@ -1326,11 +1326,12 @@ itcl::class gaia::GaiaBlink {
    protected variable xmark_ 0
    protected variable ymark_ 0
 
+   #  Which views are to be shown (indexed by index).
+   protected variable view_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Which views are to be shown (indexed by $this and index).
-   common view_
 
    #  Degrees to radians factor.
    common d2r_ 0.017453292

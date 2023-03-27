@@ -455,14 +455,14 @@ itcl::class gaia::GaiaDemo {
 
    #  Wait a while (without blocking interface).
    protected method wait_ {millisec} {
-      set continue_($this) 0
+      set continue_ 0
       after $millisec [code $this set_continue_]
-      vwait [scope continue_($this)]
+      vwait [scope continue_]
    }
 
    #  Set the continue_ variable to proceed after a while.
    protected method set_continue_ {} {
-      set [scope continue_($this)] 1
+      set [scope continue_] 1
    }
 
    #  Display an image in the main window.
@@ -781,7 +781,7 @@ itcl::class gaia::GaiaDemo {
       }
       short_display {Measuring aperture magnitudes...}
       $toolbox measure_objects [code $this set_continue_]
-      vwait [scope continue_($this)]
+      vwait [scope continue_]
       short_display {done...}
       wait_ $readtime_
       $toolbox save_objects photom.tmp
@@ -821,12 +821,12 @@ itcl::class gaia::GaiaDemo {
       wait_ $readtime_
       short_display {Measuring statistics...}
       $toolbox stats all [code $this set_continue_]
-      vwait [scope continue_($this)]
+      vwait [scope continue_]
       wait_ $readtime_
       short_display {Removing regions...}
       $toolbox configure -replace 1
       $toolbox blank all [code $this set_continue_]
-      vwait [scope continue_($this)]
+      vwait [scope continue_]
       wait_ $readtime_
       $itk_option(-rtdimage) autocut -percent 70
       {*}$itk_option(-gaiamain) configure -temporary 0
@@ -1536,11 +1536,12 @@ $catlist
    #  Development mode.
    protected variable quick_start_ 0
 
+   #  Variable to watch while waiting.
+   protected variable continue_ 0
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Variable to watch while waiting.
-   common continue_
 
 #  End of class definition.
 }
