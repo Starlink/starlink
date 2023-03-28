@@ -372,7 +372,7 @@ int GaiaLocalCatalog::startConvert()
         }
     }
     if ( convertTable_[0] == '\0' ) {
-        if (Tcl_Eval( interp_, (char *) "GaiaConvertTable #auto" ) != TCL_OK) {
+        if (Tcl_Eval( interp_, (char *) "gaia::GaiaConvertTable #auto" ) != TCL_OK) {
             return 0;
         }
         else {
