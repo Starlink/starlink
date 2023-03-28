@@ -113,12 +113,8 @@ itcl::class gaia::GaiaPolUStats {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Statistics' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -154,7 +150,7 @@ public method clear {} {
 
 #  Get the names of the statistics to display, and the number of rows
 #  needed in the table (one for each statistic).
-            set stats $values_($this,stats)
+            set stats $values_(stats)
             if { $stats == "" } {
                set stats $stats_
             }
@@ -165,7 +161,7 @@ public method clear {} {
             checkCols
 
 #  Get the column headings to use. If blank, use all columns.
-            set cols $values_($this,cols)
+            set cols $values_(cols)
             if { $cols == "" } {
                set cols $useheads_
             }
@@ -196,10 +192,10 @@ public method clear {} {
       if { $cat_ != "" } {
          $cat_ annull
       }
-      set cat_ [$cat clone]
+      set cat_ [{*}$cat clone]
 
 #  Ensure the column names are up-to-date.
-      setHeadings [$cat getHeadings]
+      setHeadings [$cat_ getHeadings]
 
 #  Indicate that statistics have not yet been calculated for this GaiaPolCat
       set done_ 0
@@ -231,7 +227,7 @@ public method clear {} {
       if { [lsearch -exact $stats "Sigma-clipped mean"] != -1 ||
            [lsearch -exact $stats "Sigma-clipped count"] != -1 ||
            [lsearch -exact $stats "Sigma-clipped std. devn"] != -1 } {
-         set npass [expr $values_($this,niter) + 1]
+         set npass [expr $values_(niter) + 1]
       } else {
          set npass 1
       }
@@ -242,7 +238,7 @@ public method clear {} {
 
 #  Set up the progress bar.
       set inc [expr ($trow+19)/20]
-      $itk_option(-pbar) config -to $trow
+      {*}$itk_option(-pbar) config -to $trow
       update idletasks
       set prow -1
       set pj 0
@@ -282,7 +278,7 @@ public method clear {} {
 #  Update the progress bar value at intervals.
             if { [incr pj] == $inc } {
                set pj -1
-               $itk_option(-pbar) config -value $prow
+               {*}$itk_option(-pbar) config -value $prow
                update idletasks
             }
          }
@@ -328,8 +324,8 @@ public method clear {} {
             set CCount($icol) $Count($icol)
          }
 
-         set nsig $values_($this,nsigma)
-         for {set iter 0} {$iter < $values_($this,niter)} {incr iter} {
+         set nsig $values_(nsigma)
+         for {set iter 0} {$iter < $values_(niter)} {incr iter} {
 
             foreach icol $jcols {
                if { $icol != "" } {
@@ -367,7 +363,7 @@ public method clear {} {
 #  Update the progress bar value at intervals.
                   if { [incr pj] == $inc } {
                      set pj -1
-                     $itk_option(-pbar) config -value $prow
+                     {*}$itk_option(-pbar) config -value $prow
                      update idletasks
                   }
 
@@ -459,7 +455,7 @@ public method clear {} {
          setHold "Calculating new statistics for selected vectors..."
 
 #  Get the names of the statistics to display. If blank, use all stats.
-         set stats $values_($this,stats)
+         set stats $values_(stats)
          if { $stats == "" } {
             set stats $stats_
          }
@@ -469,7 +465,7 @@ public method clear {} {
          checkCols
 
 #  Get the columns to display. If blank, use all columns.
-         set cols $values_($this,cols)
+         set cols $values_(cols)
          if { $cols == "" } {
             set cols $useheads_
          }
@@ -533,10 +529,10 @@ public method clear {} {
       set attr_(nsigma) Nsigma
 
 #  Set the hard-wired defaults.
-      set values_($this,cols) ""
-      set values_($this,stats) ""
-      set values_($this,niter) "3"
-      set values_($this,nsigma) "3.0"
+      set values_(cols) ""
+      set values_(stats) ""
+      set values_(niter) "3"
+      set values_(nsigma) "3.0"
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -546,15 +542,15 @@ public method clear {} {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Statistics' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,niter) == "" } { set values_($this,niter) "3" }
-      if { $values_($this,nsigma) == "" } { set values_($this,nsigma) "3" }
+      if { $values_(niter) == "" } { set values_(niter) "3" }
+      if { $values_(nsigma) == "" } { set values_(nsigma) "3" }
 
 #  Use these settings.
       newVals
@@ -566,7 +562,7 @@ public method clear {} {
 #  ---------------------------------------------------------------------
    public method checkCols {} {
 
-      set cols $values_($this,cols)
+      set cols $values_(cols)
 
 #  If the cols list is not blank, we need to check that each element in
 #  the list is a heading which is available in the currently displayed
@@ -588,7 +584,7 @@ public method clear {} {
 #  If any requested columns were not available in the current headings,
 #  update the common values_ array to hold only the available columns.
          if { $badcols != "" } {
-            set values_($this,cols) $goodcols
+            set values_(cols) $goodcols
          }
       }
    }
@@ -629,17 +625,17 @@ public method clear {} {
 
    }
 
-   public method getCols {} {return $values_($this,cols)}
-   public method setCols {x} {set values_($this,cols) $x; newVals}
+   public method getCols {} {return $values_(cols)}
+   public method setCols {x} {set values_(cols) $x; newVals}
 
-   public method getStats {} {return $values_($this,stats)}
-   public method setStats {x} {set values_($this,stats) $x; newVals}
+   public method getStats {} {return $values_(stats)}
+   public method setStats {x} {set values_(stats) $x; newVals}
 
-   public method getNiter {} {return $values_($this,niter)}
-   public method setNiter {x} {set values_($this,niter) $x; newVals}
+   public method getNiter {} {return $values_(niter)}
+   public method setNiter {x} {set values_(niter) $x; newVals}
 
-   public method getNsigma {} {return $values_($this,nsigma)}
-   public method setNsigma {x} {set values_($this,nsigma) $x; newVals}
+   public method getNsigma {} {return $values_(nsigma)}
+   public method setNsigma {x} {set values_(nsigma) $x; newVals}
 
    public method setSaveOpt {x} {set saveopt_ $x}
 
@@ -647,7 +643,7 @@ public method clear {} {
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($this,$item)\"\}"
+         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($item)\"\}"
          eval $itk_option(-actioncmd) $arglist
       }
    }
@@ -764,7 +760,7 @@ public method clear {} {
                               -anchor nw \
 			      -validate integer \
                               -command [code $this activ niter] \
-                              -textvariable [scope values_($this,niter)]
+                              -textvariable [scope values_(niter)]
 	 }
          grid $itk_component(niter) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(niter) {Number of iterations for the sigma clipping algorithm}
@@ -778,7 +774,7 @@ public method clear {} {
                               -anchor nw \
 			      -validate real \
                               -command [code $this activ nsigma] \
-                              -textvariable [scope values_($this,nsigma)]
+                              -textvariable [scope values_(nsigma)]
 	 }
          grid $itk_component(nsigma) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(nsigma) {Number of standard deviations for the sigma clipping algorithm}
@@ -831,9 +827,7 @@ public method clear {} {
 #  ---------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -854,8 +848,8 @@ public method clear {} {
 
 #  Check the currently selected statistics. Check all of them if the
 #  string is blank.
-      if { $values_($this,stats) != "" } {
-         $d setOptions $values_($this,stats)
+      if { $values_(stats) != "" } {
+         $d setOptions $values_(stats)
       } else {
          $d allOptions
       }
@@ -866,16 +860,16 @@ public method clear {} {
 
 #  Was OK pressed? If the options have changed, store the new values.
       if { $but == 0 } {
-         if { $opts != $values_($this,stats)} {
-            set values_($this,stats) $opts
+         if { $opts != $values_(stats)} {
+            set values_(stats) $opts
             activ stats
          }
 
 #  Was All pressed? Set the selection back to blank means "display all
 #  available statistics"
       } elseif { $but == 2 } {
-         if { $values_($this,stats) != "" } {
-            set values_($this,stats) ""
+         if { $values_(stats) != "" } {
+            set values_(stats) ""
             activ stats
          }
 
@@ -902,8 +896,8 @@ public method clear {} {
 #  Check the currently selected column names. Check all names if the
 #  string is blank.
       checkCols
-      if { $values_($this,cols) != "" } {
-         $d setOptions $values_($this,cols)
+      if { $values_(cols) != "" } {
+         $d setOptions $values_(cols)
       } else {
          $d allOptions
       }
@@ -914,16 +908,16 @@ public method clear {} {
 
 #  Was OK pressed? If the options have changed, store the new values.
       if { $but == 0 } {
-         if { $opts != $values_($this,cols)} {
-            set values_($this,cols) $opts
+         if { $opts != $values_(cols)} {
+            set values_(cols) $opts
             activ cols
          }
 
 #  Was All pressed? Set the column selection back to blank means "use all
 #  available columns"
       } elseif { $but == 2 } {
-         if { $values_($this,cols) != "" } {
-            set values_($this,cols) ""
+         if { $values_(cols) != "" } {
+            set values_(cols) ""
             activ cols
          }
 
@@ -937,8 +931,8 @@ public method clear {} {
 #  --------------------------
    private method setHold {text} {
       blt::busy hold $w_ -cursor "watch"
-      $itk_option(-pbar) reset
-      $itk_option(-pbar) config -text $text
+      {*}$itk_option(-pbar) reset
+      {*}$itk_option(-pbar) config -text $text
       update idletasks
    }
 
@@ -946,7 +940,7 @@ public method clear {} {
 #  --------------------------
    private method resetHold {} {
       blt::busy release $w_
-      $itk_option(-pbar) reset
+      {*}$itk_option(-pbar) reset
       update idletasks
    }
 
@@ -1002,6 +996,10 @@ public method clear {} {
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
+
+#  Array indexed by (param).
+       variable values_
+
    }
 
 #  Private data members:
@@ -1011,8 +1009,6 @@ public method clear {} {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  Name of stats selection dialog window.
    common statselect_ .polstatselect

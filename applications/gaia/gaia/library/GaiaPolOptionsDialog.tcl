@@ -106,9 +106,9 @@ itcl::class gaia::GaiaPolOptionsDialog {
       set i 0
       foreach item $itk_option(-options) {
          if { [lsearch -exact $sel $item] != -1 } {
-            set values_($this,item$i) 1
+            set values_(item$i) 1
          } else {
-            set values_($this,item$i) 0
+            set values_(item$i) 0
          }
          incr i
       }
@@ -119,7 +119,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
    public method allOptions {} {
       set i 0
       foreach item $itk_option(-options) {
-         set values_($this,item$i) 1
+         set values_(item$i) 1
          incr i
       }
    }
@@ -170,7 +170,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
                                   -onvalue 1 \
                                   -offvalue 0 \
                                   -labelwidth $lwidth \
-                                  -variable [scope values_($this,item$i)]
+                                  -variable [scope values_(item$i)]
 
             }
          pack $itk_component(item$i) -side top -fill both -anchor n -expand 1 -padx 3m
@@ -197,7 +197,7 @@ itcl::class gaia::GaiaPolOptionsDialog {
       set opts ""
       set i 0
       foreach item $itk_option(-options) {
-         if { $values_($this,item$i) } {
+         if { $values_(item$i) } {
             lappend opts $item
          }
          incr i
@@ -226,12 +226,13 @@ itcl::class gaia::GaiaPolOptionsDialog {
 #  ====================
    protected {
       variable initialized_ 0
+
+#  Array indexed by (param).
+      variable values_
    }
 
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 }

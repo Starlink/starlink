@@ -116,12 +116,8 @@ itcl::class gaia::GaiaPolUHigh {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Highlighting' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -139,7 +135,7 @@ itcl::class gaia::GaiaPolUHigh {
    public method activ { args } {
 
 #  Ensure the values in the values_ array are up to date.
-      set values_($this,clr) [$itk_component(clr) get]
+      set values_(clr) [$itk_component(clr) get]
 
 #  Get the name of the changed value.
       set item [lindex $args 0]
@@ -174,12 +170,12 @@ itcl::class gaia::GaiaPolUHigh {
       set attr_(fbold) FontBold
 
 #  Set the hard-wired defaults.
-      set values_($this,enable) 1
-      set values_($this,clr) "#0f0"
-      set values_($this,fmt) "%.1f"
-      set values_($this,ffam) "courier"
-      set values_($this,fsize) 20
-      set values_($this,fbold) 0
+      set values_(enable) 1
+      set values_(clr) "#0f0"
+      set values_(fmt) "%.1f"
+      set values_(ffam) "courier"
+      set values_(fsize) 20
+      set values_(fbold) 0
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -189,18 +185,18 @@ itcl::class gaia::GaiaPolUHigh {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Highlighting' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,enable) == "" } { set values_($this,enable) 1 }
-      if { $values_($this,clr) == "" } { set values_($this,clr) "#0f0" }
-      if { $values_($this,ffam) == "" } { set values_($this,ffam) "courier" }
-      if { $values_($this,fsize) == "" } { set values_($this,fsize) 20 }
-      if { $values_($this,fbold) == "" } { set values_($this,fbold) 0 }
+      if { $values_(enable) == "" } { set values_(enable) 1 }
+      if { $values_(clr) == "" } { set values_(clr) "#0f0" }
+      if { $values_(ffam) == "" } { set values_(ffam) "courier" }
+      if { $values_(fsize) == "" } { set values_(fsize) 20 }
+      if { $values_(fbold) == "" } { set values_(fbold) 0 }
 
 #  Ensure the font uses the values set above.
       updateFont
@@ -214,46 +210,46 @@ itcl::class gaia::GaiaPolUHigh {
 #  -----------------
    public method setEnabled {enable} {
       if { $enable } {
-         set values_($this,enable) 1
+         set values_(enable) 1
       } else {
-         set values_($this,enable) 0
+         set values_(enable) 0
       }
       newVals
    }
-   public method getEnabled {} {return $values_($this,enable)}
+   public method getEnabled {} {return $values_(enable)}
 
    public method setColour {col} {
-      set values_($this,clr) $col
+      set values_(clr) $col
       newVals
    }
-   public method getColour {} {return $values_($this,clr)}
+   public method getColour {} {return $values_(clr)}
 
    public method setFormat {fmt} {
-      set values_($this,fmt) $fmt
+      set values_(fmt) $fmt
       newVals
    }
    public method getFormat {} {
-      if { [catch { format $values_($this,fmt) 0.0 }] } {
-         error_dialog "Illegal format string \"$values_($this,fmt)\" supplied for highlight labels. Reverting to default format \"%.1f\"."
+      if { [catch { format $values_(fmt) 0.0 }] } {
+         error_dialog "Illegal format string \"$values_(fmt)\" supplied for highlight labels. Reverting to default format \"%.1f\"."
          setFormat "%.1f"
       }
-      return $values_($this,fmt)
+      return $values_(fmt)
    }
 
    public method getFont {} {return $font_}
 
    public method setFontFam {f} {
-      set values_($this,ffam) $f
+      set values_(ffam) $f
       updateFont
    }
 
    public method setFontSize {f} {
-      set values_($this,fsize) $f
+      set values_(fsize) $f
       updateFont
    }
 
    public method setFontBold {f} {
-      set values_($this,fbold) $f
+      set values_(fbold) $f
       updateFont
    }
 
@@ -263,8 +259,8 @@ itcl::class gaia::GaiaPolUHigh {
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($this,$item)\"\}"
-         eval $itk_option(-actioncmd) $arglist
+         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($item)\"\}"
+         eval {*}$itk_option(-actioncmd) $arglist
       }
    }
 
@@ -274,7 +270,7 @@ itcl::class gaia::GaiaPolUHigh {
    public method newVals {} {
       saveOld
       if { "$itk_option(-changecmd)" != "" } {
-         eval $itk_option(-changecmd)
+         eval {*}$itk_option(-changecmd)
       }
    }
 
@@ -284,7 +280,7 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Get the new font family from the menu and store in the values_ array.
       if { ![catch {set ffam [$itk_component(ffam) get]}] } {
-         set values_($this,ffam)  $ffam
+         set values_(ffam)  $ffam
       }
 
 #  Add an action to the list of undoable actions.
@@ -300,13 +296,13 @@ itcl::class gaia::GaiaPolUHigh {
 #  previous values.
 #  ----------------------------------------------------------------------
    public method updateFont {} {
-      if { $values_($this,fbold) } {
+      if { $values_(fbold) } {
          set wgt "bold"
       } else {
          set wgt "normal"
       }
-      font configure $font_ -family $values_($this,ffam) \
-                                     -size $values_($this,fsize) \
+      font configure $font_ -family $values_(ffam) \
+                                     -size $values_(fsize) \
 				     -weight $wgt
       saveOld
    }
@@ -366,7 +362,7 @@ itcl::class gaia::GaiaPolUHigh {
 			      -labelwidth $lwidth \
                               -command [code $this activ enable] \
                               -anchor nw \
-                              -variable [scope values_($this,enable)]
+                              -variable [scope values_(enable)]
 	 }
          grid $itk_component(enable) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(enable) {Controls whether the vector under the mouse pointer is highlighted or not}
@@ -381,7 +377,7 @@ itcl::class gaia::GaiaPolUHigh {
          itk_component add clr {
 	    util::LabelMenu $w_.clr -text "Colour:" \
 			      -labelwidth $lwidth \
-	    	              -variable [scope values_($this,clr)]
+	    	              -variable [scope values_(clr)]
 	 }
          grid $itk_component(clr) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(clr) {Colour to use when highlighting the vector under the pointer}
@@ -405,7 +401,7 @@ itcl::class gaia::GaiaPolUHigh {
          itk_component add fmt {
 	    util::LabelEntry $w_.fmt -text "Format string:" \
 	                       -labelwidth $lwidth \
-                               -textvariable [scope values_($this,fmt)] \
+                               -textvariable [scope values_(fmt)] \
                                -valuewidth 20 \
                                -command [code $this activ fmt] \
                                -anchor nw
@@ -423,16 +419,16 @@ itcl::class gaia::GaiaPolUHigh {
          itk_component add ffam {
 	    util::LabelMenu $w_.ffam -text "Font family:" \
 			       -labelwidth $lwidth \
-	                       -variable [scope values_($this,ffam)]
+	                       -variable [scope values_(ffam)]
 	 }
          grid $itk_component(ffam) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(ffam) {Font family to use when labelling the vector under the pointer}
 
          foreach fam [font families] {
             $itk_component(ffam) add \
-               -label $fam \
+               -label "$fam" \
                -command [code $this newFont ffam] \
-               -value $fam
+               -value "$fam"
          }
 
 #  Vertical space
@@ -449,7 +445,7 @@ itcl::class gaia::GaiaPolUHigh {
 			      -labelwidth $lwidth \
                               -anchor nw \
 			      -validate integer \
-                              -textvariable [scope values_($this,fsize)]
+                              -textvariable [scope values_(fsize)]
 	 }
          grid $itk_component(fsize) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(fsize) {Font size to use when labelling the vector under the pointer}
@@ -468,7 +464,7 @@ itcl::class gaia::GaiaPolUHigh {
 			      -labelwidth $lwidth \
                               -command [code $this newFont fbold] \
                               -anchor nw \
-                              -variable [scope values_($this,fbold)]
+                              -variable [scope values_(fbold)]
 	 }
          grid $itk_component(fbold) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(fbold) {Should highlight labels be bold?}
@@ -498,9 +494,7 @@ itcl::class gaia::GaiaPolUHigh {
 #  ---------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -549,6 +543,9 @@ itcl::class gaia::GaiaPolUHigh {
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
+
+#  Array indexed by (param).
+       variable values_
    }
 
 #  Private data members:
@@ -561,8 +558,6 @@ itcl::class gaia::GaiaPolUHigh {
 #  The number fo GaiaPolUHigh objects created so far.
    common id_ 0
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  End of class definition.
 }

@@ -148,12 +148,8 @@ itcl::class gaia::GaiaPolUCols {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Column Names' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -173,14 +169,14 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Ensure the value for the changed control is up to date in the mvalues_
 #  array.
-      set mvalues_($this,$q) [$itk_component($lq) get]
+      set mvalues_($q) [$itk_component($lq) get]
 
 #  Indicate that the user now "wants" the value in the menu. What he
 #  "wants" and what he gets may not always be the same (e.g. if the
 #  column he wants is not available in the catalogue), but for the moment,
 #  since he has explicitly selected one of the available columns, what he
 #  wants and what he gets are in fact the same.
-      set values_($this,$q) $mvalues_($this,$q)
+      set values_($q) $mvalues_($q)
 
 #  Use the command specified by the -actioncmd option to store a new
 #  undoable action in the actions list.
@@ -200,7 +196,7 @@ itcl::class gaia::GaiaPolUCols {
          set desc_($q) "the column to use for $shelp_($q) values"
          set attr_($q) $q
          append attr_($q) Col
-         set values_($this,$q) ""
+         set values_($q) ""
       }
 
 #  Over-write these with the values read from the options file created when
@@ -213,7 +209,7 @@ itcl::class gaia::GaiaPolUCols {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Column Names' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
@@ -226,10 +222,10 @@ itcl::class gaia::GaiaPolUCols {
 #  Accessor methods:
 #  -----------------
 #  Return the column name to be used for a given quantity.
-   public method getCol {q} {return $mvalues_($this,$q)}
+   public method getCol {q} {return $mvalues_($q)}
 
 #  Set the wanted column name for a given quantity.
-   public method setCol {q c} {set values_($this,$q) $c; new_wants}
+   public method setCol {q c} {set values_($q) $c; new_wants}
 
 #  Indicate if the options should be saved when the object is destroyed.
    public method setSaveOpt {x} {set saveopt_ $x}
@@ -238,8 +234,8 @@ itcl::class gaia::GaiaPolUCols {
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{setCol $item \"$oldvals_($item)\"\} \{setCol $item \"$values_($this,$item)\"\}"
-         eval $itk_option(-actioncmd) $arglist
+         set arglist "object \{change $desc_($item)\} $this \{setCol $item \"$oldvals_($item)\"\} \{setCol $item \"$values_($item)\"\}"
+         eval {*}$itk_option(-actioncmd) $arglist
       }
    }
 
@@ -257,7 +253,7 @@ itcl::class gaia::GaiaPolUCols {
 #  If a catalogue has been supplied, store a clone of the suppllied catalogue
 #  reference, and store the new headings.
       if { $cat != "" } {
-         set cat_ [$cat clone]
+         set cat_ [{*}$cat clone]
          set headings_ [$cat_ getHeadings]
 
 #  If no catalogue has been supplied, store an empty headings string.
@@ -280,7 +276,7 @@ itcl::class gaia::GaiaPolUCols {
    public method newVals {q} {
       saveOld
       if { "$itk_option(-changecmd)" != "" } {
-         eval $itk_option(-changecmd) $q
+         eval {*}$itk_option(-changecmd) $q
       }
    }
 
@@ -343,7 +339,7 @@ itcl::class gaia::GaiaPolUCols {
             itk_component add $lq {
 	       util::LabelMenu $w_.$lq -text "$q:" \
                                 -labelwidth $lwidth \
-                                -variable [scope mvalues_($this,$q)]
+                                -variable [scope mvalues_($q)]
             }
             grid $itk_component($lq) -row $r -column $col -sticky nw -padx $px
             add_short_help $itk_component($lq) "Column to use for $shelp_($q) values"
@@ -420,9 +416,7 @@ itcl::class gaia::GaiaPolUCols {
 #  --------------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -472,9 +466,9 @@ itcl::class gaia::GaiaPolUCols {
       foreach q $quantities_ {
          set col [want_column $q ]
          if { [lsearch -exact $headings_ $col] == -1 } {
-            set mvalues_($this,$q) ""
+            set mvalues_($q) ""
          } else {
-            set mvalues_($this,$q) $col
+            set mvalues_($q) $col
          }
          newVals $q
       }
@@ -487,8 +481,8 @@ itcl::class gaia::GaiaPolUCols {
 
 #  If the user has explicitly requested that a particular column be used
 #  for this quantity, return it.
-      if { $values_($this,$q) != "" } {
-         return $values_($this,$q)
+      if { $values_($q) != "" } {
+         return $values_($q)
 
 #  Otherwise, if the catalogue includes an indication of which column should
 #  be used for this quantity, return it.
@@ -558,6 +552,17 @@ itcl::class gaia::GaiaPolUCols {
 #  Has the user ben warned about unused columns in the current catalogue?
        variable warned_ 0
 
+#  Array indexed by (param).
+#  These are the requested value (i.e. what we want but which may not be
+#  available in the current headings). A blank value means "use which
+#  ever column seems most appropriate".
+       variable values_
+
+#  Array indexed by (param).
+#  These are the values actually used by the LabelMenus (i.e. these will
+#  be set to "(not available)" if the requested value is not available in
+#  the current list of column headings.
+       variable mvalues_
    }
 
 #  Private data members:
@@ -566,18 +571,6 @@ itcl::class gaia::GaiaPolUCols {
 
 #  Common (i.e. static) data members:
 #  ==================================
-
-#  Array for passing around at global level. Indexed by ($this,param).
-#  These are the requested value (i.e. what we want but which may not be
-#  available in the current headings). A blank value means "use which
-#  ever column seems most appropriate".
-   common values_
-
-#  Array for passing around at global level. Indexed by ($this,param).
-#  These are the values actually used by the LabelMenus (i.e. these will
-#  be set to "(not available)" if the requested value is not available in
-#  the current list of column headings.
-   common mvalues_
 
 #  The list of known quantities (using standard polpack names).
    common quantities_ "X Y Z RA DEC I DI Q DQ U DU V DV P DP ANG DANG PI DPI ID"

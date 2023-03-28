@@ -136,7 +136,7 @@ itcl::class gaia::GaiaPolCat {
 #  If not supplied, create a GaiaPolData object to store an immutable
 #  description of the catalogue, including the main data array.
       if { $data == "" } {
-         set data_ [::gaia::GaiaPolData data#auto $file $w $pbar]
+         set data_ [::gaia::GaiaPolData data\#auto $file $w $pbar]
       } else {
          set data_ [$data clone]
       }
@@ -178,11 +178,11 @@ itcl::class gaia::GaiaPolCat {
 
 #  If succesful, create a new GaiaPolCat for this polpack catalogue.
          if { $bincat != "" } {
-            set ret [code [::gaia::GaiaPolCat PolCat#auto $bincat $w_ $pbar_] ]
+            set ret [code [::gaia::GaiaPolCat PolCat#auto $bincat $w_ $pbar_]]
             if { $ret != "" } {
-               $ret setChanged 1
-               $ret setWarned [$data_ getWarned]
-               $ret setDesc "bin vectors"
+               {*}$ret setChanged 1
+               {*}$ret setWarned [$data_ getWarned]
+               {*}$ret setDesc "bin vectors"
             }
          }
       }
@@ -252,7 +252,7 @@ itcl::class gaia::GaiaPolCat {
       set ret 0
 
 #  Indicate what is happening
-      $pbar_ config -text "Writing $file  ..."
+      {*}$pbar_ config -text "Writing $file  ..."
       update idletasks
 
 #  Create a new data array without any deleted rows, or (if all
@@ -277,7 +277,7 @@ itcl::class gaia::GaiaPolCat {
       }
 
 #  Reset the progress bar.
-      $pbar_ reset
+      {*}$pbar_ reset
       update idletasks
 
       return $ret
@@ -408,7 +408,7 @@ itcl::class gaia::GaiaPolCat {
 #  If we have already found the differences between $this and $that
 #  then return the previously calculated results. A "change identifier"
 #  ("chid") is a unique number associated with each change of row states.
-      set thatchid [$that getChid]
+      set thatchid [{*}$that getChid]
 
       if { $that == $that_ && $thatchid == $thatchid_ && $chid_ == $thischid_ } {
          set ret $changes_
@@ -416,17 +416,17 @@ itcl::class gaia::GaiaPolCat {
 #  Otherwise calculate new results.
       } else {
 
-         if { [$data_ getTclFile] != [$that getTclFile] } {
+         if { [$data_ getTclFile] != [{*}$that getTclFile] } {
             set catch "redraw"
-            set des [$that getDesc]
+            set des [{*}$that getDesc]
 
-         } elseif { [getZvals] != [$that getZvals] } {
+         } elseif { [getZvals] != [{*}$that getZvals] } {
             set catch "redraw"
             set des "change spectral channel"
 
          } else {
 
-            upvar 0 [$that getStatesR] thatstate
+            upvar 0 [{*}$that getStatesR] thatstate
             set catch ""
             set nrow [$data_ getNrow]
             for {set i 0} {$i < $nrow} {incr i} {

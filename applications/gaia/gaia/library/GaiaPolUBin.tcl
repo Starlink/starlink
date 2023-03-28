@@ -102,12 +102,8 @@ itcl::class gaia::GaiaPolUBin {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Binning' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -122,7 +118,7 @@ itcl::class gaia::GaiaPolUBin {
    public method activ { args } {
 
 #  Ensure the menu values in the values_ array are up to date.
-      set values_($this,method) [$itk_component(method) get]
+      set values_(method) [$itk_component(method) get]
 
 #  Use the command specified by the -actioncmd option to store a new
 #  undoable action in the actions list.
@@ -137,7 +133,7 @@ itcl::class gaia::GaiaPolUBin {
 #  -------------------------------------------------------------------
    public method bin {} {
       if { "$itk_option(-changecmd)" != "" } {
-         eval $itk_option(-changecmd)
+         eval {*}$itk_option(-changecmd)
       }
    }
 
@@ -161,11 +157,11 @@ itcl::class gaia::GaiaPolUBin {
       set attr_(sigmas) Sigmas
 
 #  Set the hard-wired defaults.
-      set values_($this,box) 5
-      set values_($this,method) "median"
-      set values_($this,debias) 1
-      set values_($this,minval) 1
-      set values_($this,sigmas) 4
+      set values_(box) 5
+      set values_(method) "median"
+      set values_(debias) 1
+      set values_(minval) 1
+      set values_(sigmas) 4
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -175,18 +171,18 @@ itcl::class gaia::GaiaPolUBin {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Binning' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,box) == "" } { set values_($this,box) 5 }
-      if { $values_($this,method) == "" } { set values_($this,method) "median" }
-      if { $values_($this,debias) == "" } { set values_($this,debias) 1 }
-      if { $values_($this,minval) == "" } { set values_($this,minval) 1 }
-      if { $values_($this,sigmas) == "" } { set values_($this,sigmas) 4 }
+      if { $values_(box) == "" } { set values_(box) 5 }
+      if { $values_(method) == "" } { set values_(method) "median" }
+      if { $values_(debias) == "" } { set values_(debias) 1 }
+      if { $values_(minval) == "" } { set values_(minval) 1 }
+      if { $values_(sigmas) == "" } { set values_(sigmas) 4 }
 
 #  Save the original values as next times previous values.
       saveOld
@@ -194,23 +190,23 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Accessor methods:
 #  -----------------
-   public method setMethod {x} {set values_($this,method) $x}
-   public method getMethod {} {return $values_($this,method)}
-   public method setBox {x} {set values_($this,box) $x}
-   public method getBox {} {return $values_($this,box)}
-   public method setDebias {x} {set values_($this,debias) $x}
-   public method getDebias {} {return $values_($this,debias)}
-   public method setMinVal {x} {set values_($this,minval) $x}
-   public method getMinVal {} {return $values_($this,minval)}
-   public method setSigmas {x} {set values_($this,sigmas) $x}
-   public method getSigmas {} {return $values_($this,sigmas)}
+   public method setMethod {x} {set values_(method) $x}
+   public method getMethod {} {return $values_(method)}
+   public method setBox {x} {set values_(box) $x}
+   public method getBox {} {return $values_(box)}
+   public method setDebias {x} {set values_(debias) $x}
+   public method getDebias {} {return $values_(debias)}
+   public method setMinVal {x} {set values_(minval) $x}
+   public method getMinVal {} {return $values_(minval)}
+   public method setSigmas {x} {set values_(sigmas) $x}
+   public method getSigmas {} {return $values_(sigmas)}
    public method setSaveOpt {x} {set saveopt_ $x}
 
 #  Called to add a new action to the current list of undoable actions.
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($this,$item)\"\}"
+         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($item)\"\}"
          eval $itk_option(-actioncmd) $arglist
       }
    }
@@ -271,7 +267,7 @@ itcl::class gaia::GaiaPolUBin {
                                  -labelwidth $lwidth \
                                  -anchor nw \
                                  -validate integer \
-                                 -textvariable [scope values_($this,box)]
+                                 -textvariable [scope values_(box)]
          }
          grid $itk_component(box) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(box) {The length of a side of each square bin, in pixels}
@@ -285,7 +281,7 @@ itcl::class gaia::GaiaPolUBin {
 #  Create a LabelMenu to control the method used for binnin.
          itk_component add method {
             util::LabelMenu $w_.method -text "Method:" \
-                                 -variable [scope values_($this,method)] \
+                                 -variable [scope values_(method)] \
                                  -labelwidth $lwidth
          }
          grid $itk_component(method) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
@@ -311,7 +307,7 @@ itcl::class gaia::GaiaPolUBin {
                                      -labelwidth $lwidth \
                                      -command [code $this activ debias] \
                                      -anchor nw \
-                                     -variable [scope values_($this,debias)]
+                                     -variable [scope values_(debias)]
          }
          grid $itk_component(debias) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(debias) {Should the binned polarization values be debiassed if possible?}
@@ -330,7 +326,7 @@ itcl::class gaia::GaiaPolUBin {
                                  -labelwidth $lwidth \
                                  -anchor nw \
                                  -validate integer \
-                                 -textvariable [scope values_($this,minval)]
+                                 -textvariable [scope values_(minval)]
          }
          grid $itk_component(minval) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(minval) {The minimum number of good values in a bin}
@@ -349,7 +345,7 @@ itcl::class gaia::GaiaPolUBin {
                                  -labelwidth $lwidth \
                                  -anchor nw \
                                  -validate integer \
-                                 -textvariable [scope values_($this,sigmas)]
+                                 -textvariable [scope values_(sigmas)]
          }
          grid $itk_component(sigmas) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(sigmas) {The number of standard deviations at which to clip when using method 'sigma-clipped mean'}
@@ -395,9 +391,7 @@ itcl::class gaia::GaiaPolUBin {
 #  ---------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -438,6 +432,8 @@ itcl::class gaia::GaiaPolUBin {
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
 
+#  Array indexed by ($this,param).
+       variable values_
    }
 
 #  Private data members:
@@ -446,9 +442,6 @@ itcl::class gaia::GaiaPolUBin {
 
 #  Common (i.e. static) data members:
 #  ==================================
-
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  End of class definition.
 }

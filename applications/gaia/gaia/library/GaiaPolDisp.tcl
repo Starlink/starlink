@@ -264,12 +264,12 @@ itcl::class gaia::GaiaPolDisp {
 #  Get a description of the changes which produced the new catalogue, and
 #  the changes equired to convert the displayed catalogue into the
 #  supplied catalogue.
-          lassign [$prevcat changes $cat] catdesc catch
+         lassign [{*}$prevcat changes $cat] catdesc catch
 
 #  Get a description of the changes which produced the new style, and
 #  the changes required to convert the currently used style into the
 #  supplied style.
-          lassign [$prevsty changes $style] stydesc stych
+         lassign [{*}$prevsty changes $style] stydesc stych
 
 #  If either the catalogue or the style requires the display to be
 #  drawn from scratch, indicate this.
@@ -299,8 +299,8 @@ itcl::class gaia::GaiaPolDisp {
 #  Set up lists of canvas options for selected and unselected vectors.
 #  These include the "pretend" option -flash, which is implemented by this
 #  class.
-            set usty "-fill \"[$style getUclr]\" -width [$style getUwid] -flash [$style getUflash]"
-            set ssty "-fill \"[$style getSclr]\" -width [$style getSwidd] -flash [$style getSflash]"
+            set usty "-fill \"[{*}$style getUclr]\" -width [{*}$style getUwid] -flash [{*}$style getUflash]"
+            set ssty "-fill \"[{*}$style getSclr]\" -width [{*}$style getSwidd] -flash [{*}$style getSflash]"
 
 #  If we do not need to draw every vector again, get a list of the rows
 #  which need changing and the corresponding states. ALso get lists of
@@ -312,8 +312,8 @@ itcl::class gaia::GaiaPolDisp {
                set usty [lindex $stych 0]
                set ssty [lindex $stych 1]
             } else {
-               set usty "-fill \"[$style getUclr]\" -width [$style getUwid] -flash [$style getUflash]"
-               set ssty "-fill \"[$style getSclr]\" -width [$style getSwidd] -flash [$style getSflash]"
+               set usty "-fill \"[{*}$style getUclr]\" -width [{*}$style getUwid] -flash [{*}$style getUflash]"
+               set ssty "-fill \"[{*}$style getSclr]\" -width [{*}$style getSwidd] -flash [{*}$style getSflash]"
             }
          }
 
@@ -322,10 +322,10 @@ itcl::class gaia::GaiaPolDisp {
          set new [plot $cat $style $rows $usty $ssty]
 
 #  Store clones of the supplied catalogue and style.
-         if { $cat_ != "" } {set cat_ [$cat_ annull] }
-         if { $style_ != "" } {set style_ [$style_ annull] }
-         set cat_ [$cat clone]
-         set style_ [$style clone]
+         if { $cat_ != "" } {set cat_ [{*}$cat_ annull] }
+         if { $style_ != "" } {set style_ [{*}$style_ annull] }
+         set cat_ [{*}$cat clone]
+         set style_ [{*}$style clone]
 
 #  Ensure canvas bindings are set up.
          setBindings
@@ -853,7 +853,7 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Create the blank image large enough for the area covered by the
 #  catalogue and with a suitable WCS system.
-         if { ![catch {$cat mkImage $rtdimage_} mess] } {
+         if { ![catch {{*}$cat mkImage $rtdimage_} mess] } {
 
 #  Zoom the image to fill the screen.
             zoom_to_image
@@ -1364,24 +1364,24 @@ itcl::class gaia::GaiaPolDisp {
 
 #  Get data from the catalogue. This is a list of rows, in which
 #  each row is a list of column values.
-      set data [$cat getData]
+      set data [{*}$cat getData]
 
 #  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
-      upvar 0 [$cat getStates] states
+      upvar 0 [{*}$cat getStates] states
 
 #  Find the total number of vectors for display.
-      set ntot [expr [$cat getNsel] + [$cat getNuns]]
+      set ntot [expr [{*}$cat getNsel] + [{*}$cat getNuns]]
 
 #  Find the number of rows to draw or reconfigure.
       if { $rows != "" } {
          set nrow [llength $rows]
       } else {
-         set nrow [$cat getNrow]
+         set nrow [{*}$cat getNrow]
       }
 
 #  Get the maximum number of vectors to draw.
-      set nvec [$style getNvec]
+      set nvec [{*}$style getNvec]
 
 #  Store the probability of skipping over any single vector.
       if { $nvec != "" } {
@@ -1395,10 +1395,10 @@ itcl::class gaia::GaiaPolDisp {
 #  direction - which is north if the catalogue has WCS and vertically
 #  upwards, i.e. canvas -Y, if not. Return if either of these column is
 #  not found.
-      set lcol [$style getLcoli $cat]
+      set lcol [{*}$style getLcoli $cat]
       if { $lcol < 0 } { return }
 
-      set acol [$style getAcoli $cat]
+      set acol [{*}$style getAcoli $cat]
       if { $acol < 0 } { return }
 
 #  Find the size of an image pixel in canvas pixels.
@@ -1412,17 +1412,17 @@ itcl::class gaia::GaiaPolDisp {
 #  basis of the supplied data. Negative values indicate that all vectors
 #  should be drawn with the same length, regardless of the associated
 #  column value.
-      set mag [$style getMagd $cat $rtdimage_]
+      set mag [{*}$style getMagd $cat $rtdimage_]
 
 #  Get the angle to add on to the angle column values (degrees).
-      set rot [$style getArot]
+      set rot [{*}$style getArot]
 
 #  The reference direction for the ANG, Q and U values in the catalogue
 #  may not be parallel to Dec (e.g. if the orignal NDFs form which the
 #  catalogue was created use galactic coords). So add on the rotation
 #  required to change the ref. direction to Dec. This is assumed ot be
 #  constant over the whole map (!).
-      set refrot [$cat getRefRot]
+      set refrot [{*}$cat getRefRot]
       set rot [expr $rot + $refrot]
 
 #  Get the pixel origin of the displayed image. If the vectors are
@@ -1430,7 +1430,7 @@ itcl::class gaia::GaiaPolDisp {
 #  the catalogue. Otherwise, use the origin of the displayed ndf.
       if { [info exists blankref_($rtdimage_)] &&
            $blankref_($rtdimage_) > 0 } {
-         lassign [$cat getPixBounds] xo yo xh yh
+         lassign [{*}$cat getPixBounds] xo yo xh yh
       } else {
          $rtdimage_ origin xo yo
       }
@@ -1440,13 +1440,13 @@ itcl::class gaia::GaiaPolDisp {
       set oy_ [expr $yo - 1.5]
 
 #  If both the catalogue and the image have WCS, align in ra/dec.
-      if { [$cat gotWcs] && [$rtdimage_ astcelestial] == "1" } {
+      if { [{*}$cat gotWcs] && [$rtdimage_ astcelestial] == "1" } {
 
 #  Get the indices of the Ra and Dec columns, and the equinox.
-         set col1 [$cat getRaCol]
-         if { $col1 > -1 } { set col2 [$cat getDecCol] }
+         set col1 [{*}$cat getRaCol]
+         if { $col1 > -1 } { set col2 [{*}$cat getDecCol] }
          if { $col1 > -1 && $col2 > -1 } {
-            set equ [$cat getEquinox]
+            set equ [{*}$cat getEquinox]
 
 #  See if north is in the same direction over the entire image. If so,
 #  the anti-clockwise angle in degrees from upwards (-ve Y) to north is
@@ -1481,8 +1481,8 @@ itcl::class gaia::GaiaPolDisp {
       } else {
 
 #  Use the X and Y columns.
-         set col1 [$cat getXCol]
-         if { $col1 >= 0 } { set col2 [$cat getYCol] }
+         set col1 [{*}$cat getXCol]
+         if { $col1 >= 0 } { set col2 [{*}$cat getYCol] }
          if { $col1 >= 0 && $col2 >= 0 } {
 
 #  If the catalogue does have WCS but the image does not, the angles in the
@@ -1490,9 +1490,9 @@ itcl::class gaia::GaiaPolDisp {
 #  is because the image does not have WCS. Issue a warning and assume
 #  that north is upwards. Only do this if the warning has not already been
 #  issued.
-            if { [$cat gotWcs] && ![$cat getWarned] } {
+            if { [{*}$cat gotWcs] && ![{*}$cat getWarned] } {
                error_dialog "The catalogue specifies vectors with respect to north, but no WCS information is available for the displayed image. Continuing on the assumption that north is vertical."
-               $cat setWarned
+               {*}$cat setWarned
             }
 
 #  Store the offset from pixel coords to grid coords.
@@ -1533,7 +1533,7 @@ itcl::class gaia::GaiaPolDisp {
       set inc [expr ($nrow+19)/20]
       set irow -1
       set j -1
-      $pbar_ config -to $nrow
+      {*}$pbar_ config -to $nrow
       update idletasks
 
 #  Loop round each vector to be drawn or reconfigured.
@@ -1543,7 +1543,7 @@ itcl::class gaia::GaiaPolDisp {
          incr irow
          if { [incr j] == $inc } {
             set j -1
-            $pbar_ config -value $irow
+            {*}$pbar_ config -value $irow
             update idletasks
          }
 
@@ -1678,8 +1678,8 @@ itcl::class gaia::GaiaPolDisp {
       $canvas_ raise "S$disid_"
 
 #  Switch flashing on or off as appropriate.
-      set flashucol_ [$style getUclr]
-      set flashscol_ [$style getSclr]
+      set flashucol_ [{*}$style getUclr]
+      set flashscol_ [{*}$style getSclr]
       if { $gotuflash } { setFlash 0 $uflash }
       if { $gotsflash } { setFlash 1 $sflash }
 
@@ -1808,7 +1808,7 @@ itcl::class gaia::GaiaPolDisp {
 #  --------------------------
    protected method resetHold {} {
       blt::busy release $w_
-      $pbar_ reset
+      {*}$pbar_ reset
       update idletasks
    }
 
@@ -1894,8 +1894,8 @@ itcl::class gaia::GaiaPolDisp {
 #  --------------------------
    protected method setHold {text} {
       blt::busy hold $w_ -cursor "watch"
-      $pbar_ reset
-      $pbar_ config -text $text
+      {*}$pbar_ reset
+      {*}$pbar_ config -text $text
       update idletasks
    }
 

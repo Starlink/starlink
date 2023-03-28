@@ -108,12 +108,8 @@ itcl::class gaia::GaiaPolUSpec {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'SpecPol' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -135,11 +131,11 @@ itcl::class gaia::GaiaPolUSpec {
       if { $cat_ != "" } {
          $cat_ annull
       }
-      set cat_ [$cat clone]
+      set cat_ [{*}$cat clone]
 
 #  Clear and disable the spectral channel controls if no spectral channel
 #  is available.
-      if { [$cat getCol Z] == -1 } {
+      if { [$cat_ getCol Z] == -1 } {
          newZval "" ""
          $itk_component(zc).unit configure -text ""
          $itk_component(za).unit configure -text ""
@@ -152,14 +148,14 @@ itcl::class gaia::GaiaPolUSpec {
          $itk_component(zc).val configure -state normal
          $itk_component(za).val configure -state normal
 
-         set unit [$cat getZcunit]
+         set unit [$cat_ getZcunit]
          $itk_component(zc).unit configure -text $unit
 
-         set unit [$cat getZaunit]
+         set unit [$cat_ getZaunit]
          $itk_component(za).unit configure -text $unit
 
 #  If the catalogue already has set Z values, use them.
-         set z [$cat getZvals]
+         set z [$cat_ getZvals]
          if { [llength $z] == 2 } {
             setZvals $z
 
@@ -167,14 +163,14 @@ itcl::class gaia::GaiaPolUSpec {
 #  current Z axis control value, and use this as the new Z column value.
 #  Use the lowest Z column value if this is not possible.
          } else {
-            set zax $values_($this,zaval)
+            set zax $values_(zaval)
             if { $zax != "" && $zax != "***" } {
-               lassign [$cat zConv $zax "zaval" ] zcnew zanew
+               lassign [$cat_ zConv $zax "zaval" ] zcnew zanew
                if { $zcnew == "" || $zcnew == "***" } {
-                  set zcnew [$cat getZlo]
+                  set zcnew [$cat_ getZlo]
                }
             } else {
-               set zcnew [$cat getZlo]
+               set zcnew [$cat_ getZlo]
             }
 
 #  Store this new Z column value.
@@ -183,13 +179,13 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  If the catalogue has only a single spectral channel, disable the
 #  controls.
-         if { [$cat getZlo] == [$cat getZhi] } {
+         if { [$cat_ getZlo] == [$cat_ getZhi] } {
             $itk_component(zc).val configure -state disabled
             $itk_component(za).val configure -state disabled
          }
 
 #  Ensure the selected Z values are used by the catalogue.
-         $cat setZvals [list $values_($this,zcval) $values_($this,zaval)]
+         $cat_ setZvals [list $values_(zcval) $values_(zaval)]
       }
 
 #  Save the current control values as next times previous values.
@@ -202,8 +198,8 @@ itcl::class gaia::GaiaPolUSpec {
    public method newZval {z item} {
 
       if { $cat_ == "" || $z == "" || $z == "***" } {
-         set values_($this,zcval) ""
-         set values_($this,zaval) ""
+         set values_(zcval) ""
+         set values_(zaval) ""
 
       } else {
 
@@ -214,7 +210,7 @@ itcl::class gaia::GaiaPolUSpec {
          }
 
          set zzz [$cat_ zConv $z $item]
-         lassign $zzz values_($this,zcval) values_($this,zaval)
+         lassign $zzz values_(zcval) values_(zaval)
 
       }
    }
@@ -232,7 +228,7 @@ itcl::class gaia::GaiaPolUSpec {
 #  If the Z column or Z axis value has been changed, find usable values
 #  for both.
       if { $item == "zcval" || $item == "zaval" } {
-         newZval $values_($this,$item) $item
+         newZval $values_($item) $item
       }
 
 #  Save the previous Z column value.
@@ -242,7 +238,7 @@ itcl::class gaia::GaiaPolUSpec {
       newVals
 
 #  Issue a warning if nothing has changed.
-      if { $values_($this,zcval) == $oldval } {
+      if { $values_(zcval) == $oldval } {
          info_dialog "The nearest available spectral channel is already displayed."
       }
    }
@@ -260,8 +256,8 @@ itcl::class gaia::GaiaPolUSpec {
       set attr_(zaval) Zvals
 
 #  Set the hard-wired defaults.
-      set values_($this,zcval) ""
-      set values_($this,zaval) ""
+      set values_(zcval) ""
+      set values_(zaval) ""
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -271,7 +267,7 @@ itcl::class gaia::GaiaPolUSpec {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'SpecPol' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
@@ -281,8 +277,8 @@ itcl::class gaia::GaiaPolUSpec {
 #     (none at the moment)
 
 #  Re-instate any hard-wired defaults.
-      set values_($this,zcval) ""
-      set values_($this,zaval) ""
+      set values_(zcval) ""
+      set values_(zaval) ""
 
 #  Save the current control values as next times previous values.
       saveOld
@@ -292,7 +288,7 @@ itcl::class gaia::GaiaPolUSpec {
 #  Return the current Z values.
 #  ----------------------------
    public method getZvals {} {
-      return [list $values_($this,zcval) $values_($this,zaval)]
+      return [list $values_(zcval) $values_(zaval)]
    }
 
 #  Set new Z values (it is assumed that a usable pair of Z column and
@@ -306,8 +302,8 @@ itcl::class gaia::GaiaPolUSpec {
 #  If a list with 2 elements has been supplied, store them as the new Z
 #  values, and enable the controls.
       if { [llength $z] == 2 } {
-         set values_($this,zcval) [lindex $z 0]
-         set values_($this,zaval) [lindex $z 1]
+         set values_(zcval) [lindex $z 0]
+         set values_(zaval) [lindex $z 1]
          $itk_component(zc).val configure -state normal
          $itk_component(za).val configure -state normal
 
@@ -390,7 +386,7 @@ itcl::class gaia::GaiaPolUSpec {
                                            -validate real \
                                            -anchor nw \
                                            -state disabled \
-                                           -textvariable [scope values_($this,zcval)]
+                                           -textvariable [scope values_(zcval)]
          label $itk_component(zc).unit -text "" \
                                        -anchor w \
                                        -justify left
@@ -411,7 +407,7 @@ itcl::class gaia::GaiaPolUSpec {
                                            -validate real \
                                            -anchor nw \
                                            -state disabled \
-                                           -textvariable [scope values_($this,zaval)]
+                                           -textvariable [scope values_(zaval)]
          label $itk_component(za).unit -text "" \
                                        -anchor w \
                                        -justify left
@@ -516,6 +512,9 @@ itcl::class gaia::GaiaPolUSpec {
 
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
+
+#  Array indexed by (param).
+      variable values_
    }
 
 #  Private data members:
@@ -525,8 +524,6 @@ itcl::class gaia::GaiaPolUSpec {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  End of class definition.
 }
