@@ -222,12 +222,12 @@ itcl::class gaia::ManyLabelEntry {
          for {set i $nentry_} {$i < $itk_option(-nentry)} {incr i} {
             itk_component add entry$i {
                entry $itk_component(eframe).entry$i \
-                  -textvariable [scope tracevars_($this,$i)]
+                  -textvariable [scope tracevars_($i)]
             } {
                keep -relief -borderwidth -state
                rename -font -valuefont valueFont ValueFont
             }
-            trace variable [scope tracevars_($this,$i)] w [code $this set_textvar_]
+            trace variable [scope tracevars_($i)] w [code $this set_textvar_]
          }
          set started_ 1
          configure -orient $itk_option(-orient)
@@ -380,5 +380,5 @@ itcl::class gaia::ManyLabelEntry {
    protected variable started_ 0
 
    #  Variable for tracing changes in all entry fields.
-   common tracevars_
+   protected variable tracevars_
 }

@@ -197,7 +197,7 @@ itcl::class gaia::GaiaStartup {
          set value [$props_ get_property $prop]
          set key [$props_ get_unnamed_key Gaia $prop]
          if { $value != {} } {
-            set values_($this,$key) $value
+            set values_($key) $value
          }
       }
    }
@@ -218,56 +218,56 @@ itcl::class gaia::GaiaStartup {
    #  Reset window to defaults.
    public method reset {} {
       set_defaults_
-      $itk_component(minscale) configure -value $values_($this,min_scale)
-      $itk_component(maxscale) configure -value $values_($this,max_scale)
+      $itk_component(minscale) configure -value $values_(min_scale)
+      $itk_component(maxscale) configure -value $values_(max_scale)
    }
 
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
-      set values_($this,always_merge) 0
-      set values_($this,check_for_cubes) 1
-      set values_($this,default_cmap) real
-      set values_($this,default_cut) 100.0
-      set values_($this,isize) 9
-      set values_($this,maxshift) 5.5
-      set values_($this,default_itt) ramp
-      set values_($this,extended_precision) 0
-      set values_($this,float_panel) 0
-      set values_($this,focus_follows_mouse) 0
-      set values_($this,interop_menu) 1
-      set values_($this,linear_cartesian) 1
-      set values_($this,force_degrees) 0
-      set values_($this,max_scale) 20
-      set values_($this,min_scale) -10
-      set values_($this,panel_orient) horizontal
-      set values_($this,quiet_exit) 1
-      set values_($this,scrollbars) 1
-      set values_($this,show_hdu_chooser) 1
-      set values_($this,transient_tools) 0
-      set values_($this,transient_spectralplot) 1
-      set values_($this,with_colorramp) 1
-      set values_($this,with_pan_window) 1
-      set values_($this,with_zoom_window) 1
-      set values_($this,zoom_factor) 4
-      set values_($this,pick_zoom_factor) 10
-      set values_($this,autoscale) 0
-      set values_($this,autofit) 0
-      set values_($this,pixel_indices) 0
+      set values_(always_merge) 0
+      set values_(check_for_cubes) 1
+      set values_(default_cmap) real
+      set values_(default_cut) 100.0
+      set values_(isize) 9
+      set values_(maxshift) 5.5
+      set values_(default_itt) ramp
+      set values_(extended_precision) 0
+      set values_(float_panel) 0
+      set values_(focus_follows_mouse) 0
+      set values_(interop_menu) 1
+      set values_(linear_cartesian) 1
+      set values_(force_degrees) 0
+      set values_(max_scale) 20
+      set values_(min_scale) -10
+      set values_(panel_orient) horizontal
+      set values_(quiet_exit) 1
+      set values_(scrollbars) 1
+      set values_(show_hdu_chooser) 1
+      set values_(transient_tools) 0
+      set values_(transient_spectralplot) 1
+      set values_(with_colorramp) 1
+      set values_(with_pan_window) 1
+      set values_(with_zoom_window) 1
+      set values_(zoom_factor) 4
+      set values_(pick_zoom_factor) 10
+      set values_(autoscale) 0
+      set values_(autofit) 0
+      set values_(pixel_indices) 0
 
-      set values_($this,labelfont) TkDefaultFont
-      set values_($this,textfont) TkFixedFont
-      set values_($this,font_scale) 0.0
-      set values_($this,unicoderadec) 1
+      set values_(labelfont) TkDefaultFont
+      set values_(textfont) TkFixedFont
+      set values_(font_scale) 0.0
+      set values_(unicoderadec) 1
 
-      set values_($this,blank_color) black
-      set values_($this,image_background) black
+      set values_(blank_color) black
+      set values_(image_background) black
    }
 
    #  Update the properties object to the local values and cause a
    #  save to backing store.
    protected method save_properties_ {} {
       foreach key $options {
-         $props_ set_named_property Gaia $key $values_($this,$key)
+         $props_ set_named_property Gaia $key $values_($key)
       }
       $props_ save_properties
    }
@@ -277,52 +277,52 @@ itcl::class gaia::GaiaStartup {
    protected method apply_properties_ {} {
       if { $itk_option(-image) != {} } {
          $itk_option(-image) configure -extended_precision \
-            $values_($this,extended_precision)
+            $values_(extended_precision)
          $itk_option(-image) configure -show_hdu_chooser \
-            $values_($this,show_hdu_chooser)
+            $values_(show_hdu_chooser)
          $itk_option(-image) configure -default_cut \
-            $values_($this,default_cut)
+            $values_(default_cut)
          $itk_option(-image) configure -linear_cartesian \
-            $values_($this,linear_cartesian)
+            $values_(linear_cartesian)
          $itk_option(-image) configure -force_degrees \
-            $values_($this,force_degrees)
+            $values_(force_degrees)
          $itk_option(-image) configure -always_merge \
-            $values_($this,always_merge)
+            $values_(always_merge)
       }
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
-            $values_($this,transient_tools)
+            $values_(transient_tools)
          $itk_option(-gaia) configure -transient_spectralplot \
-            $values_($this,transient_spectralplot)
+            $values_(transient_spectralplot)
          $itk_option(-gaia) configure -quiet_exit \
-            $values_($this,quiet_exit)
+            $values_(quiet_exit)
          $itk_option(-gaia) configure -check_for_cubes \
-            $values_($this,check_for_cubes)
+            $values_(check_for_cubes)
          $itk_option(-gaia) configure -isize \
-            $values_($this,isize)
+            $values_(isize)
          $itk_option(-gaia) configure -maxshift \
-            $values_($this,maxshift)
+            $values_(maxshift)
          $itk_option(-gaia) configure -autoscale \
-            $values_($this,autoscale)
+            $values_(autoscale)
          $itk_option(-gaia) configure -autofit \
-            $values_($this,autofit)
+            $values_(autofit)
          $itk_option(-gaia) configure -pixel_indices \
-            $values_($this,pixel_indices)
+            $values_(pixel_indices)
 
          $itk_option(-gaia) configure -blank_color \
-            $values_($this,blank_color)
+            $values_(blank_color)
          $itk_option(-gaia) configure -image_background \
-            $values_($this,image_background)
+            $values_(image_background)
 
          $itk_option(-gaia) configure -unicoderadec \
-            $values_($this,unicoderadec)
+            $values_(unicoderadec)
 
       }
    }
 
    #  Set element of values_.
    protected method set_value_ {key value} {
-      set values_($this,$key) $value
+      set values_($key) $value
    }
 
    #  Add "elements" controls, i.e things you can see.
@@ -334,7 +334,7 @@ itcl::class gaia::GaiaStartup {
             -text "Use a floating panel:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,float_panel)]
+            -variable [scope values_(float_panel)]
       }
       add_short_help $itk_component(floatpanel) \
          {Create panel area in own window (requires restart)}
@@ -344,7 +344,7 @@ itcl::class gaia::GaiaStartup {
       itk_component add panelorient {
          util::LabelMenu $parent.panelorient -text "Panel orientation:" \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,panel_orient)]
+            -variable [scope values_(panel_orient)]
       }
       foreach value "horizontal vertical" {
          $itk_component(panelorient) add -label $value \
@@ -360,7 +360,7 @@ itcl::class gaia::GaiaStartup {
             -text "Display a zoom window:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,with_zoom_window)]
+            -variable [scope values_(with_zoom_window)]
       }
       add_short_help $itk_component(withzoomwindow) \
          {Display a zoom window (requires restart)}
@@ -372,7 +372,7 @@ itcl::class gaia::GaiaStartup {
             -text "Display a panner window:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,with_pan_window)]
+            -variable [scope values_(with_pan_window)]
       }
       add_short_help $itk_component(withpanwindow) \
          {Display a panner window (requires restart)}
@@ -384,7 +384,7 @@ itcl::class gaia::GaiaStartup {
             -text "Display a color ramp:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,with_colorramp)]
+            -variable [scope values_(with_colorramp)]
       }
       add_short_help $itk_component(withcolorramp) \
          {Display a color ramp at bottom of window (requires restart)}
@@ -396,7 +396,7 @@ itcl::class gaia::GaiaStartup {
             -text "Show image scrollbars:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,scrollbars)]
+            -variable [scope values_(scrollbars)]
       }
       add_short_help $itk_component(scrollbars) \
          {Display scrollbars around main image (requires restart)}
@@ -408,7 +408,7 @@ itcl::class gaia::GaiaStartup {
             -text "Show HDU chooser:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,show_hdu_chooser)]
+            -variable [scope values_(show_hdu_chooser)]
       }
       add_short_help $itk_component(hduchooser) \
          {Show the HDU chooser, by default, when loading multiextension images}
@@ -420,7 +420,7 @@ itcl::class gaia::GaiaStartup {
             -text "Show Interop menu:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,interop_menu)]
+            -variable [scope values_(interop_menu)]
       }
       add_short_help $itk_component(interopmenu) \
          {Show the main Interop menu for SAMP interactions}
@@ -438,7 +438,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 1 \
             -anchor w \
-            -value $values_($this,min_scale) \
+            -value $values_(min_scale) \
             -command [code $this set_value_ min_scale]
       }
       add_short_help $itk_component(minscale) \
@@ -457,7 +457,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 1 \
             -anchor w \
-            -value $values_($this,max_scale) \
+            -value $values_(max_scale) \
             -command [code $this set_value_ max_scale]
       }
       add_short_help $itk_component(maxscale) \
@@ -474,7 +474,7 @@ itcl::class gaia::GaiaStartup {
             -text "Focus follows mouse:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,focus_follows_mouse)]
+            -variable [scope values_(focus_follows_mouse)]
       }
       add_short_help $itk_component(focusfollowsmouse) \
          {Entry fields focus follows mouse position (requires restart)}
@@ -486,7 +486,7 @@ itcl::class gaia::GaiaStartup {
             -text "Make toolboxes transient:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,transient_tools)]
+            -variable [scope values_(transient_tools)]
       }
       add_short_help $itk_component(transienttools) \
          {Make toolboxes remain above main window (requires restart)}
@@ -498,7 +498,7 @@ itcl::class gaia::GaiaStartup {
             -text "Make spectral plot transient:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,transient_spectralplot)]
+            -variable [scope values_(transient_spectralplot)]
       }
       add_short_help $itk_component(transientplot) \
          {Make spectral plot window remain above main window (requires restart)}
@@ -510,7 +510,7 @@ itcl::class gaia::GaiaStartup {
             -text "Exit without prompt:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,quiet_exit)]
+            -variable [scope values_(quiet_exit)]
       }
       add_short_help $itk_component(quietexit) \
          {Make "Exit" option ask before closing GAIA}
@@ -522,7 +522,7 @@ itcl::class gaia::GaiaStartup {
             -text "Display milli-arcsecs:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,extended_precision)]
+            -variable [scope values_(extended_precision)]
       }
       add_short_help $itk_component(precision) \
          {Display milli-arcsecond resolution in readouts}
@@ -534,7 +534,7 @@ itcl::class gaia::GaiaStartup {
             -text "Linear CAR projections:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,linear_cartesian)]
+            -variable [scope values_(linear_cartesian)]
       }
       add_short_help $itk_component(cartesian) \
          {Assume any FITS CAR projections are simple linear mapping}
@@ -546,7 +546,7 @@ itcl::class gaia::GaiaStartup {
             -text "Display decimal degrees:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,force_degrees)]
+            -variable [scope values_(force_degrees)]
       }
       add_short_help $itk_component(forcedegrees) \
          {Force the display of decimal degrees in main window}
@@ -558,7 +558,7 @@ itcl::class gaia::GaiaStartup {
             -text "Always merge MEF headers:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,always_merge)]
+            -variable [scope values_(always_merge)]
       }
       add_short_help $itk_component(alwaysmerge) \
          {Always merge primary into extension headers for full WCS}
@@ -570,7 +570,7 @@ itcl::class gaia::GaiaStartup {
             -text "Check for cubes:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,check_for_cubes)]
+            -variable [scope values_(check_for_cubes)]
       }
       add_short_help $itk_component(checkforcubes) \
          {Check any opened files for cubes, if found open in cube toolbox}
@@ -582,7 +582,7 @@ itcl::class gaia::GaiaStartup {
             -text "Auto scale:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,autoscale)]
+            -variable [scope values_(autoscale)]
       }
       add_short_help $itk_component(autoscale) \
          {Auto scale images to fit window, disables zoom}
@@ -594,7 +594,7 @@ itcl::class gaia::GaiaStartup {
             -text "Auto fit:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,autofit)]
+            -variable [scope values_(autofit)]
       }
       add_short_help $itk_component(autofit) \
          {Auto fit new images to window, keeps zoom}
@@ -606,7 +606,7 @@ itcl::class gaia::GaiaStartup {
             -text "Pixel indices:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,pixel_indices)]
+            -variable [scope values_(pixel_indices)]
       }
       add_short_help $itk_component(pixelindices) \
          {Display NDF pixel indices as X,Y not grid coordinates}
@@ -624,7 +624,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 1 \
             -anchor w \
-            -value $values_($this,zoom_factor) \
+            -value $values_(zoom_factor) \
             -command [code $this set_value_ zoom_factor]
       }
       add_short_help $itk_component(zoomfactor) \
@@ -643,7 +643,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 1 \
             -anchor w \
-            -value $values_($this,pick_zoom_factor) \
+            -value $values_(pick_zoom_factor) \
             -command [code $this set_value_ pick_zoom_factor]
       }
       add_short_help $itk_component(pickzoomfactor) \
@@ -662,7 +662,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 0.5 \
             -anchor w \
-            -value $values_($this,default_cut) \
+            -value $values_(default_cut) \
             -command [code $this set_value_ default_cut]
       }
       add_short_help $itk_component(defaultcut) \
@@ -681,7 +681,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 1 \
             -anchor w \
-            -value $values_($this,isize) \
+            -value $values_(isize) \
             -command [code $this set_value_ isize]
       }
       add_short_help $itk_component(isize) \
@@ -700,7 +700,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 0.5 \
             -anchor w \
-            -value $values_($this,maxshift) \
+            -value $values_(maxshift) \
             -command [code $this set_value_ maxshift]
       }
       add_short_help $itk_component(maxshift) \
@@ -715,7 +715,7 @@ itcl::class gaia::GaiaStartup {
       itk_component add defaultcmap {
          util::LabelMenu $parent.cmap -text "Default colormap:" \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,default_cmap)]
+            -variable [scope values_(default_cmap)]
       }
       set cmap_files [$itk_option(-image) cmap list]
       foreach map $cmap_files {
@@ -732,7 +732,7 @@ itcl::class gaia::GaiaStartup {
          util::LabelMenu $parent.blankcolour \
             -text "Blank colour:" \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,blank_color)]
+            -variable [scope values_(blank_color)]
       }
       foreach colour $colours_ {
          $itk_component(blankcolour) add \
@@ -744,14 +744,14 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(blankcolour) \
          {Colour for blank pixels (requires restart)}
       pack $itk_component(blankcolour) -side top -fill x -expand 0
-      $itk_component(blankcolour) configure -value $values_($this,blank_color)
+      $itk_component(blankcolour) configure -value $values_(blank_color)
 
       #  Image background colour.
       itk_component add backgroundcolour {
          util::LabelMenu $parent.backgroundcolour \
             -text "Background colour:" \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,image_background)]
+            -variable [scope values_(image_background)]
       }
       foreach colour $colours_ {
          $itk_component(backgroundcolour) add \
@@ -764,7 +764,7 @@ itcl::class gaia::GaiaStartup {
          {Colour for main image background (requires restart)}
       pack $itk_component(backgroundcolour) -side top -fill x -expand 0
       $itk_component(backgroundcolour) configure \
-         -value $values_($this,image_background)
+         -value $values_(image_background)
 
    }
 
@@ -777,8 +777,8 @@ itcl::class gaia::GaiaStartup {
             -text "Label font:" \
             -chooser_title "Label font" \
             -labelwidth 10 \
-            -value $values_($this,labelfont) \
-            -textvariable [scope values_($this,labelfont)]
+            -value $values_(labelfont) \
+            -textvariable [scope values_(labelfont)]
       }
       add_short_help $itk_component(labelfont) \
          {Font used for labels (requires restart)}
@@ -790,8 +790,8 @@ itcl::class gaia::GaiaStartup {
             -chooser_title "Text font" \
             -chooser_fixed_width 1 \
             -labelwidth 10 \
-            -value $values_($this,textfont) \
-            -textvariable [scope values_($this,textfont)]
+            -value $values_(textfont) \
+            -textvariable [scope values_(textfont)]
       }
       add_short_help $itk_component(textfont) \
          {Font used for fixed width text (requires restart)}
@@ -809,7 +809,7 @@ itcl::class gaia::GaiaStartup {
             -show_arrows 1 \
             -resolution 0.05 \
             -anchor w \
-            -value $values_($this,font_scale) \
+            -value $values_(font_scale) \
             -command [code $this set_value_ font_scale]
       }
       add_short_help $itk_component(fontscale) \
@@ -823,7 +823,7 @@ itcl::class gaia::GaiaStartup {
             -text "Use unicode RA and Dec symbols:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth_ \
-            -variable [scope values_($this,unicoderadec)]
+            -variable [scope values_(unicoderadec)]
       }
       add_short_help $itk_component(unicoderadec) \
          {RA and Dec labels display unicode alpha and delta symbols}
@@ -875,6 +875,9 @@ itcl::class gaia::GaiaStartup {
    #  General label width.
    protected variable lwidth_ 25
 
+   #  Values shared by widgets -- indexed by (fieldname).
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
@@ -916,9 +919,6 @@ itcl::class gaia::GaiaStartup {
       with_zoom_window
       zoom_factor
    }
-
-   #  Values shared by widgets -- indexed by ($this,fieldname).
-   common values_
 
 #  End of class definition.
 }
