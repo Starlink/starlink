@@ -876,21 +876,21 @@ itcl::class gaia::GaiaSearch {
       #  Cone search.
       $w add_menuitem $m command "Query a VO catalog server..." \
          {Find VO cone search servers and query for catalogs} \
-         -command [code $w vo_find_cone] -state $state
+         -command "$w vo_find_cone" -state $state
 
       #  TAP query.
       $w add_menuitem $m command "Query a TAP service..." \
          {Find TAP services and query} \
-         -command [code $w vo_find_tap] -state $state
+         -command "$w vo_find_tap" -state $state
 
       #  Add SIAP query dialogs
       $w add_menuitem $m command "Query a VO image server..." \
          {Find VO image servers and make requests for images} \
-         -command [code $w vo_siap_query 0] -state $state
+         -command "$w vo_siap_query 0" -state $state
 
       $w add_menuitem $m command "Query list of VO image servers..." \
          {Query a list of VO image servers about image they hold on a region of sky} \
-         -command [code $w vo_siap_query 1] -state $state
+         -command "$w vo_siap_query 1" -state $state
 
 
 

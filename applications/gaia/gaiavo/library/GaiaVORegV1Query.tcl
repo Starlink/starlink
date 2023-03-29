@@ -67,7 +67,7 @@ itcl::class gaiavo::GaiaVORegV1Query {
    #  ----------------------
    proc instance {} {
       if { $instance_ == {} } {
-         set instance_ [GaiaVORegV1Query ::\#auto]
+         set instance_ [::gaiavo::GaiaVORegV1Query ::\#auto]
       }
       return $instance_
    }

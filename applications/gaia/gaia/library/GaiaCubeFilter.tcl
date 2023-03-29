@@ -361,7 +361,7 @@ itcl::class gaia::GaiaCubeFilter {
       blt::busy hold $w_
 
       #  Name of input cube.
-      set input_name [$itk_option(-gaiacube) get_ndfname]
+      set input_name [{*}$itk_option(-gaiacube) get_ndfname]
 
       #  Start up the task we require.
       if { $filter_type_ == "square" || $filter_type_ == "rectangle" } {
@@ -379,7 +379,7 @@ itcl::class gaia::GaiaCubeFilter {
       }
 
       #  Record the system and units so we can restore them if needed.
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
          set keep_units_ "$units"
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaCubeFilter {
                            "[$itk_component(prefix) get]" $count_ ".sdf"]
       $itk_component(outputfile) configure -value ""
 
-      set axis [$itk_option(-gaiacube) get_axis]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
 
       switch -exact $filter_type_ {
          "square" {
@@ -465,20 +465,20 @@ itcl::class gaia::GaiaCubeFilter {
       }
       if { $file != {} } {
          catch {
-            $itk_option(-gaiacube) configure -cube "$file"
+            {*}$itk_option(-gaiacube) configure -cube "$file"
          } msg
 
          $itk_component(outputfile) configure -value "$file"
 
          #  If the file has Temp in the name, record for automatic removal.
          if { [string match "*Temp*" $file] } {
-            $itk_option(-gaiacube) register_temp_file $file
+            {*}$itk_option(-gaiacube) register_temp_file $file
          }
 
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
          if { $keep_system_ != {} } {
-            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+            {*}$itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
       }
       blt::busy release $w_
@@ -497,10 +497,6 @@ itcl::class gaia::GaiaCubeFilter {
    #  The GaiaSpecCoords instance used to define the current coordinate
    #  system.
    itk_option define -spec_coords spec_coords Spec_Coords {}
-
-   #  The GaiaSpecStdOfRest instance used to define the current standard
-   #  of rest.
-   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20

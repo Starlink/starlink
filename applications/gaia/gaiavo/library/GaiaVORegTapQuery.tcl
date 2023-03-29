@@ -70,7 +70,7 @@ itcl::class gaiavo::GaiaVORegTapQuery {
    #  ----------------------
    proc instance {} {
       if { $instance_ == {} } {
-         set instance_ [GaiaVORegTapQuery ::\#auto]
+         set instance_ [::gaiavo::GaiaVORegTapQuery ::\#auto]
       }
       return $instance_
    }

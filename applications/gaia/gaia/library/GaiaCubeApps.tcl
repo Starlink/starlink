@@ -271,12 +271,12 @@ itcl::class gaia::GaiaCubeApps {
       #  changed, if so switch back to the default system (temporarily).
       lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
-         ${*}itk_option(-spec_coords) set_system "default" "default" 1
+         {*}$itk_option(-spec_coords) set_system "default" "default" 1
       }
       set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
       set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
       if { $system != "default" && $system != {} } {
-         ${*}itk_option(-spec_coords) set_system $system $units 1
+         {*}$itk_option(-spec_coords) set_system $system $units 1
       }
 
       set set_current_domain_ 0

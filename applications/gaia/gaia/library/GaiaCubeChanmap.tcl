@@ -207,7 +207,7 @@ itcl::class gaia::GaiaCubeChanmap {
                           shape=$itk_option(-shape) accept"
 
       #  Tell cube to use these limits for spectral extraction.
-      $itk_option(-gaiacube) set_extraction_range \
+      {*}$itk_option(-gaiacube) set_extraction_range \
          $itk_option(-lower_limit) $itk_option(-upper_limit)
    }
 
@@ -227,16 +227,16 @@ itcl::class gaia::GaiaCubeChanmap {
 
          #  If the coordinate system of doesn't match this (coordinate system
          #  != default), then change to this.
-         lassign [$itk_option(-spec_coords) get_system] system units
+         lassign [{*}$itk_option(-spec_coords) get_system] system units
          if { $system != "default" && $system != {} } {
             set_coordinate_system_ $file $system $units
          }
 
-         $itk_option(-gaiacube) display $file 1
+         {*}$itk_option(-gaiacube) display $file 1
 
          #  Set bindings to report the spectral coordinate of the current pane,
          #  when clicked on.
-         set cubespectrum [$itk_option(-gaiacube) component spectrum]
+         set cubespectrum [{*}$itk_option(-gaiacube) component spectrum]
          $cubespectrum close
          add_bindings_
       }

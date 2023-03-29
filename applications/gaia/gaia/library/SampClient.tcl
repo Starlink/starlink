@@ -232,7 +232,7 @@ itcl::class samp::SampClient {
          #  appropriate arguments.
          foreach agent [get_all_agents_] {
             if {[lsearch [{*}$agent get_subscribed_mtypes] $mtype] >= 0} {
-               return [eval [list $agent $mtype $sender_id $params]]
+               return [eval [list {*}$agent $mtype $sender_id $params]]
             }
          }
 
