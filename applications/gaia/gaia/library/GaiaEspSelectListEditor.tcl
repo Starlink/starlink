@@ -74,7 +74,8 @@ itk::usual GaiaEspSelectListEditor {}
 itcl::class gaia::GaiaEspSelectListEditor {
 
     # --- Inheritances
-    inherit itk::Widget gaia::GaiaEspSelectList
+    inherit itk::Widget 
+    #gaia::GaiaEspSelectList
 
     # --- Constructor
     constructor {parent_select_list initial_object_list args} {
