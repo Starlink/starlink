@@ -88,6 +88,7 @@
 
 *  Initialise the FITSIO status.
       FSTAT = CVG__FITSOK
+      PATH = ' '
 
 *  Get the path of the attached file.
       CALL FTFLNM( FUNIT, PATH, FSTAT )

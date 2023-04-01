@@ -108,6 +108,7 @@
 
 *  Initialise the FITSIO status.
       FSTAT = CVG__FITSOK
+      LPATH = ' '
 
 *  Get the length of the filename.
       NCF = CHR_LEN( PATH )
