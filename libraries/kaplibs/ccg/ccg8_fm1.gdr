@@ -242,7 +242,7 @@
                IMED = NGOOD / 2 + 1
 
 *  If number is even we need the central two values.
-               IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+               IF ( MOD( NGOOD, 2_8 ) .EQ. 0 ) THEN
 
 *  Select the two values needed for median, update the used counters.
                   CALL CCG8_KTH<T>( NGOOD, IMED, WRK1, POINT, VAL,

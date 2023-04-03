@@ -210,7 +210,7 @@
       MEDIAN = NUM_<T>TOD( QUANT( 1 ) )
 
 *  Average the middle two of an even-numbered sample.
-      IF ( MOD( NGOOD, 2 ) .EQ. 0 ) THEN
+      IF ( MOD( NGOOD, 2_8 ) .EQ. 0 ) THEN
          CALL KPG1_RETR8K( EL, NBGOOD / 2, %VAL( CNF_PVAL( IPNTR ) ),
      :                     UPERIN( 1 ), STATUS )
          CALL KPG1_RETR8<T>( EL, UPERIN( 1 ), ARRAY, QUANT( 2 ), STATUS )
