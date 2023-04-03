@@ -887,16 +887,16 @@
 *  Let's define the number of pixels per channel.  First of all it's
 *  needed to restrict the options when its value is small.
       PIXPCH = REAL( AEL ) / REAL( NOCHAN )
-      IF ( INT8( PIXPCH ) .GT. 3 ) THEN
+      IF ( INT( PIXPCH, 8 ) .GT. 3 ) THEN
          ESTIMO = 'Mean,WMean,Mode,Median,Max,Min,Comax,Comin,Absdev,'/
      :            /'Cmean,Csigma,RMS,Sigma,Sum,Iwc,Iwd,Integ,FBad,'/
      :            /'FGood,NBad,NGood'
-      ELSE IF ( INT8( PIXPCH ) .EQ. 1 ) THEN
+      ELSE IF ( INT( PIXPCH, 8 ) .EQ. 1 ) THEN
          ESTIMO = 'Mean,Max,Min,Comax,Comin,Sum,Iwc,Integ'
-      ELSE IF ( INT8( PIXPCH ) .EQ. 2 ) THEN
+      ELSE IF ( INT( PIXPCH, 8 ) .EQ. 2 ) THEN
          ESTIMO = 'Mean,WMean,Max,Min,Comax,Comin,Absdev,Sum,Iwc,'/
      :            /'Integ,FBad,FGood,NBad,NGood'
-      ELSE IF ( INT8( PIXPCH ) .EQ. 3 ) THEN
+      ELSE IF ( INT( PIXPCH, 8 ) .EQ. 3 ) THEN
          ESTIMO = 'Mean,WMean,Median,Max,Min,Comax,Comin,Absdev,Sum,'/
      :            /'Iwc,Integ,FBad,FGood,NBad,NGood'
       END IF
@@ -1015,7 +1015,7 @@
 *  we should divide the co-ordinates limits of the current WCS Frame
 *  equally and convert those channel limits to pixels.
          LBNDS( JAXIS ) = UBNDS( JAXIS ) + 1
-         UBNDS( JAXIS ) = JLO - 1 + INT8( PIXPCH * REAL( ICH ) )
+         UBNDS( JAXIS ) = JLO - 1 + INT( PIXPCH * REAL( ICH ), 8 )
          CAEL = UBNDS( JAXIS ) - LBNDS( JAXIS ) + 1
 
 *  Obtain the indices of the tile within the large output

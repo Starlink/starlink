@@ -124,7 +124,7 @@
 *  Convert the 8 byte pixel count to 4-byte. Report an error if it
 *  overflows.
       NGOOD = NGOOD8
-      IF( STATUS .EQ. SAI__OK .AND. INT8(NGOOD) .NE. NGOOD8 ) THEN
+      IF( STATUS .EQ. SAI__OK .AND. INT(NGOOD, 8) .NE. NGOOD8 ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'N', INDF1 )
          CALL ERR_REP( ' ', 'KPG1_BADBX: NDF ''^N'' has too many '//
