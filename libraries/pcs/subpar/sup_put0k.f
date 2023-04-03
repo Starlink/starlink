@@ -217,7 +217,7 @@
 
             ELSE IF ( TYPE .EQ. SUBPAR__LOGICAL ) THEN
 
-                  PARLOG( NAMECODE ) = ( MOD(KVALUE,2) .EQ. 1 )
+                  PARLOG( NAMECODE ) = ( MOD(KVALUE,2_8) .EQ. 1 )
 
             ELSE
 
