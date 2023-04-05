@@ -22,7 +22,6 @@ cp $libpath $STARLINK_DIR/lib/
 # 2. fix up their ids.
 bname=$(basename $libpath)
 newpath=$STARLINK_DIR/lib/$bname
-echo "chmod u+w $newpath"
 chmod u+w $newpath
 install_name_tool -id "$newpath" "$newpath"
 
@@ -35,7 +34,7 @@ done
 
 for i in $(find $STARLINK_DIR/bin -type f -perm +111); do
     if file $i | grep -q Mach-O; then
-	install_name_tool -change "$libpath" "$newpath" "$i";
+        install_name_tool -change "$libpath" "$newpath" "$i";
     fi
 done
 
@@ -46,5 +45,3 @@ done
 for i in $(find $STARLINK_DIR/lib -name '*.so' -type f); do
     install_name_tool -change "$libpath" "$newpath" "$i";
 done
-
-
