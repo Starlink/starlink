@@ -16,7 +16,7 @@
       Hierarchical Data System HDS (SUN/92).
     </p></abstract>
   <dependencies >
-    <build>sae</build><build>generic</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>cnf</build><build>generic</build><build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -2603,10 +2603,12 @@ $(MANIFESTS)/pongo: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/prm: \
+		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/messgen \
 		$(MANIFESTS)/sae \
-		$(MANIFESTS)/star2html
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
 	cd libraries/prm \
 	  && $(MAKE_CPT)
 
