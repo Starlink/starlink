@@ -110,7 +110,7 @@ dim_t smf_get_freemem ( double *mbytes, dim_t * pagesize,
   {
     mach_port_t host_port;
     mach_msg_type_number_t host_size;
-    vm_dim_t vmpagesize;
+    vm_size_t vmpagesize;
     vm_statistics_data_t vm_stat;
 
     host_port = mach_host_self();
