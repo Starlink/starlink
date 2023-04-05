@@ -320,9 +320,8 @@ static double smf1_f( const gsl_vector *v, void *pars );
 static int smf1_madebyskyloop( int indf, int *status );
 #ifdef HAVE_QSORT_R_BSD
 static int smf1_qsort_bsd( void *data, const void *a, const void *d );
-#else
-static int smf1_qsort( const void *a, const void *d, void *data );
 #endif
+static int smf1_qsort( const void *a, const void *d, void *data );
 static void smf1_worker( void *job_data_ptr, int *status );
 static void smf1_pol2ipcor( ThrWorkForce *wf, int model, AstKeyMap *km, Grp *igrp3,
                            const dim_t *lbnd,
@@ -2137,7 +2136,7 @@ static void smf1_worker( void *job_data_ptr, int *status ) {
 static int smf1_qsort_bsd( void *data, const void *a, const void *b ){
    return smf1_qsort( a, b, data );
 }
-#else
+#endif
 static int smf1_qsort( const void *a, const void *b, void *data ){
    int ia = *((const int *) a);
    int ib = *((const int *) b);
@@ -2150,7 +2149,6 @@ static int smf1_qsort( const void *a, const void *b, void *data ){
       return 0;
    }
 }
-#endif
 
 static void smf1_ipfit( int imodel, dim_t n, const double *q,
                         const double *u, const double *w, const double *e,
