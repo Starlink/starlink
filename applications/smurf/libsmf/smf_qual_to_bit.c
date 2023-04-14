@@ -78,7 +78,7 @@ int smf_qual_to_bit(smf_qual_t q, int *status) {
   int num=-1;
   if (*status != SAI__OK) return 0;
   if( q ) {
-    while( !((q>>num)&1) ) num++;
+    while( !((q>>++num)&1) ) ;
   }
   return num;
 }
