@@ -2,7 +2,10 @@
 
 SUBDIRS = polsub ccdpack
 
-dist_bin_SCRIPTS = $(MISC_FILES) $(DATA_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
+dist_bin_SCRIPTS = $(MISC_FILES) $(PUBLICSCRIPTS) $(DYNSCRIPTS) version.dat
+
+bindatadir = $(bindir)
+dist_bindata_DATA = $(DATA_FILES)
 
 LOCAL_LINK = polsub/libpolsub.la ccdpack/libccdpack.la `$(srcdir)/polpack_link_adam`
 
