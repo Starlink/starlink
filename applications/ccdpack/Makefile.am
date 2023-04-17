@@ -3,7 +3,8 @@ AM_FCFLAGS=-I.
 
 ccdsupportdir = $(bindir)
 
-ccdsupport_DATA = $(DATA_FILES) ccdpack.shl $(TCL_SCR) $(ITCL_SCR) $(TCL_INDEX)
+ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
+    $(TCL_SCR) $(ITCL_SCR) $(TCL_INDEX) $(CONFIG_SCR)
 
 dist_bin_SCRIPTS = $(PUBLIC_SCR)
 
@@ -95,7 +96,7 @@ IRAF_STARTUP_SCRIPT = ccdpack.cl
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCR = $(SHELL_SCR) $(ICL_SCR) $(CONFIG_SCR) \
+PUBLIC_SCR = $(SHELL_SCR) $(ICL_SCR) \
              $(STARTUP_SCRIPT) $(ICL_STARTUP_SCRIPT)
 
 SHELL_SCR = ccdfork ccdexercise wcsexercise setexercise \
