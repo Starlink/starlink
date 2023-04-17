@@ -1,10 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = $(DATA_STRUCTURE_DEFINITIONS) \
-              $(DEMO_FLUX_STANDARDS) $(LINE_IDS) 
+dist_bin_SCRIPTS = $(DATA_STRUCTURE_DEFINITIONS)
 
 bindatadir = $(bindir)
-dist_bindata_DATA = $(DATA_FILES)
+dist_bindata_DATA = $(DATA_FILES) $(LINE_IDS) $(DEMO_FLUX_STANDARDS)
 
 dist_staretc_DATA = $(MISC_FILES) $(ARCLINES) $(EXTINCTION_COEFFS) \
                $(FILTER_TRANSMISSIONS) $(FLUX_STANDARDS) $(LUTS) \
