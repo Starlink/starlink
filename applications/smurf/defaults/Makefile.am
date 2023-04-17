@@ -1,5 +1,7 @@
 noinst_DATA = params.tex
-dist_bin_SCRIPTS = $(DEFAULTS)
+
+bindatadir = $(bindir)
+dist_bindata_DATA = $(DEFAULTS)
 
 DEFAULTS = smurf_makemap.def smurf_extinction.def smurf_sc2clean.def \
            smurf_calcflat.def smurf_calcqu.def smurf_fit1d.def \
