@@ -2,7 +2,10 @@
 
 SUBDIRS = cupidsub
 
-dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.sh $(DATA_FILES)
+dist_bin_SCRIPTS = cupid.csh cupid.sh cupid.icl outlineclump.sh
+
+bindatadir = $(bindir)
+dist_bindata_DATA = $(DATA_FILES)
 
 DATA_FILES = test_data.sdf test_data.FIT
 
