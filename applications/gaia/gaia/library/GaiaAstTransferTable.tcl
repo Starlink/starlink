@@ -117,7 +117,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Add separator for new "transfer" section.
       itk_component add sep1 {
-         LabelRule $w_.sep1 -text "Transfer:"
+         gaia::LabelRule $w_.sep1 -text "Transfer:"
       }
       pack $itk_component(sep1) -fill x -ipadx 1m
 
@@ -257,7 +257,7 @@ itcl::class gaia::GaiaAstTransferTable {
 
       #  Menu button for selection.
       itk_component add targets {
-         LabelMenu $w_.targets \
+         util::LabelMenu $w_.targets \
             -labelwidth 12 \
             -valuewidth 20 \
             -valueanchor e \
@@ -424,7 +424,7 @@ itcl::class gaia::GaiaAstTransferTable {
    #  Override clear_table to also clear the RA/Dec marker.
    public method clear_table {} {
       remove_radec
-      GaiaAstTable::clear_table
+      gaia::GaiaAstTable::clear_table
    }
 
    #  Configuration options: (public variables)

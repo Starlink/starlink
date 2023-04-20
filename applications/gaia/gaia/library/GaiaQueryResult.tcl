@@ -90,7 +90,7 @@ itcl::class gaia::GaiaQueryResult {
 
    #  Remove the currently selected rows from a local catalog file.
    public method remove_selected {} {
-      set file [$astrocat url]
+      set file [{*}$astrocat url]
       set info [get_selected]
 
       if {[llength $info] == 0} {
@@ -102,7 +102,7 @@ itcl::class gaia::GaiaQueryResult {
          return
       }
 
-      if {[catch {$astrocat remove $file $info $equinox $headings_} msg]} {
+      if {[catch {{*}$astrocat remove $file $info $equinox $headings_} msg]} {
          error_dialog $msg $w_
          return
       }
@@ -110,7 +110,7 @@ itcl::class gaia::GaiaQueryResult {
 
    #  Save the currently selected rows to the local catalog file.
    public method save_selected {} {
-      set file [$astrocat url]
+      set file [{*}$astrocat url]
       set info [get_selected]
 
       if {[llength $info] == 0} {
@@ -133,12 +133,12 @@ itcl::class gaia::GaiaQueryResult {
          return
       }
 
-      set id [lindex $info [$astrocat id_col]]
+      set id [lindex $info [{*}$astrocat id_col]]
       if {! [confirm_dialog "Enter new object with id $id ?" $w_]} {
          return
       }
 
-      set file [$astrocat url]
+      set file [{*}$astrocat url]
       save_to_file $file [list $info] $headings_ 1
 
       #  Eval caller supplied command after change.
@@ -158,7 +158,7 @@ itcl::class gaia::GaiaQueryResult {
          return
       }
 
-      set file [$astrocat url]
+      set file [{*}$astrocat url]
       set id [lindex $new_data 0]
 
       if {! [confirm_dialog "Update object with id $id ?" $w_]} {
@@ -166,7 +166,7 @@ itcl::class gaia::GaiaQueryResult {
       }
 
       # remove old data
-      if {[catch {$astrocat remove $file [list $old_data] $equinox $headings_} msg]} {
+      if {[catch {{*}$astrocat remove $file [list $old_data] $equinox $headings_} msg]} {
          error_dialog $msg $w_
          return
       }
@@ -190,14 +190,14 @@ itcl::class gaia::GaiaQueryResult {
       #  Determine the sizes of the columns, provided that -format
       #  isn't set.
       if { ! $formats_flag_ } {
-         configure -sizes [$astrocat csize $itk_option(-info)]
+         configure -sizes [{*}$astrocat csize $itk_option(-info)]
       }
-      TableList::new_info
+      util::TableList::new_info
    }
 
    #  Override print to avoid bug. This method shouldn't exist.
    public method print {fd} {
-      TableList::print $fd
+      util::TableList::print $fd
    }
 
    #  Save the results to a named file.

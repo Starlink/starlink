@@ -161,7 +161,7 @@ itcl::class gaia::GaiaFITSHeader {
 
       #  Search headers for a string.
       itk_component add search {
-         LabelEntry $itk_component(buttons).search \
+         util::LabelEntry $itk_component(buttons).search \
             -text Search -valuewidth 10 \
             -command [code $this search]
       }
@@ -294,7 +294,7 @@ itcl::class gaia::GaiaFITSHeader {
          }
          set lastblank 0
 
-         set triple [GaiaFITSHeader::get_kvc $line]
+         set triple [gaia::GaiaFITSHeader::get_kvc $line]
          if { [lempty $triple] } {
             set triple [list INVALID {} $line]
          }

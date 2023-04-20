@@ -196,7 +196,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
    protected method add_att_controls_ {w} {
 
       itk_component add attrule {
-         LabelRule $w.attrule -text "Contour levels & attributes:"
+         gaia::LabelRule $w.attrule -text "Contour levels & attributes:"
       }
       pack $itk_component(attrule) -side top -fill x
 
@@ -238,7 +238,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
          #  Entry widget for the contour values.
          itk_component add value$i {
-            LabelEntry $parent.value$i \
+            util::LabelEntry $parent.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 3 \
@@ -301,7 +301,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
             $colour_menu_($i) add_custom_colour $new_colour $index
          }
       }
-      Gaia3dTool::add_custom_colour $new_colour $index
+      gaia3d::Gaia3dTool::add_custom_colour $new_colour $index
    }
 
    #  Get the level and attributes as a single string.
@@ -350,13 +350,13 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Add section header.
       itk_component add genrule {
-         LabelRule $w.genrule -text "Contour level generation:"
+         gaia::LabelRule $w.genrule -text "Contour level generation:"
       }
       pack $itk_component(genrule) -side top -fill x
 
       #  Number of contours to generate.
       itk_component add ncont {
-         LabelEntryScale $w.ncont \
+         util::LabelEntryScale $w.ncont \
             -text "Number:" \
             -labelwidth 14 \
             -valuewidth 3 \
@@ -395,7 +395,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Starting value.
       itk_component add start {
-         LabelEntry $w.start \
+         util::LabelEntry $w.start \
             -validate real \
             -text "Start:" \
             -labelwidth 14 \
@@ -407,7 +407,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Increment.
       itk_component add incre {
-         LabelEntry $w.incre \
+         util::LabelEntry $w.incre \
             -validate real \
             -text "Increment:" \
             -labelwidth 14 \
@@ -420,7 +420,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
       #  Percentile list.
       itk_component add percent {
-         LabelEntry $w.percent \
+         util::LabelEntry $w.percent \
             -text "Percentiles:" \
             -labelwidth 14 \
             -valuewidth 20 \
@@ -604,7 +604,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
    #  Create objects to manage a contour.
    protected method create_iso_contour_ {index} {
       if { $imagedata_ != {} } {
-         set contour_($index) [Gaia3dVtkIso \#auto \
+         set contour_($index) [gaia3d::Gaia3dVtkIso \#auto \
                                   -stencil [$imagedata_ get_stencil] \
                                   -imagedata [$imagedata_ get_imagedata] \
                                   -renwindow $renwindow_]
@@ -651,7 +651,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
    #  Save the current configuration to a file.
    public method write_config_file {} {
-      set w [FileSelect .\#auto -title "Save configuration to a file"]
+      set w [util::FileSelect .\#auto -title "Save configuration to a file"]
       if {[$w activate]} {
          save_config [$w get]
       }
@@ -660,7 +660,7 @@ itcl::class gaia3d::Gaia3dIsosurface {
 
    #  Restore configuration from a file.
    public method read_config_file {} {
-      set w [FileSelect .\#auto -title "Read configuration from a file"]
+      set w [util::FileSelect .\#auto -title "Read configuration from a file"]
       if {[$w activate]} {
          read_config [$w get]
       }

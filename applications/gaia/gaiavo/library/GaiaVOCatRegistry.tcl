@@ -88,7 +88,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
    #  whole catalog service, otherwise we keep "Open" and "Close" and
    #  deal with row-based actions.
    public method init {} {
-      GaiaVOCat::init
+      gaiavo::GaiaVOCat::init
 
       wm title $w_ "Query VO Registry for services"
 
@@ -148,7 +148,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
          open_service_ 1
          close
       } else {
-         GaiaVOCat::open
+         gaiavo::GaiaVOCat::open
       }
    }
 
@@ -158,7 +158,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       if { $itk_option(-whole_operation) } {
          open_service_ 0
       }
-      GaiaVOCat::close
+      gaiavo::GaiaVOCat::close
    }
 
    #  Add the component that will control the registry query.
@@ -235,7 +235,7 @@ itcl::class gaiavo::GaiaVOCatRegistry {
       if { $itk_option(-help_file) == {} } {
          add_help_button registry "On Window..." {Help on this window}
       }
-      GaiaVOCat::add_help_menu_
+      gaiavo::GaiaVOCat::add_help_menu_
    }
 
    #  Configuration options: (public variables)

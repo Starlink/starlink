@@ -299,7 +299,7 @@ itcl::class gaia3d::Gaia3dVolume {
          $min_colour_menu_ add_custom_colour $new_colour $index
          $max_colour_menu_ add_custom_colour $new_colour $index
       }
-      Gaia3dTool::add_custom_colour $new_colour $index
+      gaia3d::Gaia3dTool::add_custom_colour $new_colour $index
    }
 
    #  Called when the colour source is changed. Need to act on this. Note

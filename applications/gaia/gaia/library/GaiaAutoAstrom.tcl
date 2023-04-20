@@ -199,7 +199,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  image, or as a set of fixed parameters.
       set lwidth 20
       itk_component add wcssource {
-         StarLabelCheck $position_page.wcssource \
+         gaia::StarLabelCheck $position_page.wcssource \
             -text "Initial WCS from image:" \
             -onvalue Y \
             -offvalue N \
@@ -214,7 +214,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  If WCS source isn't the image, then we need some parameters.
       itk_component add racentre {
-         FITSLabelEntry $position_page.racentre \
+         gaia::FITSLabelEntry $position_page.racentre \
             -text "RA centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(racentre)] \
@@ -225,7 +225,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(racentre) "00:00:00"
 
       itk_component add deccentre {
-         FITSLabelEntry $position_page.deccentre \
+         gaia::FITSLabelEntry $position_page.deccentre \
             -text "Dec centre:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(deccentre)] \
@@ -236,7 +236,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(deccentre) "00:00:00"
 
       itk_component add imagescale {
-         FITSLabelEntry $position_page.imagescale \
+         gaia::FITSLabelEntry $position_page.imagescale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(imagescale)] \
@@ -247,7 +247,7 @@ itcl::class gaia::GaiaAutoAstrom {
       set values_(imagescale) "1.0"
 
       itk_component add angle {
-         FITSLabelEntry $position_page.angle \
+         gaia::FITSLabelEntry $position_page.angle \
             -text "Position Angle:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(angle)] \
@@ -260,7 +260,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Advanced ASTROM options.
       if { $itk_option(-expert) } {
          itk_component add telescope {
-            LabelEntryMenu $observation_page.telescope \
+            gaia::LabelEntryMenu $observation_page.telescope \
                -text "Telescope:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(telescope)]
@@ -271,7 +271,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Date of observation:
          itk_component add date {
-            FITSLabelEntry $observation_page.date \
+            gaia::FITSLabelEntry $observation_page.date \
                -text "Date:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(date)] \
@@ -282,7 +282,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the observation wavelength.
          itk_component add wavelength {
-            FITSLabelEntry $observation_page.wavelength \
+            gaia::FITSLabelEntry $observation_page.wavelength \
                -text "Wavelength (nm):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(wavelength)] \
@@ -293,7 +293,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the telescope temperature.
          itk_component add temperature {
-            FITSLabelEntry $observation_page.temperature \
+            gaia::FITSLabelEntry $observation_page.temperature \
                -text "Temperature (K):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(temperature)] \
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Define the atmospheric pressure.
          itk_component add pressure {
-            FITSLabelEntry $observation_page.pressure \
+            gaia::FITSLabelEntry $observation_page.pressure \
                -text "Pressure (milliBar):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(pressure)] \
@@ -339,7 +339,7 @@ itcl::class gaia::GaiaAutoAstrom {
       }
 
       itk_component add invert {
-         StarLabelCheck $position_page.invert \
+         gaia::StarLabelCheck $position_page.invert \
             -text "Axes are flipped:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -354,7 +354,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Whether to use match or findoff algorithms.
       if { $itk_option(-expert) } {
          itk_component add usematch  {
-            StarLabelCheck $tuning_page.usematch \
+            gaia::StarLabelCheck $tuning_page.usematch \
             -text "Use match algorithm:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -388,7 +388,7 @@ itcl::class gaia::GaiaAutoAstrom {
          }
       } else {
          itk_component add fitparams  {
-            StarLabelCheck $tuning_page.fitparams \
+            gaia::StarLabelCheck $tuning_page.fitparams \
                -text "Perform linear fit:" \
                -onvalue 6 \
                -offvalue 9 \
@@ -403,7 +403,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  Number of objects downloaded from reference catalogue.
       itk_component add maxobj {
-         LabelEntry $tuning_page.maxobj \
+         util::LabelEntry $tuning_page.maxobj \
             -text "Max catalogue objects:" \
             -labelwidth $lwidth \
             -textvariable [scope values_(maxobj)]
@@ -413,7 +413,7 @@ itcl::class gaia::GaiaAutoAstrom {
       #  Whether to remove defects, and if so what parameters to use.
       if { $itk_option(-expert) } {
          itk_component add defects {
-            StarLabelCheck $tuning_page.defects \
+            gaia::StarLabelCheck $tuning_page.defects \
                -text "Remove defects:" \
                -onvalue 1 \
                -offvalue 0 \
@@ -427,7 +427,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  The "badness" of objects.
          itk_component add badness {
-            LabelEntry $tuning_page.badness \
+            util::LabelEntry $tuning_page.badness \
                -text "Badness factor:" \
                -labelwidth $lwidth \
                -textvariable [scope values_(badness)]
@@ -437,7 +437,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
          #  Timeout for tasks
          itk_component add timeout {
-            LabelEntry $tuning_page.timeout \
+            util::LabelEntry $tuning_page.timeout \
                -text "Timeout (secs):" \
                -labelwidth $lwidth \
                -textvariable [scope values_(timeout)]
@@ -487,7 +487,7 @@ itcl::class gaia::GaiaAutoAstrom {
 
       #  Region for showing the output from AUTOASTROM.
       itk_component add status {
-         Scrollbox $w_.status -singleselect 0 -exportselection 1
+         gaia::Scrollbox $w_.status -singleselect 0 -exportselection 1
       }
       $w_.status configure -height 5
       add_short_help $itk_component(status) \
@@ -577,7 +577,7 @@ itcl::class gaia::GaiaAutoAstrom {
       }
 
       #  Create an object for dealing with image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
       #  Do guesses.
       guess_position_
@@ -668,7 +668,7 @@ itcl::class gaia::GaiaAutoAstrom {
          #  Establish a control object for this foreign task,
          #  if not already done.
          if { $autoastrom_ == {} } {
-            set autoastrom_ [GaiaForeignExec \#auto \
+            set autoastrom_ [gaia::GaiaForeignExec \#auto \
                                 -use_error 1 \
                                 -keepnewlines 0 \
                                 -show_output $itk_component(status) \

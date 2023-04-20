@@ -114,12 +114,8 @@ itcl::class gaia::GaiaPolUInteg {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Integrate' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -158,7 +154,7 @@ itcl::class gaia::GaiaPolUInteg {
             checkCols
 
 #  Get the column headings to use. If blank, use all columns.
-            set cols $values_($this,cols)
+            set cols $values_(cols)
             if { $cols == "" } {
                set cols $useheads_
             }
@@ -185,10 +181,10 @@ itcl::class gaia::GaiaPolUInteg {
       if { $cat_ != "" } {
          $cat_ annull
       }
-      set cat_ [$cat clone]
+      set cat_ [{*}$cat clone]
 
 #  Ensure the column names are up-to-date.
-      setHeadings [$cat getHeadings]
+      setHeadings [$cat_ getHeadings]
 
 #  Indicate that statistics have not yet been calculated for this GaiaPolCat
       set done_ 0
@@ -274,7 +270,7 @@ itcl::class gaia::GaiaPolUInteg {
             checkCols
 
 #  Get the columns to display. If blank, use all columns.
-            set cols $values_($this,cols)
+            set cols $values_(cols)
             if { $cols == "" } {
                set cols $useheads_
             }
@@ -305,7 +301,7 @@ itcl::class gaia::GaiaPolUInteg {
    public method activ { args } {
 
 #  Ensure the values in the values_ array are up to date.
-      set values_($this,method) [$itk_component(method) get]
+      set values_(method) [$itk_component(method) get]
 
 #  Get the name of the changed value.
       set item [lindex $args 0]
@@ -336,10 +332,10 @@ itcl::class gaia::GaiaPolUInteg {
       set attr_(sigmas) Sigmas
 
 #  Set the hard-wired defaults.
-      set values_($this,cols) ""
-      set values_($this,method) "mean"
-      set values_($this,debias) 1
-      set values_($this,sigmas) 4
+      set values_(cols) ""
+      set values_(method) "mean"
+      set values_(debias) 1
+      set values_(sigmas) 4
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -349,16 +345,16 @@ itcl::class gaia::GaiaPolUInteg {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Integrate' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,method) == "" } { set values_($this,method) "mean" }
-      if { $values_($this,debias) == "" } { set values_($this,debias) 1 }
-      if { $values_($this,sigmas) == "" } { set values_($this,sigmas) 4 }
+      if { $values_(method) == "" } { set values_(method) "mean" }
+      if { $values_(debias) == "" } { set values_(debias) 1 }
+      if { $values_(sigmas) == "" } { set values_(sigmas) 4 }
 
 #  Use these settings.
       newVals
@@ -370,7 +366,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  ---------------------------------------------------------------------
    public method checkCols {} {
 
-      set cols $values_($this,cols)
+      set cols $values_(cols)
 
 #  If the cols list is not blank, we need to check that each element in
 #  the list is a heading which is available in the currently displayed
@@ -392,7 +388,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  If any requested columns were not available in the current headings,
 #  update the common values_ array to hold only the available columns.
          if { $badcols != "" } {
-            set values_($this,cols) $goodcols
+            set values_(cols) $goodcols
          }
       }
    }
@@ -437,21 +433,21 @@ itcl::class gaia::GaiaPolUInteg {
 
    }
 
-   public method getCols {} {return $values_($this,cols)}
-   public method setCols {x} {set values_($this,cols) $x; newVals}
-   public method setMethod {x} {set values_($this,method) $x}
-   public method getMethod {} {return $values_($this,method)}
-   public method setDebias {x} {set values_($this,debias) $x}
-   public method getDebias {} {return $values_($this,debias)}
-   public method setSigmas {x} {set values_($this,sigmas) $x}
-   public method getSigmas {} {return $values_($this,sigmas)}
+   public method getCols {} {return $values_(cols)}
+   public method setCols {x} {set values_(cols) $x; newVals}
+   public method setMethod {x} {set values_(method) $x}
+   public method getMethod {} {return $values_(method)}
+   public method setDebias {x} {set values_(debias) $x}
+   public method getDebias {} {return $values_(debias)}
+   public method setSigmas {x} {set values_(sigmas) $x}
+   public method getSigmas {} {return $values_(sigmas)}
    public method setSaveOpt {x} {set saveopt_ $x}
 
 #  Called to add a new action to the current list of undoable actions.
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($this,$item)\"\}"
+         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($item)\"\}"
          eval $itk_option(-actioncmd) $arglist
       }
    }
@@ -466,7 +462,7 @@ itcl::class gaia::GaiaPolUInteg {
       tabConfig
 
 #  Update the statistics if the change relates to the current method.
-      if { $item != "sigmas" || $values_($this,method) == "sigma" } {
+      if { $item != "sigmas" || $values_(method) == "sigma" } {
          set done_ 0
          if { [winfo viewable $w_] } {
             calc $item
@@ -514,7 +510,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Items to display header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Items to display:"
+	    gaia::LabelRule $w_.header1 -text "Items to display:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -539,7 +535,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Vector parameters...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Parameters for binning:"
+	    gaia::LabelRule $w_.header2 -text "Parameters for binning:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -549,8 +545,8 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create a LabelMenu to control the method used for binning.
          itk_component add method {
-            LabelMenu $w_.method -text "Method:" \
-                                 -variable [scope values_($this,method)] \
+            util::LabelMenu $w_.method -text "Method:" \
+                                 -variable [scope values_(method)] \
                                  -labelwidth $lwidth
          }
          grid $itk_component(method) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
@@ -570,13 +566,13 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create a LabelCheck to set debiassing.
          itk_component add debias {
-            StarLabelCheck $w_.debias -text "Debias:" \
+            gaia::StarLabelCheck $w_.debias -text "Debias:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
                                      -labelwidth $lwidth \
                                      -command [code $this activ debias] \
                                      -anchor nw \
-                                     -variable [scope values_($this,debias)]
+                                     -variable [scope values_(debias)]
          }
          grid $itk_component(debias) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(debias) {Should the integrated polarization be debiassed if possible?}
@@ -589,13 +585,13 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Create an integer entry for the sigmas.
          itk_component add sigmas {
-            LabelEntry $w_.sigmas -text "Sigmas:" \
+            util::LabelEntry $w_.sigmas -text "Sigmas:" \
                                  -valuewidth $vwidth \
                                  -command [code $this activ sigmas] \
                                  -labelwidth $lwidth \
                                  -anchor nw \
                                  -validate integer \
-                                 -textvariable [scope values_($this,sigmas)]
+                                 -textvariable [scope values_(sigmas)]
          }
          grid $itk_component(sigmas) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(sigmas) {The number of standard deviations at which to clip when using method 'sigma-clipped mean'}
@@ -608,7 +604,7 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Vector parameters...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "Integrated column values for currently selected vectors:"
+	    gaia::LabelRule $w_.header3 -text "Integrated column values for currently selected vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -651,9 +647,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  ---------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -675,8 +669,8 @@ itcl::class gaia::GaiaPolUInteg {
 #  Check the currently selected column names. Check all names if the
 #  string is blank.
       checkCols
-      if { $values_($this,cols) != "" } {
-         $d setOptions $values_($this,cols)
+      if { $values_(cols) != "" } {
+         $d setOptions $values_(cols)
       } else {
          $d allOptions
       }
@@ -687,16 +681,16 @@ itcl::class gaia::GaiaPolUInteg {
 
 #  Was OK pressed? If the options have changed, store the new values.
       if { $but == 0 } {
-         if { $opts != $values_($this,cols)} {
-            set values_($this,cols) $opts
+         if { $opts != $values_(cols)} {
+            set values_(cols) $opts
             activ cols
          }
 
 #  Was All pressed? Set the column selection back to blank means "use all
 #  available columns"
       } elseif { $but == 2 } {
-         if { $values_($this,cols) != "" } {
-            set values_($this,cols) ""
+         if { $values_(cols) != "" } {
+            set values_(cols) ""
             activ cols
          }
 
@@ -710,8 +704,8 @@ itcl::class gaia::GaiaPolUInteg {
 #  --------------------------
    private method setHold {text} {
       blt::busy hold $w_ -cursor "watch"
-      $itk_option(-pbar) reset
-      $itk_option(-pbar) config -text $text
+      {*}$itk_option(-pbar) reset
+      {*}$itk_option(-pbar) config -text $text
       update idletasks
    }
 
@@ -719,7 +713,7 @@ itcl::class gaia::GaiaPolUInteg {
 #  --------------------------
    private method resetHold {} {
       blt::busy release $w_
-      $itk_option(-pbar) reset
+      {*}$itk_option(-pbar) reset
       update idletasks
    }
 
@@ -779,6 +773,8 @@ itcl::class gaia::GaiaPolUInteg {
 #  The column headings from the last binned catalogue.
        variable sheads_ ""
 
+#  Array indexed by ($this,param).
+       variable values_
    }
 
 #  Private data members:
@@ -788,8 +784,6 @@ itcl::class gaia::GaiaPolUInteg {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  End of class definition.
 }

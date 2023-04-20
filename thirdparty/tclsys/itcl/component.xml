@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="itcl" support="U">
-  <version>3.4</version>
+  <version>4.2.3</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
   <!-- <abstract><p></p></abstract> -->

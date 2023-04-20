@@ -798,7 +798,7 @@ itcl::class gaia::GaiaXYProfile {
       if { $itk_option(-ukirt_options) } {
          set lwidth 7
          itk_component add logfile {
-            LabelFileChooser $itk_component(lframe).logfile \
+            gaia::LabelFileChooser $itk_component(lframe).logfile \
                -labelwidth $lwidth \
                -text "Logfile:" \
                -anchor e \
@@ -810,7 +810,7 @@ itcl::class gaia::GaiaXYProfile {
 
          #  And the comment field.
          itk_component add comment {
-            LabelEntry $itk_component(lframe).comment \
+            util::LabelEntry $itk_component(lframe).comment \
                -labelwidth $lwidth \
                -text "Comment:" \
                -anchor e \
@@ -831,7 +831,7 @@ itcl::class gaia::GaiaXYProfile {
 
       #  Action buttons.
       itk_component add fix {
-         StarLabelCheck $itk_component(bframe).fix \
+         gaia::StarLabelCheck $itk_component(bframe).fix \
             -text "Fix data range:" \
             -onvalue 1 -offvalue 0 \
             -variable [scope fixed_] \

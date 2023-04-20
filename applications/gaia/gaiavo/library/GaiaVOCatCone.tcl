@@ -86,7 +86,7 @@ itcl::class gaiavo::GaiaVOCatCone {
 
    #  Add additional menu items. Nameserver.
    public method init {} {
-      GaiaVOCat::init
+      gaiavo::GaiaVOCat::init
 
       #  Override title.
       wm title $w_ "Query VO Cone Search server"
@@ -191,7 +191,7 @@ itcl::class gaiavo::GaiaVOCatCone {
 
    #  New catalogue, set default plot symbol.
    public method query_done {status result} {
-      GaiaVOCat::query_done $status $result
+      gaiavo::GaiaVOCat::query_done $status $result
       if { $status } {
          set_default_plot_symbol_
       }

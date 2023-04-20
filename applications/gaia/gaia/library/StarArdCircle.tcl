@@ -160,7 +160,7 @@ itcl::class gaia::StarArdCircle {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $rad -semiminor $rad -angle 0
       if { [lindex $args 0] != {} } {
-         eval $args
+         eval {*}$args
       }
    }
 
@@ -173,15 +173,15 @@ itcl::class gaia::StarArdCircle {
       if { ! [create_properties_window $name] } {
 
          #  Now add the buttons for the description.
-         set Xcentre_ [LabelEntry $Frame_.xcentre \
+         set Xcentre_ [util::LabelEntry $Frame_.xcentre \
                           -text {X centre:} \
                           -labelwidth $labelwidth_ \
                           -command [code $this configure -x]]
-         set Ycentre_ [LabelEntry $Frame_.ycentre \
+         set Ycentre_ [util::LabelEntry $Frame_.ycentre \
                           -text {Y centre:} \
                           -labelwidth $labelwidth_ \
                           -command [code $this configure -y]]
-         set Radius_ [LabelEntry $Frame_.radius \
+         set Radius_ [util::LabelEntry $Frame_.radius \
                          -text {Radius:}\
                          -labelwidth $labelwidth_ \
                          -command [code $this configure -rad]]

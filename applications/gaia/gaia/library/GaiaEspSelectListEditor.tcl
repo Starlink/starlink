@@ -74,7 +74,8 @@ itk::usual GaiaEspSelectListEditor {}
 itcl::class gaia::GaiaEspSelectListEditor {
 
     # --- Inheritances
-    inherit itk::Widget gaia::GaiaEspSelectList
+    inherit itk::Widget 
+    #gaia::GaiaEspSelectList
 
     # --- Constructor
     constructor {parent_select_list initial_object_list args} {
@@ -86,7 +87,7 @@ itcl::class gaia::GaiaEspSelectListEditor {
 	eval itk_initialize $args
 
 	itk_component add objlist {
-	    TableList $itk_interior.objlist \
+	    util::TableList $itk_interior.objlist \
 		    -title "Selected objects" \
 		    -headings {X Y Size canvasid} \
 		    -sizes {10 10 10 10}

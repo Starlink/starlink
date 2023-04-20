@@ -238,9 +238,9 @@ itcl::class gaia::GaiaAstGrid {
       bind $w_ <Control-c> [code $this close]
 
       #  Add auto-redraw option.
-      set auto_redraw_($this) 0
+      set auto_redraw_ 0
       $Options add checkbutton  -label {Auto-redraw} \
-         -variable [scope auto_redraw_($this)] \
+         -variable [scope auto_redraw_] \
          -onvalue 1 \
          -offvalue 0
 
@@ -252,7 +252,7 @@ itcl::class gaia::GaiaAstGrid {
          -command [code $this toggle_chanmap_defaults_]
       set chanmap_defaults_ 0
       set elementattrib_ $normalelementattrib_
-      set position_($this,labelling) "interior"
+      set position_(labelling) "interior"
 
       #  Create the tab notebook for containing each page of options.
       itk_component add TabNoteBook {
@@ -367,6 +367,7 @@ itcl::class gaia::GaiaAstGrid {
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
 
       #  Select a page.
+      #reset_page_ 1
       $itk_component(TabNoteBook) select 0
 
       #  Create a unique tag for this grid.
@@ -477,10 +478,10 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Redraw the grid if auto_redraw is on (note args are ignored).
    protected method redraw_ {args} {
-      if { $auto_redraw_($this) } {
-         set auto_redraw_($this) 0
+      if { $auto_redraw_ } {
+         set auto_redraw_ 0
          draw_grid_
-         set auto_redraw_($this) 1
+         set auto_redraw_ 1
       }
    }
 
@@ -489,24 +490,24 @@ itcl::class gaia::GaiaAstGrid {
       set options ""
 
       #  Add the position options.
-      if { $position_($this,edge1) != "default" } {
-         lappend options "edge(1)=$position_($this,edge1)"
+      if { $position_(edge1) != "default" } {
+         lappend options "edge(1)=$position_(edge1)"
       }
-      if { $position_($this,edge2) != "default" } {
-         lappend options "edge(2)=$position_($this,edge2)"
+      if { $position_(edge2) != "default" } {
+         lappend options "edge(2)=$position_(edge2)"
       }
-      if { $position_($this,labelat1) != "" } {
+      if { $position_(labelat1) != "" } {
          lappend options \
-            "labelat(1)=[radec_to_radian_ 2 $position_($this,labelat1)]"
+            "labelat(1)=[radec_to_radian_ 2 $position_(labelat1)]"
       }
-      if { $position_($this,labelat2) != "" } {
+      if { $position_(labelat2) != "" } {
          lappend options \
-            "labelat(2)=[radec_to_radian_ 1 $position_($this,labelat2)]"
+            "labelat(2)=[radec_to_radian_ 1 $position_(labelat2)]"
       }
 
-      lappend options "labelup(1)=$position_($this,labelup1)"
-      lappend options "labelup(2)=$position_($this,labelup2)"
-      lappend options "labelling=$position_($this,labelling)"
+      lappend options "labelup(1)=$position_(labelup1)"
+      lappend options "labelup(2)=$position_(labelup2)"
+      lappend options "labelling=$position_(labelling)"
 
       #  Add spacing options.
       foreach {sname lname default} $scaleattrib_ {
@@ -539,7 +540,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Add the elements options.
       foreach {sname lname default} $elementattrib_ {
-         lappend options "$sname=$element_($this,$sname)"
+         lappend options "$sname=$element_($sname)"
       }
 
       #  Add the colour options.
@@ -574,8 +575,8 @@ itcl::class gaia::GaiaAstGrid {
       #  numbers). AST formatting may also be present and introduce
       #  percent characters. These should be protected.
       foreach {sname lname} $labelattrib_ {
-         if { $label_($this,$sname) != "" } {
-            regsub -all {%} "$label_($this,$sname)" {%%} value
+         if { $label_($sname) != "" } {
+            regsub -all {%} "$label_($sname)" {%%} value
             eval set value [format \"$value\"]
 
             regsub -all {%s} "$value" {%%s} value
@@ -589,24 +590,24 @@ itcl::class gaia::GaiaAstGrid {
 
       #  And set the axes number formatting to be used. Note this is
       #  quite different for SkyFrames and ordinary Frames.
-      if { ! $format_($this,noformat) } {
+      if { ! $format_(noformat) } {
          if { [$itk_option(-rtdimage) astcelestial] } {
-            set format1 "format(1)=$Xformat_($this,sep)"
-            set format2 "format(2)=$Yformat_($this,sep)"
+            set format1 "format(1)=$Xformat_(sep)"
+            set format2 "format(2)=$Yformat_(sep)"
             foreach {lname ident} $formatattrib_ {
-               if { $Xformat_($this,$ident) } {
+               if { $Xformat_($ident) } {
                   lappend format1 $ident
                }
-               if { $Yformat_($this,$ident) } {
+               if { $Yformat_($ident) } {
                   lappend format2 $ident
                }
             }
-            lappend format1 ".$Xformat_($this,.)"
-            lappend format2 ".$Yformat_($this,.)"
+            lappend format1 ".$Xformat_(.)"
+            lappend format2 ".$Yformat_(.)"
          } else {
             #  Simple C-printf precision format only.
-            set format1 "format(1)=%%.$Xformat_($this,.)g"
-            set format2 "format(2)=%%.$Xformat_($this,.)g"
+            set format1 "format(1)=%%.$Xformat_(.)g"
+            set format2 "format(2)=%%.$Xformat_(.)g"
          }
          lappend options $format1
          lappend options $format2
@@ -636,9 +637,9 @@ itcl::class gaia::GaiaAstGrid {
             "$itk_option(-ast_tag) $grid_tag_"
 
          #  If requested just display over the visible canvas +/- a little.
-         if { ! $gridsize_($this,whole) } {
-            set xf [expr 0.5*(1.0-$gridsize_($this,xfrac))]
-            set yf [expr 0.5*(1.0-$gridsize_($this,yfrac))]
+         if { ! $gridsize_(whole) } {
+            set xf [expr 0.5*(1.0-$gridsize_(xfrac))]
+            set yf [expr 0.5*(1.0-$gridsize_(yfrac))]
             set w [winfo width $itk_option(-canvas)]
             set h [winfo height $itk_option(-canvas)]
             set x0 [$itk_option(-canvas) canvasx 0]
@@ -666,7 +667,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Save the current options to a file.
    public method write_file {} {
-      set w [FileSelect .\#auto -title "Save options to a file"]
+      set w [util::FileSelect .\#auto -title "Save options to a file"]
       if {[$w activate]} {
          save_options [$w get]
       }
@@ -675,7 +676,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Restore options from a file.
    public method read_file {} {
-      set w [FileSelect .\#auto -title "Read options from a file"]
+      set w [util::FileSelect .\#auto -title "Read options from a file"]
       if {[$w activate]} {
          read_options [$w get]
       }
@@ -695,17 +696,17 @@ itcl::class gaia::GaiaAstGrid {
             set fid [::open $filename w]
 
             #  Position options.
-            puts $fid "set position_(\$this,edge1) $position_($this,edge1)"
-            puts $fid "set position_(\$this,edge2) $position_($this,edge2)"
-            if { $position_($this,labelat1) != "" } {
-               puts $fid "set position_(\$this,labelat1) $position_($this,labelat1)"
+            puts $fid "set position_(\$this,edge1) $position_(edge1)"
+            puts $fid "set position_(\$this,edge2) $position_(edge2)"
+            if { $position_(labelat1) != "" } {
+               puts $fid "set position_(\$this,labelat1) $position_(labelat1)"
             }
-            if { $position_($this,labelat2) != "" } {
-               puts $fid "set position_(\$this,labelat2) $position_($this,labelat2)"
+            if { $position_(labelat2) != "" } {
+               puts $fid "set position_(\$this,labelat2) $position_(labelat2)"
             }
-            puts $fid "set position_(\$this,labelup1) $position_($this,labelup1)"
-            puts $fid "set position_(\$this,labelup2) $position_($this,labelup2)"
-            puts $fid "set position_(\$this,labelling) $position_($this,labelling)"
+            puts $fid "set position_(\$this,labelup1) $position_(labelup1)"
+            puts $fid "set position_(\$this,labelup2) $position_(labelup2)"
+            puts $fid "set position_(\$this,labelling) $position_(labelling)"
 
             #  Add spacing options.
             foreach {sname lname default} \
@@ -723,9 +724,9 @@ itcl::class gaia::GaiaAstGrid {
             foreach {sname lname default} $lengthattrib_ {
                puts $fid "set size_($sname) $size_($sname)"
             }
-            puts $fid "set gridsize_(\$this,whole) $gridsize_($this,whole)"
-            puts $fid "set gridsize_(\$this,xfrac) $gridsize_($this,xfrac)"
-            puts $fid "set gridsize_(\$this,yfrac) $gridsize_($this,xfrac)"
+            puts $fid "set gridsize_(\$this,whole) $gridsize_(whole)"
+            puts $fid "set gridsize_(\$this,xfrac) $gridsize_(xfrac)"
+            puts $fid "set gridsize_(\$this,yfrac) $gridsize_(xfrac)"
 
             #  Add style options.
             foreach {sname lname default} $styleattrib_ {
@@ -734,7 +735,7 @@ itcl::class gaia::GaiaAstGrid {
 
             #  Add the elements options.
             foreach {sname lname default} $elementattrib_ {
-               puts $fid "set element_(\$this,$sname) $element_($this,$sname)"
+               puts $fid "set element_(\$this,$sname) $element_($sname)"
             }
 
             #  Add the colour options.
@@ -756,21 +757,21 @@ itcl::class gaia::GaiaAstGrid {
 
             #  Add any new labels.
             foreach {sname lname} $labelattrib_ {
-               if { $label_($this,$sname) != "" } {
-                  puts $fid "set label_(\$this,$sname) \"$label_($this,$sname)\""
+               if { $label_($sname) != "" } {
+                  puts $fid "set label_(\$this,$sname) \"$label_($sname)\""
                }
             }
 
             #  Format strings.
-            puts $fid "set Xformat_(\$this,sep) $Xformat_($this,sep)"
-            puts $fid "set Yformat_(\$this,sep) $Yformat_($this,sep)"
+            puts $fid "set Xformat_(\$this,sep) $Xformat_(sep)"
+            puts $fid "set Yformat_(\$this,sep) $Yformat_(sep)"
             foreach {lname ident} $formatattrib_ {
-               puts $fid "set Xformat_(\$this,$ident) $Xformat_($this,$ident)"
-               puts $fid "set Yformat_(\$this,$ident) $Yformat_($this,$ident)"
+               puts $fid "set Xformat_(\$this,$ident) $Xformat_($ident)"
+               puts $fid "set Yformat_(\$this,$ident) $Yformat_($ident)"
             }
-            puts $fid "set Xformat_(\$this,.) $Xformat_($this,.)"
-            puts $fid "set Yformat_(\$this,.) $Yformat_($this,.)"
-            puts $fid "set format_(\$this,noformat) $format_($this,noformat)"
+            puts $fid "set Xformat_(\$this,.) $Xformat_(.)"
+            puts $fid "set Yformat_(\$this,.) $Yformat_(.)"
+            puts $fid "set format_(\$this,noformat) $format_(noformat)"
             ::close $fid
          }
       }
@@ -784,7 +785,7 @@ itcl::class gaia::GaiaAstGrid {
             reveal_ 0 1
 
             #  Source the file, making sure disabled widgets can be set.
-            set format_($this,noformat) 0
+            set format_(noformat) 0
             enable_format_all_
             $itk_component(Xfrac) configure -state normal
             $itk_component(Yfrac) configure -state normal
@@ -794,8 +795,8 @@ itcl::class gaia::GaiaAstGrid {
             #  associated variable so as to reflect these changes.
 
             #  Position options.
-            $itk_component(edge1) configure -value $position_($this,edge1)
-            $itk_component(edge2) configure -value $position_($this,edge2)
+            $itk_component(edge1) configure -value $position_(edge1)
+            $itk_component(edge2) configure -value $position_(edge2)
 
             #  Spacing options.
             foreach {sname lname default} \
@@ -813,8 +814,8 @@ itcl::class gaia::GaiaAstGrid {
             foreach {sname lname default} $lengthattrib_ {
                $itk_component(Length$sname) configure -value $size_($sname)
             }
-            $itk_component(Xfrac) configure -value $gridsize_($this,xfrac)
-            $itk_component(Yfrac) configure -value $gridsize_($this,yfrac)
+            $itk_component(Xfrac) configure -value $gridsize_(xfrac)
+            $itk_component(Yfrac) configure -value $gridsize_(yfrac)
             set_whole_
 
             #  Style options.
@@ -835,11 +836,11 @@ itcl::class gaia::GaiaAstGrid {
             }
 
             #  Format options.
-            $itk_component(SepX) configure -value $Xformat_($this,sep)
-            $itk_component(SepY) configure -value $Yformat_($this,sep)
-            $itk_component(DigitX) configure -value $Xformat_($this,.)
-            $itk_component(DigitY) configure -value $Yformat_($this,.)
-            if { $format_($this,noformat) } {
+            $itk_component(SepX) configure -value $Xformat_(sep)
+            $itk_component(SepY) configure -value $Yformat_(sep)
+            $itk_component(DigitX) configure -value $Xformat_(.)
+            $itk_component(DigitY) configure -value $Yformat_(.)
+            if { $format_(noformat) } {
                $itk_component(Noformat) select
             } else {
                $itk_component(Noformat) deselect
@@ -869,13 +870,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These values are scale factors.
       itk_component add space1 {
-         LabelRule $parent.space1 -text "$scaleannounce_"
+         gaia::LabelRule $parent.space1 -text "$scaleannounce_"
       }
       pack $itk_component(space1) -fill x -ipadx 1m
       foreach {sname lname default} $scaleattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -893,13 +894,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These values are a fraction of the plotting area.
       itk_component add space2 {
-         LabelRule $parent.space2 -text "$spacingannounce_"
+         gaia::LabelRule $parent.space2 -text "$spacingannounce_"
       }
       pack $itk_component(space2) -fill x -ipadx 1m
       foreach {sname lname default} $spacingattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -917,13 +918,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  These are integers (number of ticks usually).
       itk_component add space3 {
-         LabelRule $parent.space3 -text "$minorannounce_"
+         gaia::LabelRule $parent.space3 -text "$minorannounce_"
       }
       pack $itk_component(space3) -fill x -ipadx 1m
       foreach {sname lname default} $minorattrib_ {
          set spacing_($sname) $default
          itk_component add Spacing$sname {
-            LabelEntryScale $parent.spacing$sname \
+            util::LabelEntryScale $parent.spacing$sname \
                -text "$lname:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -955,7 +956,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Determine which edges the axes are plotted on.
       itk_component add position1 {
-         LabelRule $parent.position1 -text "Label placement:"
+         gaia::LabelRule $parent.position1 -text "Label placement:"
       }
       pack $itk_component(position1) -fill x -ipadx 1m
 
@@ -984,21 +985,21 @@ itcl::class gaia::GaiaAstGrid {
                -label $side \
                -value $side
          }
-         set position_($this,edge$axis) [lindex $sides 0]
+         set position_(edge$axis) [lindex $sides 0]
       }
 
       #  Labelling of the numbers. Interior or exterior.
       itk_component add position2 {
-         LabelRule $parent.position2 -text "Suggested axis placement:"
+         gaia::LabelRule $parent.position2 -text "Suggested axis placement:"
       }
       pack $itk_component(position2) -fill x -ipadx 1m
       itk_component add Labelling {
-         StarLabelCheck $parent.labelling \
+         gaia::StarLabelCheck $parent.labelling \
             -text "Interior:" \
             -onvalue "interior" \
             -offvalue "exterior" \
             -labelwidth $lwidth_ \
-            -variable [scope position_($this,labelling)] \
+            -variable [scope position_(labelling)] \
             -command [code $this redraw_]
       }
       pack $itk_component(Labelling) -side top -fill x -ipadx 1m -ipady 1m
@@ -1006,22 +1007,22 @@ itcl::class gaia::GaiaAstGrid {
       #  LabelAt, where to place the numeric labels. These require
       #  either a RA, Dec set of values or some other sensible value.
       itk_component add position3 {
-         LabelRule $parent.position3 -text "Place numeric labels along:"
+         gaia::LabelRule $parent.position3 -text "Place numeric labels along:"
       }
       pack $itk_component(position3) -fill x -ipadx 1m
       itk_component add Xat {
-         LabelEntry $parent.xat \
+         util::LabelEntry $parent.xat \
             -text "X Axis (Y value):" \
             -labelwidth $lwidth_ \
-            -textvariable [scope position_($this,labelat1)] \
+            -textvariable [scope position_(labelat1)] \
             -command [code $this redraw_]
       }
       pack $itk_component(Xat) -side top -fill x -ipadx 1m -ipady 1m
       itk_component add Yat {
-         LabelEntry $parent.yat \
+         util::LabelEntry $parent.yat \
             -text "Y Axis (X value):" \
             -labelwidth $lwidth_ \
-            -textvariable [scope position_($this,labelat2)] \
+            -textvariable [scope position_(labelat2)] \
             -command [code $this redraw_]
       }
       pack $itk_component(Yat) -side top -fill x -ipadx 1m -ipady 1m
@@ -1029,47 +1030,47 @@ itcl::class gaia::GaiaAstGrid {
       #  LabelUp: determine whether the numeric labels are plotted
       #  upright or rotated.
       itk_component add position4 {
-         LabelRule $parent.position4 -text "Non-rotated numeric labels:"
+         gaia::LabelRule $parent.position4 -text "Non-rotated numeric labels:"
       }
       pack $itk_component(position4) -fill x -ipadx 1m
       itk_component add Upright1 {
-         StarLabelCheck $parent.upright1 \
+         gaia::StarLabelCheck $parent.upright1 \
             -text "X Axis:" \
             -labelwidth $lwidth_ \
-            -variable [scope position_($this,labelup1)] \
+            -variable [scope position_(labelup1)] \
             -command [code $this redraw_]
       }
-      set position_($this,labelup1) 0
+      set position_(labelup1) 0
       pack $itk_component(Upright1) -side top -fill x -ipadx 1m -ipady 1m
 
       itk_component add Upright2 {
-         StarLabelCheck $parent.upright2 \
+         gaia::StarLabelCheck $parent.upright2 \
             -text "Y Axis:" \
             -labelwidth $lwidth_ \
-            -variable [scope position_($this,labelup2)] \
+            -variable [scope position_(labelup2)] \
             -command [code $this redraw_]
       }
-      set position_($this,labelup2) 0
+      set position_(labelup2) 0
       pack $itk_component(Upright2) -side top -fill x -ipadx 1m -ipady 1m
    }
 
    #  Reset the selections controls.
    protected method reset_position_ {} {
       reset_edge_
-      set position_($this,labelling) "interior"
-      set position_($this,labelat1) ""
-      set position_($this,labelat2) ""
-      set position_($this,labelup1) 0
-      set position_($this,labelup2) 0
+      set position_(labelling) "interior"
+      set position_(labelat1) ""
+      set position_(labelat2) ""
+      set position_(labelup1) 0
+      set position_(labelup2) 0
    }
 
    #  Reset the positioning of the edge labels. These go back to the
    #  AST defaults.
    protected method reset_edge_ {} {
       $itk_component(edge1) configure -value "default"
-      set position_($this,edge1) "default"
+      set position_(edge1) "default"
       $itk_component(edge2) configure -value "default"
-      set position_($this,edge2) "default"
+      set position_(edge2) "default"
    }
 
    #   Add a series of controls for setting the sizes/scales of the
@@ -1078,13 +1079,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Size of various text elements.
       itk_component add style1 {
-         LabelRule $parent.style1 -text "$fontannounce1_"
+         gaia::LabelRule $parent.style1 -text "$fontannounce1_"
       }
       pack $itk_component(style1) -fill x -ipadx 1m
       foreach {sname lname deffont defsize} $fontattrib_ {
          set size_($sname) $defsize
          itk_component add Size$sname {
-            LabelEntryScale $parent.size$sname \
+            util::LabelEntryScale $parent.size$sname \
                -text "$lname:" \
                -value $defsize \
                -labelwidth 10 \
@@ -1102,13 +1103,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Width of various line elements.
       itk_component add scale2 {
-         LabelRule $parent.scale2 -text "$widthannounce_"
+         gaia::LabelRule $parent.scale2 -text "$widthannounce_"
       }
       pack $itk_component(scale2) -fill x -ipadx 1m
       foreach {sname lname default} $widthattrib_ {
          set width_($sname) $default
          itk_component add Width$sname {
-            LabelEntryScale $parent.width$sname \
+            util::LabelEntryScale $parent.width$sname \
                -text "$lname:" \
                -value $default \
                -labelwidth 10 \
@@ -1126,13 +1127,13 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Lengths of various line elements.
       itk_component add scale3 {
-         LabelRule $parent.scale3 -text "$lengthannounce_"
+         gaia::LabelRule $parent.scale3 -text "$lengthannounce_"
       }
       pack $itk_component(scale3) -fill x -ipadx 1m
       foreach {sname lname default} $lengthattrib_ {
          set size_($sname) $default
          itk_component add Length$sname {
-            LabelEntryScale $parent.width$sname \
+            util::LabelEntryScale $parent.width$sname \
                -text "$lname:" \
                -value $default \
                -labelwidth 10 \
@@ -1151,26 +1152,26 @@ itcl::class gaia::GaiaAstGrid {
       #  Control what area the plot covers. This can be the whole just
       #  or just the part that is displayed.
       itk_component add scale4 {
-         LabelRule $parent.scale4 -text "Grid size:"
+         gaia::LabelRule $parent.scale4 -text "Grid size:"
       }
       pack $itk_component(scale4) -fill x -ipadx 1m
       itk_component add Whole {
-         StarLabelCheck $parent.whole \
+         gaia::StarLabelCheck $parent.whole \
             -text "Whole of image:" \
             -onvalue 1 \
             -offvalue 0 \
             -labelwidth 15 \
-            -variable [scope gridsize_($this,whole)] \
+            -variable [scope gridsize_(whole)] \
             -command [code $this set_whole_]
       }
-      set gridsize_($this,whole) 1
+      set gridsize_(whole) 1
       pack $itk_component(Whole) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Control the fraction of the display that grid covers. Only
       #  relevant if not drawing over the whole image.
-      set gridsize_($this,xfrac) 0.8
+      set gridsize_(xfrac) 0.8
       itk_component add Xfrac {
-         LabelEntryScale $parent.xfrac \
+         util::LabelEntryScale $parent.xfrac \
             -text "X display fraction:" \
             -labelwidth 15 \
             -valuewidth $vwidth_ \
@@ -1180,14 +1181,14 @@ itcl::class gaia::GaiaAstGrid {
             -resolution 0.01 \
             -show_arrows 1 \
             -anchor w \
-            -value $gridsize_($this,xfrac) \
+            -value $gridsize_(xfrac) \
             -command [code $this set_gridsize_config_ xfrac]
       }
       pack $itk_component(Xfrac) -side top -fill x -ipadx 1m -ipady 1m
 
-      set gridsize_($this,yfrac) 0.8
+      set gridsize_(yfrac) 0.8
       itk_component add Yfrac {
-         LabelEntryScale $parent.yfrac \
+         util::LabelEntryScale $parent.yfrac \
             -text "Y display fraction:" \
             -labelwidth 15 \
             -valuewidth $vwidth_ \
@@ -1197,7 +1198,7 @@ itcl::class gaia::GaiaAstGrid {
             -resolution 0.01 \
             -show_arrows 1 \
             -anchor w \
-            -value $gridsize_($this,yfrac) \
+            -value $gridsize_(yfrac) \
             -command [code $this set_gridsize_config_ yfrac]
       }
       pack $itk_component(Yfrac) -side top -fill x -ipadx 1m -ipady 1m
@@ -1218,17 +1219,17 @@ itcl::class gaia::GaiaAstGrid {
          set size_($sname) $default
          $itk_component(Length$sname) configure -value $default
       }
-      set gridsize_($this,whole) 1
-      set gridsize_($this,xfrac) 0.8
+      set gridsize_(whole) 1
+      set gridsize_(xfrac) 0.8
       $itk_component(Xfrac) configure -value 0.8
-      set gridsize_($this,yfrac) 0.8
+      set gridsize_(yfrac) 0.8
       $itk_component(Yfrac) configure -value 0.8
       set_whole_
    }
 
    #  Disable the display fraction widget if not allowed.
    protected method set_whole_ {} {
-      if { $gridsize_($this,whole) } {
+      if { $gridsize_(whole) } {
          $itk_component(Xfrac) configure -state disabled
          $itk_component(Yfrac) configure -state disabled
       } else {
@@ -1240,7 +1241,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Set the value of gridsize element.
    protected method set_gridsize_config_ {name value} {
-      set gridsize_($this,$name) $value
+      set gridsize_($name) $value
       redraw_
    }
 
@@ -1249,7 +1250,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Width of various line elements.
       itk_component add scale1 {
-         LabelRule $parent.scale1 -text "$styleannounce_"
+         gaia::LabelRule $parent.scale1 -text "$styleannounce_"
       }
       pack $itk_component(scale1) -fill x -ipadx 1m
 
@@ -1289,16 +1290,16 @@ itcl::class gaia::GaiaAstGrid {
    #  to display as part of the plot.
    protected method add_element_selections_ {parent} {
       itk_component add element1 {
-         LabelRule $parent.element1 -text "$elementannounce_"
+         gaia::LabelRule $parent.element1 -text "$elementannounce_"
       }
       pack $itk_component(element1) -fill x -ipadx 1m
       foreach {sname lname default} $elementattrib_ {
-         set element_($this,$sname) $default
+         set element_($sname) $default
          itk_component add Element$sname {
-            StarLabelCheck $parent.$sname \
+            gaia::StarLabelCheck $parent.$sname \
                -text "$lname:" \
                -labelwidth $lwidth_ \
-               -variable [scope element_($this,$sname)] \
+               -variable [scope element_($sname)] \
                -command [code $this redraw_]
          }
          pack $itk_component(Element$sname) -side top -fill x -ipadx 1m -ipady 1m
@@ -1308,7 +1309,7 @@ itcl::class gaia::GaiaAstGrid {
    #  Reset element selection controls to their default values.
    protected method reset_element_ {} {
       foreach {sname lname default} $elementattrib_ {
-         set element_($this,$sname) $default
+         set element_($sname) $default
       }
    }
 
@@ -1316,7 +1317,7 @@ itcl::class gaia::GaiaAstGrid {
    #  various elements.
    protected method add_colour_selections_ {parent} {
       itk_component add colour1 {
-         LabelRule $parent.colour1 -text "$colourannounce_"
+         gaia::LabelRule $parent.colour1 -text "$colourannounce_"
       }
       pack $itk_component(colour1) -fill x -ipadx 1m
       foreach {sname lname default} $colourattrib_ {
@@ -1358,7 +1359,7 @@ itcl::class gaia::GaiaAstGrid {
    #  various elements.
    protected method add_font_selections_ {parent} {
       itk_component add font1 {
-         LabelRule $parent.font1 -text "$fontannounce2_"
+         gaia::LabelRule $parent.font1 -text "$fontannounce2_"
       }
       pack $itk_component(font1) -fill x -ipadx 1m
       foreach {sname lname deffont defsize} $fontattrib_ {
@@ -1410,7 +1411,7 @@ itcl::class gaia::GaiaAstGrid {
       #  is appended with the string showin the actual value, when a
       #  system is selected.
       itk_component add system1 {
-         LabelRule $parent.system1 -text "$systemannounce_"
+         gaia::LabelRule $parent.system1 -text "$systemannounce_"
       }
       pack $itk_component(system1) -side top -fill x -ipadx 1m -ipady 1m
 
@@ -1431,7 +1432,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Epoch (date of observation usually).
       itk_component add Epoch {
-         LabelEntryMenu $parent.epoch \
+         gaia::LabelEntryMenu $parent.epoch \
             -text "Epoch:" \
             -labelwidth 8
       }
@@ -1446,7 +1447,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add Equinox {
-         LabelEntryMenu $parent.equinox \
+         gaia::LabelEntryMenu $parent.equinox \
             -text "Equinox:" \
             -labelwidth 8
       }
@@ -1509,7 +1510,7 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Text content.
       itk_component add label1 {
-         LabelRule $parent.label1 -text "$labelannounce_"
+         gaia::LabelRule $parent.label1 -text "$labelannounce_"
       }
       pack $itk_component(label1) -side top -fill x -ipadx 1m -ipady 1m
 
@@ -1517,10 +1518,10 @@ itcl::class gaia::GaiaAstGrid {
 
       foreach {sname lname} $labelattrib_ {
          itk_component add Label$sname {
-            LabelEntry $parent.label$sname \
+            util::LabelEntry $parent.label$sname \
                -text "$lname:" \
                -labelwidth 8 \
-               -textvariable "::gaia::GaiaAstGrid::label_($this,$sname)" \
+               -textvariable [scope label_($sname)] \
                -command [code $this redraw_]
          }
          pack $itk_component(Label$sname) -side top -fill x -ipadx 1m -ipady 1m
@@ -1531,6 +1532,7 @@ itcl::class gaia::GaiaAstGrid {
    protected method reset_label_ {} {
       foreach {sname lname} $labelattrib_ {
          $itk_component(Label$sname) configure -value {}
+         set label_($sname) {}
       }
    }
 
@@ -1540,12 +1542,12 @@ itcl::class gaia::GaiaAstGrid {
       #  Add a toggle for controlling if the default AST format
       #  control will be used, or the format string as shown.
       itk_component add Noformat {
-         StarLabelCheck $parent.noformat \
+         gaia::StarLabelCheck $parent.noformat \
             -text "Use default formatting:" \
             -onvalue 1 \
             -offvalue 0 \
             -labelwidth 25 \
-            -variable [scope format_($this,noformat)] \
+            -variable [scope format_(noformat)] \
             -command [code $this enable_format_all_]
       }
       pack $itk_component(Noformat) -side top -fill x -ipadx 1m -ipady 1m
@@ -1555,20 +1557,20 @@ itcl::class gaia::GaiaAstGrid {
 
          #  Add a label for this axis.
          itk_component add Label$axis {
-            LabelRule $parent.label$axis -text "$axis axis:" -anchor w
+            gaia::LabelRule $parent.label$axis -text "$axis axis:" -anchor w
          }
          pack $itk_component(Label$axis) -side top -fill x -ipadx 1m -ipady 1m
 
          #  Add choices for each possible format character.
          foreach {lname ident} $formatattrib_ {
-            set ${axis}format_($this,$ident) 0
+            set ${axis}format_($ident) 0
             itk_component add Label$ident$axis {
-               StarLabelCheck $parent.$ident$axis \
+               gaia::StarLabelCheck $parent.$ident$axis \
                   -text "$lname:" \
                   -onvalue 1 \
                   -offvalue 0 \
                   -labelwidth $lwidth_ \
-                  -variable [scope ${axis}format_($this,$ident)] \
+                  -variable [scope ${axis}format_($ident)] \
                   -command [code $this redraw_]
             }
             pack $itk_component(Label$ident$axis) -side top -fill x -ipadx 1m -ipady 1m
@@ -1576,7 +1578,7 @@ itcl::class gaia::GaiaAstGrid {
 
          #  Create a menu that allows the visual selection of one of the
          #  known separators. Use a LabelMenu widget to host the choice.
-         set ${axis}format_($this,sep) i
+         set ${axis}format_(sep) i
          itk_component add Sep$axis {
             util::LabelMenu $parent.sep$axis \
                -text "Separator:" \
@@ -1595,7 +1597,7 @@ itcl::class gaia::GaiaAstGrid {
 
          #  Add a scale to select the number of digits.
          itk_component add Digit$axis {
-            LabelEntryScale $parent.digit$axis \
+            util::LabelEntryScale $parent.digit$axis \
                -text "Digits:" \
                -labelwidth 9 \
                -valuewidth $vwidth_ \
@@ -1620,14 +1622,14 @@ itcl::class gaia::GaiaAstGrid {
 
       #  Reset main boolean elements to false.
       foreach {lname ident} $formatattrib_ {
-         set Xformat_($this,$ident) 0
-         set Yformat_($this,$ident) 0
+         set Xformat_($ident) 0
+         set Yformat_($ident) 0
       }
-      set Xformat_($this,.) 0
-      set Yformat_($this,.) 0
-      set Xformat_($this,sep) i
-      set Yformat_($this,sep) i
-      set format_($this,noformat) 1
+      set Xformat_(.) 0
+      set Yformat_(.) 0
+      set Xformat_(sep) i
+      set Yformat_(sep) i
+      set format_(noformat) 1
 
       #  Get the format string from the skyframe. The tricky bits are
       #  dealing with the number of digits and picking between
@@ -1639,23 +1641,23 @@ itcl::class gaia::GaiaAstGrid {
             set keepnext 1
          } elseif { $keepnext } {
             set keepnext 0
-            set Xformat_($this,.) $element
+            set Xformat_(.) $element
          } else {
             set keepnext 0
-            set Xformat_($this,$element) 1
+            set Xformat_($element) 1
          }
       }
 
       #  Now check out the presence of the separators and combine
       #  these into a single value.
-      if { [info exists Xformat_($this,b)] } {
-         set Xformat_($this,sep) b
+      if { [info exists Xformat_(b)] } {
+         set Xformat_(sep) b
       }
-      if { [info exists Xformat_($this,l)] } {
-         set Xformat_($this,sep) l
+      if { [info exists Xformat_(l)] } {
+         set Xformat_(sep) l
       }
-      if { [info exists Xformat_($this,g)] } {
-         set Xformat_($this,sep) g
+      if { [info exists Xformat_(g)] } {
+         set Xformat_(sep) g
       }
 
       set format [$itk_option(-rtdimage) astget "format(2)"]
@@ -1665,29 +1667,29 @@ itcl::class gaia::GaiaAstGrid {
             set keepnext 1
          } elseif { $keepnext } {
             set keepnext 0
-            set Yformat_($this,.) $element
+            set Yformat_(.) $element
          } else {
             set keepnext 0
-            set Yformat_($this,$element) 1
+            set Yformat_($element) 1
          }
       }
 
-      if { [info exists Yformat_($this,b)] } {
-         set Yformat_($this,sep) b
+      if { [info exists Yformat_(b)] } {
+         set Yformat_(sep) b
       }
-      if { [info exists Yformat_($this,l)] } {
-         set Yformat_($this,sep) l
+      if { [info exists Yformat_(l)] } {
+         set Yformat_(sep) l
       }
-      if { [info exists Yformat_($this,g)] } {
-         set Yformat_($this,sep) g
+      if { [info exists Yformat_(g)] } {
+         set Yformat_(sep) g
       }
 
       #  And set the widgets to the correct values if necessary.
-      $itk_component(SepX) configure -value $Xformat_($this,sep)
-      $itk_component(DigitX) configure -value $Xformat_($this,.)
-      $itk_component(SepY) configure -value $Xformat_($this,sep)
-      $itk_component(DigitY) configure -value $Xformat_($this,.)
-      if { $format_($this,noformat) } {
+      $itk_component(SepX) configure -value $Xformat_(sep)
+      $itk_component(DigitX) configure -value $Xformat_(.)
+      $itk_component(SepY) configure -value $Xformat_(sep)
+      $itk_component(DigitY) configure -value $Xformat_(.)
+      if { $format_(noformat) } {
          $itk_component(Noformat) select
       } else {
          $itk_component(Noformat) deselect
@@ -1697,7 +1699,7 @@ itcl::class gaia::GaiaAstGrid {
 
    #  Methods to set the value of a configuration array option.
    protected method set_position_config_ {name axis value} {
-      set position_($this,$name$axis) $value
+      set position_($name$axis) $value
       redraw_
    }
    protected method set_size_config_ {name value} {
@@ -1744,17 +1746,17 @@ itcl::class gaia::GaiaAstGrid {
       redraw_
    }
    protected method set_Xformat_config_ {name value} {
-      set Xformat_($this,$name) $value
+      set Xformat_($name) $value
       redraw_
    }
    protected method set_Yformat_config_ {name value} {
-      set Yformat_($this,$name) $value
+      set Yformat_($name) $value
       redraw_
    }
 
    #  Disabled or enable all entries if required.
    protected method enable_format_all_ {} {
-      if { $format_($this,noformat) } {
+      if { $format_(noformat) } {
          set state disabled
       } else {
          set state normal
@@ -1812,10 +1814,10 @@ itcl::class gaia::GaiaAstGrid {
    protected method toggle_chanmap_defaults_ {} {
       if { $chanmap_defaults_ } {
          set elementattrib_ $chanmapelementattrib_
-         set position_($this,labelling) "exterior"
+         set position_(labelling) "exterior"
       } else {
          set elementattrib_ $normalelementattrib_
-         set position_($this,labelling) "interior"
+         set position_(labelling) "interior"
       }
       reset_element_
    }
@@ -1999,24 +2001,24 @@ itcl::class gaia::GaiaAstGrid {
    #  Whether to configure to channel map defaults, or not.
    protected variable chanmap_defaults_ 0
 
+   #  True for auto redraw of grid when elements are changed.
+   protected variable auto_redraw_
+
+   #  Array of option names and values (too numerous for normal
+   #  methods). 
+   protected variable element_
+   protected variable label_
+   protected variable Xformat_
+   protected variable Yformat_
+   protected variable format_
+   protected variable gridsize_
+   protected variable position_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Array of option names and values (too numerous for normal
-   #  methods). As the protected option variables above, except these
-   #  are also indexed by $this so that they can be set by Tk widgets.
-   common element_
-   common position_
-   common label_
-   common Xformat_
-   common Yformat_
-   common format_
-   common gridsize_
-
-   #  True for auto redraw of grid when elements are changed.
-   common auto_redraw_
-
    #  Number of grids on display.
    common grid_count_ 0
+
 #  End of class definition.
 }

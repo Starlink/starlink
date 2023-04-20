@@ -1063,9 +1063,9 @@ F77_SUBROUTINE(pol1_tclex)( CHARACTER(FILE), INTEGER(STATUS)
 /* Check for error in the tcl script */
       if( code != TCL_OK ){
          *STATUS = SAI__ERROR;
-         if( *interp->result ) {
+         if( *(Tcl_GetStringResult(interp)) ) {
             sprintf( mess, "Error executing Tcl script %.50s: %.150s\n", file,
-                     interp->result );
+                     Tcl_GetStringResult(interp) );
          } else {
             sprintf( mess, "Error executing Tcl script %.50s", file );
          }
@@ -1199,17 +1199,17 @@ F77_SUBROUTINE(pol1_tclgt)( CHARACTER(VARNAM), INTEGER(ELEM),
 /* Check for error in the tcl script */
          if( code != TCL_OK ){
             *STATUS = SAI__ERROR;
-            if( *interp->result ) {
+            if( *(Tcl_GetStringResult(interp)) ) {
                sprintf( mess, "Error executing Tcl command '%.50s': %.150s\n", buf,
-                        interp->result );
+                        Tcl_GetStringResult(interp) );
             } else {
                sprintf( mess, "Error executing Tcl command '%.50s'", buf );
             }
             errRep( " ", mess, STATUS );
 
 /* If succesful, return an F77 copy of the result string. */
-         } else if( *interp->result ) {
-            *NC = GetSVar( interp->result, VARVAL, VARVAL_length, STATUS );
+         } else if( *(Tcl_GetStringResult(interp)) ) {
+            *NC = GetSVar( Tcl_GetStringResult(interp), VARVAL, VARVAL_length, STATUS );
          }
 
 /*  Free memory used to hold the null-terminated variable name */

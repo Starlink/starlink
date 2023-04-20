@@ -185,12 +185,12 @@ itcl::class gaia::GaiaAstReference {
          $m.fittype add radiobutton \
             -value $i \
             -label $fithelp($i) \
-            -variable [scope values_($this,fittype)] \
+            -variable [scope values_(fittype)] \
             -command [code $this configure -fittype $i]
       }
 
       #  Add option to define a different centroid maxshift/search box.
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       $m add cascade -label {Centroid search box} -menu [menu $m.isize]
       $short_help_win_ add_menu_short_help $m {Centroid search box} \
          {Change the search box used when locating centroids (pixels)}
@@ -198,10 +198,10 @@ itcl::class gaia::GaiaAstReference {
          $m.isize add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,isize)] \
+            -variable [scope values_(isize)] \
             -command [code $this configure -isize $i]
       }
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       $m add cascade -label {Centroid max shift} -menu [menu $m.maxshift]
       $short_help_win_ add_menu_short_help $m {Centroid max shift} \
          {Change the maximum shift from initial position (pixels)}
@@ -209,7 +209,7 @@ itcl::class gaia::GaiaAstReference {
          $m.maxshift add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,maxshift)] \
+            -variable [scope values_(maxshift)] \
             -command [code $this configure -maxshift $i]
       }
 
@@ -230,7 +230,7 @@ itcl::class gaia::GaiaAstReference {
       #  adds to the edit menu and the markers menu which controls
       #  the apperance of the graphics markers.
       itk_component add table {
-         GaiaAstTable $w_.table \
+         gaia::GaiaAstTable $w_.table \
 		 -editmenu $Edit \
 		 -markmenu $Markers \
 		 -rtdimage $itk_option(-rtdimage) \
@@ -244,11 +244,11 @@ itcl::class gaia::GaiaAstReference {
       #  Add a switch for controlling if the graphics markers move
       #  one-by-one or all together.
       itk_component add coupled {
-	  StarLabelCheck $w_.coupled \
+	  gaia::StarLabelCheck $w_.coupled \
 		  -text "Move markers individually:" \
 		  -onvalue 0 \
 		  -offvalue 1 \
-		  -variable [scope values_($this,coupled)] \
+		  -variable [scope values_(coupled)] \
 		  -command [code $this set_coupled_]
       }
       set default_(coupled) 0
@@ -268,12 +268,12 @@ itcl::class gaia::GaiaAstReference {
       #  Add entry widgets that specify the coordinate types, system
       #  etc. of the table values.
       itk_component add space1 {
-         LabelRule $w_.space1 -text "Parameters for table coordinates:"
+         gaia::LabelRule $w_.space1 -text "Parameters for table coordinates:"
       }
 
       #  Coordinate type for the table data (both CTYPES).
       itk_component add ctype {
-         LabelMenu $w_.ctype -relief raised \
+         util::LabelMenu $w_.ctype -relief raised \
 	    -valuewidth $vwidth_ \
 	    -labelwidth $lwidth_ \
 	    -text "Coordinate type:"
@@ -306,8 +306,8 @@ itcl::class gaia::GaiaAstReference {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add equinox {
-         LabelEntryMenu $w_.equinox \
-            -textvariable [scope values_($this,equinox)] \
+         gaia::LabelEntryMenu $w_.equinox \
+            -textvariable [scope values_(equinox)] \
 	    -labelwidth $lwidth_ \
 	    -valuewidth $vwidth_ \
 	    -text "Equinox:"
@@ -323,8 +323,8 @@ itcl::class gaia::GaiaAstReference {
 
       #  Epoch, only needed for FK4 really.
       itk_component add epoch {
-         LabelEntryMenu $w_.epoch \
-            -textvariable [scope values_($this,epoch)] \
+         gaia::LabelEntryMenu $w_.epoch \
+            -textvariable [scope values_(epoch)] \
 	    -labelwidth $lwidth_ \
 	    -valuewidth $vwidth_ \
 	    -text "Epoch:"
@@ -342,10 +342,10 @@ itcl::class gaia::GaiaAstReference {
       #  PROJP parameters (note we don't allow ZPN as this requires
       #  another 8 PROJP's!
       itk_component add space2 {
-         LabelRule $w_.space2 -text "Image parameters:"
+         gaia::LabelRule $w_.space2 -text "Image parameters:"
       }
       itk_component add proj {
-	  LabelMenu $w_.proj -relief raised \
+	  util::LabelMenu $w_.proj -relief raised \
 		  -labelwidth $lwidth_ \
 		  -valuewidth 40 \
 		  -text "Projection type:"
@@ -359,8 +359,8 @@ itcl::class gaia::GaiaAstReference {
 		  -command [code $this set_proj_ $value]
       }
       itk_component add projp1 {
-         LabelEntry $w_.projp1 \
-		 -textvariable [scope values_($this,projp1)] \
+         util::LabelEntry $w_.projp1 \
+		 -textvariable [scope values_(projp1)] \
 		 -labelwidth $lwidth_ \
 		 -valuewidth $vwidth_ \
 		 -text "projp1:"
@@ -369,8 +369,8 @@ itcl::class gaia::GaiaAstReference {
 	      {First projection parameter (PROJP1)}
 
       itk_component add projp2 {
-	  LabelEntry $w_.projp2 \
-		  -textvariable [scope values_($this,projp2)] \
+	  util::LabelEntry $w_.projp2 \
+		  -textvariable [scope values_(projp2)] \
 		  -labelwidth $lwidth_ \
 		  -valuewidth $vwidth_ \
 		  -text "projp2:"
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaAstReference {
       #  Check if X axes is to be associated with longitude or
       #  latitude axis.
       itk_component add xislong {
-         LabelMenu $w_.xislong -relief raised \
+         util::LabelMenu $w_.xislong -relief raised \
             -labelwidth $lwidth_ \
             -valuewidth $vwidth_ \
             -text "X coordinate type:"
@@ -434,7 +434,7 @@ itcl::class gaia::GaiaAstReference {
 
       #  Add a scrollbox to display results of fit.
       itk_component add results {
-         Scrollbox $w_.results -height 3 -singleselect 0
+         gaia::Scrollbox $w_.results -height 3 -singleselect 0
       }
       add_short_help $itk_component(results) {Results of fit}
 
@@ -542,22 +542,22 @@ itcl::class gaia::GaiaAstReference {
       set_epoch_ {}
       set_system_ FK5 1 0
 
-      set values_($this,projp1) {}
+      set values_(projp1) {}
       $itk_component(projp1) configure -value {}
-      set values_($this,projp2) {}
+      set values_(projp2) {}
       $itk_component(projp2) configure -value {}
 
-      set values_($this,crpix1) [expr [$itk_option(-rtdimage) width]/2]
-      $add_.crpix1 configure -value $values_($this,crpix1)
-      set values_($this,crpix2) [expr [$itk_option(-rtdimage) height]/2]
-      $add_.crpix2 configure -value $values_($this,crpix2)
+      set values_(crpix1) [expr [$itk_option(-rtdimage) width]/2]
+      $add_.crpix1 configure -value $values_(crpix1)
+      set values_(crpix2) [expr [$itk_option(-rtdimage) height]/2]
+      $add_.crpix2 configure -value $values_(crpix2)
 
-      set values_($this,longpole) {}
+      set values_(longpole) {}
       $add_.longpole configure -value {}
-      set values_($this,latpole) {}
+      set values_(latpole) {}
       $add_.latpole configure -value {}
 
-      set values_($this,coupled) 0
+      set values_(coupled) 0
       set_coupled_
 
       #  Restore WCS system to the original (if available).
@@ -585,7 +585,7 @@ itcl::class gaia::GaiaAstReference {
       if { $itk_option(-rtdimage) != {} && $nrows > 0 } {
 
          #  See if preferred longitude direction is along the X axis.
-         if { $values_($this,xislong) } {
+         if { $values_(xislong) } {
             set reversed 0
          } else {
             set reversed 1
@@ -608,8 +608,8 @@ itcl::class gaia::GaiaAstReference {
          #  the initial conditions. This refines the reference
          #  position to be correct and adds in the rotation angle.
          lassign [$itk_option(-rtdimage) astpix2wcs \
-                     $values_($this,crpix1) \
-                     $values_($this,crpix2)] crval1 crval2
+                     $values_(crpix1) \
+                     $values_(crpix2)] crval1 crval2
          create_wcs_ $reversed $crval1 $crval2 $xscale_ $yscale_ [expr -1.0*$angle_]
 	 refine_ 1
       }
@@ -624,14 +624,14 @@ itcl::class gaia::GaiaAstReference {
 
       #  Set the basic elements. If needed swap the sense.
       if { $reversed } {
-         $image aststore $chan CTYPE1 "'$values_($this,ctype2)$values_($this,proj)'"
-         $image aststore $chan CTYPE2 "'$values_($this,ctype1)$values_($this,proj)'"
+         $image aststore $chan CTYPE1 "'$values_(ctype2)$values_(proj)'"
+         $image aststore $chan CTYPE2 "'$values_(ctype1)$values_(proj)'"
          $image aststore $chan CRVAL1 $crval2
          $image aststore $chan CRVAL2 $crval1
          $image aststore $chan CROTA1 $angle
       } else {
-         $image aststore $chan CTYPE1 "'$values_($this,ctype1)$values_($this,proj)'"
-         $image aststore $chan CTYPE2 "'$values_($this,ctype2)$values_($this,proj)'"
+         $image aststore $chan CTYPE1 "'$values_(ctype1)$values_(proj)'"
+         $image aststore $chan CTYPE2 "'$values_(ctype2)$values_(proj)'"
          $image aststore $chan CRVAL1 $crval1
          $image aststore $chan CRVAL2 $crval2
          $image aststore $chan CROTA2 $angle
@@ -640,29 +640,29 @@ itcl::class gaia::GaiaAstReference {
       $image aststore $chan CDELT2 $yscale_
 
       #  Add the reference point (usually approximate).
-      $image aststore $chan CRPIX1 $values_($this,crpix1)
-      $image aststore $chan CRPIX2 $values_($this,crpix2)
+      $image aststore $chan CRPIX1 $values_(crpix1)
+      $image aststore $chan CRPIX2 $values_(crpix2)
 
       #  Only record a RADECSYS if needed.
-      if { $values_($this,system) != {} } {
-         if { $values_($this,ctype) == "Equatorial" } {
-            $image aststore $chan RADECSYS "'$values_($this,system)'"
+      if { $values_(system) != {} } {
+         if { $values_(ctype) == "Equatorial" } {
+            $image aststore $chan RADECSYS "'$values_(system)'"
          }
       }
 
       #  Most systems need an equinox (if B/J present use string).
-      if { $values_($this,equinox) != {} } {
-         if { [regexp {J(.*)|B(.*)} $values_($this,equinox) all value] } {
-            $image aststore $chan EQUINOX "'$values_($this,equinox)'"
+      if { $values_(equinox) != {} } {
+         if { [regexp {J(.*)|B(.*)} $values_(equinox) all value] } {
+            $image aststore $chan EQUINOX "'$values_(equinox)'"
          } else {
-            $image aststore $chan EQUINOX $values_($this,equinox)
+            $image aststore $chan EQUINOX $values_(equinox)
          }
       }
 
       #  And a MJD to go with it (note conversion of B/J/G date to MJD).
-      if { $values_($this,epoch) != {} &&
+      if { $values_(epoch) != {} &&
            [$itk_component(epoch) cget -state] != "disabled" } {
-         $image aststore $chan MJD-OBS [find_epoch_ $values_($this,epoch)]
+         $image aststore $chan MJD-OBS [find_epoch_ $values_(epoch)]
       } else {
          #  No epoch specified, or none applicable to the astrometry.
          #  Preserve the MJD-OBS or DATE-OBS if present, otherwise we get the
@@ -682,23 +682,23 @@ itcl::class gaia::GaiaAstReference {
 
       #  If needed for this projection, and available add the PROJP
       #  values.
-      if { $projpmap_($values_($this,proj),1) } {
-         if { $values_($this,projp1) != {} } {
-            $image aststore $chan PROJP1 $values_($this,projp1)
+      if { $projpmap_($values_(proj),1) } {
+         if { $values_(projp1) != {} } {
+            $image aststore $chan PROJP1 $values_(projp1)
          }
       }
-      if { $projpmap_($values_($this,proj),2) } {
-         if { $values_($this,projp2) != {} } {
-            $image aststore $chan PROJP2 $values_($this,projp2)
+      if { $projpmap_($values_(proj),2) } {
+         if { $values_(projp2) != {} } {
+            $image aststore $chan PROJP2 $values_(projp2)
          }
       }
 
       #  If set add LONGPOLE and LATPOLE.
-      if { $values_($this,longpole) != {} } {
-         $image aststore $chan LONGPOLE $values_($this,longpole)
+      if { $values_(longpole) != {} } {
+         $image aststore $chan LONGPOLE $values_(longpole)
       }
-      if { $values_($this,latpole) != {} } {
-         $image aststore $chan LATPOLE $values_($this,latpole)
+      if { $values_(latpole) != {} } {
+         $image aststore $chan LATPOLE $values_(latpole)
       }
 
       #  Read the channel to create an AST object and then replace
@@ -771,7 +771,7 @@ itcl::class gaia::GaiaAstReference {
    #  Record the value of the selected RADECSYS and configure the
    #  equinox entry window appropriately.
    protected method set_system_ {value needequinox needepoch} {
-       set values_($this,system) $value
+       set values_(system) $value
        $itk_component(system) configure -value $value
        if { ! $needequinox } {
 	   $itk_component(equinox) configure -value {}
@@ -799,9 +799,9 @@ itcl::class gaia::GaiaAstReference {
       #  Get the ctypes associated with this system.
       set ctype1 [lindex $ctypemap_ [expr [lsearch $ctypemap_ $value]+1]]
       set ctype2 [lindex $ctypemap_ [expr [lsearch $ctypemap_ $value]+2]]
-      set values_($this,ctype) $value
-      set values_($this,ctype1) $ctype1
-      set values_($this,ctype2) $ctype2
+      set values_(ctype) $value
+      set values_(ctype1) $ctype1
+      set values_(ctype2) $ctype2
       if { $value == "Equatorial" } {
          $itk_component(system) configure -state normal
          set text [[$itk_component(system) component mb] cget -text]
@@ -817,21 +817,21 @@ itcl::class gaia::GaiaAstReference {
             set_system_ {} 0 0
             [$itk_component(system) component mb] configure -text Galactic
          }
-         set values_($this,system) {}
+         set values_(system) {}
       }
    }
 
    #  Set the value of the equinox entry window.
    protected method set_equinox_ {value} {
-      set values_($this,equinox) $value
-      $itk_component(equinox) configure -value $values_($this,equinox)
-      $itk_component(table) configure -equinox $values_($this,equinox)
+      set values_(equinox) $value
+      $itk_component(equinox) configure -value $values_(equinox)
+      $itk_component(table) configure -equinox $values_(equinox)
    }
 
    #  Set the value of the epoch entry window.
    protected method set_epoch_ {value} {
-      set values_($this,epoch) $value
-      $itk_component(epoch) configure -value $values_($this,epoch)
+      set values_(epoch) $value
+      $itk_component(epoch) configure -value $values_(epoch)
    }
 
    #  Translate an epoch like B1950 to an MJD.
@@ -859,7 +859,7 @@ itcl::class gaia::GaiaAstReference {
    protected method fix_equinox_ {equinox} {
       set_equinox_ $equinox
       set_epoch_ $equinox
-      if { $values_($this,equinox) < 1984 } {
+      if { $values_(equinox) < 1984 } {
          set_system_ FK4 1 1
       }  else {
          set_system_ FK5 1 0
@@ -869,7 +869,7 @@ itcl::class gaia::GaiaAstReference {
    #  Set the projection type. Also enables the PROJP section if
    #  necessary.
    protected method set_proj_ {proj} {
-      set values_($this,proj) $proj
+      set values_(proj) $proj
       if { $projpmap_($proj,1) } {
          $itk_component(projp1) configure -state normal
       } else {
@@ -960,7 +960,7 @@ itcl::class gaia::GaiaAstReference {
          }
       }
       return [$itk_option(-rtdimage) astbootstats \
-                 $radec $xy $values_($this,crpix1) $values_($this,crpix2)]
+                 $radec $xy $values_(crpix1) $values_(crpix2)]
    }
 
    #  Clear the graphics markers from canvas.
@@ -993,7 +993,7 @@ itcl::class gaia::GaiaAstReference {
 
    #  Create a toplevel windows displaying additional options.
    protected method make_additional_ {} {
-      set add_ [TopLevelWidget $w_.add \
+      set add_ [util::TopLevelWidget $w_.add \
                    -transient $itk_option(-transient) \
                    -withdraw 1 \
                    -center 0]
@@ -1017,45 +1017,48 @@ itcl::class gaia::GaiaAstReference {
       bind $add_ <Control-c> [code $this hide_additional_]
 
       $add_ itk_component add space1 {
-         LabelRule $add_.space1 -text "Additional parameters:"
+         gaia::LabelRule $add_.space1 -text "Additional parameters:"
       }
-      #  Reference pixels
+      #  Reference pixels. Scope of lwidth_ and vwidth_ is not initially found
+      #  in itk classes, so eval locally.
+      set lw [set [scope lwidth_]]
+      set vw [set [scope vwidth_]]
       $add_ itk_component add crpix1 {
-         LabelEntry $add_.crpix1 \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+         util::LabelEntry $add_.crpix1 \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -text "X Reference pixel:" \
-            -textvariable [scope values_($this,crpix1)]
+            -textvariable [scope values_(crpix1)]
       }
       $add_ add_short_help $add_.crpix1 \
          {Estimated X coordinate of image reference pixel (1,1 is centre of first pixel)}
 
       $add_ itk_component add crpix2 {
-         LabelEntry $add_.crpix2 \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
+         util::LabelEntry $add_.crpix2 \
+            -labelwidth $lw \
+            -valuewidth $vw \
             -text "Y Reference pixel:" \
-            -textvariable [scope values_($this,crpix2)]
+            -textvariable [scope values_(crpix2)]
       }
       $add_ add_short_help $add_.crpix2 \
          {Estimated Y coordinate of image reference pixel (1,1 is centre of first pixel)}
 
       # Longpole AND latpole.
       $add_ itk_component add longpole {
-         LabelEntry $add_.longpole \
+         util::LabelEntry $add_.longpole \
             -text "Longpole:" \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,longpole)]
+            -labelwidth $lw \
+            -valuewidth $vw \
+            -textvariable [scope values_(longpole)]
       }
       $add_ add_short_help $add_.longpole \
          {Longitude of table system northpole}
       $add_ itk_component add latpole {
-         LabelEntry $add_.latpole \
+         util::LabelEntry $add_.latpole \
             -text "Latpole:" \
-            -labelwidth $lwidth_ \
-            -valuewidth $vwidth_ \
-            -textvariable [scope values_($this,latpole)]
+            -labelwidth $lw \
+            -valuewidth $vw \
+            -textvariable [scope values_(latpole)]
       }
       $add_ add_short_help $add_.latpole \
          {Latitude of table system northpole}
@@ -1092,19 +1095,19 @@ itcl::class gaia::GaiaAstReference {
 
    #  Set xislong variable to a value.
    protected method set_xislong_ {value} {
-      set values_($this,xislong) $value
+      set values_(xislong) $value
    }
 
    #  Set marker movement policy.
    protected method set_coupled_ {} {
-       $itk_component(table) configure -coupled $values_($this,coupled)
+       $itk_component(table) configure -coupled $values_(coupled)
    }
 
    #  Start transfer dialog.
    protected method start_transfer_ {} {
       blt::busy hold $w_
       if { ! [winfo exists $trantop_] } {
-         set trantop_ [GaiaAstTransfer $w_.trantop \
+         set trantop_ [gaia::GaiaAstTransfer $w_.trantop \
                           -rtdimage $itk_option(-rtdimage) \
                           -canvas $itk_option(-canvas) \
                           -image $itk_option(-image) \
@@ -1148,13 +1151,13 @@ itcl::class gaia::GaiaAstReference {
 
    #  The type of fit to be used when refining the coordinate system.
    itk_option define -fittype fittype Fittype 5 {
-      set values_($this,fittype) $itk_option(-fittype)
+      set values_(fittype) $itk_option(-fittype)
    }
 
    #  The centroid search box and maximum shift.
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
@@ -1167,7 +1170,7 @@ itcl::class gaia::GaiaAstReference {
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
@@ -1249,15 +1252,14 @@ itcl::class gaia::GaiaAstReference {
    #  Name of RA/Dec transfer window.
    protected variable trantop_ {}
 
+   #  Variable to share amongst all widgets.
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
    #  Which PROJP parameters are required for which projections.
    common projpmap_
-
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
 
 #  End of class definition.
 }

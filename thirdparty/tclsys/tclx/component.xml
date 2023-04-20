@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="tclx" support="U">
-  <version>8.4.0</version>
+  <version>8.4.1</version>
   <path>thirdparty/tclsys/tclx</path>
   <description>TclX</description>
   <!-- <abstract><p></p></abstract> -->

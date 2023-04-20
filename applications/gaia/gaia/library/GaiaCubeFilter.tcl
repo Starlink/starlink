@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Filter method, square, rectangle, gaussian or gaussian-elliptical.
       itk_component add filter {
-         LabelMenu $w_.filter \
+         util::LabelMenu $w_.filter \
             -labelwidth $itk_option(-labelwidth) \
             -text "Filter method:" \
             -variable [scope filter_type_]
@@ -110,7 +110,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Size of smoothing rectangle or gaussian evaluation.
       itk_component add boxsize1 {
-         LabelEntryScale $w_.boxsize1 \
+         util::LabelEntryScale $w_.boxsize1 \
             -text "Box size 1:" \
             -value $boxsize1_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -129,7 +129,7 @@ itcl::class gaia::GaiaCubeFilter {
          {Size of box for block filtering or gaussian evaluation}
 
       itk_component add boxsize2 {
-         LabelEntryScale $w_.boxsize2 \
+         util::LabelEntryScale $w_.boxsize2 \
             -text "Box size 2:" \
             -value $boxsize2_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -149,7 +149,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Estimator for block filtering. Either mean or median.
       itk_component add combination {
-         LabelMenu $w_.combination \
+         util::LabelMenu $w_.combination \
             -labelwidth $itk_option(-labelwidth) \
             -text "Estimator:" \
             -variable [scope combination_type_]
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Orientation of gaussian-elliptical.
       itk_component add orient {
-         LabelEntryScale $w_.orient \
+         util::LabelEntryScale $w_.orient \
             -text "Orientation:" \
             -value $orient_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -187,7 +187,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  FWHM of gaussian types.
       itk_component add fwhm1 {
-         LabelEntryScale $w_.fwhm1 \
+         util::LabelEntryScale $w_.fwhm1 \
             -text "FWHM (major):" \
             -value $fwhm1_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -206,7 +206,7 @@ itcl::class gaia::GaiaCubeFilter {
          {FWHM of gaussian, major axis}
 
       itk_component add fwhm2 {
-         LabelEntryScale $w_.fwhm2 \
+         util::LabelEntryScale $w_.fwhm2 \
             -text "FWHM (minor):" \
             -value $fwhm2_ \
             -labelwidth $itk_option(-labelwidth) \
@@ -226,7 +226,7 @@ itcl::class gaia::GaiaCubeFilter {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCubeFilter" \
             -labelwidth $itk_option(-labelwidth) \
@@ -237,7 +237,7 @@ itcl::class gaia::GaiaCubeFilter {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \
@@ -361,25 +361,25 @@ itcl::class gaia::GaiaCubeFilter {
       blt::busy hold $w_
 
       #  Name of input cube.
-      set input_name [$itk_option(-gaiacube) get_ndfname]
+      set input_name [{*}$itk_option(-gaiacube) get_ndfname]
 
       #  Start up the task we require.
       if { $filter_type_ == "square" || $filter_type_ == "rectangle" } {
          if { $blocktask_ == {} } {
-            set blocktask_ [GaiaApp \#auto -application \
+            set blocktask_ [gaia::GaiaApp \#auto -application \
                                $::env(KAPPA_DIR)/block \
                                -notify [code $this app_completed_]]
          }
       } else {
          if { $gausstask_ == {} } {
-            set gausstask_ [GaiaApp \#auto -application \
+            set gausstask_ [gaia::GaiaApp \#auto -application \
                                $::env(KAPPA_DIR)/gausmooth \
                                -notify [code $this app_completed_]]
          }
       }
 
       #  Record the system and units so we can restore them if needed.
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
          set keep_units_ "$units"
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaCubeFilter {
                            "[$itk_component(prefix) get]" $count_ ".sdf"]
       $itk_component(outputfile) configure -value ""
 
-      set axis [$itk_option(-gaiacube) get_axis]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
 
       switch -exact $filter_type_ {
          "square" {
@@ -465,20 +465,20 @@ itcl::class gaia::GaiaCubeFilter {
       }
       if { $file != {} } {
          catch {
-            $itk_option(-gaiacube) configure -cube "$file"
+            {*}$itk_option(-gaiacube) configure -cube "$file"
          } msg
 
          $itk_component(outputfile) configure -value "$file"
 
          #  If the file has Temp in the name, record for automatic removal.
          if { [string match "*Temp*" $file] } {
-            $itk_option(-gaiacube) register_temp_file $file
+            {*}$itk_option(-gaiacube) register_temp_file $file
          }
 
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
          if { $keep_system_ != {} } {
-            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+            {*}$itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
       }
       blt::busy release $w_
@@ -490,17 +490,13 @@ itcl::class gaia::GaiaCubeFilter {
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {} {
       if { $itk_option(-gaiacube) != {} } {
-         set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
+         set rtdimage_ [{*}$itk_option(-gaiacube) cget -rtdimage]
       }
    }
 
    #  The GaiaSpecCoords instance used to define the current coordinate
    #  system.
    itk_option define -spec_coords spec_coords Spec_Coords {}
-
-   #  The GaiaSpecStdOfRest instance used to define the current standard
-   #  of rest.
-   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20

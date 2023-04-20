@@ -167,7 +167,7 @@ itcl::class gaiavo::GaiaVOCats {
       #  notebook. We do not use a tabnotebook as that is limited to one
       #  row of tabs.
       itk_component add bookmenu {
-         LabelMenu $w_.bookmenu \
+         util::LabelMenu $w_.bookmenu \
             -text "SIAP server results:" \
             -labelwidth 18 \
             -valuewidth 30 \
@@ -205,7 +205,7 @@ itcl::class gaiavo::GaiaVOCats {
 
       #  Add the ProgressBar, looks busy during query.
       itk_component add progressbar {
-         ProgressBar $w_.progress
+         util::ProgressBar $w_.progress
       }
       pack $itk_component(progressbar) -side top -fill x
       add_short_help itk_component(progressbar) \
@@ -467,7 +467,7 @@ itcl::class gaiavo::GaiaVOCats {
       }
 
       itk_component add results$current_ {
-         GaiaQueryResult $site.results \
+         gaia::GaiaQueryResult $site.results \
             -astrocat [code $w_.cat$current_] \
             -title "Query Results" \
             -hscroll 1 \
@@ -540,7 +540,7 @@ itcl::class gaiavo::GaiaVOCats {
 
    #  Pop up a dialog to set or change the HTTP proxy server.
    public proc proxies {} {
-      utilReUseWidget ProxyDialog .proxy \
+      utilReUseWidget cat::ProxyDialog .proxy \
          -configfile $::env(HOME)/.skycat/proxies
    }
 

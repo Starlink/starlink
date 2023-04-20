@@ -106,7 +106,7 @@ itcl::class gaia::GaiaImageSpectrum {
       eval itk_initialize $args
 
       #  Create image name control object.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor - clean up when deleted.

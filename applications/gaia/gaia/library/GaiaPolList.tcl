@@ -168,13 +168,13 @@ itcl::class gaia::GaiaPolList {
 
 #  Do nothing if the supplied string is not the name of an existing
 #  GaiaPolObject (or derived class).
-      if { ![catch {$object isa ::gaia::GaiaPolObject} rc] } {
+      if { ![catch {{*}$object isa ::gaia::GaiaPolObject} rc] } {
          if { $rc } {
 
 #  If the stack is currently empty, just initialise the stack to hold
 #  a cloned reference for the supplied GaiaPolObject.
             if { $current_ < 0 } {
-               set stack_ [list [$object clone]]
+               set stack_ [list [{*}$object clone]]
                set current_ 0
 
 #  Otherwise...
@@ -201,7 +201,7 @@ itcl::class gaia::GaiaPolList {
                }
 
 #  Append a clone of the supplied object to the end of the stack.
-               lappend stack_ [$object clone]
+               lappend stack_ [{*}$object clone]
             }
          }
       }

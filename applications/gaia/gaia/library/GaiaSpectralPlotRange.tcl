@@ -91,7 +91,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
       #  First slider that controls the lower bound.
       itk_component add index1 {
-         LabelEntryScale $w_.index1 \
+         util::LabelEntryScale $w_.index1 \
             -text "$itk_option(-text1)" \
             -value $itk_option(-value1) \
             -labelwidth $itk_option(-labelwidth) \
@@ -110,7 +110,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
       #  Coordinates of index.
       itk_component add indexcoord1 {
-         LabelValue $w_.indexcoord1 \
+         util::LabelValue $w_.indexcoord1 \
             -text "$itk_option(-coordtext1)" \
             -labelwidth $itk_option(-labelwidth)
       }
@@ -118,7 +118,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
       #  Second slider that controls the upper bound.
       itk_component add index2 {
-         LabelEntryScale $w_.index2 \
+         util::LabelEntryScale $w_.index2 \
             -text "$itk_option(-text2)" \
             -value $itk_option(-value2) \
             -labelwidth $itk_option(-labelwidth) \
@@ -137,7 +137,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
       #  Coordinates of index.
       itk_component add indexcoord2 {
-         LabelValue $w_.indexcoord2 \
+         util::LabelValue $w_.indexcoord2 \
             -text "$itk_option(-coordtext2)" \
             -labelwidth $itk_option(-labelwidth)
       }
@@ -193,17 +193,17 @@ itcl::class gaia::GaiaSpectralPlotRange {
 
    #  Update the coordinates readout to show values for two planes.
    protected method update_coords_ {plane1 plane2} {
-      set coord1 [$itk_option(-gaiacube) get_coord $plane1 1 0]
-      set coord2 [$itk_option(-gaiacube) get_coord $plane2 1 0]
+      set coord1 [{*}$itk_option(-gaiacube) get_coord $plane1 1 0]
+      set coord2 [{*}$itk_option(-gaiacube) get_coord $plane2 1 0]
       $itk_component(indexcoord1) configure -value $coord1
       $itk_component(indexcoord2) configure -value $coord2
 
       #  Reposition a related reference range in a spectral plot. Note these
       #  coordinates must be unformatted.
       if { $itk_option(-show_ref_range) } {
-         set coord1 [$itk_option(-gaiacube) get_coord $plane1 0 0]
-         set coord2 [$itk_option(-gaiacube) get_coord $plane2 0 0]
-         $itk_option(-gaiacube) set_spec_ref_range_coord $itk_option(-ref_id) \
+         set coord1 [{*}$itk_option(-gaiacube) get_coord $plane1 0 0]
+         set coord2 [{*}$itk_option(-gaiacube) get_coord $plane2 0 0]
+         {*}$itk_option(-gaiacube) set_spec_ref_range_coord $itk_option(-ref_id) \
             $coord1 $coord2
       }
    }

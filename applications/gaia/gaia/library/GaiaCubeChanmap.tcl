@@ -109,11 +109,11 @@ itcl::class gaia::GaiaCubeChanmap {
    protected method add_controls_ {} {
 
       #  Use default controls (range and combination method).
-      GaiaCubeApps::add_controls_
+      gaia::GaiaCubeApps::add_controls_
 
       #  The number of channels to create.
       itk_component add nchan {
-         LabelEntryScale $w_.nchan \
+         util::LabelEntryScale $w_.nchan \
             -text "Number of channels:" \
             -value 4 \
             -labelwidth $itk_option(-labelwidth) \
@@ -133,7 +133,7 @@ itcl::class gaia::GaiaCubeChanmap {
 
       #  The number of channels to create.
       itk_component add shape {
-         LabelEntryScale $w_.shape \
+         util::LabelEntryScale $w_.shape \
             -text "X-axis channels:" \
             -value 2 \
             -labelwidth $itk_option(-labelwidth) \
@@ -153,7 +153,7 @@ itcl::class gaia::GaiaCubeChanmap {
 
       #  Value of the selected channel panel.
       itk_component add selected {
-         LabelValue $w_.selected \
+         util::LabelValue $w_.selected \
             -text "Selected coord:" \
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
@@ -191,7 +191,7 @@ itcl::class gaia::GaiaCubeChanmap {
       #  Start up the CHANMAP application, if not done.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                             $env(KAPPA_DIR)/chanmap \
                             -notify [code $this app_completed_]]
       }
@@ -207,7 +207,7 @@ itcl::class gaia::GaiaCubeChanmap {
                           shape=$itk_option(-shape) accept"
 
       #  Tell cube to use these limits for spectral extraction.
-      $itk_option(-gaiacube) set_extraction_range \
+      {*}$itk_option(-gaiacube) set_extraction_range \
          $itk_option(-lower_limit) $itk_option(-upper_limit)
    }
 
@@ -227,16 +227,16 @@ itcl::class gaia::GaiaCubeChanmap {
 
          #  If the coordinate system of doesn't match this (coordinate system
          #  != default), then change to this.
-         lassign [$itk_option(-spec_coords) get_system] system units
+         lassign [{*}$itk_option(-spec_coords) get_system] system units
          if { $system != "default" && $system != {} } {
             set_coordinate_system_ $file $system $units
          }
 
-         $itk_option(-gaiacube) display $file 1
+         {*}$itk_option(-gaiacube) display $file 1
 
          #  Set bindings to report the spectral coordinate of the current pane,
          #  when clicked on.
-         set cubespectrum [$itk_option(-gaiacube) component spectrum]
+         set cubespectrum [{*}$itk_option(-gaiacube) component spectrum]
          $cubespectrum close
          add_bindings_
       }

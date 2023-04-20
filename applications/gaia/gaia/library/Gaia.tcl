@@ -253,6 +253,9 @@ itcl::class gaia::Gaia {
       } else {
          set about_skycat "$about_ukirt_ql $about_gaia $ukirt_ql_bugs"
       }
+
+      #  Make sure our HelpWin class is used by TopLevelWidget.
+      set util::TopLevelWidget::help_window_class gaia::HelpWin
    }
 
    #  Destructor:
@@ -377,7 +380,7 @@ itcl::class gaia::Gaia {
       set curcats $itk_option(-catalog)
       set itk_option(-cat) 0
       set itk_option(-catalog) {}
-      SkyCat::init
+      skycat::SkyCat::init
       set itk_option(-cat) $curval
       set itk_option(-catalog) $curcats
 
@@ -451,7 +454,7 @@ itcl::class gaia::Gaia {
             $samp_client_ reg_change_command [code $this samp_reg_changed_]
             samp_reg_changed_
             set tracker [$samp_client_ cget -client_tracker]
-            $tracker client_change_command [code $this samp_client_changed_]
+            {*}$tracker client_change_command [code $this samp_client_changed_]
             samp_client_changed_
          }
       }
@@ -488,7 +491,7 @@ itcl::class gaia::Gaia {
    #  in user's .Xdefaults file.
    protected method setXdefaults {} {
       util::setXdefaults
-      SkyCat::setXdefaults
+      skycat::SkyCat::setXdefaults
       gaia::setXdefaults
    }
 
@@ -544,13 +547,13 @@ itcl::class gaia::Gaia {
             [message $w.msg -text $about_skycat \
                 -justify center \
                 -borderwidth 2 -relief groove] \
-            [ProgressBar $w.progress \
+            [util::ProgressBar $w.progress \
                 -from 0 -to 10 -value 0 \
                 -borderwidth 2 -relief groove] \
             -side top -fill x -padx 1m -pady 2m -expand 1
       } else {
          pack \
-            [ProgressBar $w.progress \
+            [util::ProgressBar $w.progress \
                 -from 0 -to 10 -value 0 \
                 -borderwidth 2 -relief groove] \
             -side top -fill x -padx 1m -pady 2m -expand 1
@@ -588,7 +591,7 @@ itcl::class gaia::Gaia {
    public method make_rtdimage {} {
       set image_ $w_.image
       itk_component add image {
-         GaiaImageCtrl $image_ \
+         gaia::GaiaImageCtrl $image_ \
             -file_change_cmd [code $this file_loaded_] \
             -file_types $itk_option(-file_types) \
             -usexshm $itk_option(-usexshm) \
@@ -1046,7 +1049,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom $w_.\#auto 1 \
+         gaia::GaiaApPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1060,7 +1063,7 @@ itcl::class gaia::Gaia {
    #  Make a counts aperture photometry toolbox.
    public method make_countphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom $w_.\#auto 0 \
+         gaia::GaiaApPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1074,7 +1077,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude optimal photometry toolbox.
    public method make_magoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom $w_.\#auto 1 \
+         gaia::GaiaOptPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1088,7 +1091,7 @@ itcl::class gaia::Gaia {
    #  Make a counts optimal photometry toolbox.
    public method make_countoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom $w_.\#auto 0 \
+         gaia::GaiaOptPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1102,7 +1105,7 @@ itcl::class gaia::Gaia {
    #  Make an ARD toolbox.
    public method make_ard_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaArd $w_.\#auto \
+         gaia::GaiaArd $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -image $image_ \
             -canvas [$image_ get_canvas] \
@@ -1117,7 +1120,7 @@ itcl::class gaia::Gaia {
    #  Make an STC-S toolbox.
    public method make_stcs_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaStcs $w_.\#auto \
+         gaia::GaiaStcs $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1133,7 +1136,7 @@ itcl::class gaia::Gaia {
    #  Make a MOS toolbox.
    public method make_moc_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaMOC $w_.\#auto \
+         gaia::GaiaMOC $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1149,7 +1152,7 @@ itcl::class gaia::Gaia {
    #  Make an AST grid toolbox.
    public method make_astgrid_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstGrid $w_.\#auto \
+         gaia::GaiaAstGrid $w_.\#auto \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -1163,7 +1166,7 @@ itcl::class gaia::Gaia {
    #  Make the simple autoastrom toolbox.
    public method make_simpleautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstrom $w_.\#auto \
+         gaia::GaiaAutoAstrom $w_.\#auto \
             -expert 0 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
@@ -1178,7 +1181,7 @@ itcl::class gaia::Gaia {
    #  Make the advanced autoastrom toolbox.
    public method make_advancedautoastrom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAutoAstrom $w_.\#auto \
+         gaia::GaiaAutoAstrom $w_.\#auto \
             -expert 1 \
             -rtdimage [$image_ get_image] \
             -image $image_ \
@@ -1193,7 +1196,7 @@ itcl::class gaia::Gaia {
    #  Make an AST reference WCS toolbox.
    public method make_astreference_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstReference $w_.\#auto \
+         gaia::GaiaAstReference $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1210,7 +1213,7 @@ itcl::class gaia::Gaia {
    #  Make an AST define WCS toolbox.
    public method make_astdefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDefine $w_.\#auto \
+         gaia::GaiaAstDefine $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1223,7 +1226,7 @@ itcl::class gaia::Gaia {
    #  Make an AST copy WCS toolbox.
    public method make_astcopy_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstCopy $w_.\#auto \
+         gaia::GaiaAstCopy $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1237,7 +1240,7 @@ itcl::class gaia::Gaia {
    #  Make an AST refine WCS toolbox or make it visible.
    public method make_astrefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstRefine $w_.\#auto \
+         gaia::GaiaAstRefine $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1254,7 +1257,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set celestial coordinates system toolbox.
    public method make_astsystem_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstSystem $w_.\#auto \
+         gaia::GaiaAstSystem $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1267,7 +1270,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set secondary coordinates system toolbox.
    public method make_astdomain_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDomain $w_.\#auto \
+         gaia::GaiaAstDomain $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1280,7 +1283,7 @@ itcl::class gaia::Gaia {
    #  Make an AST display all known coordinates readout.
    public method make_astdisplay_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaAstDisplayDomains $w_.\#auto \
+         gaia::GaiaAstDisplayDomains $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -1292,7 +1295,7 @@ itcl::class gaia::Gaia {
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPatch $w_.\#auto \
+         gaia::GaiaPatch $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -1304,9 +1307,9 @@ itcl::class gaia::Gaia {
 
    #  Blink any displayed images.
    public method make_blink_toolbox {name {cloned 0}} {
-      if { [llength [SkyCat::get_skycat_images] ] > 1 } {
+      if { [llength [skycat::SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
-            GaiaBlink $w_.\#auto \
+            gaia::GaiaBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
                -number $clone_ \
                -clone_cmd [code $this make_toolbox blink 1] \
@@ -1322,7 +1325,7 @@ itcl::class gaia::Gaia {
    #  Make a SExtractor toolbox.
    public method make_sextractor_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaSextractor $w_.\#auto \
+         gaia::GaiaSextractor $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1338,7 +1341,7 @@ itcl::class gaia::Gaia {
    #  Make a contour toolbox.
    public method make_contour_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaContour $w_.\#auto \
+         gaia::GaiaContour $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -1355,7 +1358,7 @@ itcl::class gaia::Gaia {
    #  Make an ESP toolbox.
    public method make_esp_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaEsp $w_.\#auto \
+         gaia::GaiaEsp $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -image $image_ \
@@ -1370,7 +1373,7 @@ itcl::class gaia::Gaia {
    #  Make positions toolbox.
    public method make_positions_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPositions $w_.\#auto \
+         gaia::GaiaPositions $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -1420,7 +1423,7 @@ itcl::class gaia::Gaia {
    }
    public method make_xyprofile_ {name cloned rect_id x0 y0 x1 y1} {
       itk_component add $name {
-         GaiaXYProfile $w_.\#auto \
+         gaia::GaiaXYProfile $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
@@ -1472,7 +1475,7 @@ itcl::class gaia::Gaia {
    }
    public method make_xyhistogram_ {name cloned rect_id x0 y0 x1 y1} {
       itk_component add $name {
-         GaiaXYHistogram $w_.\#auto \
+         gaia::GaiaXYHistogram $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
@@ -1486,7 +1489,7 @@ itcl::class gaia::Gaia {
    #  Make polarimetry toolbox.
    public method make_polarimetry_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaPolarimetry $w_.\#auto \
+         gaia::GaiaPolarimetry $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvasdraw [$image_ component draw] \
@@ -1508,7 +1511,7 @@ itcl::class gaia::Gaia {
    #  Create the mask image toolbox.
    public method make_mask_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaMask $w_.\#auto \
+         gaia::GaiaMask $w_.\#auto \
             -gaia $w_ \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -1520,7 +1523,7 @@ itcl::class gaia::Gaia {
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaDemo $w_.\#auto \
+         gaia::GaiaDemo $w_.\#auto \
             -gaiamain $w_ \
             -rtdimage [$image_ get_image] \
             -gaiactrl $image_ \
@@ -1536,7 +1539,7 @@ itcl::class gaia::Gaia {
    #  Create the startup options toolbox.
    public method make_startup_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaStartup $w_.\#auto \
+         gaia::GaiaStartup $w_.\#auto \
             -gaia $w_ \
             -image $image_ \
             -transient $itk_option(-transient_tools) \
@@ -1560,7 +1563,7 @@ itcl::class gaia::Gaia {
 
          busy {
             itk_component add opencube {
-               GaiaCube $w_.\#auto \
+               gaia::GaiaCube $w_.\#auto \
                   -gaia $w_ \
                   -canvas [$image_ get_canvas] \
                   -rtdimage [$image_ get_image] \
@@ -1758,7 +1761,7 @@ itcl::class gaia::Gaia {
 
    #  Make the "Filters" menu.
    public method make_filters_menu {} {
-      StarAppFilter \#auto $w_
+      gaia::StarAppFilter \#auto $w_
    }
 
    #  Open a new file using a filebrowser. The filebrowser will open
@@ -1879,7 +1882,7 @@ itcl::class gaia::Gaia {
    #  Open an image, handling the setting of the HDU number if part
    #  of the specification.
    protected method open_image_ {name} {
-      set namer [GaiaImageName \#auto -imagename $name]
+      set namer [gaia::GaiaImageName \#auto -imagename $name]
       $image_ configure -hdu [$namer fitshdunum]
       $image_ configure -file [$namer fullname 0]
       ::delete object $namer
@@ -1893,7 +1896,7 @@ itcl::class gaia::Gaia {
 
       if { "$args" != "" } {
          set imagename [lindex $args 0]
-         set namer [GaiaImageName \#auto -imagename $imagename]
+         set namer [gaia::GaiaImageName \#auto -imagename $imagename]
          if { [$namer exists] } {
 
             #  Release any cubes before proceeding, otherwise this holds
@@ -2120,7 +2123,7 @@ itcl::class gaia::Gaia {
 
       #  Attempt to get the default config file using a batch process
       #  to avoid nasty blocking.
-      Batch $w_.bg_proc -command [code $this loaded_eso_config_]
+      util::Batch $w_.bg_proc -command [code $this loaded_eso_config_]
       blt::busy hold $w_
       $w_.bg_proc bg_eval [code $this get_eso_config_]
 
@@ -2279,7 +2282,7 @@ window gives you access to this."
          ::close $fd
 
          #  Finally force this to be loaded.
-         AstroCat::reload_config_file $w_
+         cat::AstroCat::reload_config_file $w_
       }
       delete object $w_.bg_proc
       if { $after_id_ != {} } {
@@ -2407,7 +2410,7 @@ window gives you access to this."
    #  clients.  If no recipient is specified, it will be broadcast to all.
    public method samp_send_image_ {recipient_id} {
       if {[catch {
-         $samp_sender_ send_image $image_ $recipient_id
+         {*}$samp_sender_ send_image $image_ $recipient_id
       } msg]} {
          error_dialog "$msg"
       }
@@ -2430,9 +2433,9 @@ window gives you access to this."
          set meta(samp.icon.url) \
                 "http://astro.dur.ac.uk/~pdraper/gaia/gaiaicon.gif"
          set samp_agent_ [gaia::GaiaSampAgent \#auto]
-         lappend agents [itcl::code $samp_agent_]
-         lappend agents [itcl::code [samp::UtilAgent \#auto]]
-       # lappend agents [itcl::code [samp::TestAgent \#auto]]
+         lappend agents [code $samp_agent_]
+         lappend agents [code [samp::UtilAgent \#auto]]
+       # lappend agents [code [samp::TestAgent \#auto]]
          set client [samp::SampClient \#auto -agents $agents \
                                              -metadata [array get meta]]
 
@@ -2499,8 +2502,8 @@ window gives you access to this."
       if {[$samp_client_ is_registered]} {
          set send_mtype "image.load.fits"
          set tracker [$samp_client_ cget -client_tracker]
-         foreach client_id [$tracker get_subscribed_clients $send_mtype] {
-            set client_name [$tracker get_name $client_id]
+         foreach client_id [{*}$tracker get_subscribed_clients $send_mtype] {
+            set client_name [{*}$tracker get_name $client_id]
             add_menuitem $m command "Send to $client_name" \
                "Send the current image to $client_id" \
                -command "$this samp_send_image_ $client_id"
@@ -3063,9 +3066,6 @@ window gives you access to this."
 
 #  End of class definition.
 }
-
-#  Make sure our HelpWin class is used by TopLevelWidget.
-set util::TopLevelWidget::help_window_class gaia::HelpWin
 
 #  Need to override this proc so we use the browser version of the open dialog
 #  for local catalogues (and we need it here so that it is used in preference

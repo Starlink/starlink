@@ -94,7 +94,7 @@ itcl::class gaia::Stilts {
    public method execute {stilts_cmd args} {
       if {[is_working]} {
          if { $stilts_app_ == {} } {
-            set stilts_app_ [GaiaForeignExec \#auto \
+            set stilts_app_ [gaia::GaiaForeignExec \#auto \
                                 -notify [code $this completed_] \
                                 -application $stilts_bin_]
          }

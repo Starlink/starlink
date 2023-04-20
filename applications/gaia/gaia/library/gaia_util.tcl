@@ -75,7 +75,7 @@ proc fileName {image} {
 proc filename_dialog {{dir "."} {filter "*"} {parent ""} {types ""}} {
    set w .fs
    if {![winfo exists $w]} {
-      FileSelect $w -dir $dir -filter $filter -transient 1 \
+      util::FileSelect $w -dir $dir -filter $filter -transient 1 \
          -withdraw 1 -filter_types "$types"
    } else {
 

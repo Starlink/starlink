@@ -214,7 +214,7 @@ itcl::class gaia::StarArdList {
       set ok 0
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            puts $ios [$objects_($i) getard]
+            puts $ios [{*}$objects_($i) getard]
             set ok 1
          }
       }
@@ -229,8 +229,8 @@ itcl::class gaia::StarArdList {
       #  Get a list of the currently selected objects.
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } {
-               puts $ios [$objects_($i) getard]
+            if { [{*}$objects_($i) is_selected] } {
+               puts $ios [{*}$objects_($i) getard]
                set ok 1
             }
          }
@@ -243,7 +243,7 @@ itcl::class gaia::StarArdList {
       set desc ""
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            append desc [$objects_($i) getard]
+            append desc [{*}$objects_($i) getard]
          }
       }
       return $desc
@@ -252,7 +252,7 @@ itcl::class gaia::StarArdList {
    #  Set the description of the list selected object.
    method set_selected_description {desc} {
       if { [info exists objects_($selected_)] } {
-         $objects_($selected_) setard $desc
+         {*}$objects_($selected_) setard $desc
          return 1
       }
       error "no selected region"
@@ -263,8 +263,8 @@ itcl::class gaia::StarArdList {
       set desc ""
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } {
-               append desc [$objects_($i) getard]
+            if { [{*}$objects_($i) is_selected] } {
+               append desc [{*}$objects_($i) getard]
             }
          }
       }
@@ -281,8 +281,8 @@ itcl::class gaia::StarArdList {
       #  into AST regions.
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            if { [$objects_($i) is_selected] } {
-               set desc [$objects_($i) getregion]
+            if { [{*}$objects_($i) is_selected] } {
+               set desc [{*}$objects_($i) getregion]
                if {$desc != {}} {
                   append regions [eval gaiautils::region $desc]
                }
@@ -310,7 +310,7 @@ itcl::class gaia::StarArdList {
       if { [string first $type $known_types_] != -1 } {
          set selected_ [incr highest_index_]
          set objects_($selected_) \
-            [$routine_prefix$type \#auto \
+            [gaia::$routine_prefix$type \#auto \
                 -selected_colour $selected_colour \
                 -deselected_colour $deselected_colour \
                 -notify_delete_cmd [code $this deleted_object_ $selected_] \
@@ -344,7 +344,7 @@ itcl::class gaia::StarArdList {
 
       #  Selected region first.
       if { [info exists objects_($selected_)] } {
-         set f [$objects_($selected_) cget -mode]
+         set f [{*}$objects_($selected_) cget -mode]
          if { [string compare -nocase -length 4 $type $f] == 0 } {
             return 1
          }
@@ -353,7 +353,7 @@ itcl::class gaia::StarArdList {
       #  Search rest.
       for {set i 1} {$i <= $highest_index_} {incr i} {
          if { [info exists objects_($i)] } {
-            set f [$objects_($i) cget -mode]
+            set f [{*}$objects_($i) cget -mode]
             if { [string compare -nocase -length 4 $type $f] == 0 } {
                set selected_ $i
                $canvasdraw deselect_objects
@@ -367,7 +367,7 @@ itcl::class gaia::StarArdList {
    #  Method to deal with object creation confirmation.
    method created_object {index id} {
        if { $notify_created_cmd != {} } {
-	   eval $notify_created_cmd $index $id
+          eval {*}$notify_created_cmd $index $id
        }
    }
 
@@ -376,7 +376,7 @@ itcl::class gaia::StarArdList {
    #  for a StarArdPrim object.
    method apply_cmd {index args} {
       if { [info exists objects_($index)] } {
-         eval $objects_($index) $args
+         eval {*}$objects_($index) $args
       }
    }
 
@@ -462,13 +462,13 @@ itcl::class gaia::StarArdList {
       if { $continuous_updates } {
          for { set i 1 } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
-               $objects_($i) configure -continuous_updates 1
+               {*}$objects_($i) configure -continuous_updates 1
             }
          }
       } else {
          for { set i 1 } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
-               $objects_($i) configure -continuous_updates 0
+               {*}$objects_($i) configure -continuous_updates 0
             }
          }
       }

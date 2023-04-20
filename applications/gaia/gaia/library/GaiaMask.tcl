@@ -108,7 +108,7 @@ itcl::class gaia::GaiaMask {
       set GoMenu [add_menubutton "Go" \
                      "Go: menu with shortcuts to view previous images"]
       configure_menubutton "Go" -underline 0
-      set history_ [GaiaHistory \#auto -gaiatoplevel $this]
+      set history_ [gaia::GaiaHistory \#auto -gaiatoplevel $this]
       $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
 
       #  Add window help.
@@ -120,7 +120,7 @@ itcl::class gaia::GaiaMask {
 
       #  Name of input mask.
       itk_component add mask {
-         LabelFileChooser $w_.mask \
+         gaia::LabelFileChooser $w_.mask \
             -text "Input mask:" \
             -labelwidth $lwidth \
             -textvariable [scope itk_option(-mask)] \
@@ -146,7 +146,7 @@ itcl::class gaia::GaiaMask {
       #  Or pick out individual values using a slider.
       if { $itk_option(-show_slider) } {
          itk_component add index {
-            LabelEntryScale $w_.index \
+            util::LabelEntryScale $w_.index \
                -text "Value:" \
                -value 0 \
                -labelwidth $lwidth \
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaMask {
 
       #  Or just select all non-masked values.
       itk_component add invert {
-         StarLabelCheck $w_.invert \
+         gaia::StarLabelCheck $w_.invert \
             -text "Invert:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \
@@ -301,7 +301,7 @@ itcl::class gaia::GaiaMask {
       $history_ record_last
 
       if { $mask_namer_ == {} } {
-         set mask_namer_ [GaiaImageName \#auto]
+         set mask_namer_ [gaia::GaiaImageName \#auto]
       }
       $mask_namer_ configure -imagename $itk_option(-mask)
 
@@ -316,7 +316,7 @@ itcl::class gaia::GaiaMask {
       set fullname [$mask_namer_ fullname]
 
       if { $maskaccessor_ == {} } {
-         set maskaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         set maskaccessor_ [uplevel \#0 gaia::GaiaNDAccess \#auto]
       }
       $maskaccessor_ configure -dataset "$fullname"
 

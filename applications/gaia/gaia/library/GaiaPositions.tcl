@@ -101,7 +101,7 @@ itcl::class gaia::GaiaPositions {
       #  adds to the edit menu and the markers menu which controls the
       #  appearance of the graphics markers.
       itk_component add table {
-         GaiaPosTable $w_.table \
+         gaia::GaiaPosTable $w_.table \
             -editmenu [get_menu Edit] \
             -markmenu [get_menu Markers] \
             -labelmenu [get_menu Labels] \
@@ -295,10 +295,10 @@ itcl::class gaia::GaiaPositions {
       add_short_help $itk_component(menubar).options {Set additional options}
 
       #  Add option to switch off automatic centroiding.
-      set values_($this,autoc) 1
+      set values_(autoc) 1
       $Options add checkbutton \
          -label {Auto centroid} \
-         -variable [scope values_($this,autoc)] \
+         -variable [scope values_(autoc)] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this auto_centroid_changed_]
@@ -306,7 +306,7 @@ itcl::class gaia::GaiaPositions {
          {Toggle automatical centroid of initial positions}
 
       #  Add option to define a different centroid maxshift/search box.
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       $Options add cascade -label {Centroid search box} \
          -menu [menu $Options.isize]
       $short_help_win_ add_menu_short_help $Options {Centroid search box} \
@@ -315,11 +315,11 @@ itcl::class gaia::GaiaPositions {
          $Options.isize add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,isize)] \
+            -variable [scope values_(isize)] \
             -command [code $this configure -isize $i]
       }
 
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       $Options add cascade -label {Centroid max shift} \
          -menu [menu $Options.maxshift]
       $short_help_win_ add_menu_short_help $Options {Centroid max shift} \
@@ -329,7 +329,7 @@ itcl::class gaia::GaiaPositions {
          $Options.maxshift add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,maxshift)] \
+            -variable [scope values_(maxshift)] \
             -command [code $this configure -maxshift $i]
       }
 
@@ -343,7 +343,7 @@ itcl::class gaia::GaiaPositions {
    #  Add controls for image quality estimates.
    protected method add_image_quality_ {} {
       itk_component add rule {
-         LabelRule $w_.rule -text "Image Quality:"
+         gaia::LabelRule $w_.rule -text "Image Quality:"
       }
       pack $itk_component(rule) -side top -fill x
 
@@ -368,7 +368,7 @@ itcl::class gaia::GaiaPositions {
 
       #  Add fields for showing values.
       itk_component add fwhmx {
-         LabelValue $w_.fwhmx -text {FwhmX:} \
+         util::LabelValue $w_.fwhmx -text {FwhmX:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -377,7 +377,7 @@ itcl::class gaia::GaiaPositions {
          {Mean FWHM in X direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add fwhmy {
-         LabelValue $w_.fwhmy -text {FwhmY:} \
+         util::LabelValue $w_.fwhmy -text {FwhmY:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -386,7 +386,7 @@ itcl::class gaia::GaiaPositions {
          {Mean FWHM in Y direction in pixels/arcsec (range pixels/arcsec)}
 
       itk_component add angle {
-         LabelValue $w_.angle -text {Angle:} \
+         util::LabelValue $w_.angle -text {Angle:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaPositions {
          {Mean position angle of major axis (degrees)}
 
       itk_component add peak {
-         LabelValue $w_.peak -text {Peak:} \
+         util::LabelValue $w_.peak -text {Peak:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -404,7 +404,7 @@ itcl::class gaia::GaiaPositions {
          {Mean peak value of objects}
 
       itk_component add back {
-         LabelValue $w_.back -text {Background:} \
+         util::LabelValue $w_.back -text {Background:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -413,7 +413,7 @@ itcl::class gaia::GaiaPositions {
          {Mean background level of all objects}
 
       itk_component add nused {
-         LabelValue $w_.nused -text {Number used:} \
+         util::LabelValue $w_.nused -text {Number used:} \
             -value 0 \
             -labelwidth $lwidth
       }
@@ -456,7 +456,7 @@ itcl::class gaia::GaiaPositions {
 
    #  Toggle state of auto centroiding.
    protected method auto_centroid_changed_ {} {
-      $itk_component(table) configure -init_centroid $values_($this,autoc)
+      $itk_component(table) configure -init_centroid $values_(autoc)
    }
 
    #  Update image quality statistics
@@ -591,13 +591,13 @@ itcl::class gaia::GaiaPositions {
 
    #  The type of fit to be used when refining the coordinate system.
    itk_option define -fittype fittype Fittype 5 {
-      set values_($this,fittype) $itk_option(-fittype)
+      set values_(fittype) $itk_option(-fittype)
    }
 
    #  The centroid search box and maximum shift.
    itk_option define -isize isize Isize 9 {
       set itk_option(-isize) [expr min(21,max(3,$itk_option(-isize)))]
-      set values_($this,isize) $itk_option(-isize)
+      set values_(isize) $itk_option(-isize)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -isize $itk_option(-isize)
       }
@@ -607,7 +607,7 @@ itcl::class gaia::GaiaPositions {
    itk_option define -maxshift maxshift Maxshift 5.5 {
       set maxshift [expr min(21.5,max(3.5,$itk_option(-maxshift)))]
       set itk_option(-maxshift) [expr int($maxshift)+0.5]
-      set values_($this,maxshift) $itk_option(-maxshift)
+      set values_(maxshift) $itk_option(-maxshift)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -maxshift $itk_option(-maxshift)
       }
@@ -621,7 +621,7 @@ itcl::class gaia::GaiaPositions {
 
    #  Size of region about object, used when determining IQE.
    itk_option define -iqesize iqesize Iqesize 15 {
-      set values_($this,iqesize) $itk_option(-iqesize)
+      set values_(iqesize) $itk_option(-iqesize)
       if { [info exists itk_component(table) ] } {
          $itk_component(table) configure -msize $itk_option(-iqesize)
       }
@@ -639,12 +639,12 @@ itcl::class gaia::GaiaPositions {
    #  Indicate when we're locked in the adding mode.
    protected variable adding_ 0
 
+   #  Variable to share amongst all widgets.
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
 
 #  End of class definition.
 }

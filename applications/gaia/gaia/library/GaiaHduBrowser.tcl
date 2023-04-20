@@ -313,7 +313,7 @@ itcl::class gaia::GaiaHduBrowser {
       #  Update name with this HDU and open it.
       set dataset [$accessor_ cget -dataset]
       if { $namer_ == {} } {
-         set namer_ [GaiaImageName \#auto]
+         set namer_ [gaia::GaiaImageName \#auto]
       }
       $namer_ configure -imagename $dataset
 
@@ -379,13 +379,13 @@ itcl::class gaia::GaiaHduBrowser {
 
             #  NDF or FITS.
             if { $accessor_ != {} } {
-               if { ! [$accessor_ isa GaiaNDAccess] } {
+               if { ! [$accessor_ isa gaia::GaiaNDAccess] } {
                   catch {::delete object $accessor_}
                   set accessor_ {}
                }
             }
             if { $accessor_ == {} } {
-               set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
+               set accessor_ [uplevel \#0 gaia::GaiaNDAccess \#auto]
             }
             $accessor_ configure -dataset $itk_option(-file)
             if { [$accessor_ exists "DATA"] } {

@@ -143,7 +143,7 @@ itcl::class gaia::StarBlink {
    #  Inheritances:
    #  -------------
 
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -196,7 +196,7 @@ itcl::class gaia::StarBlink {
 	  frame $w_.sframe
       }
       itk_component add Speed {
-	  LabelNumber $itk_component(Sframe).speed \
+	  util::LabelNumber $itk_component(Sframe).speed \
 		  -text {Speed factor:} \
 		  -command [code $this change_speed] \
 		  -value 8 \
@@ -226,18 +226,18 @@ itcl::class gaia::StarBlink {
 
       #  Label for identifying the current clone.
       itk_component add Name {
-         LabelMessage $itk_component(Iframe).name \
+         util::LabelMessage $itk_component(Iframe).name \
             -text {Clone:} -value {}
       }
 
       #  Offset of clone's lower corner.
       itk_component add Xlow {
-         LabelEntry $itk_component(Iframe).xlow \
+         util::LabelEntry $itk_component(Iframe).xlow \
             -text {X offset:} -command [code $this place_image_ x] \
             -value 1
       }
       itk_component add Ylow {
-         LabelEntry $itk_component(Iframe).ylow \
+         util::LabelEntry $itk_component(Iframe).ylow \
             -text {Y offset:} -command [code $this place_image_ y] \
             -value 1
       }
@@ -340,7 +340,7 @@ itcl::class gaia::StarBlink {
       set n_ 0
       foreach w $clones {
          itk_component add image$n_ {
-            RtdImage $itk_component(Frame).image$n_ -graphics 0 \
+            rtd::RtdImage $itk_component(Frame).image$n_ -graphics 0 \
                -scrollbars 0
          }
          set canvas_($n_) [$itk_component(image$n_) get_canvas]
@@ -538,7 +538,7 @@ itcl::class gaia::StarBlink {
          #  Startup KAPPA:SLIDE if needed.
          if { $slide_ == {} } {
             global env
-            set slide_ [GaiaApp \#auto -application \
+            set slide_ [gaia::GaiaApp \#auto -application \
                            $env(KAPPA_DIR)/slide \
                            -notify [code $this slide_complete_]]
          }
@@ -572,7 +572,7 @@ itcl::class gaia::StarBlink {
          #  Proceed with combining images. Startup MAKEMOS if needed.
          if { $makemos_ == {} } {
             global env
-            set makemos_ [GaiaApp \#auto -application \
+            set makemos_ [gaia::GaiaApp \#auto -application \
                              $env(CCDPACK_DIR)/makemos \
                              -notify [code $this finished_combine_]]
          }

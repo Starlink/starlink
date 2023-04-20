@@ -243,7 +243,7 @@ itcl::class gaia::GaiaPolData {
       set ret [list "" ""]
 
 #  Indicate what is happening
-      $pbar_ config -text "Finding Z values to use ..."
+      {*}$pbar_ config -text "Finding Z values to use ..."
       update idletasks
 
 #  Ensure the values in the tclfile are available.
@@ -282,7 +282,7 @@ itcl::class gaia::GaiaPolData {
       }
 
 #  Reset the progress bar.
-      $pbar_ reset
+      {*}$pbar_ reset
       update idletasks
 
 #  Return the answer.
@@ -297,7 +297,7 @@ itcl::class gaia::GaiaPolData {
       set ret ""
 
 #  Indicate what is happening
-      $pbar_ config -text "Binning vectors ..."
+      {*}$pbar_ config -text "Binning vectors ..."
       update idletasks
 
 #  Ensure the values in the tclfile are available.
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaPolData {
       }
 
 #  Reset the progress bar.
-      $pbar_ reset
+      {*}$pbar_ reset
       update idletasks
 
       return $ret
@@ -803,10 +803,10 @@ itcl::class gaia::GaiaPolData {
 
 #  If the Tcl file doesn't exist, use polwrtcl to re-create it.
          if { ![file exists $tclfile_] } {
-            $pbar_ config -text "Reading $polfile_ ..."
+            {*}$pbar_ config -text "Reading $polfile_ ..."
             catch {tclLoad $polfile_ $tclfile_} msg
          } else {
-            $pbar_ config -text "Re-reading $polfile_ ..."
+            {*}$pbar_ config -text "Re-reading $polfile_ ..."
          }
          update idletasks
 
@@ -837,7 +837,7 @@ itcl::class gaia::GaiaPolData {
             }
          }
 
-         $pbar_ reset
+         {*}$pbar_ reset
          update idletasks
 
       }

@@ -169,7 +169,7 @@ itcl::class gaia::StarArdEllipse {
       $canvas itemconfigure $canvas_id_ \
          -semimajor $semimajor -semiminor $semiminor -angle $angle
       if { [lindex $args 0] != {} } {
-         eval $args
+         eval {*}$args
       }
    }
 
@@ -182,23 +182,23 @@ itcl::class gaia::StarArdEllipse {
       if { ! [create_properties_window $name] } {
 
          #  Now add the buttons for the description.
-         set Xcentre_ [LabelEntry $Frame_.xcentre \
+         set Xcentre_ [util::LabelEntry $Frame_.xcentre \
                           -text {X centre:} \
                           -labelwidth $labelwidth_ \
                           -command [code $this configure -x]]
-         set Ycentre_ [LabelEntry $Frame_.ycentre \
+         set Ycentre_ [util::LabelEntry $Frame_.ycentre \
                           -text {Y centre:} \
                           -labelwidth $labelwidth_ \
                           -command [code $this configure -y]]
-         set Major_ [LabelEntry $Frame_.major \
+         set Major_ [util::LabelEntry $Frame_.major \
                         -text {Semimajor axis:}\
                         -labelwidth $labelwidth_ \
                         -command [code $this configure -semimajor]]
-         set Minor_ [LabelEntry $Frame_.minor \
+         set Minor_ [util::LabelEntry $Frame_.minor \
                         -text {Semiminor axis:}\
                         -labelwidth $labelwidth_ \
                         -command [code $this configure -semiminor]]
-         set Angle_ [LabelEntry $Frame_.angle \
+         set Angle_ [util::LabelEntry $Frame_.angle \
                         -text {Position angle:}\
                         -labelwidth $labelwidth_ \
                         -command [code $this configure -angle]]

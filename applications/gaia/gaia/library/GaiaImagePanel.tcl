@@ -318,7 +318,7 @@ itcl::class gaia::GaiaImagePanel {
          }
          set lwidth [expr $itk_option(-labelwidth)+6]
          itk_component add autocut {
-            LabelCommandMenu $itk_component(aframe).autocut \
+            gaia::LabelCommandMenu $itk_component(aframe).autocut \
                -text "Auto Cut:" \
                -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
@@ -335,7 +335,7 @@ itcl::class gaia::GaiaImagePanel {
 
          #  Select a colour table.
          itk_component add autocolor {
-            LabelCommandMenu $itk_component(aframe).autocolor \
+            gaia::LabelCommandMenu $itk_component(aframe).autocolor \
                -text "Color Map:" \
                -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \
@@ -352,7 +352,7 @@ itcl::class gaia::GaiaImagePanel {
 
          #  Select a color scale/itt combination.
          itk_component add autoscale {
-            LabelCommandMenu $itk_component(aframe).autoscale \
+            gaia::LabelCommandMenu $itk_component(aframe).autoscale \
                -text "Color Scale:" \
                -labelwidth $lwidth \
                -labelfont $itk_option(-labelfont) \

@@ -108,7 +108,7 @@ itcl::class gaia::GaiaRampPrint {
 
       #  Add menu to select the font and its size.
       itk_component add lsize {
-         LabelEntryScale $w_.lsize \
+         util::LabelEntryScale $w_.lsize \
             -text "Label size:" \
             -value 1.0 \
             -labelwidth 10 \

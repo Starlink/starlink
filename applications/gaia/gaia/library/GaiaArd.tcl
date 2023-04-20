@@ -211,7 +211,7 @@ itcl::class gaia::GaiaArd {
       wm title $w_ "GAIA: Image regions ($itk_option(-number))"
 
       #  Create the ARD toolbox that does most of the work.
-      set Toolbox_ [StarArdTool \#auto \
+      set Toolbox_ [gaia::StarArdTool \#auto \
                        -canvasdraw $itk_option(-canvasdraw) \
                        -canvas $itk_option(-canvas)\
                        -rtdimage $itk_option(-rtdimage)\
@@ -362,14 +362,14 @@ itcl::class gaia::GaiaArd {
 
       #  Add an entry widget to display the results.
       itk_component add statsresults {
-         Scrollbox $w_.statsresults -exportselection 1 -singleselect 0
+         gaia::Scrollbox $w_.statsresults -exportselection 1 -singleselect 0
       }
       add_short_help $itk_component(statsresults) \
          {Results of stats measurements}
 
       #  And a file for saving the results.
       itk_component add logfile {
-         LabelFileChooser $w_.logfile \
+         gaia::LabelFileChooser $w_.logfile \
             -labelwidth 14 \
             -text "Stats results file:" \
             -textvariable [scope logfile_] \
@@ -439,7 +439,7 @@ itcl::class gaia::GaiaArd {
       pack $itk_component(statsresults) -fill both -expand 1 -side top
 
       #  Create control object for image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
    }
 
@@ -574,7 +574,7 @@ itcl::class gaia::GaiaArd {
          #  Now startup the Ardstat application.
          if { $ardstat_ == {} } {
             global gaia_dir
-            set ardstat_ [GaiaApp \#auto -application \
+            set ardstat_ [gaia::GaiaApp \#auto -application \
                              $gaia_dir/ardstat \
                              -notify [code $this measured_stats_] \
                              -show_output $itk_component(statsresults)]
@@ -621,7 +621,7 @@ itcl::class gaia::GaiaArd {
 
       #  If necessary do the completion command.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }
@@ -658,7 +658,7 @@ itcl::class gaia::GaiaArd {
          #  Now startup the Ardmask application.
          if { $ardmask_ == {} } {
             global env
-            set ardmask_ [GaiaApp \#auto -application \
+            set ardmask_ [gaia::GaiaApp \#auto -application \
                              $env(KAPPA_DIR)/ardmask \
                              -notify [code $this modified_image_]]
          }
@@ -720,7 +720,7 @@ itcl::class gaia::GaiaArd {
            #  Now startup the Ardmask application.
            if { $ardmask_ == {} } {
               global env
-              set ardmask_ [GaiaApp \#auto -application \
+              set ardmask_ [gaia::GaiaApp \#auto -application \
                                $env(KAPPA_DIR)/ardmask \
                                -notify [code $this maybe_autocrop_image_]]
            }
@@ -775,7 +775,7 @@ itcl::class gaia::GaiaArd {
       #  And crop that before display.
       if { $autocrop_ == {} } {
          global gaia_dir
-         set autocrop_ [GaiaApp \#auto -application \
+         set autocrop_ [gaia::GaiaApp \#auto -application \
                            $gaia_dir/autocrop \
                            -notify [code $this modified_image_]]
       }
@@ -795,7 +795,7 @@ itcl::class gaia::GaiaArd {
       #  Now startup the autocrop application.
       if { $autocrop_ == {} } {
          global gaia_dir
-         set autocrop_ [GaiaApp \#auto -application \
+         set autocrop_ [gaia::GaiaApp \#auto -application \
                            $gaia_dir/autocrop \
                            -notify [code $this modified_image_]]
       }
@@ -855,7 +855,7 @@ itcl::class gaia::GaiaArd {
 
       #  If given do the completed command.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
       blt::busy release $w_

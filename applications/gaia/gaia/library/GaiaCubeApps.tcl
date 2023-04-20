@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  Whether to show the various ranges as objects on the spectral plot.
       itk_component add showrange {
-         StarLabelCheck $w_.showrange \
+         gaia::StarLabelCheck $w_.showrange \
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -150,7 +150,7 @@ itcl::class gaia::GaiaCubeApps {
    #  a range, plus combination method, so that is the default.
    protected method add_controls_ {} {
       itk_component add bounds1 {
-         GaiaSpectralPlotRange $w_.bounds1 \
+         gaia::GaiaSpectralPlotRange $w_.bounds1 \
             -gaiacube $itk_option(-gaiacube) \
             -ref_id $itk_option(-ref_id) \
             -text1 {Lower index:} \
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaCubeApps {
       if { $itk_option(-show_combination) } {
          #  Method used for combination
          itk_component add combination {
-            LabelMenu $w_.cattype \
+            util::LabelMenu $w_.cattype \
                -labelwidth $itk_option(-labelwidth) \
                -text "Combination method:" \
                -variable [scope combination_type_]
@@ -269,14 +269,14 @@ itcl::class gaia::GaiaCubeApps {
       #  One twist is that the coordinate system should match that of the
       #  disk-resident cube, so check that the coordinate system hasn't been
       #  changed, if so switch back to the default system (temporarily).
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system "default" "default" 1
+         {*}$itk_option(-spec_coords) set_system "default" "default" 1
       }
-      set lb [$itk_option(-gaiacube) get_coord $lbp 1 0]
-      set ub [$itk_option(-gaiacube) get_coord $ubp 1 0]
+      set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
+      set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system $system $units 1
+         {*}$itk_option(-spec_coords) set_system $system $units 1
       }
 
       set set_current_domain_ 0
@@ -289,13 +289,13 @@ itcl::class gaia::GaiaCubeApps {
          set ub [expr $ubp - 0.5]
          if { $wcsframe_ == {} } {
             global env
-            set wcsframe_ [GaiaApp \#auto -application \
+            set wcsframe_ [gaia::GaiaApp \#auto -application \
                               $env(KAPPA_DIR)/wcsframe \
                               -notify [code $this wcsframe_completed_]]
          }
          if { $getwcsattrib_ == {} } {
             global env
-            set getwcsattrib_ [GaiaApp \#auto -application \
+            set getwcsattrib_ [gaia::GaiaApp \#auto -application \
                                   $env(KAPPA_DIR)/wcsattrib \
                                   -notify [code $this wcsattrib_completed_] \
                                   -parnotify [code $this wcsattrib_gotparam_]]
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  Convert cube to PIXEL domain, if needed.
       blt::busy hold $w_
-      set ndfname [$itk_option(-gaiacube) get_ndfname]
+      set ndfname [{*}$itk_option(-gaiacube) get_ndfname]
       if { $set_current_domain_ } {
          $getwcsattrib_ runwiths "ndf=$ndfname mode=get name=DOMAIN accept"
          ::tkwait variable [scope current_domain_]
@@ -314,7 +314,7 @@ itcl::class gaia::GaiaCubeApps {
       }
 
       #  Now start and run the main application, if not done already.
-      set axis [$itk_option(-gaiacube) get_axis]
+      set axis [{*}$itk_option(-gaiacube) get_axis]
       run_main_app_ $ndfname $axis $lb $ub
 
       #  If the reference lines are displayed these need removing.
@@ -325,7 +325,7 @@ itcl::class gaia::GaiaCubeApps {
    #  Start up the main application and run on the given ndf with the selected
    #  axis. Arrange to run the app_completed_ method as the -notify option cf.:
    #
-   #    set maintask_ [GaiaApp #auto -application $env(KAPPA_DIR)/collapse \
+   #    set maintask_ [gaia::GaiaApp #auto -application $env(KAPPA_DIR)/collapse \
    #                           -notify [code $this app_completed_]]
    #
    protected method run_main_app_ { ndfname axis } {
@@ -341,7 +341,7 @@ itcl::class gaia::GaiaCubeApps {
 
       #  If we set the current domain, restore it.
       if { $set_current_domain_ } {
-         set ndfname [$itk_option(-gaiacube) get_ndfname]
+         set ndfname [{*}$itk_option(-gaiacube) get_ndfname]
          $wcsframe_ runwiths "ndf=$ndfname frame=$current_domain_ accept"
       }
       blt::busy release $w_
@@ -379,13 +379,13 @@ itcl::class gaia::GaiaCubeApps {
       $itk_component(bounds1) configure \
          -show_ref_range $itk_option(-show_ref_range)
       if { $itk_option(-show_ref_range) } {
-         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
-         $itk_option(-gaiacube) set_ref_range_colour \
+         {*}$itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) set_ref_range_colour \
             $itk_option(-ref_id) $itk_option(-ref_colour)
          $itk_component(bounds1) configure -value1 $itk_option(-lower_limit) \
             -value2 $itk_option(-upper_limit)
       } else {
-         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
    }
 
@@ -395,7 +395,7 @@ itcl::class gaia::GaiaCubeApps {
    protected method set_coordinate_system_ {file system units} {
       if { $setwcsattrib_ == {} } {
          global env
-         set setwcsattrib_ [GaiaApp \#auto -application \
+         set setwcsattrib_ [gaia::GaiaApp \#auto -application \
                                $env(KAPPA_DIR)/wcsattrib \
                                -notify [code $this wcsattrib_set_]]
       }
@@ -426,8 +426,8 @@ itcl::class gaia::GaiaCubeApps {
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {} {
       if { $itk_option(-gaiacube) != {} } {
-         set canvas_ [$itk_option(-gaiacube) cget -canvas]
-         set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
+         set canvas_ [{*}$itk_option(-gaiacube) cget -canvas]
+         set rtdimage_ [{*}$itk_option(-gaiacube) cget -rtdimage]
       }
    }
 

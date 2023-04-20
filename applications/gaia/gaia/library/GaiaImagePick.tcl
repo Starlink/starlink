@@ -102,7 +102,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  Add a control for selecting the logfile.
       itk_component add logfile {
-         LabelFileChooser $w_.logfile \
+         gaia::LabelFileChooser $w_.logfile \
             -labelwidth 8 \
             -text "Logfile:" \
             -textvariable [scope logfile_] \
@@ -115,7 +115,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  And the comment field.
       itk_component add comment {
-         LabelEntry $w_.comment \
+         util::LabelEntry $w_.comment \
             -labelwidth 8 \
             -text "Comment:"
       }
@@ -126,7 +126,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  Toggle to report coordinates in degrees (often useful for scripts).
       itk_component add degrees {
-         StarLabelCheck $w_.degrees \
+         gaia::StarLabelCheck $w_.degrees \
             -text "Degrees:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth 8 \

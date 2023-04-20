@@ -348,11 +348,11 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
    protected method create_iso_contour_ {i j wcs renwindow} {
       if { $cubename_($i) != {} } {
          if { $wcs != {} } {
-            set contour_($i,$j) [Gaia3dVtkIso \#auto \
+            set contour_($i,$j) [gaia3d::Gaia3dVtkIso \#auto \
                                    -imagedata [$imagedata_($i) get_imagedata] \
                                    -renwindow $renwindow -wcs $wcs]
          } else {
-            set contour_($i,$j) [Gaia3dVtkIso \#auto \
+            set contour_($i,$j) [gaia3d::Gaia3dVtkIso \#auto \
                                    -imagedata [$imagedata_($i) get_imagedata] \
                                    -renwindow $renwindow]
          }
@@ -434,7 +434,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
 
          itk_component add attrule$i {
-            LabelRule $parent.attrule$i \
+            gaia::LabelRule $parent.attrule$i \
                -text "Cube, contour levels & attributes:"
          }
          pack $itk_component(attrule$i) -side top -fill x -expand 1
@@ -445,7 +445,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
          #  Select cube.
          set cubename_($i) {}
          itk_component add cube$i {
-            LabelCubeFileChooser $parent.cube$i \
+            gaia3d::LabelCubeFileChooser $parent.cube$i \
                -labelwidth 5 \
                -text "Cube:" \
                -textvariable [scope cubename_($i)] \
@@ -537,7 +537,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
 
          #  Entry widget for the contour values.
          itk_component add value$index$i {
-            LabelEntry $w.value$i \
+            util::LabelEntry $w.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 5

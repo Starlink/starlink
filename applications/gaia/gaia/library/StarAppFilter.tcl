@@ -152,7 +152,7 @@ itcl::class gaia::StarAppFilter {
       add_menu
 
       #  Create control object for image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
    }
 
@@ -231,7 +231,7 @@ itcl::class gaia::StarAppFilter {
          incr nf_
          global env
          set app [subst $info_($id,binary)]
-         set info_($id,app) [GaiaApp \#auto -application \
+         set info_($id,app) [gaia::GaiaApp \#auto -application \
                                 "$app" -show_output 0 \
                                 -notify [code $this completed $id]]
 

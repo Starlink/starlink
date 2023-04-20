@@ -97,7 +97,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       pack $itk_component(actionframe) -side top -fill x -ipadx 1m -ipady 1m
 
       itk_component add servicename {
-         LabelValue $itk_component(actionframe).servicename \
+         util::LabelValue $itk_component(actionframe).servicename \
             -text "Service:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -107,7 +107,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
       add_short_help $itk_component(servicename) "The TAP service name"
 
       itk_component add serviceurl {
-         LabelEntry $itk_component(actionframe).serviceurl \
+         util::LabelEntry $itk_component(actionframe).serviceurl \
             -text "        " \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -165,7 +165,7 @@ itcl::class gaiavo::GaiaVOTAPQuery {
 
    #  Complete interface.
    public method init {} {
-      FrameWidget::init
+      util::FrameWidget::init
    }
 
    #  Do the query as a background job.

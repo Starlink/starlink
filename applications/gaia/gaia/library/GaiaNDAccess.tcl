@@ -88,7 +88,7 @@ itcl::class gaia::GaiaNDAccess {
    constructor { args } {
 
       #  Create object for parsing image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
       #  No data components are mapped.
       set addr_(DATA) 0
@@ -481,7 +481,7 @@ itcl::class gaia::GaiaNDAccess {
       }
 
       #  Create a new instance to manage the new NDF.
-      set accessor [uplevel \#0 GaiaNDAccess \#auto]
+      set accessor [uplevel \#0 gaia::GaiaNDAccess \#auto]
       $accessor acquire $name $newhandle
 
       return $accessor
@@ -524,7 +524,7 @@ itcl::class gaia::GaiaNDAccess {
       }
 
       #  Create a new instance to manage the new NDF.
-      set accessor [uplevel \#0 GaiaNDAccess \#auto]
+      set accessor [uplevel \#0 gaia::GaiaNDAccess \#auto]
       $accessor acquire $name $newhandle
 
       return $accessor
@@ -610,7 +610,7 @@ itcl::class gaia::GaiaNDAccess {
          ndf::putc $newhandle "TITLE" $title
 
          #  Create a new instance to manage the new NDF.
-         set accessor [uplevel \#0 GaiaNDAccess \#auto]
+         set accessor [uplevel \#0 gaia::GaiaNDAccess \#auto]
          $accessor acquire $name $newhandle
 
          #  And copy the spectral data into place.
@@ -625,7 +625,7 @@ itcl::class gaia::GaiaNDAccess {
                            [${type_}::getc $handle_ "UNITS"]]
 
          #  Create a new instance to manage the new FITS file.
-         set accessor [uplevel \#0 GaiaNDAccess \#auto]
+         set accessor [uplevel \#0 gaia::GaiaNDAccess \#auto]
          $accessor configure -dataset $name
       }
       return $accessor

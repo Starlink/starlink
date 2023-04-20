@@ -91,7 +91,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
          set name $itk_option(-accessURL)
       }
       itk_component add server {
-         LabelValue $w_.server \
+         util::LabelValue $w_.server \
             -text "Server:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -102,7 +102,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
       #  Get the position from an object name lookup.
       itk_component add object {
-         LabelEntry $w_.object \
+         util::LabelEntry $w_.object \
             -text "Object name:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -114,7 +114,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
       #  Get the position on the sky, an RA and a Dec.
       itk_component add ra {
-         LabelEntry $w_.ra \
+         util::LabelEntry $w_.ra \
             -text "RA:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -126,7 +126,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
          {RA centre of search region, degrees or HH:MM:SS}
 
       itk_component add dec {
-         LabelEntry $w_.dec \
+         util::LabelEntry $w_.dec \
             -text "Dec:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -138,7 +138,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
          {Dec centre of search region, degrees or DD:MM:SS}
 
       itk_component add size {
-         LabelEntry $w_.size \
+         util::LabelEntry $w_.size \
             -text "Size:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -150,7 +150,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
       #  Verbosity. Controls number of columns returned for some services.
       itk_component add verb {
-         LabelMenu $w_.verb \
+         util::LabelMenu $w_.verb \
             -text "Columns:" \
             -labelwidth $lwidth
       }
@@ -205,7 +205,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
 
    #  Complete interface.
    public method init {} {
-      FrameWidget::init
+      util::FrameWidget::init
       set_from_image
    }
 
@@ -323,7 +323,7 @@ itcl::class gaiavo::GaiaVOConeSearch {
       set name [$itk_component(object) get]
       if { $name != {} } {
          if { $batch_ == {} } {
-            set batch_ [Batch $w_.batch \
+            set batch_ [util::Batch $w_.batch \
                            -command [code $this name_query_done_]]
          }
          blt::busy hold $w_

@@ -101,7 +101,7 @@ itcl::class gaia::GaiaSymbolConfig {
    #  proper when no symbol is defined.
    protected method fill_table {{doit 0}} {
       if { $doit == 1 } {
-         SymbolConfig::fill_table
+         cat::SymbolConfig::fill_table
       }
    }
 

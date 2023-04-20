@@ -152,7 +152,7 @@ itcl::class gaia::GaiaImageZoomView {
    #  without being updated.
    public method leave_image {image} {
       set factor_ $itk_option(-factor)
-      RtdImageZoomView::leave_image $image
+      rtd::RtdImageZoomView::leave_image $image
    }
 
    #  Configuration options: (public variables)

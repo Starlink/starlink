@@ -134,18 +134,14 @@ itcl::class gaia::GaiaPolUStyle {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Rendering' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     if { $elem == "angcol" } {
-                        puts $fd "set option($elem) \{$acol_\}"
-                     } elseif { $elem == "lencol" } {
-                        puts $fd "set option($elem) \{$lcol_\}"
-                     } else {
-                        puts $fd "set option($elem) \{$values_($name)\}"
-                     }
-                     unset values_($name)
-                  }
+               if { $name == "angcol" } {
+                  puts $fd "set option($name) \{$acol_\}"
+               } elseif { $name == "lencol" } {
+                  puts $fd "set option($name) \{$lcol_\}"
+               } else {
+                  puts $fd "set option($name) \{$values_($name)\}"
                }
+               unset values_($name)
             }
             close $fd
          }
@@ -160,19 +156,19 @@ itcl::class gaia::GaiaPolUStyle {
    public method newCat {cat} {
 
 #  Store the new headings.
-      setHeadings [$cat getHeadings]
+      setHeadings [{*}$cat getHeadings]
 
 #  If the current vector angle column is no longer available, we need to
 #  select a new one. Use the vector angle column stored in the catalogue
 #  (if there is one).
       if { [lsearch $headings_ [getAcol]] == -1 } {
-         set col [ $cat getColNam ANG ]
+         set col [ {*}$cat getColNam ANG ]
          if { $col != "" } { setAcol $col }
       }
 
 #  Do the same for the vector length column.
       if { [lsearch $headings_ [getLcol]] == -1 } {
-         set col [ $cat getColNam P ]
+         set col [ {*}$cat getColNam P ]
          if { $col != "" } { setLcol $col }
       }
 
@@ -184,16 +180,16 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Set the hard-wired defaults.
       if { !$readopt } {::gaia::GaiaPolStyle::reset 0}
-      set values_($this,sclr) [::gaia::GaiaPolStyle::getSclr]
-      set values_($this,swid) [::gaia::GaiaPolStyle::getSwid]
-      set values_($this,sflash) [::gaia::GaiaPolStyle::getSflash]
-      set values_($this,uclr) [::gaia::GaiaPolStyle::getUclr]
-      set values_($this,uwid) [::gaia::GaiaPolStyle::getUwid]
-      set values_($this,uflash) [::gaia::GaiaPolStyle::getUflash]
-      set values_($this,arot) [::gaia::GaiaPolStyle::getArot]
-      set values_($this,nvec) [::gaia::GaiaPolStyle::getNvec]
-      set values_($this,angcol) [::gaia::GaiaPolStyle::getAcol]
-      set values_($this,lencol) [::gaia::GaiaPolStyle::getLcol]
+      set values_(sclr) [::gaia::GaiaPolStyle::getSclr]
+      set values_(swid) [::gaia::GaiaPolStyle::getSwid]
+      set values_(sflash) [::gaia::GaiaPolStyle::getSflash]
+      set values_(uclr) [::gaia::GaiaPolStyle::getUclr]
+      set values_(uwid) [::gaia::GaiaPolStyle::getUwid]
+      set values_(uflash) [::gaia::GaiaPolStyle::getUflash]
+      set values_(arot) [::gaia::GaiaPolStyle::getArot]
+      set values_(nvec) [::gaia::GaiaPolStyle::getNvec]
+      set values_(angcol) [::gaia::GaiaPolStyle::getAcol]
+      set values_(lencol) [::gaia::GaiaPolStyle::getLcol]
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -203,28 +199,28 @@ itcl::class gaia::GaiaPolUStyle {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Rendering' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Save the preferred anfle and length columns, read from the options file.
-      set acol_ $values_($this,angcol)
-      set lcol_ $values_($this,lencol)
+      set acol_ $values_(angcol)
+      set lcol_ $values_(lencol)
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,sclr) == "" } { set values_($this,sclr) [::gaia::GaiaPolStyle::getSclr] }
-      if { $values_($this,swid) == "" } { set values_($this,swid) [::gaia::GaiaPolStyle::getSwid] }
-      if { $values_($this,sflash) == "" } { set values_($this,sflash) [::gaia::GaiaPolStyle::getSflash] }
-      if { $values_($this,uclr) == "" } { set values_($this,uclr) [::gaia::GaiaPolStyle::getUclr] }
-      if { $values_($this,uwid) == "" } { set values_($this,uwid) [::gaia::GaiaPolStyle::getUwid] }
-      if { $values_($this,uflash) == "" } { set values_($this,uflash) [::gaia::GaiaPolStyle::getUflash] }
-      if { $values_($this,arot) == "" } { set values_($this,arot) [::gaia::GaiaPolStyle::getArot] }
+      if { $values_(sclr) == "" } { set values_(sclr) [::gaia::GaiaPolStyle::getSclr] }
+      if { $values_(swid) == "" } { set values_(swid) [::gaia::GaiaPolStyle::getSwid] }
+      if { $values_(sflash) == "" } { set values_(sflash) [::gaia::GaiaPolStyle::getSflash] }
+      if { $values_(uclr) == "" } { set values_(uclr) [::gaia::GaiaPolStyle::getUclr] }
+      if { $values_(uwid) == "" } { set values_(uwid) [::gaia::GaiaPolStyle::getUwid] }
+      if { $values_(uflash) == "" } { set values_(uflash) [::gaia::GaiaPolStyle::getUflash] }
+      if { $values_(arot) == "" } { set values_(arot) [::gaia::GaiaPolStyle::getArot] }
 
 #  Hard-wired defaults are used for option values which depend on the
 #  particular vector map being displayed.
-      set values_($this,mag) [::gaia::GaiaPolStyle::getMag]
+      set values_(mag) [::gaia::GaiaPolStyle::getMag]
 
 #  Use these values if the controls have been created.
       if { $created_ } { activ }
@@ -237,7 +233,7 @@ itcl::class gaia::GaiaPolUStyle {
    public method setLcol {col} {
       set lcol_ $col
       ::gaia::GaiaPolStyle::setLcol $col
-      set values_($this,lencol) $col
+      set values_(lencol) $col
    }
 
 #  Get the vector length column. If the current column name stored in the
@@ -246,7 +242,7 @@ itcl::class gaia::GaiaPolUStyle {
 #  GaiaPolStyle.
 #  -----------------------------------------------------------------------
    public method getLcol {} {
-      set ret $values_($this,lencol)
+      set ret $values_(lencol)
       if { $ret != "" } {
          ::gaia::GaiaPolStyle::setLcol $ret
       } else {
@@ -260,13 +256,13 @@ itcl::class gaia::GaiaPolUStyle {
    public method setAcol {col} {
       set acol_ $col
       ::gaia::GaiaPolStyle::setAcol $col
-      set values_($this,angcol) $col
+      set values_(angcol) $col
    }
 
 #  Get the vector angle column.
 #  -----------------------------
    public method getAcol {} {
-      set ret $values_($this,angcol)
+      set ret $values_(angcol)
       if { $ret != "" } {
          ::gaia::GaiaPolStyle::setAcol $ret
       } else {
@@ -279,11 +275,11 @@ itcl::class gaia::GaiaPolUStyle {
 #  ----------------------------------------
    public method setSclr {clr} {
       ::gaia::GaiaPolStyle::setSclr $clr
-      set values_($this,sclr) $clr
+      set values_(sclr) $clr
    }
 
    public method getSclr {} {
-      set ret $values_($this,sclr)
+      set ret $values_(sclr)
       if { $ret != "" } {
          if { $ret == "(invisible)" } { set ret "" }
          ::gaia::GaiaPolStyle::setSclr $ret
@@ -297,11 +293,11 @@ itcl::class gaia::GaiaPolUStyle {
 #  ------------------------------------------
    public method setUclr {clr} {
       ::gaia::GaiaPolStyle::setUclr $clr
-      set values_($this,uclr) $clr
+      set values_(uclr) $clr
    }
 
    public method getUclr {} {
-      set ret $values_($this,uclr)
+      set ret $values_(uclr)
       if { $ret != "" } {
          if { $ret == "(invisible)" } { set ret "" }
          ::gaia::GaiaPolStyle::setUclr $ret
@@ -317,17 +313,17 @@ itcl::class gaia::GaiaPolUStyle {
 #  ---------------------------------------------------------------
    public method setMag {mag} {
       ::gaia::GaiaPolStyle::setMag $mag
-      set values_($this,mag) $mag
+      set values_(mag) $mag
    }
 
    public method getMag {} {
-      set ret $values_($this,mag)
+      set ret $values_(mag)
       if { $ret != "" && [catch {set t [expr $ret]} ] } {
          if { $ret != "" } {
             error_dialog "Vector scale value \"$ret\" is not legal. Resetting it to blank."
          }
          set ret ""
-         set values_($this,mag) ""
+         set values_(mag) ""
       }
       ::gaia::GaiaPolStyle::setMag $ret
       return $ret
@@ -337,7 +333,7 @@ itcl::class gaia::GaiaPolUStyle {
       set ret [getMag]
       if { $ret == "" } {
          set ret [::gaia::GaiaPolStyle::getMagd $cat $rtdimage]
-         set values_($this,mag) $ret
+         set values_(mag) $ret
       }
       return $ret
    }
@@ -348,17 +344,17 @@ itcl::class gaia::GaiaPolUStyle {
 #  ---------------------------------------------------------------------
    public method setArot {rot} {
       ::gaia::GaiaPolStyle::setArot $rot
-      set values_($this,arot) $rot
+      set values_(arot) $rot
    }
 
    public method getArot {} {
-      set ret $values_($this,arot)
+      set ret $values_(arot)
       if { [catch {set t [expr $ret]} ] } {
          if { $ret != "" } {
             error_dialog "Vector rotation value \"$ret\" is not legal. Reseting it to 0."
          }
          set ret 0.0
-         set values_($this,arot) 0.0
+         set values_(arot) 0.0
       }
       ::gaia::GaiaPolStyle::setArot $ret
       return $ret
@@ -370,17 +366,17 @@ itcl::class gaia::GaiaPolUStyle {
 #  ---------------------------------------------------------------------
    public method setNvec {n} {
       ::gaia::GaiaPolStyle::setNvec $n
-      set values_($this,nvec) $n
+      set values_(nvec) $n
    }
 
    public method getNvec {} {
-      set ret $values_($this,nvec)
+      set ret $values_(nvec)
       if { [catch {set t [expr $ret]} ] } {
          if { $ret != "" } {
             error_dialog "Number of vectors value \"$ret\" is not legal. Reseting it to blank."
          }
          set ret ""
-         set values_($this,nvec) ""
+         set values_(nvec) ""
       }
       ::gaia::GaiaPolStyle::setNvec $ret
       return $ret
@@ -392,17 +388,17 @@ itcl::class gaia::GaiaPolUStyle {
 #  ---------------------------------------------------------------------
    public method setUwid {wid} {
       ::gaia::GaiaPolStyle::setUwid $wid
-      set values_($this,uwid) $wid
+      set values_(uwid) $wid
    }
 
    public method getUwid {} {
-      set ret $values_($this,uwid)
+      set ret $values_(uwid)
       if { [catch {set t [expr $ret]} ] } {
          if { $ret != "" } {
             error_dialog "Unselected vector width \"$ret\" is not legal. Reseting it to 1."
          }
          set ret 1
-         set values_($this,uwid) 1
+         set values_(uwid) 1
       }
       ::gaia::GaiaPolStyle::setUwid $ret
       return $ret
@@ -414,17 +410,17 @@ itcl::class gaia::GaiaPolUStyle {
 #  ---------------------------------------------------------------------
    public method setSwid {wid} {
       ::gaia::GaiaPolStyle::setSwid $wid
-      set values_($this,swid) $wid
+      set values_(swid) $wid
    }
 
    public method getSwid {} {
-      set ret $values_($this,swid)
+      set ret $values_(swid)
       if { $ret != "" && [catch {set t [expr $ret]} ] } {
          if { $ret != "" } {
             error_dialog "Selected vector width \"$ret\" is not legal. Reseting it to blank."
          }
          set ret ""
-         set values_($this,swid) ""
+         set values_(swid) ""
       }
       ::gaia::GaiaPolStyle::setSwid $ret
       return $ret
@@ -435,14 +431,14 @@ itcl::class gaia::GaiaPolUStyle {
    public method setUflash {f} {
       ::gaia::GaiaPolStyle::setUflash $f
       if { $f } {
-         set values_($this,uflash) 1
+         set values_(uflash) 1
       } else {
-         set values_($this,uflash) 0
+         set values_(uflash) 0
       }
    }
 
    public method getUflash {} {
-      set ret $values_($this,uflash)
+      set ret $values_(uflash)
       ::gaia::GaiaPolStyle::setUflash $ret
       return $ret
    }
@@ -452,14 +448,14 @@ itcl::class gaia::GaiaPolUStyle {
    public method setSflash {f} {
       ::gaia::GaiaPolStyle::setSflash $f
       if { $f } {
-         set values_($this,sflash) 1
+         set values_(sflash) 1
       } else {
-         set values_($this,sflash) 0
+         set values_(sflash) 0
       }
    }
 
    public method getSflash {} {
-      set ret $values_($this,sflash)
+      set ret $values_(sflash)
       ::gaia::GaiaPolStyle::setSflash $ret
       return $ret
    }
@@ -481,12 +477,12 @@ itcl::class gaia::GaiaPolUStyle {
    public method activ { args } {
 
 #  Ensure the values in the values_ array are up to date.
-      set values_($this,sclr) [$itk_component(sclr) get]
-      set values_($this,uclr) [$itk_component(uclr) get]
-      set values_($this,lencol) [$itk_component(lencol) get]
-      set values_($this,angcol) [$itk_component(angcol) get]
-      set acol_ $values_($this,angcol)
-      set lcol_ $values_($this,lencol)
+      set values_(sclr) [$itk_component(sclr) get]
+      set values_(uclr) [$itk_component(uclr) get]
+      set values_(lencol) [$itk_component(lencol) get]
+      set values_(angcol) [$itk_component(angcol) get]
+      set acol_ $values_(angcol)
+      set lcol_ $values_(lencol)
 
 #  Use the current values.
       if { "$itk_option(-changecmd)" != "" } {
@@ -528,7 +524,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Column names header...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Columns to use for:"
+	    gaia::LabelRule $w_.header1 -text "Columns to use for:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -538,16 +534,16 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Create a LabelMenu to control the vector lengths within the above frame.
          itk_component add lencol {
-	    LabelMenu $w_.lencol -text "Vector length:" -labelwidth $lwidth1 \
-                                 -variable [scope values_($this,lencol)]
+	    util::LabelMenu $w_.lencol -text "Vector length:" -labelwidth $lwidth1 \
+                                 -variable [scope values_(lencol)]
 	 }
          grid $itk_component(lencol) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(lencol) {Column to use for vector lengths}
 
 #  Create a LabelMenu to control the vector angles within the above frame.
          itk_component add angcol {
-	    LabelMenu $w_.angcol -text "Vector angles:" -labelwidth $lwidth1 \
-                                       -variable [scope values_($this,angcol)]
+	    util::LabelMenu $w_.angcol -text "Vector angles:" -labelwidth $lwidth1 \
+                                       -variable [scope values_(angcol)]
 	 }
          grid $itk_component(angcol) -row $r -column 1 -columnspan 2 -sticky nw -padx $px
          add_short_help $itk_component(angcol) {Column to use for vector angles}
@@ -560,7 +556,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Attributes for selected vectors...
          itk_component add header2 {
-	    LabelRule $w_.header2 -text "Selected vectors:"
+	    gaia::LabelRule $w_.header2 -text "Selected vectors:"
 	 }
          grid $itk_component(header2) -row [incr r] -column 0  -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -571,8 +567,8 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelMenu within the above frame to control the colour for
 #  selected vectors.
          itk_component add sclr {
-	    LabelMenu $w_.sclr -text "Colour:" -labelwidth $lwidth1 \
-                               -variable [scope values_($this,sclr)]
+	    util::LabelMenu $w_.sclr -text "Colour:" -labelwidth $lwidth1 \
+                               -variable [scope values_(sclr)]
          }
          grid $itk_component(sclr) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(sclr) {Colour for selected vectors}
@@ -593,12 +589,12 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelEntry within the above frame to control the width for
 #  selected vectors.
          itk_component add swid {
-	    LabelEntry $w_.swid -text "Thickness:" \
+	    util::LabelEntry $w_.swid -text "Thickness:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -anchor nw \
                                 -labelwidth $lwidth2 \
-                                -textvariable [scope values_($this,swid)]
+                                -textvariable [scope values_(swid)]
 	 }
          grid $itk_component(swid) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(swid) {Line width for selected vectors (in pixels)}
@@ -606,13 +602,13 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelCheck within the above frame to control the flashing
 #  state of selected vectors.
          itk_component add sflash {
-	    StarLabelCheck $w_.sflash -text "Flashing:" \
+	    gaia::StarLabelCheck $w_.sflash -text "Flashing:" \
                                       -onvalue 1 \
                                       -offvalue 0 \
                                       -command [code $this activ] \
                                       -labelwidth $lwidth2 \
                                       -anchor nw \
-                                      -variable [scope values_($this,sflash)]
+                                      -variable [scope values_(sflash)]
 	 }
          grid $itk_component(sflash) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(sflash) {Check to make selected vectors flash}
@@ -622,7 +618,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Attributes for unselected vectors...
          itk_component add header3 {
-	    LabelRule $w_.header3 -text "All other vectors:"
+	    gaia::LabelRule $w_.header3 -text "All other vectors:"
 	 }
          grid $itk_component(header3) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -633,8 +629,8 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelMenu within the above frame to control the colour for
 #  unselected vectors.
          itk_component add uclr {
-	    LabelMenu $w_.uclr -text "Colour:" -labelwidth $lwidth1 \
-                               -variable [scope values_($this,uclr)]
+	    util::LabelMenu $w_.uclr -text "Colour:" -labelwidth $lwidth1 \
+                               -variable [scope values_(uclr)]
 	 }
          grid $itk_component(uclr) -row $r -column 0 -sticky nw -padx $px
          add_short_help $itk_component(uclr) {Colour for unselected vectors}
@@ -655,12 +651,12 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelEntry within the above frame to control the width for
 #  unselected vectors.
          itk_component add uwid {
-	    LabelEntry $w_.uwid -text "Thickness:" \
+	    util::LabelEntry $w_.uwid -text "Thickness:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \
                                 -anchor nw \
-                                -textvariable [scope values_($this,uwid)]
+                                -textvariable [scope values_(uwid)]
 	 }
          grid $itk_component(uwid) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(uwid) {Line width for unselected vectors (in pixels)}
@@ -668,13 +664,13 @@ itcl::class gaia::GaiaPolUStyle {
 #  Create a LabelCheck within the above frame to control the flashing
 #  state of unselected vectors.
          itk_component add uflash {
-	    StarLabelCheck $w_.uflash -text "Flashing:" \
+	    gaia::StarLabelCheck $w_.uflash -text "Flashing:" \
                                       -onvalue 1 \
                                       -offvalue 0 \
                                       -command [code $this activ] \
                                       -labelwidth $lwidth2 \
                                       -anchor nw \
-                                      -variable [scope values_($this,uflash)]
+                                      -variable [scope values_(uflash)]
 	 }
          grid $itk_component(uflash) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(uflash) {Check to make unselected vectors flash}
@@ -684,7 +680,7 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Others header
          itk_component add header4 {
-	    LabelRule $w_.header4 -text "Misc.:"
+	    gaia::LabelRule $w_.header4 -text "Misc.:"
 	 }
          grid $itk_component(header4) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -694,12 +690,12 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Vector scale
          itk_component add mag {
-	    LabelEntry $w_.mag -text "Vector scale:" \
+	    util::LabelEntry $w_.mag -text "Vector scale:" \
                                -valuewidth $vwidth \
                                -command [code $this activ] \
                                -labelwidth $lwidth1 \
                                -anchor nw \
-                               -textvariable [scope values_($this,mag)]
+                               -textvariable [scope values_(mag)]
 	 }
 
          grid $itk_component(mag) -row $r -column 0 -sticky nw -padx $px
@@ -707,24 +703,24 @@ itcl::class gaia::GaiaPolUStyle {
 
 #  Angle rotation
          itk_component add arot {
-	    LabelEntry $w_.arot -text "Rotation:" \
+	    util::LabelEntry $w_.arot -text "Rotation:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \
                                 -anchor nw \
-                                -textvariable [scope values_($this,arot)]
+                                -textvariable [scope values_(arot)]
          }
          grid $itk_component(arot) -row $r -column 1 -sticky nw -padx $px
          add_short_help $itk_component(arot) {Anti-clockwise angle (in degrees) by which to rotate vectors}
 
 #  Number of vectors
          itk_component add nvec {
-	    LabelEntry $w_.nvec -text "Max. vectors:" \
+	    util::LabelEntry $w_.nvec -text "Max. vectors:" \
                                 -valuewidth $vwidth \
                                 -command [code $this activ] \
                                 -labelwidth $lwidth2 \
                                 -anchor nw \
-                                -textvariable [scope values_($this,nvec)]
+                                -textvariable [scope values_(nvec)]
          }
          grid $itk_component(nvec) -row $r -column 2 -sticky nw -padx $px
          add_short_help $itk_component(nvec) {Maximum number of vectors to draw (blank means no limit)}
@@ -780,12 +776,12 @@ itcl::class gaia::GaiaPolUStyle {
 #  property, if any. Otherwise, select the blank item.
          if { $ok } {
             if { [lsearch -exact $headings_ $lcol_] != -1 } {
-               set values_($this,lencol) $lcol_
+               set values_(lencol) $lcol_
             } else {
-               set values_($this,lencol) ""
+               set values_(lencol) ""
             }
          } else {
-            set values_($this,lencol) ""
+            set values_(lencol) ""
          }
 
 #  Do the same for the column name giving vector angles...
@@ -801,12 +797,12 @@ itcl::class gaia::GaiaPolUStyle {
          $itk_component(angcol) add -label "" -value ""
          if { $ok } {
             if { [lsearch -exact $headings_ $acol_] != -1 } {
-               set values_($this,angcol) $acol_
+               set values_(angcol) $acol_
             } else {
-               set values_($this,angcol) ""
+               set values_(angcol) ""
             }
          } else {
-            set values_($this,angcol) ""
+            set values_(angcol) ""
          }
       }
    }
@@ -851,7 +847,10 @@ itcl::class gaia::GaiaPolUStyle {
 #  Column headings
        variable headings_ ""
 
+#  Widget settings.
+       variable values_
    }
+   
 
 #  Private data members:
 #  =====================
@@ -860,8 +859,6 @@ itcl::class gaia::GaiaPolUStyle {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  End of class definition.
 }

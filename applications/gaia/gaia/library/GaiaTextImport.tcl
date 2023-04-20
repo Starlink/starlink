@@ -125,7 +125,7 @@ itcl::class gaia::GaiaTextImport {
       #  Name of input file.
       if { $itk_option(-show_infile) } {
          itk_component add infile {
-            LabelFileChooser $w_.infile \
+            gaia::LabelFileChooser $w_.infile \
                -labelwidth 9 \
                -text "Input file:" \
                -textvariable [scope itk_option(-infile)] \
@@ -139,7 +139,7 @@ itcl::class gaia::GaiaTextImport {
       #  Name of output file.
       if { $itk_option(-show_outfile) } {
          itk_component add outfile {
-            LabelFileChooser $w_.outfile \
+            gaia::LabelFileChooser $w_.outfile \
                -labelwidth 9 \
                -text "Output file:" \
                -textvariable [scope itk_option(-outfile)] \
@@ -155,7 +155,7 @@ itcl::class gaia::GaiaTextImport {
       if { $itk_option(-format) == "tab" } {
 
          itk_component add system {
-            LabelMenu $w_.system \
+            util::LabelMenu $w_.system \
                -text "System:" \
                -relief raised \
                -labelwidth 9
@@ -170,7 +170,7 @@ itcl::class gaia::GaiaTextImport {
          add_short_help $itk_component(system) {Celestial coordinate system}
 
          itk_component add equinox {
-            LabelEntryMenu $w_.equinox \
+            gaia::LabelEntryMenu $w_.equinox \
                -text "Equinox:" \
                -labelwidth 9
          }
@@ -253,11 +253,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Run-time initialisations
       set_separated_
-      set values_($this,id) {}
-      set values_($this,ra) {}
-      set values_($this,dec) {}
-      set values_($this,x) {}
-      set values_($this,y) {}
+      set values_(id) {}
+      set values_(ra) {}
+      set values_(dec) {}
+      set values_(x) {}
+      set values_(y) {}
    }
 
    #  Destructor:
@@ -270,11 +270,11 @@ itcl::class gaia::GaiaTextImport {
 
    #  Set defaults for widget states.
    protected method set_defaults_ {} {
-      set values_($this,separated) 1
-      set values_($this,delimiter) " "
-      set values_($this,comment) "\#"
-      set values_($this,fixwidths) {10 20}
-      set values_($this,skip) 0
+      set values_(separated) 1
+      set values_(delimiter) " "
+      set values_(comment) "\#"
+      set values_(fixwidths) {10 20}
+      set values_(skip) 0
    }
 
    #  Close window writing output file.
@@ -312,11 +312,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Delimitered or fixed format.
       itk_component add separated {
-         StarLabelCheck $parent.separated \
+         gaia::StarLabelCheck $parent.separated \
             -text "Use delimiter (otherwise fixed width):" \
             -onvalue 1 \
             -offvalue 0 \
-            -variable [scope values_($this,separated)] \
+            -variable [scope values_(separated)] \
             -command [code $this set_separated_]
       }
       pack $itk_component(separated) -side top -fill x -pady 3 -padx 3
@@ -325,10 +325,10 @@ itcl::class gaia::GaiaTextImport {
 
       #  Set the delimiter.
       itk_component add delimiter {
-         LabelMenu $parent.delimiter \
+         util::LabelMenu $parent.delimiter \
             -labelwidth $lwidth \
             -text "Delimiter:" \
-            -variable [scope values_($this,delimiter)]
+            -variable [scope values_(delimiter)]
       }
       pack $itk_component(delimiter) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(delimiter) \
@@ -343,11 +343,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Comment delimiter.
       itk_component add comment {
-         LabelEntry $parent.comment \
+         util::LabelEntry $parent.comment \
             -labelwidth $lwidth \
             -text "Comment:" \
-            -textvariable [scope values_($this,comment)] \
-            -value $values_($this,comment)
+            -textvariable [scope values_(comment)] \
+            -value $values_(comment)
       }
       pack $itk_component(comment) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(comment) \
@@ -355,11 +355,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Number of lines to skip at beginning of file.
       itk_component add skip {
-         LabelEntry $parent.skip \
+         util::LabelEntry $parent.skip \
             -labelwidth $lwidth \
             -text "Header lines:" \
-            -textvariable [scope values_($this,skip)] \
-            -value $values_($this,skip) \
+            -textvariable [scope values_(skip)] \
+            -value $values_(skip) \
             -validate integer
       }
       pack $itk_component(skip) -side top -fill x -ipadx 1m -ipady 1m
@@ -368,11 +368,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Fixed width control.
       itk_component add fixwidths {
-         LabelEntry $parent.fixwidths \
+         util::LabelEntry $parent.fixwidths \
             -labelwidth $lwidth \
             -text "Field positions:" \
-            -textvariable [scope values_($this,fixwidths)] \
-            -value $values_($this,fixwidths) \
+            -textvariable [scope values_(fixwidths)] \
+            -value $values_(fixwidths) \
             -command [code $this update_fixed_ to]
       }
       pack $itk_component(fixwidths) -side top -fill x -ipadx 1m -ipady 1m
@@ -381,11 +381,11 @@ itcl::class gaia::GaiaTextImport {
 
       #  Interactive tab positioning widget.
       itk_component add tabstop {
-         GaiaTabStops $parent.tabstop \
+         gaia::GaiaTabStops $parent.tabstop \
             -change_cmd [code $this update_fixed_ from] \
             -text "No information, press update"
       }
-      $itk_component(tabstop) setindices $values_($this,fixwidths)
+      $itk_component(tabstop) setindices $values_(fixwidths)
       pack $itk_component(tabstop) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(tabstop) \
          {Fixed width positions (can interactively adjust/create/delete)}
@@ -394,7 +394,7 @@ itcl::class gaia::GaiaTextImport {
 
    #  Toggle the state of the delimiter fields.
    protected method set_separated_ {} {
-      if { $values_($this,separated) } {
+      if { $values_(separated) } {
          #  Using delimiter
          $itk_component(delimiter) configure -state normal
          $itk_component(fixwidths) configure -state disabled
@@ -410,7 +410,7 @@ itcl::class gaia::GaiaTextImport {
    #  Set/reset the fixed widths.
    protected method update_fixed_ {action value} {
       if { $action == "from" } {
-         set values_($this,fixwidths) $value
+         set values_(fixwidths) $value
       } else {
          $itk_component(tabstop) setindices \
             [$itk_component(fixwidths) get]
@@ -419,7 +419,7 @@ itcl::class gaia::GaiaTextImport {
 
    #  Set the delimiter symbol.
    protected method set_delimiter_ {value} {
-      set values_($this,delimiter) $value
+      set values_(delimiter) $value
    }
 
    #  Heading names and types controls.
@@ -471,39 +471,39 @@ itcl::class gaia::GaiaTextImport {
       for {set i 0;set j 1} {$i < $ncolumns_} {incr i; incr j} {
 
          #  Keep old column names if any exist.
-         if { ! [info exists values_($this,heading$i)] } {
-            set values_($this,heading$i) "Col$i"
+         if { ! [info exists values_(heading$i)] } {
+            set values_(heading$i) "Col$i"
          }
          itk_component add col$i {
-            LabelEntry $parent.col$i \
+            util::LabelEntry $parent.col$i \
                -labelwidth 2 \
                -text "$i:" \
-               -textvariable [scope values_($this,heading$i)] \
-               -value $values_($this,heading$i)
+               -textvariable [scope values_(heading$i)] \
+               -value $values_(heading$i)
          }
          itk_component add id$i {
             radiobutton $parent.id$i \
-               -variable [scope values_($this,id)] \
+               -variable [scope values_(id)] \
                -value $i
          }
          itk_component add ra$i {
             radiobutton $parent.ra$i \
-               -variable [scope values_($this,ra)] \
+               -variable [scope values_(ra)] \
                -value $i
          }
          itk_component add dec$i {
             radiobutton $parent.dec$i \
-               -variable [scope values_($this,dec)] \
+               -variable [scope values_(dec)] \
                -value $i
          }
          itk_component add x$i {
             radiobutton $parent.x$i \
-               -variable [scope values_($this,x)] \
+               -variable [scope values_(x)] \
                -value $i
          }
          itk_component add y$i {
             radiobutton $parent.y$i \
-               -variable [scope values_($this,y)] \
+               -variable [scope values_(y)] \
                -value $i
          }
 
@@ -535,7 +535,7 @@ itcl::class gaia::GaiaTextImport {
    #  Add a TableList object to display the decoded text file.
    protected method add_table_controls_ {parent} {
       itk_component add table {
-         TableList $parent.table \
+         util::TableList $parent.table \
             -title "Input file data" \
             -hscroll 1
       }
@@ -553,7 +553,7 @@ itcl::class gaia::GaiaTextImport {
       #  Set the table headings.
       set headings ""
       for {set i 0} {$i < $ncolumns_} {incr i} {
-         append headings "$values_($this,heading$i) "
+         append headings "$values_(heading$i) "
       }
       $itk_component(table) configure -headings $headings
 
@@ -564,10 +564,10 @@ itcl::class gaia::GaiaTextImport {
       while { 1 } {
          incr count
          set llen [gets $fid line]
-         if { $count > $values_($this,skip) } {
+         if { $count > $values_(skip) } {
             if { $llen > 0 } {
-               if { ! [string match "$values_($this,comment)*" $line] } {
-                  if { $values_($this,separated) } {
+               if { ! [string match "$values_(comment)*" $line] } {
+                  if { $values_(separated) } {
                      parseline_ $line
                   } else {
                      splitline_ $line
@@ -596,7 +596,7 @@ itcl::class gaia::GaiaTextImport {
       clear_headings_
 
       #  If using a delimiter.
-      if { $values_($this,separated) } {
+      if { $values_(separated) } {
 
          #  Open the file.
          if { $itk_option(-infile) != "" } {
@@ -605,9 +605,9 @@ itcl::class gaia::GaiaTextImport {
             while { 1 } {
                incr count
                set llen [gets $fid line]
-               if { $count > $values_($this,skip) } {
+               if { $count > $values_(skip) } {
                   if { $llen > 0 } {
-                     if { ! [string match "$values_($this,comment)*" $line] } {
+                     if { ! [string match "$values_(comment)*" $line] } {
                         break
                      }
                   }
@@ -622,7 +622,7 @@ itcl::class gaia::GaiaTextImport {
       } else {
 
          #  Fixed width entries.
-         set fixwidths [split $values_($this,fixwidths) " "]
+         set fixwidths [split $values_(fixwidths) " "]
          set ncolumns_ [llength $fixwidths]
       }
       add_headings_
@@ -637,7 +637,7 @@ itcl::class gaia::GaiaTextImport {
       if { $line != {} } {
          set ncol 0
          while { 1 } {
-            set word [ctoken line $values_($this,delimiter)]
+            set word [ctoken line $values_(delimiter)]
             if { $word != {} } {
                incr ncol
                lappend wordlist_ $word
@@ -657,7 +657,7 @@ itcl::class gaia::GaiaTextImport {
       set wordlist_ {}
       if { $line != {} } {
          set last 0
-         foreach pos $values_($this,fixwidths) {
+         foreach pos $values_(fixwidths) {
             incr pos -1
             lappend wordlist_ [string range $line $last $pos]
             set last [expr $pos+1]
@@ -682,36 +682,36 @@ itcl::class gaia::GaiaTextImport {
             puts $outid "long_name: conversion of text file: $itk_option(-infile)"
             puts $outid "short_name: convert@text"
             puts $outid "url: $itk_option(-outfile)"
-            if { $values_($this,id) != {} } {
-               puts $outid "id_col: $values_($this,id)"
+            if { $values_(id) != {} } {
+               puts $outid "id_col: $values_(id)"
             }
-            if { $values_($this,ra) != {} } {
-               puts $outid "ra_col: $values_($this,ra)"
+            if { $values_(ra) != {} } {
+               puts $outid "ra_col: $values_(ra)"
                set raout_ 1
             }
-            if { $values_($this,dec) != {} } {
-               puts $outid "dec_col: $values_($this,dec)"
+            if { $values_(dec) != {} } {
+               puts $outid "dec_col: $values_(dec)"
                set decout_ 1
             }
-            if { $values_($this,ra) != {} || $values_($this,dec) != {} } {
+            if { $values_(ra) != {} || $values_(dec) != {} } {
                puts $outid "equinox: [$itk_component(equinox) get]"
                puts $outid "system: [$itk_component(system) get]"
             }
-            if { $values_($this,x) != {} } {
-               puts $outid "x_col: $values_($this,x)"
+            if { $values_(x) != {} } {
+               puts $outid "x_col: $values_(x)"
                set xout_ 1
             }
-            if { $values_($this,y) != {} } {
-               puts $outid "y_col: $values_($this,y)"
+            if { $values_(y) != {} } {
+               puts $outid "y_col: $values_(y)"
                set yout_ 1
             }
             set headings ""
             for {set i 0} {$i < $ncolumns_} {incr i} {
-               append headings "$values_($this,heading$i)\t"
+               append headings "$values_(heading$i)\t"
             }
-            if { $values_($this,ra) != {} && $values_($this,dec) != {}
+            if { $values_(ra) != {} && $values_(dec) != {}
                  ||
-                 $values_($this,x) != {} && $values_($this,y) != {} } {
+                 $values_(x) != {} && $values_(y) != {} } {
                puts $outid "symbol: {} circle 4"
             }
 
@@ -721,11 +721,11 @@ itcl::class gaia::GaiaTextImport {
             while { 1 } {
                incr count
                set llen [gets $inid line]
-               if { $count > $values_($this,skip) } {
+               if { $count > $values_(skip) } {
                   if { $llen > 0 } {
                      if { ! [string match \
-                                "$values_($this,comment)*" $line]  } {
-                        if { $values_($this,separated) } {
+                                "$values_(comment)*" $line]  } {
+                        if { $values_(separated) } {
                            parseline_ $line
                         } else {
                            splitline_ $line
@@ -747,20 +747,20 @@ itcl::class gaia::GaiaTextImport {
             set dec -1
             set x -1
             set y -1
-            if { $values_($this,id) != {} } {
-               set id $values_($this,id)
+            if { $values_(id) != {} } {
+               set id $values_(id)
             }
-            if { $values_($this,ra) != {} } {
-               set raout_ $values_($this,ra)
+            if { $values_(ra) != {} } {
+               set raout_ $values_(ra)
             }
-            if { $values_($this,dec) != {} } {
-               set decout_ $values_($this,dec)
+            if { $values_(dec) != {} } {
+               set decout_ $values_(dec)
             }
-            if { $values_($this,x) != {} } {
-               set xout_ $values_($this,x)
+            if { $values_(x) != {} } {
+               set xout_ $values_(x)
             }
-            if { $values_($this,y) != {} } {
-               set yout_ $values_($this,y)
+            if { $values_(y) != {} } {
+               set yout_ $values_(y)
             }
 
             #  Set defaults, if RA/DEC etc. not selected. Note these
@@ -772,15 +772,15 @@ itcl::class gaia::GaiaTextImport {
                #  Five columns or more. Defaults are id, ra, dec, x, y.
                if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
                     $xout_ == -1 && $yout_ == -1} {
-                  set values_($this,id) 0
+                  set values_(id) 0
                   set id 0
-                  set values_($this,ra) 1
+                  set values_(ra) 1
                   set raout_ 1
-                  set values_($this,dec) 2
+                  set values_(dec) 2
                   set decout_ 2
-                  set values_($this,x) 3
+                  set values_(x) 3
                   set xout_ 3
-                  set values_($this,y) 4
+                  set values_(y) 4
                   set yout_ 4
                }
             } elseif { $ncolumns_ == 4 } {
@@ -788,13 +788,13 @@ itcl::class gaia::GaiaTextImport {
                #  Only four columns. Defaults are ra, dec, x, y.
                if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
                     $xout_ == -1 && $yout_ == -1} {
-                  set values_($this,ra) 0
+                  set values_(ra) 0
                   set raout_ 0
-                  set values_($this,dec) 1
+                  set values_(dec) 1
                   set decout_ 1
-                  set values_($this,x) 2
+                  set values_(x) 2
                   set xout_ 2
-                  set values_($this,y) 3
+                  set values_(y) 3
                   set yout_ 3
                }
             } elseif { $ncolumns_ == 3 } {
@@ -802,11 +802,11 @@ itcl::class gaia::GaiaTextImport {
                #  Only three columns. Defaults are id, ra, dec.
                if { $id == -1 && $raout_ == -1 && $decout_ == -1 &&
                     $xout_ == -1 && $yout_ == -1} {
-                  set values_($this,id) 0
+                  set values_(id) 0
                   set id 0
-                  set values_($this,ra) 1
+                  set values_(ra) 1
                   set raout_ 1
-                  set values_($this,dec) 2
+                  set values_(dec) 2
                   set decout_ 2
                }
             }
@@ -816,10 +816,10 @@ itcl::class gaia::GaiaTextImport {
             while { 1 } {
                incr count
                set llen [gets $inid line]
-               if { $count > $values_($this,skip) } {
+               if { $count > $values_(skip) } {
                   if { $llen > 0 } {
-                     if { ! [string match "$values_($this,comment)*" $line] } {
-                        if { $values_($this,separated) } {
+                     if { ! [string match "$values_(comment)*" $line] } {
+                        if { $values_(separated) } {
                            parseline_ $line
                         } else {
                            splitline_ $line
@@ -916,11 +916,12 @@ itcl::class gaia::GaiaTextImport {
    #  Variable to trace when output file is written.
    protected variable saved_ 0
 
+   #  Values shared by widgets -- indexed by (fieldname).
+   protected variable values_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Values shared by widgets -- indexed by ($this,fieldname).
-   common values_
 
 #  End of class definition.
 }

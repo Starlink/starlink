@@ -88,7 +88,7 @@ itcl::class gaiavo::GaiaVOTAP {
 
    #  Add additional menu items.
    public method init {} {
-      GaiaVOCat::init
+      gaiavo::GaiaVOCat::init
 
       #  Override title.
       wm title $w_ "Query TAP service"
@@ -170,7 +170,7 @@ itcl::class gaiavo::GaiaVOTAP {
 
    #  New catalogue, set default plot symbol.
    public method query_done {status result} {
-      GaiaVOCat::query_done $status $result
+      gaiavo::GaiaVOCat::query_done $status $result
       if { $status } {
          set_default_plot_symbol_
       }

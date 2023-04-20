@@ -125,12 +125,12 @@ itcl::class gaia::GaiaAstDomain {
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.
       itk_component add rule {
-         LabelRule $w_.rule -text {Built-in coordinate systems:}
+         gaia::LabelRule $w_.rule -text {Built-in coordinate systems:}
       }
 
       #  System.
       itk_component add System {
-         LabelMenu $w_.system \
+         util::LabelMenu $w_.system \
                -text "System:" \
                -relief raised \
                -labelwidth 8 \

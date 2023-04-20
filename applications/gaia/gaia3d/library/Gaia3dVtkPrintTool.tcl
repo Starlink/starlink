@@ -70,7 +70,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Choice of graphics format.
       itk_component add format {
-         LabelMenu $w_.format \
+         util::LabelMenu $w_.format \
             -labelwidth $lwidth \
             -text "Graphic format:" \
             -variable [scope format_]
@@ -87,7 +87,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Image scale, allow values 1 through 20.
       itk_component add scale {
-         LabelEntryScale $w_.scale \
+         util::LabelEntryScale $w_.scale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -108,7 +108,7 @@ itcl::class ::gaia3d::Gaia3dVtkPrintTool {
 
       #  Output file name.
       itk_component add filename {
-         LabelFileChooser $w_.filename \
+         gaia::LabelFileChooser $w_.filename \
             -labelwidth $lwidth \
             -text "Output file:" \
             -value $filename_ \

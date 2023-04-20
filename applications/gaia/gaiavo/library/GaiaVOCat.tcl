@@ -190,7 +190,7 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  Add the table for displaying the query results.
       itk_component add results {
-         GaiaQueryResult $w_.results \
+         gaia::GaiaQueryResult $w_.results \
             -astrocat [code $w_.cat] \
             -title "Query Results" \
             -hscroll 1 \
@@ -231,7 +231,7 @@ itcl::class gaiavo::GaiaVOCat {
 
       #  Add the ProgressBar, looks busy during query.
       itk_component add progressbar {
-         ProgressBar $w_.progress
+         util::ProgressBar $w_.progress
       }
       pack $itk_component(progressbar) -side top -fill x
       add_short_help itk_component(progressbar) \
@@ -248,7 +248,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Save query to a VOTable.
    public method save_query {} {
-      set w [FileSelect .\#auto -title "Save query to a local file"]
+      set w [util::FileSelect .\#auto -title "Save query to a local file"]
       if {[$w activate]} {
          set filename [$w get]
          if {[file exists $filename]} {
@@ -263,7 +263,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Read query from a VOTable.
    public method read_query {} {
-      set w [FileSelect .\#auto -title "Read old query from a local file"]
+      set w [util::FileSelect .\#auto -title "Read old query from a local file"]
       if { [$w activate] } {
          set filename [$w get]
          if {[file exists $filename]} {
@@ -587,7 +587,7 @@ itcl::class gaiavo::GaiaVOCat {
 
    #  Pop up a dialog to set or change the HTTP proxy server.
    public proc proxies {} {
-      utilReUseWidget ProxyDialog .proxy \
+      utilReUseWidget cat::ProxyDialog .proxy \
          -configfile $::env(HOME)/.skycat/proxies
    }
 

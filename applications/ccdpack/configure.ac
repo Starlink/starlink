@@ -16,9 +16,10 @@ AC_FC_MAIN
 
 STAR_MESSGEN(user_err.msg)
 
-TCL_VERSION=8.5
-ITCL_VERSION=3.4
-IWIDGETS_VERSION=4.0.1
+TCL_VERSION=8.6
+ITCL_VERSION=4.2.3
+ITK_VERSION=4.1.0
+IWIDGETS_VERSION=4.1.1
 BLT_VERSION=25
 
 AC_PATH_XTRA
@@ -50,12 +51,12 @@ if test "${TCL_PREFIX}" != ""; then
    my_save_LIBS="$LIBS"
    LIBS="$LIBS $X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11"
    AC_CHECK_LIB(itcl$ITCL_VERSION,Itcl_Init,,[unset have_itcl],[$TCL_LIBS])
-   AC_CHECK_LIB(itk$ITCL_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub$ITCL_VERSION $TK_LIBS $TCL_LIBS])
+   AC_CHECK_LIB(itk$ITK_VERSION,Itk_Init,,[unset have_itcl],[-litcl$ITCL_VERSION -litclstub$ITCL_VERSION $TK_LIBS $TCL_LIBS])
    AC_MSG_CHECKING([whether to use incr tcl])
    if test -n "$have_itcl"; then
       AC_MSG_RESULT(yes)
       AC_DEFINE(HAVE_ITCL, 1, [Is incr Tcl present?])
-      ITCL_LIBS="-litk$ITCL_VERSION -litcl$ITCL_VERSION"
+      ITCL_LIBS="-litk$ITK_VERSION -litcl$ITCL_VERSION"
       AC_SUBST(ITCL_LIBS)
    else
       AC_MSG_RESULT(no)

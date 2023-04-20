@@ -124,7 +124,7 @@ itcl::class gaia::GaiaAstDisplayDomains {
       #  Only one element is available. A dropdown box showing the AST
       #  domains for the current image.
       itk_component add rule {
-         LabelRule $w_.rule -text {Built-in coordinate readouts:}
+         gaia::LabelRule $w_.rule -text {Built-in coordinate readouts:}
       }
 
       #  We need read outs for all domains known to the displayed

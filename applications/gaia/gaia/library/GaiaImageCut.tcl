@@ -58,7 +58,7 @@ itcl::class gaia::GaiaImageCut {
 
    #  Constructor: create a new instance of this class.
    constructor {args} {
-      eval RtdImageCut::constructor $args
+      eval rtd::RtdImageCut::constructor $args
    } {
       eval itk_initialize $args
    }
@@ -66,7 +66,7 @@ itcl::class gaia::GaiaImageCut {
    #  Override the make the control panel to make changes in the way
    #  that the slider widget's limits and resolutions are set.
    method make_controls {} {
-      RtdImageCut::make_controls
+      rtd::RtdImageCut::make_controls
       set from [$image_ min]
       set to [$image_ max]
       set increment_ [expr min(50,($to-$from)/1000.0)]
@@ -77,7 +77,7 @@ itcl::class gaia::GaiaImageCut {
 
    #  Override make buttons to change some text.
    method make_buttons {} {
-      RtdImageCut::make_buttons
+      rtd::RtdImageCut::make_buttons
       $itk_component(median) configure -text "Median Filter"
    }
 

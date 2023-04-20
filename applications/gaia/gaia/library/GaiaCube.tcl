@@ -240,12 +240,12 @@ itcl::class gaia::GaiaCube {
          -command [code $this show_builtin_toolbox_]
 
       #  Spectral and time coordinates handler.
-      set spec_coords_ [uplevel \#0 GaiaSpecCoords \#auto]
+      set spec_coords_ [uplevel \#0 gaia::GaiaSpecCoords \#auto]
       $spec_coords_ configure -change_cmd [code $this coords_changed_]
       $spec_coords_ add_menu $SpectralCoords
 
       #  Spectral standard-of-rest handler.
-      set spec_sor_ [uplevel \#0 GaiaSpecCoords \#auto]
+      set spec_sor_ [uplevel \#0 gaia::GaiaSpecCoords \#auto]
       $spec_sor_ configure -change_cmd [code $this coords_changed_]
 
       #  Add the "Go" menu to switch back and forth between cubes that have
@@ -253,7 +253,7 @@ itcl::class gaia::GaiaCube {
       set GoMenu [add_menubutton "Go" \
                   "Go: menu with shortcuts to view cubes previously viewed"]
       configure_menubutton "Go" -underline 0
-      set history_ [GaiaCubeHistory \#auto -gaia_cube $this]
+      set history_ [gaia::GaiaCubeHistory \#auto -gaia_cube $this]
       $GoMenu config -postcommand [code $history_ update_history_menu $GoMenu]
 
       #  Add window help.
@@ -263,7 +263,7 @@ itcl::class gaia::GaiaCube {
 
       #  Name of input dataset.
       itk_component add cube {
-         LabelFileChooser $w_.cube \
+         gaia::LabelFileChooser $w_.cube \
             -text "Input cube:" \
             -textvariable [scope itk_option(-cube)] \
             -command [code $this configure -cube] \
@@ -276,7 +276,7 @@ itcl::class gaia::GaiaCube {
 
       #  Control for selecting the axis we move along.
       itk_component add axis {
-         LabelMenu $w_.axis \
+         util::LabelMenu $w_.axis \
             -text "Axis:" \
             -labelwidth $lwidth
       }
@@ -294,7 +294,7 @@ itcl::class gaia::GaiaCube {
 
       #  Slider that moves along the chosen axis.
       itk_component add index {
-         GaiaSpectralPlotLine $w_.index \
+         gaia::GaiaSpectralPlotLine $w_.index \
             -gaiacube [code $this] \
             -ref_id 1 \
             -text {Index of plane:} \
@@ -314,7 +314,7 @@ itcl::class gaia::GaiaCube {
 
       #  Whether to show a label with the coordinate in the main window.
       itk_component add showcoordlabel {
-         StarLabelCheck $w_.showcoordlabel \
+         gaia::StarLabelCheck $w_.showcoordlabel \
             -text "Show coordinate label:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $lwidth \
@@ -356,7 +356,7 @@ itcl::class gaia::GaiaCube {
 
       #  Spectrum section.
       itk_component add sruler {
-         LabelRule $spectrumTab.sruler -text "Spectrum controls:"
+         gaia::LabelRule $spectrumTab.sruler -text "Spectrum controls:"
       }
       pack $itk_component(sruler) -side top -fill x
 
@@ -377,7 +377,7 @@ itcl::class gaia::GaiaCube {
 
       set ref_ids 1
       itk_component add spectrum {
-         GaiaCubeSpectrum $sf1win.spectrum \
+         gaia::GaiaCubeSpectrum $sf1win.spectrum \
             -gaiacube [code $this] \
             -gaia $itk_option(-gaia) \
             -ref_id $ref_ids \
@@ -400,13 +400,13 @@ itcl::class gaia::GaiaCube {
       #  Animation section.
 
       itk_component add aruler {
-         LabelRule $animationTab.aruler -text "Animation controls:"
+         gaia::LabelRule $animationTab.aruler -text "Animation controls:"
       }
       pack $itk_component(aruler) -side top -fill x
 
       incr ref_ids
       itk_component add animation {
-         GaiaCubeAnimation $animationTab.animation \
+         gaia::GaiaCubeAnimation $animationTab.animation \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -421,13 +421,13 @@ itcl::class gaia::GaiaCube {
       #  Collapse section.
 
       itk_component add cruler {
-         LabelRule $collapseTab.cruler -text "Collapse controls:"
+         gaia::LabelRule $collapseTab.cruler -text "Collapse controls:"
       }
       pack $itk_component(cruler) -side top -fill x
 
       incr ref_ids
       itk_component add collapse {
-         GaiaCubeCollapse $collapseTab.collapse \
+         gaia::GaiaCubeCollapse $collapseTab.collapse \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -443,13 +443,13 @@ itcl::class gaia::GaiaCube {
       #  Chanmap section.
 
       itk_component add chanmapruler {
-         LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
+         gaia::LabelRule $chanmapTab.chanmapruler -text "Channel map controls:"
       }
       pack $itk_component(chanmapruler) -side top -fill x
 
       incr ref_ids
       itk_component add chanmap {
-         GaiaCubeChanmap $chanmapTab.chanmap \
+         gaia::GaiaCubeChanmap $chanmapTab.chanmap \
             -gaiacube [code $this] \
             -ref_id $ref_ids \
             -lower_limit $plane_ \
@@ -465,12 +465,12 @@ itcl::class gaia::GaiaCube {
       #  Rebin section.
 
       itk_component add rebinruler {
-         LabelRule $rebinTab.rebinruler -text "Rebin cube controls:"
+         gaia::LabelRule $rebinTab.rebinruler -text "Rebin cube controls:"
       }
       pack $itk_component(rebinruler) -side top -fill x
 
       itk_component add rebin {
-         GaiaCubeRebin $rebinTab.rebin \
+         gaia::GaiaCubeRebin $rebinTab.rebin \
             -gaiacube [code $this] \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -481,12 +481,12 @@ itcl::class gaia::GaiaCube {
       #  Filter section.
 
       itk_component add filterruler {
-         LabelRule $filterTab.filterruler -text "Filter cube controls:"
+         gaia::LabelRule $filterTab.filterruler -text "Filter cube controls:"
       }
       pack $itk_component(filterruler) -side top -fill x
 
       itk_component add filter {
-         GaiaCubeFilter $filterTab.filter \
+         gaia::GaiaCubeFilter $filterTab.filter \
             -gaiacube [code $this] \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -497,14 +497,14 @@ itcl::class gaia::GaiaCube {
       #  Baseline subtraction section. Must be the last.
 
       itk_component add baselineruler {
-         LabelRule $baselineTab.baselineruler \
+         gaia::LabelRule $baselineTab.baselineruler \
             -text "Baseline subtraction controls:"
       }
       pack $itk_component(baselineruler) -side top -fill x
 
       set baseline_id_ [incr ref_ids]
       itk_component add baseline {
-         GaiaCubeBaseline $baselineTab.baseline \
+         gaia::GaiaCubeBaseline $baselineTab.baseline \
             -gaiacube [code $this] \
             -ref_id $baseline_id_ \
             -lower_limit $plane_ \
@@ -636,7 +636,7 @@ itcl::class gaia::GaiaCube {
    protected method set_chosen_cube_ {{keeplimits 0}} {
 
       if { $namer_ == {} } {
-         set namer_ [GaiaImageName \#auto]
+         set namer_ [gaia::GaiaImageName \#auto]
       }
       $namer_ configure -imagename $itk_option(-cube)
 
@@ -659,7 +659,7 @@ itcl::class gaia::GaiaCube {
       }
 
       if { $cubeaccessor_ == {} } {
-         set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
+         set cubeaccessor_ [uplevel \#0 gaia::GaiaNDAccess \#auto]
       } elseif { $keeplimits } {
 
          #  Existing cube accessor and keeping limits regardless, so we
@@ -1597,7 +1597,7 @@ itcl::class gaia::GaiaCube {
       if { $fitsheaders_ == {} } {
          set fitsheaders_ $w_.fitsheaders_
       }
-      utilReUseWidget GaiaFITSHeader $fitsheaders_ -accessor $cubeaccessor_
+      utilReUseWidget gaia::GaiaFITSHeader $fitsheaders_ -accessor $cubeaccessor_
       $fitsheaders_ activate
    }
 
@@ -1618,7 +1618,7 @@ itcl::class gaia::GaiaCube {
          if { $hdu_list_ == {} } {
             set hdu_list_ $w_.hdulist
          }
-         utilReUseWidget GaiaCubeHduChooser $hdu_list_ -gaiacube $this
+         utilReUseWidget gaia::GaiaCubeHduChooser $hdu_list_ -gaiacube $this
       }
    }
 
@@ -1901,7 +1901,7 @@ itcl::class gaia::GaiaCube {
    #  ===========================
    protected method show_builtin_toolbox_ {} {
       if { $cubeaccessor_ != {} } {
-         utilReUseWidget GaiaCubeAstDomain $w_.domainchooser \
+         utilReUseWidget gaia::GaiaCubeAstDomain $w_.domainchooser \
             -gaiacube $this \
             -notify_cmd [code $this coords_changed_]
       }
@@ -1921,7 +1921,7 @@ itcl::class gaia::GaiaCube {
    #  one importer for each instance of this. Any 3D uses query the importer
    #  for catalogues.
    public method make_cupid_importer {} {
-      utilReUseWidget GaiaCupidImporter $w_.cupidimporter -gaiacube $this
+      utilReUseWidget gaia::GaiaCupidImporter $w_.cupidimporter -gaiacube $this
       renderers_set_cupid_importer_
    }
 

@@ -237,7 +237,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Create a GaiaPhotomList object to deal with the PSF
       #  object details (actually there is only one of these).
-      set psf_list_ [GaiaPhotomList \#auto \
+      set psf_list_ [gaia::GaiaPhotomList \#auto \
                         -show_list 0 \
                         -details $child_(psf).psfdetails \
                         -canvasdraw $itk_option(-canvasdraw) \
@@ -256,7 +256,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
-      set object_list_ [GaiaPhotomList \#auto \
+      set object_list_ [gaia::GaiaPhotomList \#auto \
                            -scrollbox $child_(results).box \
                            -details $child_(details).details \
                            -canvasdraw $itk_option(-canvasdraw) \
@@ -275,7 +275,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the PSF object.
       itk_component add PSFDetails {
-         GaiaPhotomDetails $child_(psf).psfdetails \
+         gaia::GaiaPhotomDetails $child_(psf).psfdetails \
             -positions_cmd [code $this sky_method_changed psf] \
             -usemags $usemags_ \
             -object_list [code $psf_list_]
@@ -285,7 +285,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the selected object.
       itk_component add ObjectDetails {
-         GaiaPhotomDetails $child_(details).details \
+         gaia::GaiaPhotomDetails $child_(details).details \
             -positions_cmd [code $this sky_method_changed object] \
             -usemags $usemags_ \
             -object_list [code $object_list_]
@@ -296,7 +296,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Create a GaiaPhotomExtras object to deal with any additional
       #  parameters for AUTOPHOTOM.
       itk_component add Extras {
-         GaiaPhotomExtras $child_(params).extras -phottype optimal
+         gaia::GaiaPhotomExtras $child_(params).extras -phottype optimal
       }
 
       #  Add an options menu for setting options that should probably
@@ -379,7 +379,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  Sky zero point and frame exposure time.
       if { $usemags_ } {
          itk_component add Skymag {
-            LabelEntry $w_.skymag \
+            util::LabelEntry $w_.skymag \
                -text {Frame zero point (mags) :} \
                -value $skymag_ \
                -labelwidth 25 \
@@ -391,7 +391,7 @@ itcl::class gaia::GaiaOptPhotom {
 
       #  Name of the results file.
       itk_component add Results {
-         LabelFileChooser $w_.results \
+         gaia::LabelFileChooser $w_.results \
             -labelwidth 8 \
             -text "Results:" \
 	    -value "GaiaPhotomLog.Dat"
@@ -540,7 +540,7 @@ itcl::class gaia::GaiaOptPhotom {
       $itk_component(TabNoteBook) select 0
 
       #  Create image name control object.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor:
@@ -609,7 +609,7 @@ itcl::class gaia::GaiaOptPhotom {
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
          if { ! $itk_option(-quiet_exit) } {
-            OptionDialog $w_.dialog \
+            gaia::OptionDialog $w_.dialog \
                -title {Unsaved apertures} \
                -text {There are unsaved apertures, are you sure you want to quit?} \
                -buttons [list Yes No] \
@@ -631,7 +631,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Choose PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Choose PHOTOM file"]
 	 if {[$w activate]} {
             set filename [$w get]
 	    $psf_list_ read_file $filename $update
@@ -654,7 +654,7 @@ itcl::class gaia::GaiaOptPhotom {
             if { $autophotom_ == {} } {
                #  Start autophotom application.
                global env
-               set autophotom_ [GaiaApp \#auto -application \
+               set autophotom_ [gaia::GaiaApp \#auto -application \
                                    $env(PHOTOM_DIR)/autophotom \
                                    -notify [code $this measured_objects]]
             }
@@ -729,7 +729,7 @@ itcl::class gaia::GaiaOptPhotom {
    #  Save the measurements to a file.
    method save_objects {{filename ""}} {
       if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
             set filename [$w get]
 	    $psf_list_ write_file $filename
@@ -747,7 +747,7 @@ itcl::class gaia::GaiaOptPhotom {
    method append_objects {{filename ""}} {
      set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
-	 set w [FileSelect .\#auto -title "Write PHOTOM file"]
+	 set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
 	 if {[$w activate]} {
 	    $psf_list_ append_file $comment [$w get]
 	    $object_list_ append_file "" [$w get]

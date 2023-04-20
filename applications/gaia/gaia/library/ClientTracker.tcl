@@ -167,11 +167,11 @@ itcl::class samp::ClientTracker {
       array unset clients_
       array unset metadata_
       array unset subscriptions_
-      foreach id [$hub execute getRegisteredClients $private_key] {
+      foreach id [{*}$hub execute getRegisteredClients $private_key] {
          set clients_($id) 1
-         set metadata_($id) [$hub execute getMetadata $private_key $id]
+         set metadata_($id) [{*}$hub execute getMetadata $private_key $id]
          set subscriptions_($id) \
-                [$hub execute getSubscriptions $private_key $id]
+                [{*}$hub execute getSubscriptions $private_key $id]
       }
    }
 

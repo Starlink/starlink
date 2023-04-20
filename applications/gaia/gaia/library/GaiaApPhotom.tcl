@@ -246,11 +246,11 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Add controls for viewing all measurements (do this now to get
       #  name).
-      set view_($this) 0
+      set view_ 0
       itk_component add ViewAll {
          checkbutton $child_(results).viewall  \
             -text {View all measurements:} \
-            -variable [scope view_($this)] \
+            -variable [scope view_] \
             -onvalue 1 \
             -offvalue 0 \
             -command [code $this view]
@@ -262,7 +262,7 @@ itcl::class gaia::GaiaApPhotom {
       #  Create a GaiaPhotomDetails object to display the values
       #  of the selected object.
       itk_component add ObjectDetails {
-         GaiaPhotomDetails $child_(details).details \
+         gaia::GaiaPhotomDetails $child_(details).details \
             -positions_cmd [code $this sky_method_changed] \
             -usemags $usemags_
       }
@@ -271,7 +271,7 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Create the GaiaPhotomList object to deal with the details of
       #  the objects that are being measured.
-      set object_list_ [GaiaPhotomList \#auto \
+      set object_list_ [gaia::GaiaPhotomList \#auto \
                            -scrollbox $child_(results).box \
                            -details $itk_component(ObjectDetails) \
                            -canvasdraw $itk_option(-canvasdraw) \
@@ -293,11 +293,11 @@ itcl::class gaia::GaiaApPhotom {
       #  parameters for autophotom.
       itk_component add Extras {
          if { $usemags_ } {
-            GaiaPhotomExtras $child_(params).extras
+            gaia::GaiaPhotomExtras $child_(params).extras
          } else {
             # For counts we assume gaussian sky is more plausible than
             # photon statistics
-            GaiaPhotomExtras $child_(params).extras -photon_errors "gaussian sky"
+            gaia::GaiaPhotomExtras $child_(params).extras -photon_errors "gaussian sky"
          }
       }
 
@@ -355,10 +355,10 @@ itcl::class gaia::GaiaApPhotom {
       add_menu_short_help $File {Exit} {Close this window}
 
       #  Determine how sky positions will be indicated.
-      set skymethod_($this) 1
+      set skymethod_ 1
       $Options add checkbutton \
          -label {Use annular sky regions} \
-         -variable [scope skymethod_($this)] \
+         -variable [scope skymethod_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this sky_method_changed]
@@ -366,10 +366,10 @@ itcl::class gaia::GaiaApPhotom {
          {Toggle to define sky in detached apertures}
 
       #  Get shape of apertures (sky and object must be the same).
-      set shape_($this) 1
+      set shape_ 1
       $Options add checkbutton \
          -label {Use circular apertures} \
-         -variable [scope shape_($this)] \
+         -variable [scope shape_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this set_shape]
@@ -402,7 +402,7 @@ itcl::class gaia::GaiaApPhotom {
       #  Sky zero point and frame exposure time.
       if { $usemags_ } {
          itk_component add Skymag {
-            LabelEntry $w_.skymag \
+            util::LabelEntry $w_.skymag \
                -text {Frame zero point (mags) :} \
                -value $skymag_ \
                -labelwidth 25 \
@@ -414,7 +414,7 @@ itcl::class gaia::GaiaApPhotom {
 
       #  Name of the results file.
       itk_component add Results {
-         LabelFileChooser $w_.results \
+         gaia::LabelFileChooser $w_.results \
             -labelwidth 8 \
             -text "Results:" \
             -value "GaiaPhotomLog.Dat"
@@ -530,7 +530,7 @@ itcl::class gaia::GaiaApPhotom {
       $itk_component(TabNoteBook) select 0
 
       #  Create object to control image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor:
@@ -586,7 +586,7 @@ itcl::class gaia::GaiaApPhotom {
       #  offer not to quit.
       if { [$object_list_ cget -modified] } {
          if { ! $itk_option(-quiet_exit) } {
-            OptionDialog $w_.dialog \
+            gaia::OptionDialog $w_.dialog \
                -title {Unsaved apertures} \
                -text {There are unsaved apertures, are you sure you want to quit?} \
                -buttons [list Yes No] \
@@ -608,7 +608,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Read and display positions from a PHOTOM file.
    method read_file {{filename ""} {update 0}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Choose PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Choose PHOTOM file"]
          if {[$w activate]} {
             $object_list_ read_file [$w get] $update
          }
@@ -621,7 +621,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Read positions from a positions file.
    method read_positions {{filename ""} {update 0}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Choose positions file"]
+         set w [util::FileSelect .\#auto -title "Choose positions file"]
          if {[$w activate]} {
             $object_list_ read_positions_file [$w get] $update
          }
@@ -637,7 +637,7 @@ itcl::class gaia::GaiaApPhotom {
          if { $autophotom_ == {} } {
             #  Start autophotom application.
             global env
-            set autophotom_ [GaiaApp \#auto -application \
+            set autophotom_ [gaia::GaiaApp \#auto -application \
                                 $env(PHOTOM_DIR)/autophotom \
                                 -notify [code $this measured_objects]]
          }
@@ -710,7 +710,7 @@ itcl::class gaia::GaiaApPhotom {
    #  Save the measurements to a file.
    method save_objects {{filename ""}} {
       if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
          if {[$w activate]} {
             $object_list_ write_file [$w get]
          }
@@ -725,7 +725,7 @@ itcl::class gaia::GaiaApPhotom {
    method append_objects {{filename ""}} {
      set comment "[$itk_option(-rtdimage) fullname]"
      if { $filename == "" } {
-         set w [FileSelect .\#auto -title "Write PHOTOM file"]
+         set w [util::FileSelect .\#auto -title "Write PHOTOM file"]
          if {[$w activate]} {
             $object_list_ append_file $comment [$w get]
          }
@@ -748,7 +748,7 @@ itcl::class gaia::GaiaApPhotom {
 
    #  Toggle the define sky button to reflect the current state.
    private method toggle_sky_button_ {} {
-      if { $skymethod_($this) } {
+      if { $skymethod_ } {
          $itk_component(DefineSky) configure -state disabled
       } else {
          $itk_component(DefineSky) configure -state normal
@@ -762,7 +762,7 @@ itcl::class gaia::GaiaApPhotom {
          $object_list_ read_file GaiaPhotomOut.Dat 1
       }
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }
@@ -775,12 +775,12 @@ itcl::class gaia::GaiaApPhotom {
    private method sky_method_changed {args} {
       if { $args != {} } {
          if { [lindex $args 0] == "annulus" } {
-            set skymethod_($this) 1
+            set skymethod_ 1
          } else {
-            set skymethod_($this) 0
+            set skymethod_ 0
          }
       } else {
-         if { $skymethod_($this) } {
+         if { $skymethod_ } {
             configure -annulus 1
          } else {
             configure -annulus 0
@@ -793,19 +793,19 @@ itcl::class gaia::GaiaApPhotom {
    #  GaiaPhotomList).
    method view {{value ""}} {
       if { $value != "" } {
-         set view_($this) $value
+         set view_ $value
       }
-      $object_list_ configure -show_list $view_($this)
+      $object_list_ configure -show_list $view_
    }
 
    #  Set shape configuration option and disabled unwanted controls.
    private method set_shape {} {
-      if { $shape_($this) } {
+      if { $shape_ } {
          configure -shape circle
       } else {
          configure -shape ellipse
       }
-      $itk_component(ObjectDetails) set_for_circles $shape_($this)
+      $itk_component(ObjectDetails) set_for_circles $shape_
    }
 
    #  Sky zero point may have changed, remeasure objects if so.
@@ -988,19 +988,18 @@ itcl::class gaia::GaiaApPhotom {
    #  Whether apertures are automatically measured when created, or not.
    protected variable auto_measure_ 0
 
+   #  Shape of aperture.
+   protected variable shape_ 1
+
+   #  Methods of estimating sky.
+   protected variable skymethod_ 1
+
+   #  Whether to view all measurements or not.
+   protected variable view_ 0
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Methods of estimating sky (this is a global array visible
-   #  in this namespace only and indexed by $this to resolve between
-   #  different instances).
-   common skymethod_
-
-   #  Shape of aperture.
-   common shape_
-
-   #  Whether to view all measurements or not.
-   common view_
 
 #  End of class definition.
 }

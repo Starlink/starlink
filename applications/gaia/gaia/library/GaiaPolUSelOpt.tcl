@@ -103,12 +103,8 @@ itcl::class gaia::GaiaPolUSelOpt {
             puts "Error writing defaults to file '$optfile' for the polarimetry toolbox 'Selecting' panel : $mess"
          } else {
             foreach name [array names values_] {
-               if { [regexp {([^,]+),(.*)} $name match obj elem] } {
-                  if { $obj == $this } {
-                     puts $fd "set option($elem) \{$values_($name)\}"
-                     unset values_($name)
-                  }
-               }
+               puts $fd "set option($name) \{$values_($name)\}"
+               unset values_($name)
             }
             close $fd
          }
@@ -133,8 +129,8 @@ itcl::class gaia::GaiaPolUSelOpt {
    public method activb {reset item} {
 
 #  Ensure the values in the values_ array are up to date.
-      set values_($this,select) [$itk_component(select) get]
-      set values_($this,shape) [$itk_component(shape) get]
+      set values_(select) [$itk_component(select) get]
+      set values_(shape) [$itk_component(shape) get]
 
 #  Use the command specified by the -actioncmd option to store a new
 #  undoable action in the actions list.
@@ -162,10 +158,10 @@ itcl::class gaia::GaiaPolUSelOpt {
       set attr_(freeze) Freeze
 
 #  Set the hard-wired defaults.
-      set values_($this,select) 1
-      set values_($this,shape) "box"
-      set values_($this,sexps) ""
-      set values_($this,freeze) 0
+      set values_(select) 1
+      set values_(shape) "box"
+      set values_(sexps) ""
+      set values_(freeze) 0
 
 #  Over-write these with the values read from the options file created when
 #  the last used instance of this class was destroyed.
@@ -175,67 +171,67 @@ itcl::class gaia::GaiaPolUSelOpt {
             puts "Error reading defaults from file '$optfile' for the polarimetry toolbox 'Selecting' panel : $mess"
          } else {
             foreach elem [array names option] {
-               set values_($this,$elem) "$option($elem)"
+               set values_($elem) "$option($elem)"
             }
          }
       }
 
 #  Replace illegal blank values read from the options file with the hardwired
 #  defaults.
-      if { $values_($this,select) == "" } { set values_($this,select) 1 }
-      if { $values_($this,shape) == "" } { set values_($this,shape) "box" }
-      if { $values_($this,freeze) == "" } { set values_($this,freeze) 0 }
+      if { $values_(select) == "" } { set values_(select) 1 }
+      if { $values_(shape) == "" } { set values_(shape) "box" }
+      if { $values_(freeze) == "" } { set values_(freeze) 0 }
 
 #  Set hard-wired defaults for things which are data dependant.
-      set values_($this,sexp) ""
+      set values_(sexp) ""
 
 #  Save the original values as next times previous values.
       saveOld
    }
 
 #  Ensure the menu holding recently used selection expressions reflects
-#  the expressions stored in values_($this,sexps).
+#  the expressions stored in values_(sexps).
 #  ---------------------------------------------------------------------
    public method sexpMenu {} {
-      set exp0 $values_($this,sexp)
+      set exp0 $values_(sexp)
       $itk_component(sexp) clear
-      foreach exp $values_($this,sexps) {
+      foreach exp $values_(sexps) {
          $itk_component(sexp) add \
                   -label $exp \
                   -value $exp \
                   -command "[code $this activ sexp]"
       }
-      set values_($this,sexp) $exp0
+      set values_(sexp) $exp0
    }
 
 #  Accessor methods:
 #  -----------------
    public method setSelect {s} {
       if { $s } {
-         set values_($this,select) 1
+         set values_(select) 1
       } else {
-         set values_($this,select) 0
+         set values_(select) 0
       }
       newVals 0 select
    }
-   public method getSelect {} {return $values_($this,select)}
+   public method getSelect {} {return $values_(select)}
 
    public method setShape {s} {
       if { $s == "box" || $s == "circle"} {
-         set values_($this,shape) $s
+         set values_(shape) $s
          newVals 0 shape
       } else {
          error_dialog "setShape(GaiaPolUSelOpt): Illegal cursor selection shape \"$s\" supplied."
       }
    }
-   public method getShape {} {return $values_($this,shape)}
+   public method getShape {} {return $values_(shape)}
 
-   public method getSexp {} {return $values_($this,sexp)}
+   public method getSexp {} {return $values_(sexp)}
 
    public method setSaveOpt {x} {set saveopt_ $x}
 
-   public method setFreeze {x} {set values_($this,freeze) $x}
-   public method getFreeze {} {return $values_($this,freeze)}
+   public method setFreeze {x} {set values_(freeze) $x}
+   public method getFreeze {} {return $values_(freeze)}
 
 #  Called to add a new action to the current list of undoable actions.
 #  Note, a new selection expression does not generate a new undoable action
@@ -244,7 +240,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  ------------------------------------------------------------------------
    public method newAction {item} {
       if { "$item" != "sexp" && "$itk_option(-actioncmd)" != "" } {
-         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($this,$item)\"\}"
+         set arglist "object \{change $desc_($item)\} $this \{set$attr_($item) \"$oldvals_($item)\"\} \{set$attr_($item) \"$values_($item)\"\}"
          eval $itk_option(-actioncmd) $arglist
       }
    }
@@ -269,26 +265,26 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  If the expression is good, and it is not blank, and if it is not already
 #  in the associated menu, we now add the tidied expression to the menu.
       if { $tidy != "" && $isgood != 0 } {
-         if { [lsearch -exact $values_($this,sexps) $tidy] == -1 } {
+         if { [lsearch -exact $values_(sexps) $tidy] == -1 } {
 
 #  The values to be stored in the menu are kept in element "sexps"
 #  of values_. Add the new expression into this list at the start,
 #  removing the last entry if there are more than 9.
-            if { ![info exists values_($this,sexps)] } {
+            if { ![info exists values_(sexps)] } {
                set nold 0
             } else {
-               set nold [llength $values_($this,sexps)]
+               set nold [llength $values_(sexps)]
             }
 
             if { $nold == 0 } {
-               set values_($this,sexps) [list $tidy]
+               set values_(sexps) [list $tidy]
             } else {
                if { $nold > 9 } {
-                  set old [lrange $values_($this,sexps) 0 8]
+                  set old [lrange $values_(sexps) 0 8]
                } else {
-                  set old [lrange $values_($this,sexps) 0 end]
+                  set old [lrange $values_(sexps) 0 end]
                }
-               set values_($this,sexps) "[list $tidy] $old"
+               set values_(sexps) "[list $tidy] $old"
             }
 
 #  Put these values into the menu.
@@ -302,7 +298,7 @@ itcl::class gaia::GaiaPolUSelOpt {
       }
 
 #  Ensure the correct tidied expression is stored in the entry field
-      set values_($this,sexp) $tidy
+      set values_(sexp) $tidy
 
 #  Save the current values as next times previous values.
       saveOld
@@ -360,7 +356,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 
 #  Label parameters...
          itk_component add header1 {
-	    LabelRule $w_.header1 -text "Vector Selection Options:"
+	    gaia::LabelRule $w_.header1 -text "Vector Selection Options:"
 	 }
          grid $itk_component(header1) -row [incr r] -column 0 -padx 1m \
                                       -columnspan $ncol -sticky nwe -pady 2m
@@ -371,7 +367,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelEntryMenu to give the selection expression.
          itk_component add sexp {
             ::gaia::LabelEntryMenu $w_.sexp -text "Expression:" \
-                              -textvariable [scope values_($this,sexp)] \
+                              -textvariable [scope values_(sexp)] \
                               -labelwidth $lwidth \
                               -indicatoron 1 \
                               -valuewidth 50 \
@@ -396,8 +392,8 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelMenu to control whether chosen vectors are selected or
 #  deselected.
          itk_component add select {
-            LabelMenu $w_.select -text "Operation:" \
-                                 -variable [scope values_($this,select)] \
+            util::LabelMenu $w_.select -text "Operation:" \
+                                 -variable [scope values_(select)] \
                                  -labelwidth $lwidth
          }
          grid $itk_component(select) -row $r -columnspan $ncol -column 0 -sticky nw -padx $px
@@ -416,8 +412,8 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelMenu to control whether cursor selection uses a
 #  rectangle or a circle.
          itk_component add shape {
-            LabelMenu $w_.shape -text "Region shape:" \
-                              -variable [scope values_($this,shape)] \
+            util::LabelMenu $w_.shape -text "Region shape:" \
+                              -variable [scope values_(shape)] \
                               -labelwidth $lwidth
          }
          grid $itk_component(shape) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
@@ -436,13 +432,13 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Create a LabelCheck to disable clicking and dragging as a means of
 #  selecting vectors.
          itk_component add freeze {
-            StarLabelCheck $w_.freeze -text "Disable mouse:" \
+            gaia::StarLabelCheck $w_.freeze -text "Disable mouse:" \
                                      -onvalue 1 \
                                      -offvalue 0 \
                                      -labelwidth $lwidth \
                                      -command [code $this activ freeze] \
                                      -anchor nw \
-                                     -variable [scope values_($this,freeze)]
+                                     -variable [scope values_(freeze)]
          }
          grid $itk_component(freeze) -row $r -column 0 -columnspan $ncol -sticky nw -padx $px
          add_short_help $itk_component(freeze) {Click to prevent vectors being selected or deselected by clicking and dragging over the vector map}
@@ -505,11 +501,11 @@ itcl::class gaia::GaiaPolUSelOpt {
          }
 
 #  Ensure the menu holding recently used selection expressions reflects
-#  the expressions stored in values_($this,sexps).
+#  the expressions stored in values_(sexps).
          sexpMenu
 
 #  Activate the correct menu item.
-         $itk_component(sexp) configure -value "$values_($this,sexp)"
+         $itk_component(sexp) configure -value "$values_(sexp)"
       }
    }
 
@@ -519,9 +515,7 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  ---------------------------------------------
    protected method saveOld {} {
       foreach name [array names values_] {
-         if { [regexp {[^,]+,(.*)} $name match elem] } {
-            set oldvals_($elem) $values_($name)
-         }
+         set oldvals_($name) $values_($name)
       }
    }
 
@@ -562,6 +556,8 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Should current settings be saved when this object is destroyed?
        variable saveopt_ 1
 
+#  Array indexed by (param).
+       variable values_
    }
 
 #  Private data members:
@@ -571,8 +567,6 @@ itcl::class gaia::GaiaPolUSelOpt {
 #  Common (i.e. static) data members:
 #  ==================================
 
-#  Array for passing around at global level. Indexed by ($this,param).
-   common values_
 
 #  Currently selected selection expression in menu button.
    common cursexp_

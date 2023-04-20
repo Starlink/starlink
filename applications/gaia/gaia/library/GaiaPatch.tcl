@@ -236,30 +236,30 @@ itcl::class gaia::GaiaPatch {
       }
 
       #  Whether to use annulus for background regions or not.
-      set annuli_($this) 1
+      set annuli_ 1
       $Options add checkbutton \
          -label {Fit background using an annulus} \
-         -variable [scope annuli_($this)] \
+         -variable [scope annuli_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this annuli_changed]
       annuli_changed
 
       #  Whether to update continuously or not.
-      set frequency_($this) 1
+      set frequency_ 1
       $Options add checkbutton \
          -label {Frequent updates (fast machine)} \
-         -variable [scope frequency_($this)] \
+         -variable [scope frequency_] \
          -onvalue 1 \
          -offvalue 0 \
          -command [code $this frequency_changed]
       frequency_changed
 
       #  Wether to use data variances if available.
-      set variance_($this) 1
+      set variance_ 1
       $Options add checkbutton \
          -label {Use data variances (if available)} \
-         -variable [scope variance_($this)] \
+         -variable [scope variance_] \
          -onvalue 1 \
          -offvalue 0
 
@@ -430,7 +430,7 @@ itcl::class gaia::GaiaPatch {
                    -keep $replace_region -region $region \
                    -order $itk_option(-order) \
                    -scale $itk_option(-noise_factor) \
-                   -usevar $variance_($this)"
+                   -usevar $variance_"
                   set modified_ 1
                } else {
                   error_dialog "Sorry this image cannot be modified (file is readonly)."
@@ -453,7 +453,7 @@ itcl::class gaia::GaiaPatch {
 
    #  Usage of annuli as background estimates changed.
    method annuli_changed {} {
-      configure -use_annuli $annuli_($this)
+      configure -use_annuli $annuli_
    }
 
    #  Read in an ARD file.
@@ -493,8 +493,8 @@ itcl::class gaia::GaiaPatch {
    #  Set frequency of updates (continuous or only when command
    #  finished).
    method frequency_changed {} {
-      $Repl_ configure -continuous_updates $frequency_($this)
-      $Back_ configure -continuous_updates $frequency_($this)
+      $Repl_ configure -continuous_updates $frequency_
+      $Back_ configure -continuous_updates $frequency_
    }
 
    #  Change modification status of image (for remote control only).
@@ -547,7 +547,7 @@ itcl::class gaia::GaiaPatch {
 
    #  Use variances if available.
    itk_option define -use_variances use_variances Use_Variances {1} {
-      set variance_($this) $itk_option(-use_variances)
+      set variance_ $itk_option(-use_variances)
    }
 
    #  Scaling factor for noise estimates.
@@ -581,17 +581,17 @@ itcl::class gaia::GaiaPatch {
    #  Is image modified?
    protected variable modified_ 0
 
-   #  Common variables: (shared by all instances)
-   #  -----------------
-
-   #  State of annuli in various instances (index by $this).
-   common annuli_
+   #  State of annuli in various instances.
+   protected variable annuli_
 
    #  Frequency of updates in instances.
-   common frequency_
+   protected variable frequency_
 
    #  Whether this instance uses variances.
-   common variance_
+   protected variable variance_
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
 
 #  End of class definition.
 }

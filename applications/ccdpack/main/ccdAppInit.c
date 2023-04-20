@@ -19,6 +19,7 @@
 #include "tkGwm.h"
 #include <stdlib.h>
 #ifdef HAVE_ITCL
+#  include "itcl.h"
 #  include "itk.h"
 #endif /* HAVE_ITCL */
 
@@ -109,7 +110,7 @@ Tcl_AppInit(interp)
     }
 
     /* Look for Iwidgets, no Init procedure so try to "require" it */
-    if (Tcl_Eval( interp, "package require Iwidgets 4.0.1" ) == TCL_ERROR) {
+    if (Tcl_Eval( interp, "package require Iwidgets 4.1.1" ) == TCL_ERROR) {
         return TCL_ERROR;
     }
 

@@ -154,11 +154,11 @@ itcl::class gaia::GaiaPhotomExtras {
       #  Add widgets for accessing the values.
       #  Source of the exposure time.
       itk_component add Label1 {
-         LabelRule $w_.label1 \
+         gaia::LabelRule $w_.label1 \
             -text "Exposure time:"
       }
       itk_component add ExSource {
-         LabelMenu $w_.exsrc \
+         util::LabelMenu $w_.exsrc \
             -text "Exposure time source:" \
             -labelwidth $labelwidth
       }
@@ -170,7 +170,7 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Exposure time qualifier.
       itk_component add Etime {
-	  LabelEntry $w_.etime \
+	  util::LabelEntry $w_.etime \
 		  -text {Exposure time/qualifier:} \
 		  -value 1.0 \
 		  -labelwidth $labelwidth  \
@@ -180,11 +180,11 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Image description parameters.
       itk_component add Label2 {
-         LabelRule $w_.label2 \
+         gaia::LabelRule $w_.label2 \
             -text "Image parameters:"
       }
       itk_component add Biaslevel {
-         LabelEntry $w_.bias \
+         util::LabelEntry $w_.bias \
             -text "Image bias level:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -192,7 +192,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Biaslevel) \
          {Bias level in image data units (zero when removed)}
       itk_component add Photons {
-         LabelEntry $w_.padu \
+         util::LabelEntry $w_.padu \
             -text "Photons per data unit" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -200,7 +200,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Photons) \
          {Numbers of photons per ADU, used for noise est.}
       itk_component add Saturation {
-         LabelEntry $w_.satur \
+         util::LabelEntry $w_.satur \
             -text "Saturation value:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -210,21 +210,21 @@ itcl::class gaia::GaiaPhotomExtras {
 
       #  Centroid parameters.
       itk_component add Label3 {
-         LabelRule $w_.label3 \
+         gaia::LabelRule $w_.label3 \
             -text "Centroid parameters:"
       }
       itk_component add Centroid {
-         StarLabelCheck $w_.cent \
+         gaia::StarLabelCheck $w_.cent \
             -text "Perform centroiding:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
-            -variable [scope state_($this,centroid)]
+            -variable [scope state_(centroid)]
       }
-      set state_($this,centroid) TRUE
+      set state_(centroid) TRUE
       add_short_help $itk_component(Centroid) \
          {Centroid initial aperture positions}
       itk_component add Maxiterations {
-         LabelEntry $w_.maxiter \
+         util::LabelEntry $w_.maxiter \
             -text "Maximum iterations:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -232,7 +232,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Maxiterations) \
          {Maximum no. iterations when locating centroid}
       itk_component add Maxshift {
-         LabelEntry $w_.maxshift \
+         util::LabelEntry $w_.maxshift \
             -text "Maximum shift in position:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -240,7 +240,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Maxshift) \
          {Maximum shift from initial positions (pixels)}
       itk_component add Search {
-         LabelEntry $w_.search \
+         util::LabelEntry $w_.search \
             -text "Size of search box:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -248,7 +248,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Search) \
          {Size of box to use when locating centroid}
       itk_component add Toler {
-         LabelEntry $w_.toler \
+         util::LabelEntry $w_.toler \
             -text "Positional accuracy:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -256,24 +256,24 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Toler) \
          {Accuracy for centroid corrected position}
       itk_component add Positive {
-         StarLabelCheck $w_.positive \
+         gaia::StarLabelCheck $w_.positive \
             -text "Positive features:" \
             -onvalue TRUE -offvalue FALSE \
             -labelwidth $labelwidth \
-            -variable [scope state_($this,positive)]
+            -variable [scope state_(positive)]
       }
       add_short_help $itk_component(Positive) \
          {Look for positive features}
-      set state_($this,positive) TRUE
+      set state_(positive) TRUE
 
       #  Measurement parameters.
       itk_component add Label4 {
-         LabelRule $w_.label4 \
+         gaia::LabelRule $w_.label4 \
             -text "Measurement parameters:"
       }
 
       itk_component add Photonerr {
-         LabelMenu $w_.photon \
+         util::LabelMenu $w_.photon \
             -text "Measurement errors use:" \
             -labelwidth $labelwidth
       }
@@ -289,7 +289,7 @@ itcl::class gaia::GaiaPhotomExtras {
          {How to calculate measurement errors}
 
       itk_component add Skyest {
-         LabelMenu $w_.skyest -text "Sky estimator:" \
+         util::LabelMenu $w_.skyest -text "Sky estimator:" \
             -labelwidth $labelwidth
       }
       $itk_component(Skyest) add -label {mean} \
@@ -304,7 +304,7 @@ itcl::class gaia::GaiaPhotomExtras {
          {Estimator to use when determining sky value}
 
       itk_component add Sky {
-         LabelEntry $w_.sky \
+         util::LabelEntry $w_.sky \
             -text "Default sky level:" \
             -labelwidth $labelwidth \
          -command [code $this null_method]
@@ -312,7 +312,7 @@ itcl::class gaia::GaiaPhotomExtras {
       add_short_help $itk_component(Sky) \
          {Sky value when estimator is set to constant}
       itk_component add Skysig {
-         LabelEntry $w_.skysig \
+         util::LabelEntry $w_.skysig \
             -text "Default error in sky level:" \
             -labelwidth $labelwidth \
             -command [code $this null_method]
@@ -377,11 +377,11 @@ itcl::class gaia::GaiaPhotomExtras {
    #  menu buttons do not need updating.
    method update_state {} {
       configure -bias_level [$itk_component(Biaslevel) get]
-      configure -centroid $state_($this,centroid)
+      configure -centroid $state_(centroid)
       configure -max_iterations [$itk_component(Maxiterations) get]
       configure -max_shift [$itk_component(Maxshift) get]
       configure -photons_per_adu [$itk_component(Photons) get]
-      configure -positive_objects $state_($this,positive)
+      configure -positive_objects $state_(positive)
       configure -saturation_value [$itk_component(Saturation) get]
       configure -search_box_size [$itk_component(Search) get]
       configure -sky_value [$itk_component(Sky) get]
@@ -656,11 +656,12 @@ itcl::class gaia::GaiaPhotomExtras {
    #  Protected variables: (available to instance)
    #  --------------------
 
+   #  Variable to decouple check button states.
+   protected variable state_
+
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Global variable to decouple check button states.
-   common state_
 
 #  End of class definition.
 }

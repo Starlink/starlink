@@ -131,7 +131,7 @@ itcl::class gaia::GaiaForeignExec {
    constructor  {args} {
 
       #  Create the command queue.
-      set command_queue_ [Queue \#auto]
+      set command_queue_ [gaia::Queue \#auto]
 
       #  And evaluate any configuration options.
       if { $args != {} } {
@@ -252,7 +252,7 @@ itcl::class gaia::GaiaForeignExec {
       #  If request use a callback to preprocess the output (this
       #  allows the user to clean the output of escape sequences).
       if { $preprocess != {} } {
-         set output [$preprocess $msg]
+         set output [{*}$preprocess $msg]
       } else {
          set output $msg
       }
@@ -350,9 +350,9 @@ itcl::class gaia::GaiaForeignExec {
    public variable show_output {0} {
       if { $show_output == "1" } {
          set show_output_ 1
-         set Top_ [TopLevelWidget .\#auto]
+         set Top_ [util::TopLevelWidget .\#auto]
          wm title $Top_ "Output from application \"$this\""
-         set Scrollbox_ [Scrollbox $Top_.output]
+         set Scrollbox_ [gaia::Scrollbox $Top_.output]
          pack $Scrollbox_ -fill both -expand true
       } elseif { [winfo exists $show_output] } {
          set Scrollbox_ $show_output

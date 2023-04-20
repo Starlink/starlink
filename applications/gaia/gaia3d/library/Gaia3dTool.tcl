@@ -225,7 +225,7 @@ itcl::class gaia3d::Gaia3dTool {
       }
 
       #  Add the renderer widget in the right-hand pane.
-      set renwindow_ [Gaia3dVtkWindow $w_.renwindow \
+      set renwindow_ [gaia3d::Gaia3dVtkWindow $w_.renwindow \
                          -backingstore_on $backingstore_on_]
       $renwindow_ set_interaction_mode $interaction_mode_
       add_short_help $renwindow_ {See help for interactions}
@@ -341,7 +341,7 @@ itcl::class gaia3d::Gaia3dTool {
          ::frame $w_.controls
       }
       itk_component add rule {
-         LabelRule $itk_component(controls).rule -text "Controls:"
+         gaia::LabelRule $itk_component(controls).rule -text "Controls:"
       }
       pack $itk_component(rule) -side top -fill x
 
@@ -591,7 +591,7 @@ itcl::class gaia3d::Gaia3dTool {
       pack $itk_component(catframe) -side top -fill x -expand 0
 
       itk_component add catrule {
-         LabelRule $itk_component(catframe).catrule \
+         gaia::LabelRule $itk_component(catframe).catrule \
             -text "Catalogue:"
       }
       pack $itk_component(catrule) -side top -fill x -expand 1
@@ -658,7 +658,7 @@ itcl::class gaia3d::Gaia3dTool {
       pack $itk_component(astframe) -side top -fill x -expand 0
 
       itk_component add astrule {
-         LabelRule $itk_component(astframe).astrule \
+         gaia::LabelRule $itk_component(astframe).astrule \
             -text "AST attributes for axes:"
       }
       pack $itk_component(astrule) -side top -fill x -expand 1
@@ -697,7 +697,7 @@ itcl::class gaia3d::Gaia3dTool {
       } else {
          busy {
             itk_component add extratoolbox {
-               Gaia3dExtraIsosurface $w_.\#auto \
+               gaia3d::Gaia3dExtraIsosurface $w_.\#auto \
                   -rtdimage $itk_option(-rtdimage) \
                   -number $itk_option(-number) \
                   -filter_types $itk_option(-filter_types)
@@ -717,7 +717,7 @@ itcl::class gaia3d::Gaia3dTool {
       } else {
          busy {
             itk_component add lightingtoolbox {
-               Gaia3dVtkLights $w_.\#auto \
+               gaia3d::Gaia3dVtkLights $w_.\#auto \
                   -renwindow $renwindow_
             }
          }

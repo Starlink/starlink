@@ -132,7 +132,7 @@ itcl::class gaia::GaiaPolStyle {
          set ret ""
       } else {
          set ret [code $ret]
-         $ret setFrom $this
+         {*}$ret setFrom $this
       }
       return $ret
    }
@@ -187,11 +187,11 @@ itcl::class gaia::GaiaPolStyle {
          if { $lcol != -1 } {
 
 #  Get the data array from the PolCat.
-            set data [$cat getData]
+            set data [{*}$cat getData]
 
 #  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
-            upvar 0 [$cat getStates] states
+            upvar 0 [{*}$cat getStates] states
 
 #  Form a string including all non-zero vector lengths, separated by
 #  newlines. Also note the length of the last non-zero vector (use $ret
@@ -237,7 +237,7 @@ itcl::class gaia::GaiaPolStyle {
                }
 
 #  Number of pixels covered by the catalogue.
-               set np [$cat getNpix]
+               set np [{*}$cat getNpix]
 
 #  Find the default scaling factor.
                set ret [string trim [format "%10.3g" [expr sqrt(1.3*$np/$n)/$med]]]
@@ -323,8 +323,8 @@ itcl::class gaia::GaiaPolStyle {
 #  ------------------------------------------------------------------------
    public method changes {that} {
       set des ""
-
-      if { [getMag] != [$that getMag] } {
+      
+      if { [getMag] != [{*}$that getMag] } {
          set ret "redraw"
          if { $des == "" } {
             set des "change vector scale"
@@ -333,7 +333,7 @@ itcl::class gaia::GaiaPolStyle {
          }
       }
 
-      if { [getArot] != [$that getArot] } {
+      if { [getArot] != [{*}$that getArot] } {
          set ret "redraw"
          if { $des == "" } {
             set des "change vector rotation"
@@ -342,7 +342,7 @@ itcl::class gaia::GaiaPolStyle {
          }
       }
 
-      if { [getLcol] != [$that getLcol] } {
+      if { [getLcol] != [{*}$that getLcol] } {
          set ret "redraw"
          if { $des == "" } {
             set des "change vector length column"
@@ -351,7 +351,7 @@ itcl::class gaia::GaiaPolStyle {
          }
       }
 
-      if { [getAcol] != [$that getAcol] } {
+      if { [getAcol] != [{*}$that getAcol] } {
          set ret "redraw"
          if { $des == "" } {
             set des "change vector angle column"
@@ -360,7 +360,7 @@ itcl::class gaia::GaiaPolStyle {
          }
       }
 
-      if { [getNvec] != [$that getNvec] } {
+      if { [getNvec] != [{*}$that getNvec] } {
          set ret "redraw"
          if { $des == "" } {
             set des "change maximum number of drawn vectors"
@@ -371,7 +371,7 @@ itcl::class gaia::GaiaPolStyle {
 
       if { $des == "" } {
          set retu ""
-         set val [$that getUclr]
+         set val [{*}$that getUclr]
          if { [getUclr] != $val } {
             append retu "-fill \"$val\" "
             if { $des == "" } {
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaPolStyle {
             }
          }
 
-         set val [$that getUwid]
+         set val [{*}$that getUwid]
          if { [getUwid] != $val } {
             append retu "-width $val "
             if { $des == "" } {
@@ -391,7 +391,7 @@ itcl::class gaia::GaiaPolStyle {
             }
          }
 
-         set val [$that getUflash]
+         set val [{*}$that getUflash]
          if { [getUflash] != $val } {
             append retu "-flash $val "
             if { $des == "" } {
@@ -402,7 +402,7 @@ itcl::class gaia::GaiaPolStyle {
          }
 
          set rets ""
-         set val [$that getSclr]
+         set val [{*}$that getSclr]
          if { [getSclr] != $val } {
             append rets "-fill \"$val\" "
             if { $des == "" } {
@@ -412,7 +412,7 @@ itcl::class gaia::GaiaPolStyle {
             }
          }
 
-         set val [$that getSwidd]
+         set val [{*}$that getSwidd]
          if { [getSwidd] != $val } {
             append rets "-width $val "
             if { $des == "" } {
@@ -422,7 +422,7 @@ itcl::class gaia::GaiaPolStyle {
             }
          }
 
-         set val [$that getSflash]
+         set val [{*}$that getSflash]
          if { [getSflash] != $val } {
             append rets "-flash $val "
             if { $des == "" } {
@@ -476,7 +476,7 @@ itcl::class gaia::GaiaPolStyle {
 #  an error if the column name is not found.
 #  ---------------------------------------------------------------------
    private method findCol {cat col w} {
-      set headings [$cat getHeadings]
+      set headings [{*}$cat getHeadings]
       set ret [lsearch -exact $headings $col]
       if { $ret == -1 } {
          info_dialog "Please use the \"Rendering\" panel to indicate which column holds the vector $w values."

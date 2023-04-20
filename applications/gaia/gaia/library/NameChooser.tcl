@@ -96,7 +96,7 @@ itcl::class gaia::NameChooser {
 
 	#  Add a scrolling listbox to show the contents.
 	itk_component add scrollbox {
-	    Scrollbox $w_.scrollbox -singleselect 1
+	    gaia::Scrollbox $w_.scrollbox -singleselect 1
 	} {
 	    keep -width
 	}

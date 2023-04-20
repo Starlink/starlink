@@ -364,7 +364,7 @@ GwmCmd(clientData, interp, argc, argv)
                                           (ClientData) gwmPtr,
                                           (void (*)()) NULL);
 
-    interp->result = Tk_PathName(gwmPtr->tkwin);
+    Tcl_SetResult(interp, Tk_PathName(gwmPtr->tkwin), TCL_VOLATILE);
     return TCL_OK;
 }
 

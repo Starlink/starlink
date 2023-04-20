@@ -140,7 +140,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
       } {}
 
       itk_component add keyint {
-         LabelScale $itk_component(intfrm).int \
+         gaia::LabelScale $itk_component(intfrm).int \
             -text "Key light:" \
             -labelwidth $lwidth \
             -from 0 \
@@ -149,7 +149,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop KeyLightIntensity]
       }
       itk_component add fillrat {
-         LabelScale $itk_component(intfrm).fillrat \
+         gaia::LabelScale $itk_component(intfrm).fillrat \
             -text "Fill light ratio:" \
             -labelwidth $lwidth \
             -from 2 \
@@ -159,7 +159,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop KeyToFillRatio]
       }
       itk_component add headrat {
-         LabelScale $itk_component(intfrm).headrat \
+         gaia::LabelScale $itk_component(intfrm).headrat \
             -text "Head light ratio:" \
             -labelwidth $lwidth \
             -from 2 \
@@ -169,7 +169,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop KeyToHeadRatio]
       }
       itk_component add backrat {
-         LabelScale $itk_component(intfrm).backrat \
+         gaia::LabelScale $itk_component(intfrm).backrat \
             -text "Back light ratio:" \
             -labelwidth $lwidth \
             -from 2 \
@@ -191,7 +191,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -text "Key light tweaks:"
       } {}
       itk_component add keywarm {
-         LabelScale $itk_component(keyfrm).warm \
+         gaia::LabelScale $itk_component(keyfrm).warm \
             -text "Warmth:" \
             -labelwidth $lwidth \
             -from 0 \
@@ -201,7 +201,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop KeyLightWarmth]
       }
       itk_component add keyelev {
-         LabelScale $itk_component(keyfrm).elev \
+         gaia::LabelScale $itk_component(keyfrm).elev \
             -text "Elevation:" \
             -labelwidth $lwidth \
             -from 0 \
@@ -210,7 +210,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop KeyLightElevation]
       }
       itk_component add keyazim {
-         LabelScale $itk_component(keyfrm).azim \
+         gaia::LabelScale $itk_component(keyfrm).azim \
             -text "Azimuth:" \
             -labelwidth $lwidth \
             -from -90 \
@@ -228,7 +228,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -text "Fill light tweaks:"
       } {}
       itk_component add fillwarm {
-         LabelScale $itk_component(fillfrm).warm \
+         gaia::LabelScale $itk_component(fillfrm).warm \
             -labelwidth $lwidth \
             -text "Warmth:" \
             -from 0 \
@@ -238,7 +238,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop FillLightWarmth]
       }
       itk_component add fillelev {
-         LabelScale $itk_component(fillfrm).elev \
+         gaia::LabelScale $itk_component(fillfrm).elev \
             -labelwidth $lwidth \
             -text "Elevation:" \
             -from -90 \
@@ -247,7 +247,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop FillLightElevation]
       }
       itk_component add fillazim {
-         LabelScale $itk_component(fillfrm).azim \
+         gaia::LabelScale $itk_component(fillfrm).azim \
             -labelwidth $lwidth \
             -text "Azimuth:" \
             -from -90 \
@@ -265,7 +265,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -text "Back light tweaks:"
       } {}
       itk_component add backwarm {
-         LabelScale $itk_component(backfrm).warm \
+         gaia::LabelScale $itk_component(backfrm).warm \
             -labelwidth $lwidth \
             -text "Warmth:" \
             -from 0 \
@@ -275,7 +275,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop BackLightWarmth]
       }
       itk_component add backelev {
-         LabelScale $itk_component(backfrm).elev \
+         gaia::LabelScale $itk_component(backfrm).elev \
             -labelwidth $lwidth \
             -text "Elevation:" \
             -from -45 \
@@ -284,7 +284,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -command [code $this set_prop BackLightElevation]
       }
       itk_component add backazim {
-         LabelScale $itk_component(backfrm).azim \
+         gaia::LabelScale $itk_component(backfrm).azim \
             -labelwidth $lwidth \
             -text "Azimuth:" \
             -from 60 \
@@ -302,7 +302,7 @@ itcl::class ::gaia3d::Gaia3dVtkLights {
             -text "Head light tweaks:"
       } {}
       itk_component add headwarm {
-         LabelScale $itk_component(headfrm).warm \
+         gaia::LabelScale $itk_component(headfrm).warm \
             -labelwidth $lwidth \
             -text "Warmth:" \
             -from 0 \

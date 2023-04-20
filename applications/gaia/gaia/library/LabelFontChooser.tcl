@@ -120,7 +120,7 @@ itcl::class gaia::LabelFontChooser {
    #  Choose a font and enter it into the entry field.
    protected method choose_font_ {} {
       if { $font_chooser_ == {} } {
-         set font_chooser_ [FontChooser .\#auto \
+         set font_chooser_ [gaia::FontChooser .\#auto \
                                -title $itk_option(-chooser_title)\
                                -fixed_width $itk_option(-chooser_fixed_width)\
                               ]

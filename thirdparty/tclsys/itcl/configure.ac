@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(itcl, 3.4, starlink@jiscmail.ac.uk)
+AC_INIT(itcl, 4.2.3, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -22,7 +22,7 @@ dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
 dnl    Locate a suitable Starlink Tcl/Tk for this build.
-STAR_PATH_TCLTK(8.5, tk)
+STAR_PATH_TCLTK(8.6, tk)
 
 dnl    Allow user control over Tcl and Tk.
 AC_ARG_WITH(tcl, [  --with-tcl              directory containing tcl configuration (tclConfig.sh)],

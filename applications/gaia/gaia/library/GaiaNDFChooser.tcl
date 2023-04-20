@@ -262,7 +262,7 @@ itcl::class gaia::GaiaNDFChooser {
 
    #  Add a short help window
    protected method make_short_help_ {} {
-      TopLevelWidget::make_short_help
+      util::TopLevelWidget::make_short_help
 
       add_short_help $itk_component(table) \
          {Table: Click to select NDF, double-click to display image}
@@ -386,7 +386,7 @@ itcl::class gaia::GaiaNDFChooser {
       set w $imagetab_
       for {set i 0} {$i < $num_images_} {incr i} {
          set f [frame $w.f$i -borderwidth 2 -relief raised]
-         set im [RtdImage $f.im \
+         set im [rtd::RtdImage $f.im \
                     -graphics 0 \
                     -displaymode 0 \
                     -canvaswidth 100 \
@@ -443,9 +443,9 @@ itcl::class gaia::GaiaNDFChooser {
          for {set i 0} {$i < $num_images_} {incr i} {
             if {[info exists ext_($i,frame)]} {
                if {"$ext_($i,ndf)" == "$ndf"} {
-                  $ext_($i,frame) configure -relief sunken
+                  {*}$ext_($i,frame) configure -relief sunken
                } else {
-                  $ext_($i,frame) configure -relief raised
+                  {*}$ext_($i,frame) configure -relief raised
                }
             }
          }

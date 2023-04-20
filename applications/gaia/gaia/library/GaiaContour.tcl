@@ -374,7 +374,7 @@ itcl::class gaia::GaiaContour {
 
    #  Save the current configuration to a file.
    public method write_config_file {} {
-      set w [FileSelect .\#auto -title "Save configuration to a file"]
+      set w [util::FileSelect .\#auto -title "Save configuration to a file"]
       if {[$w activate]} {
          save_config [$w get]
       }
@@ -383,7 +383,7 @@ itcl::class gaia::GaiaContour {
 
    #  Restore configuration from a file.
    public method read_config_file {} {
-      set w [FileSelect .\#auto -title "Read configuration from a file"]
+      set w [util::FileSelect .\#auto -title "Read configuration from a file"]
       if {[$w activate]} {
          read_config [$w get]
       }
@@ -579,13 +579,13 @@ itcl::class gaia::GaiaContour {
 
       #  Separator.
       itk_component add namerule {
-         LabelRule $w_.namerule -text "Contour image:"
+         gaia::LabelRule $w_.namerule -text "Contour image:"
       }
       pack $itk_component(namerule) -side top -fill x
 
       #  Menu button for selection from displayed images.
       itk_component add targets {
-         LabelMenu $w_.targets \
+         util::LabelMenu $w_.targets \
             -labelwidth 14 \
             -valuewidth 20 \
             -valueanchor e \
@@ -604,7 +604,7 @@ itcl::class gaia::GaiaContour {
 
       #  Add a control for selecting a image stored in disk file.
       itk_component add conimg {
-         LabelFileChooser $w_.conimg \
+         gaia::LabelFileChooser $w_.conimg \
             -labelwidth 14 \
             -text "Other image:" \
             -filter_types $itk_option(-filter_types) \
@@ -619,7 +619,7 @@ itcl::class gaia::GaiaContour {
    protected method add_att_controls_ {w} {
 
       itk_component add attrule {
-         LabelRule $w.attrule -text "Contour levels & attributes:"
+         gaia::LabelRule $w.attrule -text "Contour levels & attributes:"
       }
       pack $itk_component(attrule) -side top -fill x
 
@@ -659,7 +659,7 @@ itcl::class gaia::GaiaContour {
 
          #  Entry widget for the contour values.
          itk_component add value$i {
-            LabelEntry $parent.value$i \
+            util::LabelEntry $parent.value$i \
                -validate real \
                -text "$i:" \
                -labelwidth 3 \
@@ -1246,13 +1246,13 @@ itcl::class gaia::GaiaContour {
 
       #  Add section header.
       itk_component add genrule {
-         LabelRule $w.genrule -text "Contour level generation:"
+         gaia::LabelRule $w.genrule -text "Contour level generation:"
       }
       pack $itk_component(genrule) -side top -fill x
 
       #  Number of contours to generate.
       itk_component add ncont {
-         LabelEntryScale $w.ncont \
+         util::LabelEntryScale $w.ncont \
             -text "Number:" \
             -labelwidth 14 \
             -valuewidth 3 \
@@ -1291,7 +1291,7 @@ itcl::class gaia::GaiaContour {
 
       #  Starting value.
       itk_component add start {
-         LabelEntry $w.start \
+         util::LabelEntry $w.start \
             -validate real \
             -text "Start:" \
             -labelwidth 14 \
@@ -1303,7 +1303,7 @@ itcl::class gaia::GaiaContour {
 
       #  Increment.
       itk_component add incre {
-         LabelEntry $w.incre \
+         util::LabelEntry $w.incre \
             -validate real \
             -text "Increment:" \
             -labelwidth 14 \
@@ -1316,7 +1316,7 @@ itcl::class gaia::GaiaContour {
 
       #  Percentile list.
       itk_component add percent {
-         LabelEntry $w.percent \
+         util::LabelEntry $w.percent \
             -text "Percentiles:" \
             -labelwidth 14 \
             -valuewidth 20 \
@@ -1478,13 +1478,13 @@ itcl::class gaia::GaiaContour {
 
       #  Add section header.
       itk_component add keyrule {
-         LabelRule $w.keyrule -text "Key configuration:"
+         gaia::LabelRule $w.keyrule -text "Key configuration:"
       }
       pack $itk_component(keyrule) -side top -fill x
 
       #  Whether to draw key or not.
       itk_component add drawkey {
-         StarLabelCheck $w.drawkey \
+         gaia::StarLabelCheck $w.drawkey \
             -text "Display key:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -1498,7 +1498,7 @@ itcl::class gaia::GaiaContour {
 
       #  Title for key.
       itk_component add keytitle {
-         LabelEntry $w.keytitle \
+         util::LabelEntry $w.keytitle \
             -text "Title:" \
             -labelwidth 15 \
             -value "Contour key" \
@@ -1510,7 +1510,7 @@ itcl::class gaia::GaiaContour {
 
       #  Position of key relative to top right hand corner.
       itk_component add xkeypos {
-         LabelEntryScale $w.xkeypos \
+         util::LabelEntryScale $w.xkeypos \
             -text "X offset:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1528,7 +1528,7 @@ itcl::class gaia::GaiaContour {
          {X offset of key from top right hand corner}
 
       itk_component add ykeypos {
-         LabelEntryScale $w.ykeypos \
+         util::LabelEntryScale $w.ykeypos \
             -text "Y offset:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1587,7 +1587,7 @@ itcl::class gaia::GaiaContour {
 
       #  Key line lengths.
       itk_component add keylength {
-         LabelEntryScale $w.keylength \
+         util::LabelEntryScale $w.keylength \
             -text "Bar length:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1606,7 +1606,7 @@ itcl::class gaia::GaiaContour {
 
       #  Surround box line width.
       itk_component add keywidth {
-         LabelEntryScale $w.keywidth \
+         util::LabelEntryScale $w.keywidth \
             -text "Surround width:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1771,11 +1771,11 @@ itcl::class gaia::GaiaContour {
       #  Control what area the plot covers. This can be the whole just
       #  or just the part that is displayed.
       itk_component add regionrule {
-         LabelRule $w.region -text "Contour region:"
+         gaia::LabelRule $w.region -text "Contour region:"
       }
       pack $itk_component(regionrule) -fill x -ipadx 1m
       itk_component add whole {
-         StarLabelCheck $w.whole \
+         gaia::StarLabelCheck $w.whole \
             -text "Whole of image:" \
             -onvalue 1 \
             -offvalue 0 \
@@ -1792,7 +1792,7 @@ itcl::class gaia::GaiaContour {
       #  covers.
       set xfrac_ 0.7
       itk_component add xfrac {
-         LabelEntryScale $w.xfrac \
+         util::LabelEntryScale $w.xfrac \
             -text "X display fraction:" \
             -labelwidth 15 \
             -valuewidth 5 \
@@ -1811,7 +1811,7 @@ itcl::class gaia::GaiaContour {
 
       set yfrac_ 0.7
       itk_component add yfrac {
-         LabelEntryScale $w.yfrac \
+         util::LabelEntryScale $w.yfrac \
             -text "Y display fraction:" \
             -labelwidth 15 \
             -valuewidth 5 \

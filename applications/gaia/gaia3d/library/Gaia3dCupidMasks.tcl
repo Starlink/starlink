@@ -68,7 +68,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
       #  Different UI layout for 1 cube.
       if { $itk_option(-maxcubes) == 1 } {
          itk_component add attrule {
-            LabelRule $w_.attrule \
+            gaia::LabelRule $w_.attrule \
                -text "Mask & attributes:"
          }
          pack $itk_component(attrule) -side top -fill x -expand 1
@@ -300,11 +300,11 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
    protected method create_segmenter_ {i wcs} {
       if { $cubename_($i) != {} } {
          if { $wcs != {} } {
-            set segmenter_($i) [Gaia3dVtkSegmenter \#auto \
+            set segmenter_($i) [gaia3d::Gaia3dVtkSegmenter \#auto \
                                    -imagedata [$imagedata_($i) get_imagedata] \
                                    -wcs $wcs]
          } else {
-            set segmenter($i) [Gaia3dVtkSegmenter \#auto \
+            set segmenter($i) [gaia3d::Gaia3dVtkSegmenter \#auto \
                                   -imagedata [$imagedata_($i) get_imagedata]]
          }
       }
@@ -434,7 +434,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
 
          if { $itk_option(-maxcubes) != 1 } {
             itk_component add attrule$i {
-               LabelRule $parent.attrule$i \
+               gaia::LabelRule $parent.attrule$i \
                   -text "Mask & attributes:"
             }
             pack $itk_component(attrule$i) -side top -fill x -expand 1
@@ -461,7 +461,7 @@ itcl::class ::gaia3d::Gaia3dCupidMasks {
          #  Select cube.
          set cubename_($i) {}
          itk_component add cube$i {
-            LabelCubeFileChooser $parent.cube$i \
+            gaia3d::LabelCubeFileChooser $parent.cube$i \
                -labelwidth $lwidth_ \
                -text "Mask:" \
                -textvariable [scope cubename_($i)] \

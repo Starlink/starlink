@@ -106,7 +106,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
          set enable_range_($i) 0
          itk_component add enable$i {
-            StarLabelCheck $childsite_.enable$i \
+            gaia::StarLabelCheck $childsite_.enable$i \
                -text "Enable:" \
                -onvalue 1 -offvalue 0 \
                -labelwidth $itk_option(-labelwidth) \
@@ -117,7 +117,7 @@ itcl::class gaia::GaiaCubeBaseline {
          add_short_help $itk_component(enable$i) {Enable this range}
 
          itk_component add bounds$i {
-            GaiaSpectralPlotRange $childsite_.bounds$i \
+            gaia::GaiaSpectralPlotRange $childsite_.bounds$i \
                -gaiacube $itk_option(-gaiacube) \
                -ref_id [expr $itk_option(-ref_id) + $i]\
                -text1 {Lower index:} \
@@ -140,7 +140,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  No default controls.
       itk_component add order {
-         LabelEntryScale $w_.order \
+         util::LabelEntryScale $w_.order \
             -text "Order of fits:" \
             -value 1 \
             -labelwidth $itk_option(-labelwidth) \
@@ -160,7 +160,7 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCube" \
             -labelwidth $itk_option(-labelwidth) \
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaCubeBaseline {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \
@@ -246,7 +246,7 @@ itcl::class gaia::GaiaCubeBaseline {
       #  Now startup the MFITTREND application.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                             $env(KAPPA_DIR)/mfittrend \
                             -notify [code $this app_completed_]]
       }
@@ -259,11 +259,11 @@ itcl::class gaia::GaiaCubeBaseline {
 
       #  Need to determine ranges. Note handle case when coordinate system
       #  doesn't match the disk-file.
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
          set keep_units_ "$units"
-         $itk_option(-spec_coords) set_system "default" "default" 1
+         {*}$itk_option(-spec_coords) set_system "default" "default" 1
       } else {
          set keep_system_ {}
          set keep_units_ {}
@@ -273,13 +273,13 @@ itcl::class gaia::GaiaCubeBaseline {
          if { $enable_range_($i) } {
             set lbp [expr min($lower_limits_($i),$upper_limits_($i))]
             set ubp [expr max($lower_limits_($i),$upper_limits_($i))]
-            set lb [$itk_option(-gaiacube) get_coord $lbp 1 0]
-            set ub [$itk_option(-gaiacube) get_coord $ubp 1 0]
+            set lb [{*}$itk_option(-gaiacube) get_coord $lbp 1 0]
+            set ub [{*}$itk_option(-gaiacube) get_coord $ubp 1 0]
             lappend ranges $lb $ub
          }
       }
       if { $system != "default" && $system != {} } {
-         $itk_option(-spec_coords) set_system $system $units 1
+         {*}$itk_option(-spec_coords) set_system $system $units 1
       }
 
       if { $ranges != {} } {
@@ -306,12 +306,12 @@ itcl::class gaia::GaiaCubeBaseline {
          set file $tmpimage_
       }
       if { $file != {} } {
-         $itk_option(-gaiacube) configure -cube $file
+         {*}$itk_option(-gaiacube) configure -cube $file
 
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
          if { $keep_system_ != {} } {
-            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+            {*}$itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
 
          #  Show name of results.
@@ -355,14 +355,14 @@ itcl::class gaia::GaiaCubeBaseline {
          set id [expr $itk_option(-ref_id) + $i]
 
          if { $enable_range_($i) } {
-            $itk_option(-gaiacube) make_ref_range $id
-            $itk_option(-gaiacube) set_ref_range_colour $id \
+            {*}$itk_option(-gaiacube) make_ref_range $id
+            {*}$itk_option(-gaiacube) set_ref_range_colour $id \
                $itk_option(-ref_colour)
             $itk_component(bounds$i) configure \
                -value1 $lower_limits_($i) \
                -value2 $upper_limits_($i)
          } else {
-            $itk_option(-gaiacube) remove_ref_range $id
+            {*}$itk_option(-gaiacube) remove_ref_range $id
          }
       }
    }

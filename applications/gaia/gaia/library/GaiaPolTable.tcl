@@ -128,10 +128,10 @@ itcl::class gaia::GaiaPolTable {
       if { $cat_ != "" } {
 
 #  Clear the table.
-         $table_ config -headings {}
-         $table_ config -hformats {}
-         $table_ config -formats {}
-         $table_ config -info {}
+         {*}$table_ config -headings {}
+         {*}$table_ config -hformats {}
+         {*}$table_ config -formats {}
+         {*}$table_ config -info {}
 
 #  Clear the properties.
          catch {unset crows_ }
@@ -164,9 +164,9 @@ itcl::class gaia::GaiaPolTable {
       setHold "Sorting the table..."
 
 #  Sort the data.
-      $table_ config -sort_cols $cols
-      $table_ config -sort_order $order
-      $table_ new_info
+      {*}$table_ config -sort_cols $cols
+      {*}$table_ config -sort_order $order
+      {*}$table_ new_info
 
 #  Create new lists for converting between catalogue and table row
 #  indices, incorporating the effects of the sorting.
@@ -199,8 +199,8 @@ itcl::class gaia::GaiaPolTable {
          }
       }
 
-      $table_ config -formats $formats
-      $table_ config -hformats $hformats
+      {*}$table_ config -formats $formats
+      {*}$table_ config -hformats $hformats
       $table_ new_info
 
 #  Reset the progress bar.
@@ -214,7 +214,7 @@ itcl::class gaia::GaiaPolTable {
 
 #  Find the catalogue row indices for the currently selected rows.
       set crows ""
-      foreach trow [$table_ component listbox curselection] {
+      foreach trow [{*}$table_ component listbox curselection] {
          lappend crows $crows_($trow)
       }
 
@@ -256,7 +256,7 @@ itcl::class gaia::GaiaPolTable {
 #  Get a description of the changes which produced the new catalogue, and
 #  the changes equired to convert the displayed catalogue into the
 #  supplied catalogue.
-          lassign [$prevcat changes $cat] catdesc catch
+         lassign [{*}$prevcat changes $cat] catdesc catch
 
 #  If the catalogue requires the table to be tabulated from scratch, indicate
 #  this.
@@ -297,37 +297,37 @@ itcl::class gaia::GaiaPolTable {
 
 #  Store a clone of the supplied catalogue.
       if { $cat_ != "" } {set cat_ [$cat_ annull] }
-      set cat_ [$cat clone]
+      set cat_ [{*}$cat clone]
 
 #  Get headings and formats from the supplied GaiaPolCat.
-      set heads_ [$cat getHeadings]
-      set fmts_ [$cat getFmts]
-      set hfmts_ [$cat getHfmts]
+      set heads_ [$cat_ getHeadings]
+      set fmts_ [$cat_ getFmts]
+      set hfmts_ [$cat_ getHfmts]
 
 #  Save the index of the ID column.
-      set id_col_ [$cat getIdCol]
+      set id_col_ [$cat_ getIdCol]
 
 #  Assume no RA/DEC cols are available.
       set from_ ""
       set to_ ""
       set racol_ ""
       set deccol_ ""
-      $table_ config -filtercmd  "#"
+      {*}$table_ config -filtercmd  "#"
 
 #  If RA and DEC columns are available, add a filter to the TableList which converts
 #  RA/DEC values from decimal degrees to H:M:S format.
-      if { [$cat gotWcs] } {
+      if { [$cat_ gotWcs] } {
 
 #  Set up the globals used to communicate with the tableFilter method.
-         set racol_ [$cat getRaCol]
-         set deccol_ [$cat getDecCol]
+         set racol_ [$cat_ getRaCol]
+         set deccol_ [$cat_ getDecCol]
          if { $racol_ > -1 && $deccol_ > -1 } {
-            set from_ "deg [$cat getEquinox]"
-            set to_ "wcs [$cat getEquinox]"
+            set from_ "deg [$cat_ getEquinox]"
+            set to_ "wcs [$cat_ getEquinox]"
 
 #  Configure the TableList to use the tableFilter mathod defined within
 #  this class.
-            $table_ config -filtercmd  "$this tableFilter"
+            {*}$table_ config -filtercmd  "$this tableFilter"
 
 #  Modify the formats for the RA and DEC columns.
             set fmts_ [lreplace $fmts_ $racol_ $racol_ "%-16s"]
@@ -343,23 +343,23 @@ itcl::class gaia::GaiaPolTable {
 
 #  Configure the TableList to call the tableLayout method when the table
 #  layout is changed.
-      $table_ config -layoutcommand "$this tableLayout"
+      {*}$table_ config -layoutcommand "$this tableLayout"
 
 #  Configure the TableList to call the tableSort method when table
 #  sort options change.
-      $table_ config -sortcommand "$this tableSort"
+      {*}$table_ config -sortcommand "$this tableSort"
 
 #  Add the headings and formats into the TableList.
-      $table_ config -headings $heads_
-      $table_ config -formats $fmts_
-      $table_ config -hformats $hfmts_
+      {*}$table_ config -headings $heads_
+      {*}$table_ config -formats $fmts_
+      {*}$table_ config -hformats $hfmts_
 
 #  Ensure all columns are visible.
-      $table_ set_options $heads_ Show 1
+      {*}$table_ set_options $heads_ Show 1
 
 #  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
-      upvar 0 [$cat getStates] states
+      upvar 0 [$cat_ getStates] states
 
 #  Initialise the list of remaining data.
       set remdata ""
@@ -368,7 +368,7 @@ itcl::class gaia::GaiaPolTable {
 #  deleted, add its data to the list of remaining data.  Also save a list
 #  of all row identifiers in the catalogue.
       set crow -1
-      foreach row [$cat getData] {
+      foreach row [$cat_ getData] {
          incr crow
          if { $states($crow) != "D" } {
             lappend remdata $row
@@ -377,7 +377,7 @@ itcl::class gaia::GaiaPolTable {
       }
 
 #  Add the remaining data into the TableList.
-      $table_ config -info $remdata
+      {*}$table_ config -info $remdata
 
 #  Create lists which enable conversion between table and catalogue row
 #  indices.
@@ -399,14 +399,14 @@ itcl::class gaia::GaiaPolTable {
 
 #  Store a clone of the supplied catalogue.
       if { $cat_ != "" } {set cat_ [$cat_ annull] }
-      set cat_ [$cat clone]
+      set cat_ [{*}$cat clone]
 
       set ret 0
       if { [llength $crows] > 0 } {
 
 #  Get access to an array of row states (selected, unselected, deleted)
 #  indexed by row number.
-         upvar 0 [$cat getStates] states
+         upvar 0 [$cat_ getStates] states
 
 #  For each changed row, find the index of the row within the table which
 #  corresponds to the same catalogue row index, and set the state of the table
@@ -420,10 +420,10 @@ itcl::class gaia::GaiaPolTable {
             } else {
                set state $states($crow)
                if { $state == "S" } {
-                  $table_ select_row $trow 0
+                  {*}$table_ select_row $trow 0
 
                } elseif { $state == "U" } {
-                  $table_ deselect_row $trow
+                  {*}$table_ deselect_row $trow
 
                } elseif { $state == "D" } {
                   set ret 1
@@ -443,9 +443,9 @@ itcl::class gaia::GaiaPolTable {
 #  row visible. Do this by re-selecting the last selected row (if any).
 #  --------------------------------------------------------------------
    protected method seeTabSel {} {
-      set rows [$table_ component listbox curselection]
+      set rows [{*}$table_ component listbox curselection]
       if { $rows != "" } {
-         $table_ select_row [lindex $rows end] 0
+         {*}$table_ select_row [lindex $rows end] 0
       }
    }
 
@@ -453,8 +453,8 @@ itcl::class gaia::GaiaPolTable {
 #  --------------------------
    protected method setHold {text} {
       blt::busy hold $w_ -cursor "watch"
-      $pbar_ reset
-      $pbar_ config -text $text
+      {*}$pbar_ reset
+      {*}$pbar_ config -text $text
       update idletasks
    }
 
@@ -462,7 +462,7 @@ itcl::class gaia::GaiaPolTable {
 #  --------------------------
    protected method resetHold {} {
       blt::busy release $w_
-      $pbar_ reset
+      {*}$pbar_ reset
       update idletasks
    }
 
@@ -477,7 +477,7 @@ itcl::class gaia::GaiaPolTable {
       catch {unset trows_}
 
       set trow -1
-      foreach row [$table_ get_contents] {
+      foreach row [{*}$table_ get_contents] {
          incr trow
          set crow $catrow_([lindex $row $id_col_])
          set crows_($trow) $crow
@@ -488,12 +488,12 @@ itcl::class gaia::GaiaPolTable {
 #  Highlight any selected rows.
 #  ----------------------------
    protected method highlight {} {
-      $table_ clear_selection
+      {*}$table_ clear_selection
       upvar 0 [$cat_ getStates] states
       set nrow [$cat_ getNrow]
       for {set crow 0} {$crow < $nrow} {incr crow} {
          if { $states($crow) == "S" } {
-            $table_ select_row $trows_($crow) 0
+            {*}$table_ select_row $trows_($crow) 0
          }
       }
    }

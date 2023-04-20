@@ -92,7 +92,7 @@ itcl::class gaia::GaiaCubeRebin {
 
       #  Average or sum.
       itk_component add combination {
-         LabelMenu $w_.combination \
+         util::LabelMenu $w_.combination \
             -labelwidth $itk_option(-labelwidth) \
             -text "Combination method:" \
             -variable [scope combination_type_]
@@ -111,7 +111,7 @@ itcl::class gaia::GaiaCubeRebin {
       #  Rebinning factors for each dimension.
       foreach n {1 2 3} {
          itk_component add bin$n {
-            LabelEntryScale $w_.bin$n \
+            util::LabelEntryScale $w_.bin$n \
                -text "Bin factor, axis $n:" \
                -value [set bin${n}_] \
                -labelwidth $itk_option(-labelwidth) \
@@ -132,7 +132,7 @@ itcl::class gaia::GaiaCubeRebin {
 
       #  Prefix for name of output cube (auto-suggested until given a name).
       itk_component add prefix {
-         LabelEntry $w_.prefix \
+         util::LabelEntry $w_.prefix \
             -text "Output prefix:" \
             -value "GaiaTempCubeRebin" \
             -labelwidth $itk_option(-labelwidth) \
@@ -143,7 +143,7 @@ itcl::class gaia::GaiaCubeRebin {
          {Prefix for names of output cubes, will be appended by an integer}
 
       itk_component add outputfile {
-         LabelValue $w_.outputfile \
+         util::LabelValue $w_.outputfile \
             -text "Output name:" \
             -value "" \
             -labelwidth $itk_option(-labelwidth) \
@@ -197,19 +197,19 @@ itcl::class gaia::GaiaCubeRebin {
       blt::busy hold $w_
 
       #  Name of input cube.
-      set input_name [$itk_option(-gaiacube) get_ndfname]
+      set input_name [{*}$itk_option(-gaiacube) get_ndfname]
 
       #  Start up the task we require.
       if { $combination_type_ == "mean" } {
          if { $compavetask_ == {} } {
-            set compavetask_ [GaiaApp \#auto -application \
+            set compavetask_ [gaia::GaiaApp \#auto -application \
                                  $::env(KAPPA_DIR)/compave \
                                  -notify [code $this app_completed_]]
          }
          set task $compavetask_
       } else {
          if { $compaddtask_ == {} } {
-            set compaddtask_ [GaiaApp \#auto -application \
+            set compaddtask_ [gaia::GaiaApp \#auto -application \
                                  $::env(KAPPA_DIR)/compadd \
                                  -notify [code $this app_completed_]]
          }
@@ -217,7 +217,7 @@ itcl::class gaia::GaiaCubeRebin {
       }
 
       #  Record the system and units so we can restore them if needed.
-      lassign [$itk_option(-spec_coords) get_system] system units
+      lassign [{*}$itk_option(-spec_coords) get_system] system units
       if { $system != "default" && $system != {} } {
          set keep_system_ "$system"
          set keep_units_ "$units"
@@ -252,19 +252,19 @@ itcl::class gaia::GaiaCubeRebin {
       }
       if { $file != {} } {
          catch {
-            $itk_option(-gaiacube) open_keeplimits "$file"
+            {*}$itk_option(-gaiacube) open_keeplimits "$file"
          } msg
          $itk_component(outputfile) configure -value "$file"
 
          #  If the file has Temp in the name, record for automatic removal.
          if { [string match "*Temp*" $file] } {
-            $itk_option(-gaiacube) register_temp_file $file
+            {*}$itk_option(-gaiacube) register_temp_file $file
          }
 
          #  The original cube may have used a different coordinate system,
          #  switch to that if we can.
          if { $keep_system_ != {} } {
-            $itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
+            {*}$itk_option(-spec_coords) set_system $keep_system_ $keep_units_ 0
          }
       }
       blt::busy release $w_
@@ -276,17 +276,13 @@ itcl::class gaia::GaiaCubeRebin {
    #  The related GaiaCube instance.
    itk_option define -gaiacube gaiacube GaiaCube {} {
       if { $itk_option(-gaiacube) != {} } {
-         set rtdimage_ [$itk_option(-gaiacube) cget -rtdimage]
+         set rtdimage_ [{*}$itk_option(-gaiacube) cget -rtdimage]
       }
    }
 
    #  The GaiaSpecCoords instance used to define the current coordinate
    #  system.
    itk_option define -spec_coords spec_coords Spec_Coords {}
-
-   #  The GaiaSpecCoords instance used to define the current standard
-   #  of rest.
-   itk_option define -spec_sor spec_sor Spec_Coords {}
 
    #  Width of labels.
    itk_option define -labelwidth labelwidth LabelWidth 20

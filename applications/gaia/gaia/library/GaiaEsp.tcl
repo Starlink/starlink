@@ -234,7 +234,7 @@ itcl::class gaia::GaiaEsp {
 
         #  Add a status area for monitoring the output of the program
         itk_component add status {
-            Scrollbox $w_.status
+            gaia::Scrollbox $w_.status
         }
         $w_.status configure -height 5
         add_short_help $itk_component(status) \
@@ -271,7 +271,7 @@ itcl::class gaia::GaiaEsp {
         $itk_component(notebook) select 0
 
         #  Create an object for dealing with image names
-        set namer_ [GaiaImageName #auto]
+        set namer_ [gaia::GaiaImageName #auto]
     }
 
     # Destructor
@@ -321,7 +321,7 @@ itcl::class gaia::GaiaEsp {
         if {[info exists notebook_characteristics_(files,$whichpage)]} {
             set fileexists ""
             foreach ftype $notebook_characteristics_(files,$whichpage) {
-                set fname $values_($this,$ftype)
+                set fname $values_($ftype)
                 if {$fname == {}} {
                     switch $ftype {
                         "outputstlfile" {
@@ -349,7 +349,7 @@ itcl::class gaia::GaiaEsp {
                             set fname [format "GaiaEsp_%s" $ftype]
                         }
                     }
-                    set values_($this,$ftype) $fname
+                    set values_($ftype) $fname
                 }
                 # Check that none of these output files already exist.
                 if {[file exists $fname]} {
@@ -364,7 +364,7 @@ itcl::class gaia::GaiaEsp {
             # output.  Omit the warning if -warn-if-overwrite is false.
             if {$fileexists != ""} {
                 if {$itk_option(-warn-if-overwrite)} {
-                    set w [DialogWidget $w_.dialog \
+                    set w [util::DialogWidget $w_.dialog \
                             -text [format "I'll overwrite output files\n%s.\nIs that OK?" $fileexists] \
                             -bitmap warning \
                             -buttons {OK Cancel} \
@@ -396,7 +396,7 @@ itcl::class gaia::GaiaEsp {
         } elseif {$notebook_characteristics_(reqsrc,$whichpage) && [$objectlist_ get_sourcelist] == {}} {
             set allok 0
             error_dialog "Can't run ESP: you haven't defined any sources"
-        } elseif {$values_($this,sourcefile) == {}} {
+        } elseif {$values_(sourcefile) == {}} {
             set allok 0
             error_dialog "Can't save sources"
         }
@@ -405,7 +405,7 @@ itcl::class gaia::GaiaEsp {
 
             # Save the source information to a file
             if {$notebook_characteristics_(reqsrc,$whichpage)} {
-                save_${whichpage}_sourcefile_ $values_($this,sourcefile)
+                save_${whichpage}_sourcefile_ $values_(sourcefile)
             }
 
             lappend arglist "reset accept"
@@ -441,7 +441,7 @@ itcl::class gaia::GaiaEsp {
                 blt::busy hold $w_
 
                 if {$star_app_ == {} || $star_app_name_ != $invoke_cmd} {
-                    set star_app_ [GaiaApp #auto \
+                    set star_app_ [gaia::GaiaApp #auto \
                             -show_output $itk_component(status) \
                             -notify [code $this completed_${whichpage}_] \
                             -application $invoke_cmd
@@ -476,7 +476,7 @@ itcl::class gaia::GaiaEsp {
             reveal_ $indexes_(results)
         }
 
-        set stl [gaia::StarSTLFile #auto $values_($this,outputstlfile)]
+        set stl [gaia::StarSTLFile #auto $values_(outputstlfile)]
         if {[$stl status]} {
             # nellipses is the number of rows read from the STL catalogue.
             set nellipses [$stl parameter _nrows]
@@ -578,9 +578,9 @@ itcl::class gaia::GaiaEsp {
     }
 
     # return the string `true' or `false' depending on whether
-    # $value_($this,$var) is true or false
+    # $value_($var) is true or false
     private method bool_value {var} {
-        if {$values_($this,$var)} {
+        if {$values_($var)} {
             return "true"
         } else {
             return "false"
@@ -668,7 +668,7 @@ itcl::class gaia::GaiaEsp {
 
     protected method add_objectselection_selections_ {parent} {
         itk_component add objsel {
-            $objectlist_ edit_sourcelist $parent
+           $objectlist_ edit_sourcelist $parent
         }
         pack $itk_component(objsel) -side top -fill x -ipadx 1m -ipady 1m
         add_short_help $itk_component(objsel) \
@@ -701,7 +701,7 @@ itcl::class gaia::GaiaEsp {
 
     private method make_ellprofou_command_ {image} {
         # insist that back and sigma be specified, otherwise return ""
-        if {$values_($this,sigma) <= 0} {
+        if {$values_(sigma) <= 0} {
             # If Sigma is null, that's an error, because ELLPRO/FOU
             # refuse to deal with that.  If -auto-fit-background is
             # true, then automatically fit the background, if false,
@@ -709,7 +709,7 @@ itcl::class gaia::GaiaEsp {
             if {$itk_option(-auto-fit-background)} {
                 set answer 0
             } else {
-                set w [DialogWidget $w_.dialog \
+                set w [util::DialogWidget $w_.dialog \
                         -text "No background or standard deviation\nspecified.  Should I estimate them?" \
                         -bitmap warning \
                         -buttons {OK Cancel} \
@@ -723,9 +723,9 @@ itcl::class gaia::GaiaEsp {
                 return {}
             }
         }
-        if {$values_($this,back) <= 0} {
+        if {$values_(back) <= 0} {
             # Zero background is legitimate but worth warning about.
-            set w [DialogWidget $w_.dialog \
+            set w [util::DialogWidget $w_.dialog \
                     -text "Zero background.  Is that OK?" \
                     -bitmap warning \
                     -buttons {OK Cancel} \
@@ -739,7 +739,7 @@ itcl::class gaia::GaiaEsp {
 
         set arglist {}
 
-        set fullmeth $values_($this,ellprofoumethod)
+        set fullmeth $values_(ellprofoumethod)
         set meth [string range $fullmeth 0 2]
         set is_ellpro [expr {$meth == "pro"}]
 
@@ -749,14 +749,14 @@ itcl::class gaia::GaiaEsp {
             lappend arglist "$itk_option(-esp_dir)/ellfou"
         }
 
-        lappend arglist "infile=$values_($this,sourcefile)"
+        lappend arglist "infile=$values_(sourcefile)"
 
-        set ofname [string trim $values_($this,outputtextfile)]
+        set ofname [string trim $values_(outputtextfile)]
         if {$ofname != {}} {
-            lappend arglist "out=$values_($this,outputtextfile)"
+            lappend arglist "out=$values_(outputtextfile)"
         }
 
-        set ofname [string trim $values_($this,outputstlfile)]
+        set ofname [string trim $values_(outputstlfile)]
         if {! [regexp {\.txt$} $ofname]} {
             error_dialog "STL file must end in .txt"
             return {}
@@ -774,23 +774,23 @@ itcl::class gaia::GaiaEsp {
         lappend arglist "in=$image"
         lappend arglist "mode=false"
         lappend arglist "angcon=[bool_value angcon]"
-        lappend arglist "angoff=$values_($this,angoff)"
-        if {$values_($this,ardfile) != {}} {
-            lappend arglist "ardfil=^$values_($this,ardfile)"
+        lappend arglist "angoff=$values_(angoff)"
+        if {$values_(ardfile) != {}} {
+            lappend arglist "ardfil=^$values_(ardfile)"
         } else {
             lappend arglist "ardfil=!"
         }
-        lappend arglist "back=$values_($this,back)"
-        lappend arglist "sigma=$values_($this,sigma)"
+        lappend arglist "back=$values_(back)"
+        lappend arglist "sigma=$values_(sigma)"
         if {$is_ellpro} {
             # fast is true if ellprofoumethod is pro, false if it's proslow
             lappend arglist "fast=[expr {($fullmeth == "pro") ? "true" : "false"}]"
         }
         if {[$itk_component(fine) is_enabled]} {
-            lappend arglist "fine=$values_($this,fine)"
+            lappend arglist "fine=$values_(fine)"
         }
 
-        set sourcepos $values_($this,ellprofouoriginflag)
+        set sourcepos $values_(ellprofouoriginflag)
         if {[string index $sourcepos 0] == {y}} {
             lappend arglist autol
             lappend arglist "autolt=[bool_value autolt]"
@@ -800,39 +800,39 @@ itcl::class gaia::GaiaEsp {
         lappend arglist [expr {[string index $sourcepos 1]=={y} ? "nofrzori" : "frzori"}]
 
         if {$is_ellpro && [$itk_component(fract) is_enabled]} {
-            lappend arglist "fract=$values_($this,fract)"
+            lappend arglist "fract=$values_(fract)"
         }
         if {[$itk_component(lim1) is_enabled]} {
-            lappend arglist "lim1=$values_($this,lim1)"
+            lappend arglist "lim1=$values_(lim1)"
         }
         if {[$itk_component(lim2) is_enabled]} {
-            lappend arglist "lim2=$values_($this,lim2)"
+            lappend arglist "lim2=$values_(lim2)"
         }
         if {$is_ellpro && [$itk_component(lim3) is_enabled]} {
-            if {$values_($this,lim3flag)} {
+            if {$values_(lim3flag)} {
                 # don't impose limit -- give negative argument
                 lappend arglist "lim3=-1"
             } else {
-                lappend arglist "lim3=$values_($this,lim3)"
+                lappend arglist "lim3=$values_(lim3)"
             }
         }
-        lappend arglist "psize=$values_($this,psize)"
+        lappend arglist "psize=$values_(psize)"
         # Set default rlim.  This is never used, because we specify individual
         # radius limits in the input sourcelist file, but we need to specify it
         # or else we get an error from the parameter system.
         lappend arglist "rlim=0"
         if {[$itk_component(zerop) is_enabled]} {
-            lappend arglist "zerop=$values_($this,zerop)"
+            lappend arglist "zerop=$values_(zerop)"
         }
-        if {$is_ellpro && $values_($this,minmod) >= 0} {
-            lappend arglist "minmod=$values_($this,minmod)"
+        if {$is_ellpro && $values_(minmod) >= 0} {
+            lappend arglist "minmod=$values_(minmod)"
         }
 
         return $arglist
     }
 
     protected method reset_ellprofou_ {} {
-        set values_($this,expert) $defaults_(expert)
+        set values_(expert) $defaults_(expert)
         $itk_component(fine) reset
         $itk_component(fract) reset
         $itk_component(lim1) reset
@@ -849,10 +849,10 @@ itcl::class gaia::GaiaEsp {
         add_common_widgets_ $parent {outtextname outstlname inardname back} ellprofou
 
         itk_component add method-ellprofou {
-            LabelMenu $parent.method \
+            util::LabelMenu $parent.method \
                     -text "Method:" \
                     -labelwidth $lwidth \
-                    -variable [scope values_($this,ellprofoumethod)]
+                    -variable [scope values_(ellprofoumethod)]
         }
         foreach {str val} \
                 {"Using isophote contours" fou "Using intensity analysis" pro "Using intensity analysis (slow variant)" proslow} {
@@ -861,7 +861,7 @@ itcl::class gaia::GaiaEsp {
                     -command [code $this toggle_expert_]
         }
         $itk_component(method-ellprofou) configure \
-                -value $values_($this,ellprofoumethod)
+                -value $values_(ellprofoumethod)
         pack $itk_component(method-ellprofou) \
                 -side top -fill x -ipadx 1m -ipady 1m
         add_short_help $itk_component(method-ellprofou) \
@@ -869,10 +869,10 @@ itcl::class gaia::GaiaEsp {
 
         # origin settings
         itk_component add originflag-ellprofou {
-            LabelMenu $parent.originflag \
+            util::LabelMenu $parent.originflag \
                     -text "Source:" \
                     -labelwidth $lwidth \
-                    -variable [scope values_($this,ellprofouoriginflag)]
+                    -variable [scope values_(ellprofouoriginflag)]
         }
         foreach {str val} \
                 {"Source position fixed" nn "Refine initial position, then fix" yn "Refine position during processing" ny "Continuously refine position" yy} {
@@ -881,7 +881,7 @@ itcl::class gaia::GaiaEsp {
                     -command [code $this toggle_originflag_]
         }
         $itk_component(originflag-ellprofou) configure \
-                -value $values_($this,ellprofouoriginflag)
+                -value $values_(ellprofouoriginflag)
         pack $itk_component(originflag-ellprofou) \
                 -side top -fill x -ipadx 1m -ipady 1m
         add_short_help $itk_component(originflag-ellprofou) \
@@ -889,18 +889,18 @@ itcl::class gaia::GaiaEsp {
 
         # autolt
         itk_component add autolt {
-            LabelMenu $parent.autolt \
+            util::LabelMenu $parent.autolt \
                     -text "Auto-origin:" \
                     -labelwidth $lwidth \
-                    -variable [scope values_($this,autolt)]
+                    -variable [scope values_(autolt)]
         }
         foreach {str val} {"Simple centroid" 0 "Weighted centroid" 1} {
             $itk_component(autolt) add \
                     -label $str -value $val \
-                    -command "set values_($this,autolt) $val"
+                    -command "set values_(autolt) $val"
         }
         $itk_component(autolt) configure \
-                -value $values_($this,autolt)
+                -value $values_(autolt)
         pack $itk_component(autolt) \
                 -side top -fill x -ipadx 1m -ipady 1m
         add_short_help $itk_component(autolt) \
@@ -913,12 +913,12 @@ itcl::class gaia::GaiaEsp {
                     -labelwidth $lwidth
         }
         set cs [$itk_component(angoff) childsite]
-        entry $cs.b -textvariable [scope values_($this,angoff)] -width 10
+        entry $cs.b -textvariable [scope values_(angoff)] -width 10
         radiobutton $cs.a1 -text "clockwise" \
-                -variable [scope values_($this,angcon)] \
+                -variable [scope values_(angcon)] \
                 -value 1 -anchor w
         radiobutton $cs.a0 -text "anticlockwise" \
-                -variable [scope values_($this,angcon)] \
+                -variable [scope values_(angcon)] \
                 -value 0 -anchor w
         pack $cs.b $cs.a1 $cs.a0 -side left -fill x
         pack $itk_component(angoff) -side top -fill x -ipadx 1m -ipady 1m
@@ -927,12 +927,12 @@ itcl::class gaia::GaiaEsp {
 
         # Expert toggle
         itk_component add expert {
-            StarLabelCheck $parent.expert \
+            gaia::StarLabelCheck $parent.expert \
                     -text "Expert options:" \
                     -onvalue 1 -offvalue 0 \
                     -labelwidth $lwidth \
                     -anchor w \
-                    -variable [scope values_($this,expert)] \
+                    -variable [scope values_(expert)] \
                     -command [code $this toggle_expert_]
         }
         pack $itk_component(expert) -side top -fill x -ipadx 1m -ipady 1m
@@ -946,10 +946,10 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0.0 -to 2.0 -variable [scope values_($this,fine)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0.0 -to 2.0 -variable [scope values_(fine)]"
         }
         set cs [$itk_component(fine) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,fine)]
+        label $cs.tracelabel -textvariable [scope values_(fine)]
         pack $cs.tracelabel -side left -fill x -ipadx 1m
         pack $itk_component(fine) -side top -fill x -ipadx 1m
         add_short_help $itk_component(fine) \
@@ -962,10 +962,10 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_($this,fract)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_(fract)]"
         }
         set cs [$itk_component(fract) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,fract)]
+        label $cs.tracelabel -textvariable [scope values_(fract)]
         label $cs.units -text "%"
         pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
         pack $itk_component(fract) -side top -fill x -ipadx 1m
@@ -979,10 +979,10 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0 -to 2 -variable [scope values_($this,lim1)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0 -to 2 -variable [scope values_(lim1)]"
         }
         set cs [$itk_component(lim1) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,lim1)]
+        label $cs.tracelabel -textvariable [scope values_(lim1)]
         pack $cs.tracelabel -side left -fill x -ipadx 1m
         pack $itk_component(lim1) -side top -fill x -ipadx 1m
         add_short_help $itk_component(lim1) \
@@ -995,10 +995,10 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution 0.1 -from 0 -to 5 -variable [scope values_($this,lim2)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution 0.1 -from 0 -to 5 -variable [scope values_(lim2)]"
         }
         set cs [$itk_component(lim2) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,lim2)]
+        label $cs.tracelabel -textvariable [scope values_(lim2)]
         label $cs.units -text {std.dev.}
         pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
         pack $itk_component(lim2) -side top -fill x -ipadx 1m
@@ -1012,13 +1012,13 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_($this,lim3)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_(lim3)]"
         }
         set cs [$itk_component(lim3) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,lim3)]
+        label $cs.tracelabel -textvariable [scope values_(lim3)]
         label $cs.units -text px
         checkbutton $cs.cb -text {No freeze} \
-                -variable [scope values_($this,lim3flag)]
+                -variable [scope values_(lim3flag)]
         pack $cs.tracelabel $cs.units $cs.cb \
                 -side left -fill x -ipadx 1m
         pack $itk_component(lim3) -side top -fill x -ipadx 1m
@@ -1032,10 +1032,10 @@ itcl::class gaia::GaiaEsp {
                     -enablebutton 1 \
                     -initialstate 0 \
                     -childtype scale \
-                    -childopts "-orient horizontal -showvalue 0 -resolution .25 -from 0 -to 40 -variable [scope values_($this,zerop)]"
+                    -childopts "-orient horizontal -showvalue 0 -resolution .25 -from 0 -to 40 -variable [scope values_(zerop)]"
         }
         set cs [$itk_component(zerop) childsite]
-        label $cs.tracelabel -textvariable [scope values_($this,zerop)]
+        label $cs.tracelabel -textvariable [scope values_(zerop)]
         label $cs.units -text {mags/sq.as}
         pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
         pack $itk_component(zerop) -side top -fill x -ipadx 1m
@@ -1044,16 +1044,16 @@ itcl::class gaia::GaiaEsp {
 
         #  Minimisation mode
         itk_component add minmod {
-            LabelMenu $parent.minmod \
+            util::LabelMenu $parent.minmod \
                     -text "Min'n mode:" \
                     -labelwidth $lwidth \
-                    -variable [scope values_($this,minmod)]
+                    -variable [scope values_(minmod)]
         }
         foreach {name value} \
                 "Default -1 Mean 0 Median 1 Least-squares 2" {
             $itk_component(minmod) add \
                     -label $name -value $value \
-                    -command "set values_($this,minmod) $value"
+                    -command "set values_(minmod) $value"
         }
         pack $itk_component(minmod) -side top -fill x -ipadx 1m -ipady 1m
         add_short_help $itk_component(minmod) \
@@ -1081,14 +1081,14 @@ itcl::class gaia::GaiaEsp {
 
     private method add_results_selections_ {parent} {
         itk_component add results-menu {
-            LabelMenu $parent.results-menu \
+            util::LabelMenu $parent.results-menu \
                     -text "Source:"
         }
         $itk_component(results-menu) add -label "None" -value 0
         pack $itk_component(results-menu) -side top
 
         itk_component add results {
-            TableList $parent.results \
+            util::TableList $parent.results \
                     -title "Results" \
                     -hscroll 1 -vscroll 1 \
                     -headings {SourceN X Y SemiMajor Count PA Ellipt} \
@@ -1113,46 +1113,46 @@ itcl::class gaia::GaiaEsp {
 
     #  Set an element of the values_ array
     protected method set_values_ {elem value} {
-        set values_($this,$elem) $value
+        set values_($elem) $value
     }
 
     # Set defaults for _all_ of the parameters which are used in ESP
     protected method set_defaults_ {} {
 
         # Set local defaults
-        set values_($this,angcon) 1     ;# boolean
-        set values_($this,angoff) 0.0
-        set values_($this,autol) 0      ;# boolean
-        set values_($this,back) 0.0
-        set values_($this,calcsd) 1     ;# boolean
-        set values_($this,expert) 0     ;# doesn't correspond to parameter
-        set values_($this,fwhm) 1       ;# boolean
-        set values_($this,maxiter) -1
-        set values_($this,nsigma) 0
-        set values_($this,psize) 1
-        set values_($this,sigma) 0.0
+        set values_(angcon) 1     ;# boolean
+        set values_(angoff) 0.0
+        set values_(autol) 0      ;# boolean
+        set values_(back) 0.0
+        set values_(calcsd) 1     ;# boolean
+        set values_(expert) 0     ;# doesn't correspond to parameter
+        set values_(fwhm) 1       ;# boolean
+        set values_(maxiter) -1
+        set values_(nsigma) 0
+        set values_(psize) 1
+        set values_(sigma) 0.0
 
         # ellprofou-specific
-        set values_($this,ellprofoumethod) pro
-        set values_($this,autolt) 1     ;# boolean
-        set values_($this,fast) 1       ;# boolean
-        set values_($this,fine) 1.0
-        set values_($this,fract) 40
-        set values_($this,frzori) 1     ;# boolean
-        set values_($this,lim1) 1.25
-        set values_($this,lim2) 0.5
-        set values_($this,lim3) 20
-        set values_($this,lim3flag) 0
-        set values_($this,zerop) 27.5
-        set values_($this,minmod) 0
-        set values_($this,ellprofouoriginflag) yy
+        set values_(ellprofoumethod) pro
+        set values_(autolt) 1     ;# boolean
+        set values_(fast) 1       ;# boolean
+        set values_(fine) 1.0
+        set values_(fract) 40
+        set values_(frzori) 1     ;# boolean
+        set values_(lim1) 1.25
+        set values_(lim2) 0.5
+        set values_(lim3) 20
+        set values_(lim3flag) 0
+        set values_(zerop) 27.5
+        set values_(minmod) 0
+        set values_(ellprofouoriginflag) yy
 
         # File names
-        set values_($this,sourcefile) {}
-        set values_($this,outputndffile) {GaiaEspResults.sdf}
-        set values_($this,outputtextfile) {GaiaEspResults.txt}
-        set values_($this,outputstlfile) {GaiaEspCat.txt}
-        set values_($this,ardfile) {}
+        set values_(sourcefile) {}
+        set values_(outputndffile) {GaiaEspResults.sdf}
+        set values_(outputtextfile) {GaiaEspResults.txt}
+        set values_(outputstlfile) {GaiaEspCat.txt}
+        set values_(ardfile) {}
 
         set valuenames_ {
             angcon
@@ -1188,14 +1188,14 @@ itcl::class gaia::GaiaEsp {
 
         #  Record defaults so they can be restored
         foreach name $valuenames_ {
-            set defaults_($name) $values_($this,$name)
+            set defaults_($name) $values_($name)
         }
 
     }
 
     #  Helper methods
 
-    # If values_($this,expert) is now `true', then enable a set of
+    # If values_(expert) is now `true', then enable a set of
     # fields; if it is now `false',
     # switch that set off.  The set consists of $expert_parameter_list_ if
     # `useellpromethod' is pro or proslow, but if that is false, then
@@ -1203,7 +1203,7 @@ itcl::class gaia::GaiaEsp {
     # {$expert_parameter_list_ \ $ellpro_only_}, and the members of
     # $ellpro_only_ should all be disabled.
     private method toggle_expert_ {} {
-        if {$values_($this,expert)} {
+        if {$values_(expert)} {
             set newval normal
         } else {
             set newval disabled
@@ -1211,7 +1211,7 @@ itcl::class gaia::GaiaEsp {
 
         # get current value from menu
         set method [$itk_component(method-ellprofou) get]
-        set values_($this,ellprofoumethod) $method
+        set values_(ellprofoumethod) $method
 
         foreach i $expert_parameter_list_ {
             if {$method == "fou" && [lsearch -exact $ellpro_only_ $i] >= 0} {
@@ -1224,9 +1224,9 @@ itcl::class gaia::GaiaEsp {
     }
 
     private method toggle_originflag_ {} {
-        set values_($this,ellprofouoriginflag) \
+        set values_(ellprofouoriginflag) \
                 [$itk_component(originflag-ellprofou) get]
-        if {[string index $values_($this,ellprofouoriginflag) 0] == {y}} {
+        if {[string index $values_(ellprofouoriginflag) 0] == {y}} {
             $itk_component(autolt) configure -state normal
         } else {
             $itk_component(autolt) configure -state disabled
@@ -1275,7 +1275,7 @@ itcl::class gaia::GaiaEsp {
         # Establish a control object for this task, if not already done
         blt::busy hold $w_
 
-        set hsub_star_app_ [GaiaApp #auto \
+        set hsub_star_app_ [gaia::GaiaApp #auto \
                 -show_output $itk_component(status) \
                 -notify [code $this completed_bg_from_hsub_] \
                 -application $invoke_cmd
@@ -1310,8 +1310,8 @@ itcl::class gaia::GaiaEsp {
                 set mode [$kw parameter mode]
                 set sd   [$kw parameter sd]
                 if {$mode != {} && $sd != {}} {
-                    set values_($this,back) $mode
-                    set values_($this,sigma) $sd
+                    set values_(back) $mode
+                    set values_(sigma) $sd
                 } else {
                     error_dialog "Couldn't find BACK and SIGMA from HSUB"
                 }
@@ -1335,10 +1335,10 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist inardname] >= 0} {
             itk_component add inardname-$toolname {
-                LabelFileChooser $parent.inardname \
+                gaia::LabelFileChooser $parent.inardname \
                         -labelwidth $labelwidth_ \
                         -text "ARD file:" \
-                        -textvariable [scope values_($this,ardfile)]
+                        -textvariable [scope values_(ardfile)]
             }
             pack $itk_component(inardname-$toolname) \
                     -side top -fill x -ipadx 1m -ipady 1m
@@ -1348,10 +1348,10 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outndfname] >= 0} {
             itk_component add outndfname-$toolname {
-                LabelFileChooser $parent.outndfname \
+                gaia::LabelFileChooser $parent.outndfname \
                         -labelwidth $labelwidth_ \
                         -text "NDF output:" \
-                        -textvariable [scope values_($this,outputndffile)]
+                        -textvariable [scope values_(outputndffile)]
             }
             pack $itk_component(outndfname-$toolname) \
                     -side top -fill x -ipadx 1m -ipady 1m
@@ -1361,10 +1361,10 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outtextname] >= 0} {
             itk_component add outtextname-$toolname {
-                LabelFileChooser $parent.outtextname \
+                gaia::LabelFileChooser $parent.outtextname \
                         -labelwidth $labelwidth_ \
                         -text "Text output:" \
-                        -textvariable [scope values_($this,outputtextfile)]
+                        -textvariable [scope values_(outputtextfile)]
             }
             pack $itk_component(outtextname-$toolname) \
                     -side top -fill x -ipadx 1m -ipady 1m
@@ -1374,10 +1374,10 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist outstlname] >= 0} {
             itk_component add outstlname-$toolname {
-                LabelFileChooser $parent.outstltname \
+                gaia::LabelFileChooser $parent.outstltname \
                         -labelwidth $labelwidth_ \
                         -text "STL output:" \
-                        -textvariable [scope values_($this,outputstlfile)]
+                        -textvariable [scope values_(outputstlfile)]
             }
             pack $itk_component(outstlname-$toolname) \
                     -side top -fill x -ipadx 1m -ipady 1m
@@ -1393,9 +1393,9 @@ itcl::class gaia::GaiaEsp {
                         -labelwidth $labelwidth_
             }
             set cs [$itk_component(back-$toolname) childsite]
-            entry $cs.b -textvariable [scope values_($this,back)]  -width 7
+            entry $cs.b -textvariable [scope values_(back)]  -width 7
             label $cs.l1 -text {+/-}
-            entry $cs.s -textvariable [scope values_($this,sigma)] -width 7
+            entry $cs.s -textvariable [scope values_(sigma)] -width 7
             label $cs.l2 -text {counts}
             button $cs.button \
                     -text {Estimate} \
@@ -1413,11 +1413,11 @@ itcl::class gaia::GaiaEsp {
 
         if {[lsearch $panellist nsigma] >= 0} {
             itk_component add nsigma-$toolname {
-                LabelEntry $parent.nsigma \
+                util::LabelEntry $parent.nsigma \
                         -text "Sig. sigma:" \
                         -labelwidth $labelwidth_ \
                         -valuewidth 2 \
-                        -textvariable [scope values_($this,nsigma)]
+                        -textvariable [scope values_(nsigma)]
             }
             pack $itk_component(nsigma-$toolname) \
                     -side top -ipadx 1m -ipady 1m
@@ -1630,7 +1630,7 @@ itcl::class gaia::GaiaEsp {
     #  `files' and `reqsrc'.  The `files' characteristic contains a
     #  list of file type names which the `run' function checks have
     #  names -- for each entry, c, in this list, it checks that
-    #  $values_($this,$c) has a value.  The `reqsrc' characteristic is
+    #  $values_($c) has a value.  The `reqsrc' characteristic is
     #  a boolean: if true, then the objectlist_ is checked to be
     #  non-empty when `run' is called.
     private common notebook_characteristics_
@@ -1644,10 +1644,10 @@ itcl::class gaia::GaiaEsp {
     #  Last source used in results table.
     private variable last_sourcen_ 1
 
-    #  -- Common variables (shared by all instances)
+    #  Array for widget access.
+    protected variable values_
 
-    #  Array for passing around globally.  Indexed by ($this,param).
-    common values_
+    #  -- Common variables (shared by all instances)
 
     #  Widgets which are in the main panel are as follows
     common common_widgets_ \

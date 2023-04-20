@@ -91,7 +91,7 @@ itcl::class gaia::GaiaCubeAnimation {
       #  Whether to show the animation limits as a range object on the
       #  spectral plot.
       itk_component add showrange {
-         StarLabelCheck $w_.showrange \
+         gaia::StarLabelCheck $w_.showrange \
             -text "Show limits on plot:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth $itk_option(-labelwidth) \
@@ -103,7 +103,7 @@ itcl::class gaia::GaiaCubeAnimation {
          {Show extent of animation on plot with a reference range figure}
 
       itk_component add bounds {
-         GaiaSpectralPlotRange $w_.bounds \
+         gaia::GaiaSpectralPlotRange $w_.bounds \
             -gaiacube $itk_option(-gaiacube) \
             -ref_id $itk_option(-ref_id) \
             -text1 {Lower index:} \
@@ -121,7 +121,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
       #  Delay used in animation.
       itk_component add delay {
-         LabelEntryScale $w_.delay \
+         util::LabelEntryScale $w_.delay \
             -text {Delay (milli):} \
             -value $itk_option(-delay) \
             -labelwidth $itk_option(-labelwidth) \
@@ -141,7 +141,7 @@ itcl::class gaia::GaiaCubeAnimation {
 
       #  Step between planes.
       itk_component add step {
-         LabelEntryScale $w_.step \
+         util::LabelEntryScale $w_.step \
             -text {Step:} \
             -value $itk_option(-step) \
             -labelwidth $itk_option(-labelwidth) \
@@ -330,7 +330,7 @@ itcl::class gaia::GaiaCubeAnimation {
             set step_ $itk_option(-step)
          }
          set plane_ $itk_option(-lower_limit)
-         $itk_option(-gaiacube) set_display_plane $itk_option(-lower_limit) 0
+         {*}$itk_option(-gaiacube) set_display_plane $itk_option(-lower_limit) 0
          increment_
       }
    }
@@ -345,7 +345,7 @@ itcl::class gaia::GaiaCubeAnimation {
          puts "animated for: [expr [clock clicks -milliseconds] - $initial_seconds_]"
 
          #  Update the WCS so that the spectral axis coordinate is correct.
-         $itk_option(-gaiacube) update_wcs
+         {*}$itk_option(-gaiacube) update_wcs
 
          #  Create the animated GIF, if required.
          if { $loop_ == "capture" && $capframes_ != {} } {
@@ -389,7 +389,7 @@ itcl::class gaia::GaiaCubeAnimation {
    protected method increment_ {} {
       if { [inside_] } {
          set plane_ [expr ${plane_}+$step_]
-         $itk_option(-gaiacube) set_display_plane $plane_ 0
+         {*}$itk_option(-gaiacube) set_display_plane $plane_ 0
 
          if { $loop_ == "capture" } {
             if { ! [capture_] } {
@@ -489,7 +489,7 @@ itcl::class gaia::GaiaCubeAnimation {
       #  Do snapshot.
       ::update idletasks
       ::after $itk_option(-delay)
-      set canvas [$itk_option(-gaiacube) cget -canvas]
+      set canvas [{*}$itk_option(-gaiacube) cget -canvas]
       set image [::image create photo -format window -data $canvas]
       incr capcount_
       set gif [gaia::GaiaTempName::make_name \
@@ -546,13 +546,13 @@ itcl::class gaia::GaiaCubeAnimation {
       $itk_component(bounds) configure \
          -show_ref_range $itk_option(-show_ref_range)
       if { $itk_option(-show_ref_range) } {
-         $itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
-         $itk_option(-gaiacube) set_ref_range_colour \
+         {*}$itk_option(-gaiacube) make_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) set_ref_range_colour \
             $itk_option(-ref_id) "yellow"
          $itk_component(bounds) configure -value1 $itk_option(-lower_limit) \
             -value2 $itk_option(-upper_limit)
       } else {
-         $itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
+         {*}$itk_option(-gaiacube) remove_ref_range $itk_option(-ref_id)
       }
    }
 

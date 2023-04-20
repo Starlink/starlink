@@ -112,7 +112,7 @@ itcl::class gaia::GaiaImageCtrl {
       $canvas_ bind $imageId_ <Shift-2> [code eval $this zoomout]
 
       #  Create an object for handling image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
 
       #  Remove options we're overriding from base classes.
       itk_option remove rtd::RtdImage::show_object_menu
@@ -874,7 +874,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  retains the current name and filters when repeatably accessed.
    protected method get_file_ {dir pattern types} {
       if { ! [winfo exists $fileselect_] } {
-         set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
+         set fileselect_ [util::FileSelect $w_.select -dir $dir -filter $pattern \
                              -transient 1 -withdraw 1 -filter_types $types]
          wm transient $fileselect_ [winfo toplevel $w_]
       } else {
@@ -908,7 +908,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  works for FITS images.
    public method set_bias {} {
       if { [$image_ isfits] } {
-         RtdImageCtrl::set_bias
+         rtd::RtdImageCtrl::set_bias
          return
       }
       warning_dialog "Only enabled for FITS data"
@@ -1006,7 +1006,7 @@ itcl::class gaia::GaiaImageCtrl {
    # locally or just by the filename convention).
    public method add_history {filename} {
       if { ! $itk_option(-temporary) && ! [string match {*GaiaTemp*} $filename] } {
-         SkyCatCtrl::add_history $filename
+         skycat::SkyCatCtrl::add_history $filename
       }
    }
 
@@ -1035,7 +1035,7 @@ itcl::class gaia::GaiaImageCtrl {
          if { [only_user_] } {
             raise $w_
             regsub {\.gaia} $top_ {} clone
-            set d [DialogWidget .#auto \
+            set d [util::DialogWidget .#auto \
                       -title {Temporary image} \
                       -text "The image ($last_file_) that was displayed in \
                              window $itk_option(-appname): ($clone) is marked \
@@ -1070,7 +1070,7 @@ itcl::class gaia::GaiaImageCtrl {
       set gaia_logo [image create photo -file $gaia_library/gaia_logo.xpm]
       set lines [split $about_skycat "\n"]
       set max_lines [llength $lines]
-      DialogWidget $w_.about \
+      util::DialogWidget $w_.about \
          -image $gaia_logo \
          -messagewidth 5i \
          -justify center \
@@ -1260,7 +1260,7 @@ itcl::class gaia::GaiaImageCtrl {
          if { [winfo exists $w_.ndfhdu] } {
             after idle [code destroy $w_.ndfhdu]
          }
-         RtdImageCtrl::update_fits_hdus
+         rtd::RtdImageCtrl::update_fits_hdus
       } else {
 
          #  Displaying NDF now, if FITS last time remove popup.
@@ -1321,7 +1321,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  the main image and non-zero for a rapid frame. Override so that
    #  GAIA tools may be informed of these events.
    protected method camera_post_command {frameid} {
-      RtdImage::camera_post_command $frameid
+      rtd::RtdImage::camera_post_command $frameid
       if { $frameid == 0 } {
          if { $itk_option(-real_time_command) != {} } {
             eval $itk_option(-real_time_command)

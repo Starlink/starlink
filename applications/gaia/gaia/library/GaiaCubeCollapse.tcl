@@ -105,7 +105,7 @@ itcl::class gaia::GaiaCubeCollapse {
       #  Start up the COLLAPSE application, if not already done.
       if { $maintask_ == {} } {
          global env
-         set maintask_ [GaiaApp \#auto -application \
+         set maintask_ [gaia::GaiaApp \#auto -application \
                            $env(KAPPA_DIR)/collapse \
                            -notify [code $this app_completed_]]
       }
@@ -122,12 +122,12 @@ itcl::class gaia::GaiaCubeCollapse {
       #  is true, as that means conversions are failing).
       set wcsatts "!"
       if { ! $set_current_domain_ } {
-         lassign [$itk_option(-spec_coords) get_system] system units
+         lassign [{*}$itk_option(-spec_coords) get_system] system units
          if { $system != "default" && $system != {} } {
             set lb [expr min($itk_option(-lower_limit),$itk_option(-upper_limit))]
             set ub [expr max($itk_option(-lower_limit),$itk_option(-upper_limit))]
-            set lb [$itk_option(-gaiacube) get_coord $lb 1 0]
-            set ub [$itk_option(-gaiacube) get_coord $ub 1 0]
+            set lb [{*}$itk_option(-gaiacube) get_coord $lb 1 0]
+            set ub [{*}$itk_option(-gaiacube) get_coord $ub 1 0]
             if { $units != "default" && $units != {} } {
                set wcsatts "system=$system,unit=$units"
             } else {
@@ -142,7 +142,7 @@ itcl::class gaia::GaiaCubeCollapse {
                            wcsatts=\"$wcsatts\" accept"
 
       #  Tell cube to use these limits for spectral extraction.
-      $itk_option(-gaiacube) set_extraction_range \
+      {*}$itk_option(-gaiacube) set_extraction_range \
          $itk_option(-lower_limit) $itk_option(-upper_limit)
    }
 
@@ -159,7 +159,7 @@ itcl::class gaia::GaiaCubeCollapse {
          set file $tmpimage_
       }
       if { $file != {} } {
-         $itk_option(-gaiacube) display $file 1
+         {*}$itk_option(-gaiacube) display $file 1
       }
    }
 

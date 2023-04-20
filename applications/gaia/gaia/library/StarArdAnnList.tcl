@@ -87,7 +87,7 @@ itcl::class gaia::StarArdAnnList {
    constructor {args} {
       regsub {\-scale[\ ]+[^\ ]+} "$args" {} safeargs
       regsub {\-show_annuli[\ ]+[^\ ]+} "$args" {} safeargs
-      eval StarArdList::constructor -routine_prefix StarArdAnn $safeargs
+      eval gaia::StarArdList::constructor -routine_prefix StarArdAnn $safeargs
    } {
       #  Initialise the tag for annular objects.
       set tag_annuli_ "${this}ann_tag"
@@ -118,7 +118,7 @@ itcl::class gaia::StarArdAnnList {
       if { [string first $type $known_types_] != -1 } {
          set selected_ [incr highest_index_]
          set local_objects_($selected_) \
-            [$routine_prefix$type \#auto \
+            [gaia::$routine_prefix$type \#auto \
                 -selected_colour $selected_colour \
                 -deselected_colour $deselected_colour \
                 -notify_delete_cmd [code $this deleted_object_ $selected_] \

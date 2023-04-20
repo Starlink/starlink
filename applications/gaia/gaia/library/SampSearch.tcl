@@ -60,7 +60,7 @@ itcl::class gaia::SampSearch {
 
    #  Initialise widget.
    public method init {} {
-      GaiaSearch::init
+      gaia::GaiaSearch::init
 
       set samp_client_ [gaia::Gaia::get_samp_client]
       if {$samp_client_ != ""} {
@@ -100,7 +100,7 @@ itcl::class gaia::SampSearch {
          $samp_client_ reg_change_command [code $this samp_reg_changed_]
          samp_reg_changed_
          set tracker [$samp_client_ cget -client_tracker]
-         $tracker client_change_command [code $this samp_client_changed_]
+         {*}$tracker client_change_command [code $this samp_client_changed_]
          samp_client_changed_
       }
 
@@ -167,7 +167,7 @@ itcl::class gaia::SampSearch {
    #  Override select_symbol to perform additional SAMP-related
    #  row highlighting activities.
    public method select_symbol {id toggle {rownum -1}} {
-      SkySearch::select_symbol $id $toggle $rownum
+      skycat::SkySearch::select_symbol $id $toggle $rownum
       activate_selected_row
    }
 
@@ -277,9 +277,9 @@ itcl::class gaia::SampSearch {
       if {[$samp_client_ is_registered]} {
          set tracker [$samp_client_ cget -client_tracker]
          set mtype "table.select.rowList"
-         set subscribed [$tracker get_subscribed_clients $mtype]
+         set subscribed [{*}$tracker get_subscribed_clients $mtype]
          foreach client_id $subscribed {
-            set client_name [$tracker get_name $client_id]
+            set client_name [{*}$tracker get_name $client_id]
             add_menuitem $info_menu command "Send to $client_name" \
                "Send all visible rows to $client_name" \
                -command "[code $this transmit_info $client_id]"

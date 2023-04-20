@@ -104,7 +104,7 @@ itcl::class gaia::GaiaSearch {
 
       #  The catalogue may be accessed during construction (and converted
       #  to native format), catch any errors and dispose of this object.
-      if { [catch {SkySearch::init} msg] } {
+      if { [catch {skycat::SkySearch::init} msg] } {
          catch {::delete object $this}
          error $msg
       }
@@ -211,7 +211,7 @@ itcl::class gaia::GaiaSearch {
 
       #  Table to display results as text
       itk_component add results {
-         set results_ [GaiaQueryResult $w_.results \
+         set results_ [gaia::GaiaQueryResult $w_.results \
                           -astrocat [code $w_.cat] \
                           -skycat $skycat_ \
                           -title "Search Results" \
@@ -237,7 +237,7 @@ itcl::class gaia::GaiaSearch {
    #  given command which will be called immediately after the catalogue
    #  is opened.
    public method open_catalog {} {
-      AstroCat::open_catalog
+      cat::AstroCat::open_catalog
       if { $itk_option(-open_cmd) != {} } {
          eval $itk_option(-open_cmd)
       }
@@ -281,7 +281,7 @@ itcl::class gaia::GaiaSearch {
    #  GaiaQuery instead.
    public method add_search_options {} {
       itk_component add searchopts {
-         set searchopts_ [GaiaQuery $w_.searchopts \
+         set searchopts_ [gaia::GaiaQuery $w_.searchopts \
                              -relief groove \
                              -borderwidth 2 \
                              -astrocat [code $w_.cat] \
@@ -311,7 +311,7 @@ itcl::class gaia::GaiaSearch {
       set_origin
       if { $allow_searches_ } {
          set_wcs_type
-         AstroCat::search $args
+         cat::AstroCat::search $args
          restore_equinox_
       }
 
@@ -406,7 +406,7 @@ itcl::class gaia::GaiaSearch {
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 0
       }
-      SkySearch::plot
+      skycat::SkySearch::plot
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 1
       }
@@ -664,7 +664,7 @@ itcl::class gaia::GaiaSearch {
 
       set notset 0
       set catalog $history_catalog_
-      set image [$skycat get_image]
+      set image [{*}$skycat get_image]
       if {[catch {$astrocat_ open $catalog}]} {
          # no catalog yet
          set notset 1
@@ -686,7 +686,7 @@ itcl::class gaia::GaiaSearch {
          }
       } else {
          #  Let SkySearch restore from catalogue.
-         SkySearch::apply_history $skycat $filename
+         skycat::SkySearch::apply_history $skycat $filename
       }
    }
 
@@ -876,21 +876,21 @@ itcl::class gaia::GaiaSearch {
       #  Cone search.
       $w add_menuitem $m command "Query a VO catalog server..." \
          {Find VO cone search servers and query for catalogs} \
-         -command [code $w vo_find_cone] -state $state
+         -command "$w vo_find_cone" -state $state
 
       #  TAP query.
       $w add_menuitem $m command "Query a TAP service..." \
          {Find TAP services and query} \
-         -command [code $w vo_find_tap] -state $state
+         -command "$w vo_find_tap" -state $state
 
       #  Add SIAP query dialogs
       $w add_menuitem $m command "Query a VO image server..." \
          {Find VO image servers and make requests for images} \
-         -command [code $w vo_siap_query 0] -state $state
+         -command "$w vo_siap_query 0" -state $state
 
       $w add_menuitem $m command "Query list of VO image servers..." \
          {Query a list of VO image servers about image they hold on a region of sky} \
-         -command [code $w vo_siap_query 1] -state $state
+         -command "$w vo_siap_query 1" -state $state
 
 
 

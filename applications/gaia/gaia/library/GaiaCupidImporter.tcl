@@ -117,7 +117,7 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Add control for selecting the CUPID catalogue.
       itk_component add chooser {
-         LabelFileChooser $w_.chooser \
+         gaia::LabelFileChooser $w_.chooser \
             -text "Catalogue:" \
             -labelwidth 8 \
             -valuewidth 27 \
@@ -134,7 +134,7 @@ itcl::class gaia::GaiaCupidImporter {
       #  columns to use for world coordinates etc.
       foreach {label name} $coltypes_ {
          itk_component add $name {
-            LabelMenu $w_.$name \
+            util::LabelMenu $w_.$name \
                -text "$label:" \
                -relief raised \
                -labelwidth 8 \
@@ -157,7 +157,7 @@ itcl::class gaia::GaiaCupidImporter {
 
       #  Or use the STC shape.
       itk_component add stc {
-         StarLabelCheck $w_.stc \
+         gaia::StarLabelCheck $w_.stc \
             -text "STC shape:" \
             -onvalue 1 -offvalue 0 \
             -labelwidth 8 \

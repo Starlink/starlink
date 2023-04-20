@@ -127,7 +127,7 @@ itcl::class gaia::GaiaAstTransform {
       #  are not modified and are transformed to show in the second
       #  table. Note we only use id, ra and dec.
       itk_component add reftable {
-         TableList $w_.reftable \
+         util::TableList $w_.reftable \
             -title "Reference positions (table coordinates)" \
              -hscroll 1 \
              -selectmode extended \
@@ -142,7 +142,7 @@ itcl::class gaia::GaiaAstTransform {
       #  positions. Most of the controls are disabled and only the
       #  Marker menu is used in this case.
       itk_component add trantable {
-         GaiaPosTable $w_.trantable \
+         gaia::GaiaPosTable $w_.trantable \
             -title "Transformed positions (image coordinates)" \
             -editmenu {} \
             -markmenu $Markers \
@@ -162,12 +162,12 @@ itcl::class gaia::GaiaAstTransform {
       #  is appended with the string showing the actual value, when a
       #  system is selected.
       itk_component add rule {
-         LabelRule $w_.rule -text "Reference celestial coordinate system:"
+         gaia::LabelRule $w_.rule -text "Reference celestial coordinate system:"
       }
 
       #  System.
       itk_component add System {
-         LabelMenu $w_.system \
+         util::LabelMenu $w_.system \
 	       -text "System:" \
 	       -relief raised \
 	       -labelwidth 8 \
@@ -185,7 +185,7 @@ itcl::class gaia::GaiaAstTransform {
 
       #  Epoch (date of observation usually).
       itk_component add Epoch {
-         LabelEntryMenu $w_.epoch \
+         gaia::LabelEntryMenu $w_.epoch \
 	       -text "Epoch:" \
 	       -labelwidth 8
       }
@@ -200,7 +200,7 @@ itcl::class gaia::GaiaAstTransform {
 
       #  Equinox, J2000 or B1950 usually.
       itk_component add Equinox {
-         LabelEntryMenu $w_.equinox \
+         gaia::LabelEntryMenu $w_.equinox \
 	       -text "Equinox:" \
 	       -labelwidth 8
       }
@@ -511,10 +511,6 @@ itcl::class gaia::GaiaAstTransform {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
 
 #  End of class definition.
 }

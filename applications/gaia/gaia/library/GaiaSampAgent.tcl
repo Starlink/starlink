@@ -84,7 +84,7 @@ itcl::class gaia::GaiaSampAgent {
             #  already busy downloading...
             if { $urlget_ == {} } {
                set urlget_ \
-                  [GaiaUrlGet .\#auto -notify_cmd [code $this display_file_]]
+                  [gaia::GaiaUrlGet .\#auto -notify_cmd [code $this display_file_]]
                $urlget_ get $img_url
             } else {
                error "Already downloading - can't do two at once"

@@ -143,7 +143,7 @@ itcl::class gaia::GaiaSpectralPlot {
       #  access to the original data, important to preserve as much
       #  information as possible.
       if { $itk_option(-spec_writer) != {} } {
-         $itk_option(-spec_writer) set_menu $File
+         {*}$itk_option(-spec_writer) set_menu $File
       }
 
       #  Add print option.
@@ -412,7 +412,7 @@ itcl::class gaia::GaiaSpectralPlot {
       if { $itk_option(-spec_coords) != {} } {
          set SpectralCoords [add_menubutton "Coords/StdOfRest"]
          configure_menubutton "Coords/StdOfRest" -underline 0
-         $itk_option(-spec_coords) add_menu $SpectralCoords
+         {*}$itk_option(-spec_coords) add_menu $SpectralCoords
       }
 
       #  Interoperability. Send spectrum to other SAMP enabled
@@ -436,10 +436,10 @@ itcl::class gaia::GaiaSpectralPlot {
 
          #  Arrange for the menu to be kept up to date with the current state
          #  of the SAMP connection.
-         $samp_client_ reg_change_command [code $this samp_reg_changed_]
+         {*}$samp_client_ reg_change_command [code $this samp_reg_changed_]
          samp_reg_changed_
-         set tracker [$samp_client_ cget -client_tracker]
-         $tracker client_change_command [code $this samp_client_changed_]
+         set tracker [{*}$samp_client_ cget -client_tracker]
+         {*}$tracker client_change_command [code $this samp_client_changed_]
          samp_client_changed_
       }
 
@@ -904,7 +904,7 @@ itcl::class gaia::GaiaSpectralPlot {
             set mapping [$itk_component(canvas) itemcget $spectrum_ -mapping]
             set ind [gaiautils::getaxiscoord $mapping $x0 0]
 
-            eval $itk_option(-ref_line_changed_cmd) $id $ind $mode
+            eval {*}$itk_option(-ref_line_changed_cmd) $id $ind $mode
          }
 
          #  Update coordinate label.
@@ -1424,9 +1424,9 @@ itcl::class gaia::GaiaSpectralPlot {
                                    -type ".fits" -exists 0]
             }
             set filename [$temp_files_ get_name]
-            $itk_option(-spec_writer) write_as_fits $filename
+            {*}$itk_option(-spec_writer) write_as_fits $filename
 
-            set shortname [$itk_option(-spec_writer) get_shortname]
+            set shortname [{*}$itk_option(-spec_writer) get_shortname]
             if { $shortname == {} } {
                set shortname "$filename"
             }
@@ -1435,7 +1435,7 @@ itcl::class gaia::GaiaSpectralPlot {
             set axis [$itk_component(canvas) itemcget $spectrum_ -axis]
             set coordunit [gaiautils::astget $frameset "unit($axis)"]
 
-            $sender send_spectrum $filename $shortname \
+            {*}$sender send_spectrum $filename $shortname \
                $coordunit $dataunit $recipient_id
          }
       } msg]} {
@@ -1449,7 +1449,7 @@ itcl::class gaia::GaiaSpectralPlot {
       #  Configure the menu items all enabled/disabled according to whether
       #  there is a SAMP connection.
       set state disabled
-      if { $samp_client_ != {} && [$samp_client_ is_registered] } {
+      if { $samp_client_ != {} && [{*}$samp_client_ is_registered] } {
          set state normal
       }
       set nitem [$interopmenu_ index last]
@@ -1466,12 +1466,12 @@ itcl::class gaia::GaiaSpectralPlot {
       #  receiving spectra.
       set specific_menu $interopmenu_.send_spectrum
       $specific_menu delete 0 last
-      if { [$samp_client_ is_registered] } {
-         set tracker [$samp_client_ cget -client_tracker]
+      if { [{*}$samp_client_ is_registered] } {
+         set tracker [{*}$samp_client_ cget -client_tracker]
          set mtype "spectrum.load.ssa-generic"
-         set subscribed_clients [$tracker get_subscribed_clients $mtype]
+         set subscribed_clients [{*}$tracker get_subscribed_clients $mtype]
          foreach client_id $subscribed_clients {
-            set client_name [$tracker get_name $client_id]
+            set client_name [{*}$tracker get_name $client_id]
             add_menuitem $specific_menu command "Send to $client_name" \
                "Send spectrum to $client_name" \
                -command [code $this send_spectrum $client_id]

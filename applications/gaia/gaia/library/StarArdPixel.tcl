@@ -166,10 +166,10 @@ itcl::class gaia::StarArdPixel {
       if { ! [create_properties_window $name] } {
 
          #  Now add the buttons for the description.
-         set X_ [LabelEntry $Frame_.x \
+         set X_ [util::LabelEntry $Frame_.x \
                     -text {X:} \
                     -command [code $this configure -x]]
-         set Y_ [LabelEntry $Frame_.y \
+         set Y_ [util::LabelEntry $Frame_.y \
                     -text {Y:} \
                     -command [code $this configure -y]]
          pack $X_ $Y_ -side top -fill x

@@ -145,7 +145,7 @@ itcl::class gaia::GaiaAstTable {
        #  Add the table for displaying the reference positions (note
        #  fixed headings).
        itk_component add table {
-          TableList $w_.table \
+          util::TableList $w_.table \
              -title $itk_option(-title) \
              -hscroll 1 \
              -selectmode $selectmode_ \
@@ -354,9 +354,9 @@ itcl::class gaia::GaiaAstTable {
 
          #  Create a Name chooser to display the possible catalogues
          #  and allow a choice.
-         NameChooser $w_.chooser \
+         gaia::NameChooser $w_.chooser \
             -title "Select a catalogue" \
-            -textvariable [scope catalogue_($this)] \
+            -textvariable [scope catalogue_] \
             -width 40
          foreach instance $astrocats {
             if { ![info exists have($instance)] } {
@@ -374,14 +374,15 @@ itcl::class gaia::GaiaAstTable {
             tkwait window $w_.chooser
          }
          #  If catalogue_ is set then start to take over its objects.
-         if { $catalogue_($this) != {} } {
-            set grabbed $table($catalogue_($this))
+         set catalogue [set [scope catalogue_]]
+         if { $catalogue != {} } {
+            set grabbed $table($catalogue)
             set size [$grabbed total_rows]
             if { $size < 1 } {
                error_dialog {The choosen catalogue contains no entries}
             } else {
                #  All ready to go.
-               grab_table_ $grabbed $equinox($catalogue_($this))
+               grab_table_ $grabbed $equinox($catalogue)
             }
          }
       } else {
@@ -720,7 +721,7 @@ itcl::class gaia::GaiaAstTable {
          error_dialog "No rows are selected" $w_
          return
       }
-      GaiaEnterObject $w_.ef \
+      gaia::GaiaEnterObject $w_.ef \
          -title {Please edit the data for the object below:} \
          -image $itk_option(-image) \
          -labels [$itk_component(table) cget -headings] \
@@ -812,7 +813,7 @@ itcl::class gaia::GaiaAstTable {
          catch {destroy $enter_object_}
       }
       set enter_object_ \
-         [GaiaEnterObject $w_.ef \
+         [gaia::GaiaEnterObject $w_.ef \
              -title {Please enter the data for a new object below:} \
              -image $itk_option(-image) \
              -labels [$itk_component(table) cget -headings] \
@@ -971,7 +972,7 @@ itcl::class gaia::GaiaAstTable {
             -value $name \
             -bitmap $bitmap \
             -command [code $this configure -mtype $name] \
-            -variable [scope values_($this,mtype)]
+            -variable [scope values_(mtype)]
       }
 
       #  Width menu
@@ -979,7 +980,7 @@ itcl::class gaia::GaiaAstTable {
          $m.width add radiobutton \
             -value width$i \
             -bitmap width$i \
-            -variable [scope values_($this,mwidth)] \
+            -variable [scope values_(mwidth)] \
             -command [code $this configure -mwidth $i]
       }
 
@@ -988,7 +989,7 @@ itcl::class gaia::GaiaAstTable {
          $m.size add radiobutton \
             -value $i \
             -label $i \
-            -variable [scope values_($this,msize)] \
+            -variable [scope values_(msize)] \
             -command [code $this configure -msize $i]
       }
 
@@ -997,7 +998,7 @@ itcl::class gaia::GaiaAstTable {
          $m.outline add radiobutton \
             -value $i \
             -command [code $this configure -mcolour $i] \
-            -variable [scope values_($this,mcolour)] \
+            -variable [scope values_(mcolour)] \
             -background $i
       }
 
@@ -1006,12 +1007,12 @@ itcl::class gaia::GaiaAstTable {
          -value {} \
          -label None \
          -command [code $this configure -mfill {}] \
-         -variable [scope values_($this,mfill)]
+         -variable [scope values_(mfill)]
       foreach i $itk_option(-colors) {
          $m.fill add radiobutton \
             -value $i \
             -command [code $this configure -mfill $i] \
-            -variable [scope values_($this,mfill)] \
+            -variable [scope values_(mfill)] \
             -background $i
       }
 
@@ -1021,7 +1022,7 @@ itcl::class gaia::GaiaAstTable {
          $m.stipple add radiobutton \
             -value pat$i \
             -bitmap $bitmap \
-            -variable [scope values_($this,mstipple)] \
+            -variable [scope values_(mstipple)] \
             -command [code $this configure -mstipple pat$i]
       }
 
@@ -1100,7 +1101,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Write a copy of the table to an ordinary file.
    public method write_to_file {} {
-      set w [FileSelect .\#auto -title "Write positions to file"]
+      set w [util::FileSelect .\#auto -title "Write positions to file"]
       if {[$w activate]} {
          set filename [$w get]
          if { [file exists $filename] } {
@@ -1128,7 +1129,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Read positions from a text file.
    public method read_from_file {} {
-      set w [FileSelect .\#auto -title "Read positions from file"]
+      set w [util::FileSelect .\#auto -title "Read positions from file"]
       if {[$w activate]} {
          read_positions [$w get]
       }
@@ -1462,7 +1463,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Size of the markers drawn to display current positions.
    itk_option define -msize msize Msize 5 {
-       set values_($this,msize) $itk_option(-msize)
+       set values_(msize) $itk_option(-msize)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1477,7 +1478,7 @@ itcl::class gaia::GaiaAstTable {
       if { ! [regexp $marker_regexp_ $itk_option(-mtype) ] } {
          set itk_option(-mtype) cross
       }
-      set values_($this,mtype) $itk_option(-mtype)
+      set values_(mtype) $itk_option(-mtype)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1487,7 +1488,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Width of a marker.
    itk_option define -mwidth mwidth Mwidth 1 {
-       set values_($this,mwidth) $itk_option(-mwidth)
+       set values_(mwidth) $itk_option(-mwidth)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1497,7 +1498,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Outline colour of marker.
    itk_option define -mcolour mcolour Mcolour blue {
-       set values_($this,mcolour) $itk_option(-mcolour)
+       set values_(mcolour) $itk_option(-mcolour)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1507,7 +1508,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Fill colour of marker.
    itk_option define -mfill mfill Mfill {} {
-       set values_($this,mfill) $itk_option(-mfill)
+       set values_(mfill) $itk_option(-mfill)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1517,7 +1518,7 @@ itcl::class gaia::GaiaAstTable {
 
    #  Fill stipple pattern.
    itk_option define -mstipple mstipple MStipple {} {
-       set values_($this,mstipple) $itk_option(-mstipple)
+       set values_(mstipple) $itk_option(-mstipple)
        if { $going_ } {
 	   set configure_ 1
 	   redraw
@@ -1664,15 +1665,14 @@ itcl::class gaia::GaiaAstTable {
    #  GaiaEnterObject reference.
    protected variable enter_object_ {}
 
-   #  Common variables: (shared by all instances)
-   #  -----------------
-
-   #  Variable to share amongst all widgets. This is indexed by the
-   #  object name ($this)
-   common values_
+   #  Variable to share amongst all widgets.
+   protected variable values_
 
    #  Name of catalogue selected during grab.
-   common catalogue_
+   protected variable catalogue_ {}
+
+   #  Common variables: (shared by all instances)
+   #  -----------------
 
 #  End of class definition.
 }

@@ -276,7 +276,7 @@ itcl::class gaia::GaiaSextractor {
       #  Allow selection of the detection image.
       set lwidth 18
       itk_component add detname {
-         LabelFileChooser $w_.detname \
+         gaia::LabelFileChooser $w_.detname \
             -labelwidth $lwidth \
             -text "Detection image:" \
             -textvariable [scope values_(detname)] \
@@ -289,7 +289,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Add fields for setting the catalogue name and type(!).
       itk_component add catname {
-         LabelEntry $w_.catname \
+         util::LabelEntry $w_.catname \
             -labelwidth $lwidth \
             -text "Catalogue name:" \
             -textvariable [scope values_(catname)] \
@@ -300,7 +300,7 @@ itcl::class gaia::GaiaSextractor {
          {Name of output object catalogue (do not include file type)}
 
       itk_component add cattype {
-         LabelMenu $w_.cattype \
+         util::LabelMenu $w_.cattype \
             -labelwidth $lwidth \
             -text "Catalogue type:" \
             -variable [scope values_(cattype)]
@@ -313,7 +313,7 @@ itcl::class gaia::GaiaSextractor {
       #  Name for configuration parameters file and the catalogue
       #  parameters file.
       itk_component add conpar {
-         LabelEntry $w_.conpar \
+         util::LabelEntry $w_.conpar \
             -labelwidth $lwidth \
             -text "Config parameters:" \
             -textvariable [scope values_(conpar)]
@@ -323,7 +323,7 @@ itcl::class gaia::GaiaSextractor {
          {Name of file to store configuration (i.e. program) parameters}
 
       itk_component add catpar {
-         LabelEntry $w_.catpar \
+         util::LabelEntry $w_.catpar \
             -labelwidth $lwidth \
             -text "Catalogue parameters:" \
             -textvariable [scope values_(catpar)]
@@ -423,7 +423,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Add a status area for monitoring the output of the program.
       itk_component add status {
-         Scrollbox $w_.status
+         gaia::Scrollbox $w_.status
       }
       $w_.status configure -height 5
       add_short_help $itk_component(status) \
@@ -452,7 +452,7 @@ itcl::class gaia::GaiaSextractor {
       toggle_draw_iso_ellipses_
 
       #  Create an object for dealing with image names.
-      set namer_ [GaiaImageName \#auto]
+      set namer_ [gaia::GaiaImageName \#auto]
    }
 
    #  Destructor:
@@ -530,7 +530,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Save the current config parameters to a file.
    public method write_conpar_file {} {
-      set w [FileSelect .\#auto -title "Save config parameters to a file"]
+      set w [util::FileSelect .\#auto -title "Save config parameters to a file"]
       if {[$w activate]} {
          save_conpars [$w get]
       }
@@ -539,7 +539,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Restore config parameters from a file.
    public method read_conpar_file {} {
-      set w [FileSelect .\#auto -title "Read config parameters from a file"]
+      set w [util::FileSelect .\#auto -title "Read config parameters from a file"]
       if {[$w activate]} {
          read_conpars [$w get]
       }
@@ -548,7 +548,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Save the catalogue parameters to a file.
    public method write_catpar_file {} {
-      set w [FileSelect .\#auto -title "Save catalogue parameters to a file"]
+      set w [util::FileSelect .\#auto -title "Save catalogue parameters to a file"]
       if {[$w activate]} {
          save_catpars [$w get]
       }
@@ -557,7 +557,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Read columns from a file.
    public method read_catpar_file {} {
-      set w [FileSelect .\#auto -title "Read catalogue parameters from a file"]
+      set w [util::FileSelect .\#auto -title "Read catalogue parameters from a file"]
       if {[$w activate]} {
          read_catpars [$w get]
       }
@@ -769,7 +769,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Minimum size of an object, in pixels.
       itk_component add minsize {
-         LabelEntryScale $parent.minsize \
+         util::LabelEntryScale $parent.minsize \
             -text "Object size:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -793,7 +793,7 @@ itcl::class gaia::GaiaSextractor {
       #  absolute.
       #  Type of background estimate used for detections.
       itk_component add threshtype {
-         LabelMenu $parent.threshtype \
+         util::LabelMenu $parent.threshtype \
             -text "Threshold type:" \
             -labelwidth $lwidth \
             -variable [scope values_(threshtype)]
@@ -813,7 +813,7 @@ itcl::class gaia::GaiaSextractor {
       #  The detection threshold. Either a number of standard
       #  deviations, or a surface brightness and zero point.
       itk_component add detthresh {
-         ManyLabelEntry $parent.detthresh \
+         gaia::ManyLabelEntry $parent.detthresh \
             -nentry 2 \
             -text "Detection threshold:" \
             -labelwidth $lwidth \
@@ -828,7 +828,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Analysis threshold.
       itk_component add analthresh {
-         ManyLabelEntry $parent.analthresh \
+         gaia::ManyLabelEntry $parent.analthresh \
             -nentry 2 \
             -text "Analysis threshold:" \
             -labelwidth $lwidth \
@@ -845,7 +845,7 @@ itcl::class gaia::GaiaSextractor {
       #  Detection filter. Either NONE or some known filename. Note
       #  the use of full path names.
       itk_component add detfilter {
-         LabelMenu $parent.detfilter \
+         util::LabelMenu $parent.detfilter \
             -text "Detection filter:" \
             -labelwidth $lwidth \
             -variable [scope values_(detfilter)]
@@ -865,7 +865,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Number of thresholds used in deblending.
       itk_component add debthresh {
-         LabelEntryScale $parent.debthresh \
+         util::LabelEntryScale $parent.debthresh \
             -text "Deblend thresholds:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -888,7 +888,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Contrast parameter.
       itk_component add debcontrast {
-         LabelEntryScale $parent.debcontrast \
+         util::LabelEntryScale $parent.debcontrast \
             -text "Contrast parameter:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -909,7 +909,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Whether to clean detections and the efficiency.
       itk_component add detclean {
-         StarLabelCheck $parent.detclean \
+         gaia::StarLabelCheck $parent.detclean \
             -text "Clean detections:" \
             -onvalue Y \
             -offvalue N \
@@ -923,7 +923,7 @@ itcl::class gaia::GaiaSextractor {
          {Clean catalogue for false detections}
 
       itk_component add deteffic {
-         LabelEntryScale $parent.deteffic \
+         util::LabelEntryScale $parent.deteffic \
             -text "Clean efficiency:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1112,7 +1112,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Zero point (magnitudes).
       itk_component add photzero {
-         LabelEntry $childsite.photzero \
+         util::LabelEntry $childsite.photzero \
             -text "Zero point:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1128,7 +1128,7 @@ itcl::class gaia::GaiaSextractor {
       #  Number and size of apertures for photometry. XXX only 1 works
       #  in SExtractor 2.0.19, so removed for now.
       itk_component add photnum {
-         LabelEntryScale $childsite.photnum \
+         util::LabelEntryScale $childsite.photnum \
             -text "Number of apertures:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1149,7 +1149,7 @@ itcl::class gaia::GaiaSextractor {
          {Number of fixed sized apertures to use (1 to 32)}
 
       itk_component add photapps {
-         ManyLabelEntry $childsite.photapp \
+         gaia::ManyLabelEntry $childsite.photapp \
             -text "Aperture size:" \
             -labelwidth $lwidth \
             -nentry $values_(photnum) \
@@ -1169,7 +1169,7 @@ itcl::class gaia::GaiaSextractor {
       #  Kron photometry. Get the Kron factor and the minimum radius
       #  for objects analysed this way.
       itk_component add kronfact {
-         LabelEntryScale $childsite.kronfact \
+         util::LabelEntryScale $childsite.kronfact \
             -text "Kron factor:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1191,7 +1191,7 @@ itcl::class gaia::GaiaSextractor {
          {Kron factor (elliptical total magnitudes)}
 
       itk_component add kronmin {
-         LabelEntryScale $childsite.kronmin \
+         util::LabelEntryScale $childsite.kronmin \
             -text "Kron min radius:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1215,7 +1215,7 @@ itcl::class gaia::GaiaSextractor {
       #  Petrosian photometry. Get the Petrosian factor and the minimum radius
       #  for objects analysed this way.
       itk_component add petrofact {
-         LabelEntryScale $childsite.petrofact \
+         util::LabelEntryScale $childsite.petrofact \
             -text "Petrosian factor:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1236,7 +1236,7 @@ itcl::class gaia::GaiaSextractor {
       add_short_help $itk_component(petrofact) {Petrosian magnitudes factor}
 
       itk_component add petromin {
-         LabelEntryScale $childsite.petromin \
+         util::LabelEntryScale $childsite.petromin \
             -text "Petrosian min radius:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1259,7 +1259,7 @@ itcl::class gaia::GaiaSextractor {
       #  Flux fraction. Get a fractional flux value to determine a radius.
       #  Half-light, or really half kron flux.
       itk_component add fluxfrac {
-         LabelEntryScale $childsite.fluxfrac \
+         util::LabelEntryScale $childsite.fluxfrac \
             -text "Flux fraction:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1282,7 +1282,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of MASKing used on photometry neighbours.
       itk_component add photmask {
-         LabelMenu $childsite.detmask \
+         util::LabelMenu $childsite.detmask \
             -text "Neighbour mask:" \
             -labelwidth $lwidth \
             -variable [scope values_(photmask)]
@@ -1406,7 +1406,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of detector.
       itk_component add dettype {
-         LabelMenu $parent.dettype \
+         util::LabelMenu $parent.dettype \
             -text "Detector type:" \
             -labelwidth $lwidth \
             -variable [scope values_(dettype)]
@@ -1424,7 +1424,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Size of a pixel in arcseconds.
       itk_component add imagescale {
-         LabelEntry $parent.imagescale \
+         util::LabelEntry $parent.imagescale \
             -text "Image scale:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1439,7 +1439,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Data saturation value.
       itk_component add photsat {
-         LabelEntry $parent.photsat \
+         util::LabelEntry $parent.photsat \
             -text "Saturation level:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1454,7 +1454,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Gain of detector (CCD).
       itk_component add photgain {
-         LabelEntryScale $parent.photgain \
+         util::LabelEntryScale $parent.photgain \
             -text "Detector gain:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1476,7 +1476,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Gamma for photographic emulsion.
       itk_component add photgamma {
-         LabelEntry $parent.photgamma \
+         util::LabelEntry $parent.photgamma \
             -text "Emulsion gamma:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1522,7 +1522,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Seeing FWHM.
       itk_component add fwhm {
-         LabelEntry $parent.fwhm \
+         util::LabelEntry $parent.fwhm \
             -text "Seeing FWHM:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1537,7 +1537,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Neural network weight table.
       itk_component add nettable {
-         LabelMenu $parent.nettable \
+         util::LabelMenu $parent.nettable \
             -text "Neural network table:" \
             -labelwidth $lwidth \
             -variable [scope values_(nettable)]
@@ -1569,7 +1569,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of values used to estimate radii.
       itk_component add radtype {
-         LabelMenu $parent.radtype \
+         util::LabelMenu $parent.radtype \
             -labelwidth $lwidth \
             -text "Type of values:" \
             -variable [scope values_(radtype)]
@@ -1587,7 +1587,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Values that determine the thresholds used.
       itk_component add radthresh {
-         ManyLabelEntry $parent.radthresh \
+         gaia::ManyLabelEntry $parent.radthresh \
             -nentry 3 \
             -text "Threshold parameters:" \
             -labelwidth $lwidth \
@@ -1688,7 +1688,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of background estimate used for detections.
       itk_component add backtype {
-         LabelMenu $parent.backtype \
+         util::LabelMenu $parent.backtype \
             -text "Background type:" \
             -labelwidth $lwidth \
             -variable [scope values_(backtype)]
@@ -1707,7 +1707,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Value of background (if backtype is MANUAL).
       itk_component add backvalue {
-         LabelEntry $parent.backvalue \
+         util::LabelEntry $parent.backvalue \
             -text "Background value:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1722,7 +1722,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Background mesh size.
       itk_component add backmesh {
-         ManyLabelEntry $parent.backmesh \
+         gaia::ManyLabelEntry $parent.backmesh \
             -nentry 2 \
             -text "Mesh size:" \
             -labelwidth $lwidth \
@@ -1739,7 +1739,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Background filter size.
       itk_component add backfilter {
-         ManyLabelEntry $parent.backfilter \
+         gaia::ManyLabelEntry $parent.backfilter \
             -nentry 2 \
             -text "Filter size:" \
             -labelwidth $lwidth \
@@ -1756,7 +1756,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of background estimates used when estimate magnitudes.
       itk_component add backphot {
-         LabelMenu $parent.backphot \
+         util::LabelMenu $parent.backphot \
             -text "Photometry type:" \
             -labelwidth $lwidth \
             -variable [scope values_(backphot)]
@@ -1775,7 +1775,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Thickness of background annulus.
       itk_component add backthick {
-         LabelEntryScale $parent.backthick \
+         util::LabelEntryScale $parent.backthick \
             -text "Thickness:" \
             -labelwidth $lwidth \
             -valuewidth $vwidth \
@@ -1842,7 +1842,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Type of checkimage to produce.
       itk_component add checktype {
-         LabelMenu $parent.checktype \
+         util::LabelMenu $parent.checktype \
             -text "Checkimage type:" \
             -labelwidth $lwidth \
             -variable [scope values_(checktype)]
@@ -1860,7 +1860,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Name of check image.
       itk_component add checkimage {
-         LabelEntry $parent.checkimage \
+         util::LabelEntry $parent.checkimage \
             -labelwidth $lwidth \
             -text "Check image name:" \
             -value $values_(checkimage) \
@@ -2361,7 +2361,7 @@ itcl::class gaia::GaiaSextractor {
                   #  Establish a control object for this foreign task,
                   #  if not already done.
                   if { $foreign_sex_ == {} } {
-                     set foreign_sex_ [GaiaForeignExec \#auto \
+                     set foreign_sex_ [gaia::GaiaForeignExec \#auto \
                                           -show_output $itk_component(status) \
                                           -use_error 1 \
                                           -preprocess [code $this clean_] \
@@ -2401,7 +2401,7 @@ itcl::class gaia::GaiaSextractor {
                #  Establish a control object for this task,if not already done.
                blt::busy hold $w_
                if { $star_sex_ == {} } {
-                  set star_sex_ [GaiaApp \#auto \
+                  set star_sex_ [gaia::GaiaApp \#auto \
                                     -show_output $itk_component(status) \
                                     -notify [code $this completed_] \
                                     -see_end 1 \
@@ -2468,7 +2468,7 @@ itcl::class gaia::GaiaSextractor {
 
    #  Restore an old catalogue, displaying the detection ellipses.
    public method read_old_catalogue {} {
-      set w [FileSelect .\#auto -title "Read existing compatible catalogue"]
+      set w [util::FileSelect .\#auto -title "Read existing compatible catalogue"]
       if {[$w activate]} {
          set catalogue [$w get]
          if { ! [file readable $catalogue] } {
@@ -2688,7 +2688,7 @@ itcl::class gaia::GaiaSextractor {
 
       #  Issue the measurements available command if needed.
       if { $complete_cmd_ != {} } {
-         eval $complete_cmd_
+         eval {*}$complete_cmd_
          set complete_cmd_ {}
       }
    }

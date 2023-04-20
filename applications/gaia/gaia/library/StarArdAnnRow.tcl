@@ -84,7 +84,7 @@ itcl::class gaia::StarArdAnnRow {
    #  Inheritances:
    #  -------------
 
-   inherit StarArdRow
+   inherit gaia::StarArdRow
 
    #  Constructor:
    #  ------------

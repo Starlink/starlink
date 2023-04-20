@@ -84,7 +84,7 @@ itcl::class gaia::StarArdAnnColumn {
    #  Inheritances:
    #  -------------
 
-   inherit StarArdColumn
+   inherit gaia::StarArdColumn
 
    #  Constructor:
    #  ------------

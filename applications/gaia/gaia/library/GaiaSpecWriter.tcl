@@ -131,7 +131,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to a text file.
    public method save_as_text {} {
-      set w [FileSelect .\#auto -title "Save spectrum to text file"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to text file"]
       if { [$w activate] } {
          if { [catch {write_as_text [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"
@@ -145,18 +145,18 @@ itcl::class gaia::GaiaSpecWriter {
       if { $filename != {} } {
 
          #  Get the GaiaSpectralPlot instance and its components.
-         set gaiaspectrum [$cubespectrum get_spectrum]
-         set spectrum [$gaiaspectrum get_spectrum]
+         set gaiaspectrum [{*}$cubespectrum get_spectrum]
+         set spectrum [{*}$gaiaspectrum get_spectrum]
          if { $spectrum != {} } {
 
             blt::busy hold $w_
 
             #  Get spectral axis of dataset WCS.
-            set canvas [$gaiaspectrum component canvas]
+            set canvas [{*}$gaiaspectrum component canvas]
             set axis [$canvas itemcget $spectrum -axis]
 
             #  Get spectral WCS (need to pick out 1D from full WCS).
-            set cubeaccessor [$gaiacube get_cubeaccessor]
+            set cubeaccessor [{*}$gaiacube get_cubeaccessor]
             set frameset [$cubeaccessor getaxiswcs $axis 0]
 
             #  Open the output file.
@@ -167,7 +167,7 @@ itcl::class gaia::GaiaSpecWriter {
             puts $fid "# File created by GAIA"
 
             #  Set name of the spectrum.
-            set shortname [$cubespectrum sectioned_name]
+            set shortname [{*}$cubespectrum sectioned_name]
             if { $shortname == {} } {
                puts $fid "# name $filename"
             } else {
@@ -214,7 +214,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to an NDF.
    public method save_as_ndf {} {
-      set w [FileSelect .\#auto -title "Save spectrum to an NDF"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to an NDF"]
       if { [$w activate] } {
          if { [catch {write_as_ndf [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"
@@ -230,10 +230,10 @@ itcl::class gaia::GaiaSpecWriter {
 
          #  Use the GaiaCube to get access to the GaiaNDAccess
          #  instance and use that to re-extract the data.
-         set cubeaccessor [$gaiacube get_cubeaccessor]
+         set cubeaccessor [{*}$gaiacube get_cubeaccessor]
 
          #  Set name of the spectrum to the extracted spectrum section name.
-         set shortname [$cubespectrum sectioned_name]
+         set shortname [{*}$cubespectrum sectioned_name]
          if { $shortname == {} } {
             set shortname "$filename"
          }
@@ -246,7 +246,7 @@ itcl::class gaia::GaiaSpecWriter {
          #  Check for other data components and copy them too, but only
          #  if this is a point spectrum. When averaged over some region
          #  a simple extraction would be incorrect.
-         if { [$cubespectrum last_extracted_type] == "point" } {
+         if { [{*}$cubespectrum last_extracted_type] == "point" } {
             if { [$cubeaccessor exists "VARIANCE"] } {
                set mapped [$cubeaccessor ismapped "VARIANCE"]
                if { ! $mapped } {
@@ -287,7 +287,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Save the current spectrum to a FITS file.
    public method save_as_fits {} {
-      set w [FileSelect .\#auto -title "Save spectrum to FITS"]
+      set w [util::FileSelect .\#auto -title "Save spectrum to FITS"]
       if { [$w activate] } {
          if { [catch {write_as_fits [$w get]} msg] } {
             error_dialog "Failed to write spectrum: $msg"
@@ -303,7 +303,7 @@ itcl::class gaia::GaiaSpecWriter {
 
          #  Use the GaiaCube to get access to the GaiaNDAccess
          #  instance and use that to re-extract the data.
-         set cubeaccessor [$gaiacube get_cubeaccessor]
+         set cubeaccessor [{*}$gaiacube get_cubeaccessor]
 
          #  Set name of the spectrum.
          set shortname [get_shortname]
@@ -318,7 +318,7 @@ itcl::class gaia::GaiaSpecWriter {
 
          #  Save the headers describing the pointing and ACSIS meta-data.
          #  Only useful for point extraction.
-         if { [$cubespectrum last_extracted_type] == "point" } {
+         if { [{*}$cubespectrum last_extracted_type] == "point" } {
             write_extraction_headers_ $cubeaccessor $specaccessor
          }
          $specaccessor close
@@ -329,7 +329,7 @@ itcl::class gaia::GaiaSpecWriter {
 
    #  Return a suitable shortname.
    public method get_shortname {} {
-      return [$cubespectrum sectioned_name]
+      return [{*}$cubespectrum sectioned_name]
    }
 
 
@@ -444,7 +444,7 @@ itcl::class gaia::GaiaSpecWriter {
 
       #  Not fatal if this fails.
       catch {
-         lassign [$cubespectrum get_last_coords] \
+         lassign [{*}$cubespectrum get_last_coords] \
             ra dec xra xdec dra ddec refra refdec drefra drefdec
          if { $ra != {} } {
             $specaccessor fitswrite EXRA  $ra \

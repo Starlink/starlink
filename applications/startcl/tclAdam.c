@@ -719,11 +719,11 @@ char *argv[]
       ams_path ( argv[1], &path, &status );
       if ( status == SAI__OK )
       {
-         strcpy(interp->result, "1");
+         Tcl_SetResult(interp, "1", TCL_STATIC);
       }
       else
       {
-         strcpy(interp->result, "0");
+         Tcl_SetResult(interp, "0", TCL_STATIC);
       }
       tcl_status = TCL_OK;
    }
