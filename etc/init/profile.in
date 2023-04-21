@@ -112,87 +112,91 @@ if test -d ${JREHOME}; then
 fi
 unset JREHOME JDKHOME
 
-#     Check if @LD_LIB_PATH@ is set, needed on all platforms
-#     that have shareable libraries, plus all platforms that
-#     have Java JNI libraries.
+if true; then  # Disable if library paths patched.
 
-#  Is @LD_LIB_PATH@ set?
+   #     Check if @LD_LIB_PATH@ is set, needed on all platforms
+   #     that have shareable libraries, plus all platforms that
+   #     have Java JNI libraries.
 
-if test "${@LD_LIB_PATH@}" != ""; then
+   #  Is @LD_LIB_PATH@ set?
 
-#  @LD_LIB_PATH@ is set.  Search it for required components and
-#  Set appropriate flag variables.
+   if test "${@LD_LIB_PATH@}" != ""; then
 
-   found_sharelib="no"
-   if test "`echo ${@LD_LIB_PATH@} | grep -c ":${sharelibdir}"`" != "0"; then
-      found_sharelib="yes"
-   fi
-   if test "`echo ${@LD_LIB_PATH@} | grep -c "^${sharelibdir}"`" != "0"; then
-      found_sharelib="yes"
-   fi
+   #  @LD_LIB_PATH@ is set.  Search it for required components and
+   #  Set appropriate flag variables.
 
-#  Add required components to start of @LD_LIB_PATH@ if flag variables
-#  indicate they are not present.
+      found_sharelib="no"
+      if test "`echo ${@LD_LIB_PATH@} | grep -c ":${sharelibdir}"`" != "0"; then
+         found_sharelib="yes"
+      fi
+      if test "`echo ${@LD_LIB_PATH@} | grep -c "^${sharelibdir}"`" != "0"; then
+         found_sharelib="yes"
+      fi
 
-   if test "$found_sharelib" = "no"; then
+   #  Add required components to start of @LD_LIB_PATH@ if flag variables
+   #  indicate they are not present.
+
+      if test "$found_sharelib" = "no"; then
+         case "@build@" in
+            *-osf*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/alpha:${@LD_LIB_PATH@}"
+            ;;
+            x86_64*-linux*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/amd64:${@LD_LIB_PATH@}"
+            ;;
+            *-linux*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/i386:${@LD_LIB_PATH@}"
+            ;;
+            *-cygwin*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/x86:${@LD_LIB_PATH@}"
+            ;;
+            *-sun*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/sparc:${@LD_LIB_PATH@}"
+            ;;
+            *pc-apple-darwin*)
+               export @LD_LIB_PATH@="${starjavadir}/lib/ppc:${@LD_LIB_PATH@}"
+            ;;
+            *86*-apple-darwin*)
+               # We just add both architectures
+               export @LD_LIB_PATH@="${starjavadir}/lib/i386:${starjavadir}/lib/x86_64:${@LD_LIB_PATH@}"
+            ;;
+         esac
+
+         export @LD_LIB_PATH@="${sharelibdir}:${@LD_LIB_PATH@}"
+      fi
+
+   else
+
+   #  @LD_LIB_PATH@ is not set.  Add required components.
+
+      export @LD_LIB_PATH@=${sharelibdir}
+
       case "@build@" in
-         *-osf*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/alpha:${@LD_LIB_PATH@}"
-         ;;
-         x86_64*-linux*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/amd64:${@LD_LIB_PATH@}"
-         ;;
-         *-linux*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/i386:${@LD_LIB_PATH@}"
-         ;;
-         *-cygwin*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/x86:${@LD_LIB_PATH@}"
-         ;;
-         *-sun*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/sparc:${@LD_LIB_PATH@}"
-         ;;
-         *pc-apple-darwin*)
-            export @LD_LIB_PATH@="${starjavadir}/lib/ppc:${@LD_LIB_PATH@}"
-         ;;
-         *86*-apple-darwin*)
-            # We just add both architectures
-            export @LD_LIB_PATH@="${starjavadir}/lib/i386:${starjavadir}/lib/x86_64:${@LD_LIB_PATH@}"
-         ;;
+        *-osf*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
+        ;;
+        x86_64*-linux*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
+        ;;
+        *-linux*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
+        ;;
+        *-cygwin*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
+        ;;
+        *-sun*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:/usr/openwin/lib:${starjavadir}/lib/sparc"
+        ;;
+        *pc-apple-darwin*)
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
+        ;;
+        *86*-apple-darwin*)
+           # We just add both architectures
+           export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
+        ;;
       esac
-
-      export @LD_LIB_PATH@="${sharelibdir}:${@LD_LIB_PATH@}"
    fi
 
-else
-
-#  @LD_LIB_PATH@ is not set.  Add required components.
-
-   export @LD_LIB_PATH@=${sharelibdir}
-
-   case "@build@" in
-     *-osf*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/alpha"
-     ;;
-     x86_64*-linux*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/amd64"
-     ;;
-     *-linux*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386"
-     ;;
-     *-cygwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/x86"
-     ;;
-     *-sun*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:/usr/openwin/lib:${starjavadir}/lib/sparc"
-     ;;
-     *pc-apple-darwin*)
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/ppc"
-     ;;
-     *86*-apple-darwin*)
-        # We just add both architectures
-        export @LD_LIB_PATH@="${@LD_LIB_PATH@}:${starjavadir}/lib/i386:${starjavadir}/lib/x86_64"
-     ;;
-   esac
 fi
 
 # Define the Starlink environment first
