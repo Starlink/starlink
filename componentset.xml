@@ -172,7 +172,7 @@ including FITS.
 </component>
 
 <component id="cupid" support="S">
-  <version>2.7</version>
+  <version>2.8</version>
   <path>applications/cupid</path>
   <description>CUPID - Clump identification and analysis package</description>
   <abstract><p>
@@ -1651,7 +1651,7 @@ package.
 </component>
 
 <component id="smurf" support="S">
-  <version>1.7.0</version>
+  <version>1.7.1</version>
   <path>applications/smurf</path>
   <description>SMURF - Sub-mm User Reduction Facility</description>
   <abstract><p>
@@ -3151,7 +3151,7 @@ to handle data from a variety of different instruments.
 </component>
 
 <component id="ast" support="S">
-  <version>9.2.5</version>
+  <version>9.2.10</version>
   <path>libext/ast</path>
   <description>WCS library</description>
   <abstract>
@@ -5214,7 +5214,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="cfitsio" support="U">
-  <version>3.48</version>
+  <version>4.2.0</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
@@ -5334,7 +5334,7 @@ GKS (SUN/83) should be used.</p></abstract>
 </component>
 
 <component id="perl" support="U">
-  <version>5.18.2</version>
+  <version>5.36.0</version>
   <path>thirdparty/perlsys/perl</path>
   <description>Perl</description>
   <dependencies >
@@ -5411,7 +5411,7 @@ and some distortion.
 </component>
 
 <component id="itcl" support="U">
-  <version>3.4</version>
+  <version>4.2.3</version>
   <path>thirdparty/tclsys/itcl</path>
   <description>[incr Tcl]</description>
   <dependencies >
@@ -5431,7 +5431,7 @@ and some distortion.
 </component>
 
 <component id="tcl" support="U">
-  <version>8.5.16</version>
+  <version>8.6.13</version>
   <path>thirdparty/tclsys/tcl</path>
   <description>The Tcl system</description>
   <dependencies >
@@ -5469,7 +5469,7 @@ and some distortion.
 </component>
 
 <component id="tclx" support="U">
-  <version>8.4.0</version>
+  <version>8.4.1</version>
   <path>thirdparty/tclsys/tclx</path>
   <description>TclX</description>
   <dependencies >
@@ -5505,7 +5505,7 @@ and some distortion.
 </component>
 
 <component id="tk" support="U">
-  <version>8.5.16</version>
+  <version>8.6.13</version>
   <path>thirdparty/tclsys/tk</path>
   <description>The Tk system</description>
   <dependencies >
