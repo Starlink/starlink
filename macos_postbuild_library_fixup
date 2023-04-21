@@ -1,0 +1,479 @@
+#!/usr/bin/env python3
+
+from codecs import ascii_decode
+from itertools import chain
+import logging
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+logger = logging.getLogger('postbuild_library_fixup')
+
+
+def main():
+    # Parse arguments.
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('-q', '--quiet', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.add_argument('-n', '--dry-run', action='store_true')
+    parser.add_argument('--starlink-dir')
+    parser.add_argument('--sign', action='store_true')
+    parser.add_argument('--backup', action='store_true')
+    parser.add_argument('--backup-delete', action='store_true')
+    parser.add_argument('--backup-restore', action='store_true')
+    args = parser.parse_args()
+
+    # Configure logger.
+    logging.basicConfig(level=(
+        logging.WARNING if args.quiet else (
+            logging.DEBUG if args.verbose else logging.INFO)))
+
+    # Determine location of Starlink installation to process.
+    starlink_dir = args.starlink_dir
+    if starlink_dir is None:
+        starlink_dir = os.environ.get('STARLINK_DIR')
+    if starlink_dir is None:
+        logger.error('Neither --starlink-dir or $STARLINK_DIR were set')
+        return 1
+    while starlink_dir.endswith('/'):
+        starlink_dir = starlink_dir[:-1]
+    logger.debug('STARLINK_DIR: %s', starlink_dir)
+
+    if sys.platform == 'darwin':
+        fixup = FixupMacOs()
+    elif sys.platform == 'linux':
+        fixup = FixupLinux()
+    else:
+        logger.error('Platform not recognized')
+        return 1
+
+    if args.backup_delete or args.backup_restore:
+        if args.backup_delete and args.backup_restore:
+            logger.error('Both backup delete and restore specified')
+            return 1
+
+        fixup.process_backup(
+            starlink_dir, delete=args.backup_delete, dry_run=args.dry_run)
+
+        return 0
+
+    (executables, libraries, library_links) = fixup.find_files(starlink_dir)
+
+    library_paths = fixup.make_library_map(
+        chain(libraries, library_links), starlink_dir)
+
+    kwargs = {
+        'library_paths': library_paths,
+        'starlink_dir': starlink_dir,
+        'sign': args.sign,
+        'backup': args.backup,
+        'dry_run': args.dry_run,
+    }
+
+    logger.critical('Applying fixes')
+
+    for (is_library, filepaths) in ((False, executables), (True, libraries)):
+        for filepath in filepaths:
+            fixup.fix_file(is_library=is_library, filepath=filepath, **kwargs)
+
+
+class FixupBase():
+    # NOTE: previous script would have included some of these.
+    non_executable_extensions = (
+        '.tcl', '.pl', '.py', '.sh', '.csh', '.icl', '.pro',
+        '.la', '.a', '.o')
+
+    pattern_so_filename = re.compile('\.so(\.\d+)*$')
+
+    def find_files(self, starlink_dir):
+        logger.critical('Looking for libraries and executables')
+
+        executables = []
+        libraries = []
+        library_links = []
+
+        for (dirpath, dirnames, filenames) in os.walk(starlink_dir):
+            for filename in filenames:
+                filepath = os.path.join(dirpath, filename)
+                if os.path.islink(filepath):
+                    if self.is_library(filepath):
+                        logger.debug('Found library link: %s', filepath)
+                        library_links.append(filepath)
+                    else:
+                        logger.debug('Ignoring link: %s', filepath)
+
+                elif self.is_library(filepath):
+                    logger.debug('Found library: %s', filepath)
+                    libraries.append(filepath)
+
+                elif self.is_executable(filepath):
+                    logger.debug('Found executable: %s', filepath)
+                    executables.append(filepath)
+
+        return (executables, libraries, library_links)
+
+    def make_library_map(self, libraries, starlink_dir):
+        logger.critical('Checking for duplicate library names')
+
+        library_paths = {}
+        starperl_lib_dir = os.path.join(starlink_dir, 'Perl', 'lib')
+
+        for filepath in libraries:
+            # Skip Perl libraries.
+            if filepath.startswith(starperl_lib_dir):
+                continue
+
+            # Skip .dylib.dSYM?
+            if '.dylib.dSYM/' in filepath:
+                continue
+
+            basename = os.path.basename(filepath)
+            if basename in library_paths:
+                logger.warning(
+                    'Duplicate library: %s %s',
+                    filepath, library_paths[basename])
+
+            library_paths[basename] = filepath
+
+        return library_paths
+
+    def is_library(self, filepath):
+        return (self.pattern_so_filename.search(filepath)
+                or filepath.endswith('.dylib')
+                or filepath.endswith('.bundle'))
+
+    def is_executable(self, filepath):
+        for extension in self.non_executable_extensions:
+            if filepath.endswith(extension):
+                return False
+
+        return os.access(filepath, os.X_OK)
+
+    def get_library_rel_path(
+            self, filepath, library, starlink_dir, library_paths):
+        if library in library_paths.values():
+            logger.debug('%s: found %s', filepath, library)
+            library_path = library
+
+        elif os.path.basename(library) in library_paths:
+            logger.debug('%s: found basename %s', filepath, library)
+            library_path = library_paths[os.path.basename(library)]
+
+        else:
+            logger.warning('%s: not found: %s', filepath, library)
+            return
+
+        if not library_path.startswith(starlink_dir):
+            logger.error('%s: not in STARLINK_DIR: %s', filepath, library_path)
+            return
+
+        prefix_len = len(starlink_dir) + 1
+        return os.path.join('@rpath', library_path[prefix_len:])
+
+    def process_backup(self, starlink_dir, delete, dry_run):
+        logger.critical('Looking for backup files')
+
+        for (dirpath, dirnames, filenames) in os.walk(starlink_dir):
+            for filename in filenames:
+                if not filename.endswith('.bak'):
+                    continue
+
+                filepath = os.path.join(dirpath, filename)
+
+                if delete:
+                    if dry_run:
+                        logger.debug(
+                            'would have deleted backup (dry-run mode): %s',
+                            filepath)
+                    else:
+                        logger.debug('deleting backup: %s', filepath)
+
+                        os.remove(filepath)
+
+                else:
+                    original_filepath = filepath[:-4]
+                    assert '{}.bak'.format(original_filepath) == filepath
+
+                    if dry_run:
+                        logger.debug(
+                            'would have restored backup (dry-run mode): %s %s',
+                            filepath, original_filepath)
+                    else:
+                        logger.debug(
+                            'restoring backup: %s %s',
+                            filepath, original_filepath)
+
+                        shutil.move(filepath, original_filepath)
+
+    def backup_file(self, filepath, dry_run):
+        """Generate backup file path by adding ".bak".  If this file
+        does not already exist, copy the file to it."""
+
+        backup_filepath = '{}.bak'.format(filepath)
+
+        if not os.path.exists(backup_filepath):
+            if dry_run:
+                logger.debug(
+                    'would have created backup (dry-run mode): %s %s',
+                    filepath, backup_filepath)
+            else:
+                logger.debug(
+                    'creating backup: %s %s',
+                    filepath, backup_filepath)
+
+                shutil.copy(filepath, backup_filepath)
+
+    def _run_command(self, command, dry_run):
+        command_str = ' '.join(command)
+        if dry_run:
+            logger.debug('would have run (dry-run mode): %s', command_str)
+        else:
+            logger.debug('running: %s', command_str)
+            try:
+                subprocess.check_call(command)
+            except:
+                logger.exception('error running command: %s', command_str)
+                raise
+
+
+class FixupMacOs(FixupBase):
+    library_paths_ignore = (
+        '/usr/lib',
+        '/opt/X11/lib',
+        '/System/Library/Frameworks',
+    )
+
+    # NOTE: previous script just checked for "Mach-O" so would have
+    # matched various other things, e.g. .o
+    pattern_executable = re.compile(b'Mach-O .* executable')
+
+    def is_executable(self, filepath):
+        if not super().is_executable(filepath):
+            return False
+
+        output = subprocess.check_output(['/usr/bin/file', filepath])
+        if self.pattern_executable.search(output):
+            return True
+
+        return False
+
+    def fix_file(
+            self, is_library, filepath,
+            library_paths, starlink_dir, sign, backup, dry_run):
+        # Skip .dylib.dSYM?
+        if '.dylib.dSYM/' in filepath:
+            return
+
+        updates = []
+
+        if is_library and filepath.endswith('.dylib'):
+            current_library_id = self.get_library_id(filepath)
+            if current_library_id:
+                library_id = self.get_library_rel_path(
+                    filepath, current_library_id,
+                    starlink_dir=starlink_dir, library_paths=library_paths)
+
+                if library_id != current_library_id:
+                    updates.append(('-id', library_id))
+                    logger.debug(
+                        '%s: setting library id: %s', filepath, library_id)
+
+        linked_libraries = self.get_libraries(filepath)
+        for library in linked_libraries:
+            if any(library.startswith(ignore)
+                    for ignore in self.library_paths_ignore):
+                continue
+
+            replacement = self.get_library_rel_path(
+                filepath, library,
+                starlink_dir=starlink_dir, library_paths=library_paths)
+
+            if (replacement is not None) and (replacement != library):
+                updates.append(('-change', library, replacement))
+                logger.debug(
+                    '%s: replacement library: %s', filepath, replacement)
+
+        rpath = '@loader_path/{}/'.format(
+            os.path.relpath(starlink_dir, os.path.dirname(filepath)))
+
+        current_rpaths = self.get_rpaths(filepath)
+
+        if not current_rpaths:
+            logger.debug('%s: setting rpath: %s', filepath, rpath)
+            updates.append(('-add_rpath', rpath))
+        else:
+            if rpath in current_rpaths:
+                logger.debug(
+                    '%s: already have rpath %s in %r',
+                    filepath, rpath, current_rpaths)
+                for current_rpath in current_rpaths:
+                    if current_rpath != rpath:
+                        updates.append(('-delete_rpath', current_rpath))
+
+            else:
+                updates.append(('-rpath', current_rpaths[0], rpath))
+                for current_rpath in current_rpaths[1:]:
+                    updates.append(('-delete_rpath', current_rpath))
+
+        if not (updates or sign):
+            logger.debug('%s: no updates', filepath)
+            return
+
+        logger.info('Applying fixes to: %s', filepath)
+
+        if backup:
+            self.backup_file(filepath, dry_run=dry_run)
+
+        if updates:
+            command = list(chain(('install_name_tool',), *updates, (filepath,)))
+            self._run_command(command, dry_run=dry_run)
+
+        if sign:
+            self._sign_file(filepath, dry_run=dry_run)
+
+    def _sign_file(self, filepath, identity='-', dry_run=False):
+        command = [
+            'codesign', '--force',
+            '--sign', identity,
+            filepath,
+        ]
+
+        self._run_command(command, dry_run=dry_run)
+
+    def get_library_id(self, filepath):
+        output = subprocess.check_output(['/usr/bin/otool', '-XD', filepath])
+
+        return ascii_decode(output)[0].strip()
+
+    def get_libraries(self, filepath):
+        output = subprocess.check_output(['/usr/bin/otool', '-XL', filepath])
+
+        result = []
+        for line in ascii_decode(output)[0].splitlines():
+            result.append(line.strip().split(' ')[0])
+
+        return result
+
+    def get_rpaths(self, filepath):
+        output = subprocess.check_output(['/usr/bin/otool', '-Xl', filepath])
+
+        result = []
+        found_rpath = False
+        for line in ascii_decode(output)[0].splitlines():
+            line = line.strip()
+            if line == 'cmd LC_RPATH':
+                found_rpath = True
+            elif found_rpath and line.startswith('path '):
+                result.append(line.split(' ')[1])
+                found_path = False
+
+        return result
+
+
+class FixupLinux(FixupBase):
+    library_paths_ignore = (
+        '/lib64',
+        '/usr/lib64',
+    )
+
+    pattern_executable = re.compile(b'ELF .* executable')
+    pattern_ldd_output = re.compile('=>\s*(\S+)\s*\(')
+    pattern_objdump_output = re.compile('(\S+)\s*(\S+)')
+
+    def is_executable(self, filepath):
+        if not super().is_executable(filepath):
+            return False
+
+        output = subprocess.check_output(['/usr/bin/file', filepath])
+        if self.pattern_executable.search(output):
+            return True
+
+        return False
+
+    def fix_file(
+            self, is_library, filepath,
+            library_paths, starlink_dir, sign, backup, dry_run):
+        if sign:
+            raise Exception('Signing not supported')
+
+        updates = []
+
+        linked_libraries = self.get_libraries(filepath)
+        for library in linked_libraries:
+            if any(library.startswith(ignore)
+                    for ignore in self.library_paths_ignore):
+                continue
+
+            # Compute replacement in order to be able to issue warnings.
+            self.get_library_rel_path(
+                filepath, library,
+                starlink_dir=starlink_dir, library_paths=library_paths)
+
+        # TODO: also process libraries?
+        if is_library:
+            return
+
+        current_rpaths = self.get_rpaths(filepath)
+
+        # TODO: also include StarJava path?
+        rpath = os.path.join(
+            '$ORIGIN',
+            os.path.relpath(
+                os.path.join(starlink_dir, 'lib'),
+                os.path.dirname(filepath)))
+
+        if ((len(current_rpaths) != 1) or (current_rpaths[0] != rpath)):
+            updates.extend((
+                ('--remove-rpath',),
+                ('--force-rpath', '--set-rpath', rpath),
+            ))
+
+        if not updates:
+            return
+
+        logger.info('Applying fixes to: %s', filepath)
+
+        if backup:
+            self.backup_file(filepath, dry_run=dry_run)
+
+        for update in updates:
+            command = list(chain(('patchelf',), update, (filepath,)))
+            self._run_command(command, dry_run=dry_run)
+
+    def get_libraries(self, filepath):
+        output = subprocess.check_output(['ldd', filepath])
+
+        result = []
+        for line in ascii_decode(output)[0].splitlines():
+            m = self.pattern_ldd_output.search(line)
+            if not m:
+                continue
+
+            result.append(m.group(1))
+
+        return result
+
+    def get_rpaths(self, filepath):
+        output = subprocess.check_output(['objdump', '-p', filepath])
+
+        result = []
+        for line in ascii_decode(output)[0].splitlines():
+            m = self.pattern_objdump_output.search(line)
+            if not m:
+                continue
+
+            # TODO: check also for runpath?
+            if m.group(1) == 'RPATH':
+                # TODO: check if correct separator?
+                result.extend(m.group(2).split(':'))
+
+        return result
+
+
+if __name__ == '__main__':
+    status = main()
+    if status:
+        sys.exit(status)
