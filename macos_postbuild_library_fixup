@@ -267,6 +267,10 @@ class FixupMacOs(FixupBase):
         if '.dylib.dSYM/' in filepath:
             return
 
+        # Skip ELF .so files in starjava?
+        if ('starjava/lib' in filepath) and filepath.endswith('.so'):
+            return
+
         updates = []
 
         if is_library and filepath.endswith('.dylib'):
