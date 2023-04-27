@@ -134,7 +134,8 @@ This guide covers the following:
 \item \cref{Chapter}{sec:analyse}{Chapter 8} -- Analysing your reduced cube.
 \item \cref{Chapter}{sec:advanced}{Chapter 9} -- Advanced analysis techniques such as changing co-ordinate frames.
 \item \cref{Chapter}{sec:gaia}{Chapter 10} -- Using \gaia\ to analyse your data.
-\item \cref{Chapter}{sec:fromcadc}{Chapter 11} -- Getting your data from CADC.
+\item \cref{Chapter}{sec:splat}{Chapter 11} -- Plotting spectra using \splat.
+\item \cref{Chapter}{sec:fromcadc}{Chapter 12} -- Getting your data from CADC.
 \end{itemize}
 
 \textbf{Style convention}\\
@@ -143,7 +144,7 @@ In this cookbook the following styles are followed:
 \item \texttt{\%} represents the command-line prompt.
 \item Command-line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
 \item Parameters, FITS keywords, parameters and their values are presented in \texttt{typewriter font}.
-\item The names of Starlink commands appear as in \task{san serif font}.
+\item The names of Starlink commands appear as in \task{sans serif font}.
 \item The names of commands, menu items, tabs, or buttons within graphical tools (such as \gaia\ or
 \splat) appear \guithing{like this}.
 \item The names of windows produced by graphical tools appear \guiwindow{like this}.
@@ -220,7 +221,7 @@ a UNIX shell.
            reduction of the raw data following pre-defined recipes.
          & \texttt{\%\,oracdr\_acsis} & \oracdrsun \\
 \hline
-\textsc{Picard} & \textsc{Picard} uses a similar pipeline system as \ORACDR\ but
+\picard\        & \textsc{Picard} uses a similar pipeline system as \ORACDR\ but
                   for the post-processing of reduced data. While mainly implemented
                   for SCUBA-2 data, there are a few recipes that are heterodyne
                   compatible. See \cref{Appendix}{app:picard}{Picard} for more details
@@ -237,7 +238,7 @@ a UNIX shell.
        & \texttt{\%\,gaia} & \gaiasun\ \gaiasc\ \\
 
 \hline
-\HDSTRACE\ & This tool lets you examine the contents of Starlink data files.
+\HDSTRACEref\ & This tool lets you examine the contents of Starlink data files.
            & \texttt{\%\,hdstrace $<$file$>$} & \hdstracesun\ \\
 
 \hline
@@ -687,7 +688,7 @@ Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calib
 
 The N\=amakanui instrument is a spare receiver for the Greenland
 Telescope (GLT) on loan for use on the JCMT courtesy of ASIAA.
-N\=amakanui contains three inserts: Ala$`$ihi, $`$\=U$`$\=u, and
+N\=amakanui contains three inserts: $`$Ala$`$ihi, $`$\=U$`$\=u, and
 $`$\=Aweoweo operating around 86, 230, and 345\,GHz. Each of the three
 inserts receive dual linear polarizations which are labelled using a
 zero-based system: P0, P1. Each insert has a separate optical path and
@@ -725,10 +726,10 @@ saw first light on 2021 January 14.  Due to its sensitivity
 $`$\=Aweoweo's most-common observing mode is stare. For larger areas,
 HARP becomes more efficient for jiggle and raster mapping.
 
-\subsection{Ala$`$ihi frontend (future)}
+\subsection{$`$Ala$`$ihi frontend (in commissioning)}
 
-Ala$`$ihi is the other insert held within the N\=amakanui instrument.
-Unlike $`$\=U$`$\=u and $`$\=Aweoweo, Ala$`$ihi is a Single SideBand
+$`$Ala$`$ihi is the other insert held within the N\=amakanui instrument.
+Unlike $`$\=U$`$\=u and $`$\=Aweoweo, $`$Ala$`$ihi is a Single SideBand
 (SSB) instrument. It will operate at frequencies around 77 to 88\,GHz
 with dual linear polarizations. Its primary function at the JCMT will
 be as part of VLBI observations.
@@ -737,7 +738,7 @@ be as part of VLBI observations.
 \subsection{\xlabel{harp}HARP frontend}
 
 The Heterodyne Receiver Array Programme (HARP) is single-sideband
-receiver (SSB) comprised of a16-receptor array
+receiver (SSB) comprised of a 16-receptor array
 arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band
 between 325 and 375 GHz. The receptors are adjacent on the focal plane
 but separated on the sky by 30 arcseconds (or approximately twice the
@@ -933,7 +934,7 @@ limited to targets which have a blank reference position within
 
 \item[\textbf{Frequency-switch}]
 In frequency-switch (FSW) mode the telescope does not move but the
-centre of the spectral band is shifted, typically by 8 or 16\,Mhz,
+centre of the spectral band is shifted, typically by 8 or 16\,MHz,
 to a line-free region of the spectrum. It is very efficient with no
 off-source time and can be
 useful when no emission-free reference position can be found.
@@ -991,7 +992,7 @@ Instrument\_Insert\_Polarisation\_Sideband
 
 For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U,
 with U denoting the insert. For $`$\=Aweoweo, W denotes the insert:
-e.g. NW0L, NW0U, NW1L, NW1U; and for Ala$`$ihi, A denotes the insert.
+e.g. NW0L, NW0U, NW1L, NW1U; and for $`$Ala$`$ihi, A denotes the insert.
 
 \section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
@@ -1242,7 +1243,7 @@ command-line option.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item The raw data is copied to the local directory. Typically,
+\item The raw data are copied to the local directory. Typically,
 subsystems are treated as individual and separate observations by
 \ORACDR\ except for hybrid-mode observations.
 
@@ -1569,7 +1570,7 @@ description of all available QA parameters.
 If certain receptors are known to be bad for the full length of an
 observations (e.g. dead receptors), processing time can be reduced by
 not having the pipeline attempt to reduce those data. The ability to
-masking bad receptors also provides an additional tool for those wishing
+mask bad receptors also provides an additional tool for those wishing
 to examine data in more detail (e.g. when looking at data from an
 instrument that has yet to be fully commissioned).
 
@@ -1646,7 +1647,7 @@ receptors}.
 % oracdr_acsis
 \end{terminalv}
 
-\item Define environment variables to ensure the data is read from,
+\item Define environment variables to ensure the data are read from,
 and written to, the right place. Many are set automatically when the
 pipeline is initialised but others must be set manually. Details of
 the optional variables are given in \acsispipelinesun\ but you should
@@ -1766,7 +1767,7 @@ created. In addition PNG images are made of the reduced files at a
 variety of resolutions.
 
 \begin{tip}
-TIP: Even if just a single observation is processed, a group file is
+Even if just a single observation is processed, a group file is
 created so long as the observation passes the QA check.
 \end{tip}
 
@@ -2364,7 +2365,7 @@ Intensity-weighted co-ordinate (\param{Iwc}) to get the velocity field
 velocity dispersion (second moment).
 
 \begin{tip}
-TIP: You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
+You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
 \cref{Appendix}{app:picard}{Picard} for details. This recipe follows
 the advanced method outlined above.
 \end{tip}
@@ -2715,7 +2716,7 @@ time, the effective time and, if \param{spread=nearest} when running
 the top level and click the \guithing{Data} button.
 
 \begin{tip}
-TIP: You can write out the error component into a new file using
+You can write out the error component into a new file using
 \ndfcopy.
 \begin{terminalv}
 % ndfcopy map comp=err noisemap
@@ -3489,7 +3490,7 @@ over your HARP maps in \gaia.
 
 
 \clearpage
-\chapter{\xlabel{gaia}Using SPLAT}
+\chapter{\xlabel{splat}Using SPLAT}
 \label{sec:splat}
 
 \splat\ is a graphical spectral-analysis tool. \splat\ offers tools for
@@ -4049,7 +4050,7 @@ MNRAS, 453, 73 (DOI:10.1093/mnras/stv1545)
 \newpage
 \appendix
 
-\chapter{PICARD}
+\chapter{\xlabel{picard}PICARD}
 \label{app:picard}
 There are two \picard\ recipes which can be used with ACSIS data and are of general interest:
 
@@ -4146,7 +4147,7 @@ file [\param{f}] or an xwindow [\param{x}].
 \end{itemize}
 
 \begin{tip}
-TIP: The \file{.sdf} extension on filenames is required by \textsc{Picard}.
+The \file{.sdf} extension on filenames is required by \textsc{Picard}.
 \end{tip}
 
 \begin{tip}
