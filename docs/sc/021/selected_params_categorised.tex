@@ -153,7 +153,7 @@ default~:~30 \\
 \hline
 \xparam{DCMAXSTEPS}{dcmaxsteps} &
 Control the cleaning of DC steps in bolometer time streams &
-default~:~10 \\
+default~:~4 \\
 
 \hline
 \xparam{DCLIMCORR}{dclimcorr} &
@@ -331,7 +331,7 @@ default~:~0 \\
 \hline
 \xparam{COM.ZERO_SNRLO}{com.zero\_snrlo} &
 Improve estimate of the common-mode by increasing the size of the SNR mask without introducing noise. &
-default~:~0 \\
+default~:~<undef> \\
 
 \hline
 \xparam{COM.ZERO_UNION}{com.zero\_union} &
@@ -438,7 +438,7 @@ default~:~0 \\
 \hline
 \xparam{FLT.ZERO_SNRLO}{flt.zero\_snrlo} &
 Speeds up convergences and reduces ringing by increasing the size of the SNR mask without introducing noise. &
-default~:~0 \newline
+default~:~<undef> \newline
 \jsageneric~:~3 \newline
 \brightextended~:~3 \\
 
@@ -488,12 +488,12 @@ default~:~adaptive \\
 \hline
 \xparam{EXT.TAURELATION.450}{ext.taurelation.450} &
 Controls the 450 um extinction values used in the EXT model and the EXTINCTION task. &
-default~:~(26.0,-0.012) \\
+default~:~(23.3,-0.018,0.05) \\
 
 \hline
 \xparam{EXT.TAURELATION.850}{ext.taurelation.850} &
 Controls the 850 um extinction values used in the EXT model and the EXTINCTION task. &
-default~:~(4.6,-0.0043) \\
+default~:~(3.71,-0.040,0.202) \\
 
 \hline
 \xparam{EXT.CSOTAU}{ext.csotau} &
@@ -561,7 +561,7 @@ default~:~0 \\
 \hline
 \xparam{AST.ZERO_SNRLO}{ast.zero\_snrlo} &
 Can help to remove bowls around sources by increasing the size of the SNR mask without introducing noise. &
-default~:~0 \newline
+default~:~<undef> \newline
 \jsageneric~:~3 \newline
 \brightextended~:~2 \\
 

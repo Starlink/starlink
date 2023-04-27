@@ -16,7 +16,10 @@
       residuals will be identified by looking at the spread of
       residual values that contribute to each map pixel. Any
       residuals that are above ast.mapspike standard deviations
-      from the mean value in the pixel are flagged as spikes. [10.0]
+      from the mean value in the pixel are flagged as spikes.
+      Parameter \texttt{"}\xref{ast.mapspike\_freeze}{sun258}{AST.MAPSPIKE_FREEZE}\texttt{"}  can be used to control
+      the number of iterations for which this de-spiking is
+      applied. [10.0]
    }
    \sstattributetype{
       real
@@ -106,8 +109,11 @@
       count of iterations. If ast.zero\_freeze is greater than
       zero but less than 1.0, the AST mask will be frozen when
       the normalized change in the map between iterations drops
-      below the ast.zero\_freeze value. A value less than or
-      equal to zero means that the mask is never frozen. [0.0]
+      below the ast.zero\_freeze value. A value less than zero
+      means that the mask is frozen as soon as the initial
+      iterations specified by parameter \texttt{"}\xref{ast.skip}{sun258}{AST.SKIP}\texttt{"}  have been
+      done. A value equal to zero means that the mask is never
+      frozen. [0.0]
    }
    \sstattributetype{
       real
@@ -162,7 +168,8 @@
       with the output image in pixel coordinates). The pixels in
       the map that are to be constrained to 0 should be set to the
       bad value in the mask. All other pixels will be allowed to
-      vary during map-making. [0]
+      vary during map-making. The mask for the first iteration
+      can be set separately using parameter \texttt{"}\xref{ast.zero\_mask0}{sun258}{AST.ZERO_MASK0}\texttt{"} . [0]
    }
    \sstattributetype{
       integer or string
@@ -180,8 +187,8 @@
    number of iterations
 }{
    \sstdescription{
-      If ast.zero\_niter is non-zero, it gives the number of
-      iterations for which the AST model should be masked.
+      If ast.zero\_niter is non-zero, it determines the number
+      of iterations for which the AST model should be masked.
       Subsequent iterations are not masked. A value of zero
       means \texttt{"} mask on all iterations\texttt{"} . However, if parameter
       \texttt{"}\xref{ast.zero\_notlast}{sun258}{AST.ZERO_NOTLAST}\texttt{"}  is set, the mask will will not be
@@ -191,10 +198,19 @@
       is not as important, but keeping as much data around the
       edges of the map is. Note, any initial iterations
       specified by parameter \texttt{"}\xref{ast.skip}{sun258}{AST.SKIP}\texttt{"}  are not included in
-      the count of iterations. [0]
+      the count of iterations. If ast.zero\_niter is greater than
+      zero but less than 1.0, the AST mask will be used until
+      the normalized change in the map between iterations drops
+      below the ast.zero\_freeze value. A negative value for
+      ast.zero\_niter will disable all masking of the AST model.
+      If a value is set for \texttt{"} ast.zero\_niter\texttt{"} , the iterative
+      map-making process will not terminate until the number of
+      iterations required by the supplied \texttt{"} ast.zero\_niter\texttt{"}  value
+      have occurred, regardless of whether the condition specified
+      by parameter \texttt{"}\xref{maptol}{sun258}{MAPTOL}\texttt{"}  is achieved earlier. [0.0]
    }
    \sstattributetype{
-      int
+      real
    }
    \sstdiytopic{
       SMURF Usage
@@ -331,13 +347,13 @@
    size of the SNR mask without introducing noise
 }{
    \sstdescription{
-      If non-zero values are supplied for ast.zero\_snrlo and
+      If values are supplied for ast.zero\_snrlo and
       parameter \texttt{"}\xref{ast.zero\_snr}{sun258}{AST.ZERO_SNR}\texttt{"} , then the basic mask created by
       thresholding at the SNR value specified by ast.zero\_snr is
       modified by expanding each un-masked \texttt{"} source\texttt{"}  area down to
       an SNR equal to ast.zero\_snrlo, without introducing any new
       isolated source areas. The ast.zero\_snrlo should be lower
-      than the ast.zero\_snr value. [0]
+      than the ast.zero\_snr value. [\texttt{$<$undef$>$}]
    }
    \sstattributetype{
       real
@@ -700,8 +716,11 @@
       count of iterations. If com.zero\_freeze is greater than
       zero but less than 1.0, the COM mask will be frozen when
       the normalized change in the map between iterations drops
-      below the com.zero\_freeze value. A value less than or
-      equal to zero means that the mask is never frozen. [0.0]
+      below the com.zero\_freeze value. A value less than zero
+      means that the mask is frozen as soon as the initial
+      iterations specified by parameter \texttt{"}\xref{ast.skip}{sun258}{AST.SKIP}\texttt{"}  have been
+      done. A value equal to zero means that the mask is never
+      frozen. [0.0]
    }
    \sstattributetype{
       real
@@ -758,7 +777,9 @@
       with the output image in pixel coordinates). The pixels in
       the map that are to be included in the common-mode
       estimation should be set to the bad value in the mask. All
-      other pixels will be excluded from the COM estimation. [0]
+      other pixels will be excluded from the COM estimation. The
+      mask for the first iteration can be set separately using
+      parameter \texttt{"}\xref{com.zero\_mask0}{sun258}{COM.ZERO_MASK0}\texttt{"} . [0]
    }
    \sstattributetype{
       integer or string
@@ -836,7 +857,7 @@
    of the SNR mask without introducing noise
 }{
    \sstdescription{
-      If non-zero values are supplied for com.zero\_snrlo and
+      If values are supplied for com.zero\_snrlo and
       parameter \texttt{"}\xref{com.zero\_snr}{sun258}{COM.ZERO_SNR}\texttt{"} , then the basic mask created by
       thresholding at the SNR value specified by com.zero\_snr is
       modified by expanding each un-masked \texttt{"} source\texttt{"}  area down to
@@ -952,11 +973,11 @@
 }{
    \sstdescription{
       The maximum number of steps that can be corrected in each
-      minute of good data (i.e. per 12000 samples) from a bolometer
-      before the entire bolometer is flagged as bad. A value of
-      zero will cause a bolometer to be rejected if any steps are
-      found in the bolometer data stream. Only used if parameter
-      \texttt{"}\xref{dcfitbox}{sun258}{DCFITBOX}\texttt{"}  is non-zero. [10]
+      minute of good data (taking any down-sampling into account)
+      from a bolometer before the entire bolometer is flagged as
+      bad. A value of zero will cause a bolometer to be rejected
+      if any steps are found in the bolometer data stream. Only
+      used if parameter \texttt{"}\xref{dcfitbox}{sun258}{DCFITBOX}\texttt{"}  is non-zero. [4]
    }
    \sstattributetype{
       integer
@@ -1030,14 +1051,14 @@
       \sstitemlist{
 
          \sstitem
-         \texttt{"} bef\texttt{"} : the NDF contains the residuals as they were
+          \texttt{"} bef\texttt{"} : the NDF contains the residuals as they were
          before the model was subtracted.
 
          \sstitem
-         \texttt{"} mod\texttt{"} : the NDF contains the model values themselves.
+          \texttt{"} mod\texttt{"} : the NDF contains the model values themselves.
 
          \sstitem
-         \texttt{"} aft\texttt{"} : the NDF contains the residuals as they were after
+          \texttt{"} aft\texttt{"} : the NDF contains the residuals as they were after
          the model was subtracted.
 
       }
@@ -1141,7 +1162,12 @@
       component of the resulting NDF for RES. QUA will become the
       quality component of any full 3-dimensional model (e.g.
       RES, AST, FLT, EXT), but no quality will be written to model
-      components with different dimensions. [0]
+      components with different dimensions. Note, since an NDF
+      can only contain 8 quality flags, it may be necessary to
+      compress quality information by combining flags with
+      similar purposes together. To avoid this, it is possible
+      to use parameter \texttt{"}\xref{exportqbits}{sun258}{EXPORTQBITS}\texttt{"}  to specify that only a
+      subset of the quality flags be written out t the NDF. [0]
    }
    \sstattributetype{
       integer or list of strings
@@ -1216,15 +1242,16 @@
 }{
    \sstdescription{
       Each tau relation is parameterised in the form:
-      \texttt{"} tau\_filt = a ( tau\_cso $+$ b )\texttt{"} , where \texttt{"} a\texttt{"}  and \texttt{"} b\texttt{"}  are the
-      two values supplied for this parameter. See also parameter
+      \texttt{"} tau\_filt = a ( tau\_cso $+$ b $+$ c sqrt(tau\_cso) )\texttt{"} ,
+      where \texttt{"} a\texttt{"} , \texttt{"} b\texttt{"}  and \texttt{"} c\texttt{"}  are the
+      three values supplied for this parameter. See also parameter
       \texttt{"}\xref{ext.taurelation.850}{sun258}{EXT.TAURELATION.850}\texttt{"} . Here, the trailing \texttt{"} .450\texttt{"}  in the
       parameter name is the filter name, not the sub-instrument
       name as would be the case if it appeared at the start of
-      parameter name. [(26.0,-0.012)]
+      parameter name. [(23.3,-0.018,0.05)]
    }
    \sstattributetype{
-      (real,real)
+      (real,real,real)
    }
    \sstdiytopic{
       SMURF Usage
@@ -1239,10 +1266,10 @@
    and the EXTINCTION task
 }{
    \sstdescription{
-      The 850 um equivalent to the parameter \texttt{"}\xref{ext.taurelation.450}{sun258}{EXT.TAURELATION.450}\texttt{"} . [(4.6,-0.0043)]
+      The 850 um equivalent to the parameter \texttt{"}\xref{ext.taurelation.450}{sun258}{EXT.TAURELATION.450}\texttt{"} . [(3.71,-0.040,0.202)]
    }
    \sstattributetype{
-      (real,real)
+      (real,real,real)
    }
    \sstdiytopic{
       SMURF Usage
@@ -1280,22 +1307,15 @@
       To test the response of the map-maker to different known
       astronomical sources, an external \texttt{"} fakemap\texttt{"}  can be specified
       to provide an image of the sky that will produce additional
-      astronomical signal to the time series. At present, the
-      dimensions of this map must be identical to that of the real
-      map. A typical procedure may involve: (i) produce a map with
-      makemap; (ii) produce an image with simulated data with the
-      same pixel dimensions; (iii) specify this new map for the
-      \texttt{"} fakemap\texttt{"}  parameter below. Note that this is a fully-parsed
-      ndf identifier, so you can do things like:
-
-      \sstitemlist{
-
-         \sstitem
-         fakemap = fakesky.sdf
-
-         \sstitem
-         fakemap = fakesky[1:300,100:450] [\texttt{$<$undef$>$}]
-      }
+      astronomical signal to the time series. A rectangular
+      region is first extracted from the supplied fake map with
+      pixel bounds equal to those of the main output map. The WCS
+      within this extracted region must match that of the main
+      output map (i.e. each pixel must have the same sky
+      coordinates in both maps). A typical procedure may involve:
+      (i) produce a map with makemap; (ii) produce an image with
+      simulated data with the same pixel dimensions and WCS;
+      (iii) specify this new map for the \texttt{"} fakemap\texttt{"}  parameter below. [\texttt{$<$undef$>$}]
    }
    \sstattributetype{
       string
@@ -1313,8 +1333,31 @@
 }{
    \sstdescription{
       Each pixel in the supplied fake map (see paramater \texttt{"} fakemap\texttt{"} )
-      will be multiplied by this scaling factor before being added
-      to the time stream data. [1]
+      will be multiplied by a scaling factor before being added
+      to the time stream data. If more than one contiguous chunk
+      of data is being processed, each chunk may be given a
+      different scale. They can be specified in two ways:
+
+      \sstitemlist{
+
+         \sstitem
+          A comma-separated list of explicit numerical values can
+         be supplied for the \texttt{"} fakescale\texttt{"}  parameter. The list must be
+         enclosed in parentheses if it contains more than a single
+         element. The last value in the list will be replicated if
+         the number of values in the list is smaller than the number
+         of chunks. Thus, the default value of 1.0 will cause a scale
+         of 1.0 to be used for every chunk.
+
+         \sstitem
+          The \texttt{"} fakescale\texttt{"}  parameter can be set to an arbitrary
+         algebraic expression in which the variable names are the
+         names of FITS keyword. The keyword must be present in the
+         FITS extension of the input data and must have numerical
+         values. The expression should be enclosed in double quotes.
+         The value of the expression using the FITS keywords values
+         for a chunk will then be used as the scale for that chunk. [1]
+      }
    }
    \sstattributetype{
       real
@@ -1632,8 +1675,11 @@
       count of iterations. If flt.zero\_freeze is greater than
       zero but less than 1.0, the FLT mask will be frozen when
       the normalized change in the map between iterations drops
-      below the flt.zero\_freeze value. A value less than or
-      equal to zero means that the mask is never frozen. [0.0]
+      below the flt.zero\_freeze value. A value less than zero
+      means that the mask is frozen as soon as the initial
+      iterations specified by parameter \texttt{"}\xref{ast.skip}{sun258}{AST.SKIP}\texttt{"}  have been
+      done. A value equal to zero means that the mask is never
+      frozen. [0.0]
    }
    \sstattributetype{
       real
@@ -1691,7 +1737,8 @@
       the FLT model should be set to the bad value in the mask. All
       other pixels will be excluded from the filtering (i.e.
       they will be replaced by artifical data interpolated from the
-      adjacent data). [0]
+      adjacent data). The mask for the first iteration can be set
+      separately using parameter \texttt{"}\xref{flt.zero\_mask0}{sun258}{FLT.ZERO_MASK0}\texttt{"} . [0]
    }
    \sstattributetype{
       integer or string
@@ -1718,7 +1765,10 @@
       Note, using FLT masking on many iterations can inhibit
       convergence. Also, any initial iterations specified by
       parameter \texttt{"}\xref{ast.skip}{sun258}{AST.SKIP}\texttt{"}  are not included in the count of
-      iterations. [2]
+      iterations. A negative value will disable all masking
+      of the FLT model. This parameter controls the masking
+      requested via parameter \texttt{"}\xref{flt.clip}{sun258}{FLT.CLIP}\texttt{"} , in addition to the
+      masking requested via the \texttt{"} flt.zero\_xxx\texttt{"}  set of parameters. [2]
    }
    \sstattributetype{
       int
@@ -1798,7 +1848,7 @@
    size of the SNR mask without introducing noise
 }{
    \sstdescription{
-      If non-zero values are supplied for flt.zero\_snrlo and
+      If values are supplied for flt.zero\_snrlo and
       parameter \texttt{"}\xref{flt.zero\_snr}{sun258}{FLT.ZERO_SNR}\texttt{"} , then the basic mask created by
       thresholding at the SNR value specified by flt.zero\_snr is
       modified by expanding each un-masked \texttt{"} source\texttt{"}  area down to
@@ -1902,11 +1952,11 @@
       used if parameter \texttt{"}\xref{numiter}{sun258}{NUMITER}\texttt{"}  is negative. The normalised mean
       (or maximum) change between maps is defined as the mean (or
       maximum) of the absolute change in map pixel value, taken
-      over all pixels within the region of the AST mask (if any,
-      see parameter \texttt{"}\xref{ast.zero\_mask}{sun258}{AST.ZERO_MASK}\texttt{"} , etc), and normalised by the RMS
-      of the square root of the pixel variances. Compared to parameter
-      \texttt{"}\xref{chitol}{sun258}{CHITOL}\texttt{"} , this is much more like a \texttt{"} by eye\texttt{"}  test, that will stop
-      the solution when the map stops changing. [0.05]
+      over all pixels within the region of the mask specified by
+      parameter \texttt{"}\xref{maptol\_mask}{sun258}{MAPTOL_MASK}\texttt{"} , and normalised by the RMS of the
+      square root of the pixel variances. Compared to parameter
+      \texttt{"}\xref{chitol}{sun258}{CHITOL}\texttt{"} , this is much more like a \texttt{"} by eye\texttt{"}  test, that will
+      stop the solution when the map stops changing. [0.05]
    }
    \sstattributetype{
       real
@@ -1952,37 +2002,37 @@
       \sstitemlist{
 
          \sstitem
-         dks: fit and remove dark squid for the column
+          dks: fit and remove dark squid for the column
 
          \sstitem
-         com: remove common-mode signal
+          com: remove common-mode signal
 
          \sstitem
-         gai: if com specified, fit gain/offset of common mode
+          gai: if com specified, fit gain/offset of common mode
 
          \sstitem
-         ext: apply extinction correction
+          ext: apply extinction correction
 
          \sstitem
-         ast: estimate the map and astronomical signal
+          ast: estimate the map and astronomical signal
 
          \sstitem
-         flt: apply filter to time streams
+          flt: apply filter to time streams
 
          \sstitem
-         noi: estimate time-domain variance
+          noi: estimate time-domain variance
 
          \sstitem
-         smo: time series smoothing using a median or mean boxcar filter
+          smo: time series smoothing using a median or mean boxcar filter
 
          \sstitem
-         ssn: scan-synchronous (i.e. azimuth dependent) noise removal
+          ssn: scan-synchronous (i.e. azimuth dependent) noise removal
 
          \sstitem
-         pln: remove plane from each time slice
+          pln: remove plane from each time slice
 
          \sstitem
-         tmp: remove externally define template such as azimuth [(com,gai,ext,flt,ast,noi)]
+          tmp: remove externally define template such as azimuth [(com,gai,ext,flt,ast,noi)]
       }
    }
    \sstattributetype{
