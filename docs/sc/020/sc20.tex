@@ -1384,7 +1384,7 @@ You can use either of the options below:
 You can override the recipe set in the FITS header by listing any different
 one on the command line when starting \ORACDR. For example:
 \begin{terminalv}
-% oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
+% oracdr -files mylist -log x REDUCE_SCIENCE_GRADIENT
 \end{terminalv}
 
 \section{Setting recipe parameters (optional)}
@@ -1691,7 +1691,7 @@ recipe name on the end ensures that all data being processed using
 \narrowline.
 
 \begin{terminalv}
-% oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
+% oracdr -files list.txt -batch -log xf -calib qaparams=myqa.ini \
   bad_receptors=index -recpars mypar.ini -nodisplay REDUCE_SCIENCE_NARROWLINE
 \end{terminalv}
 \end{enumerate}
@@ -1708,7 +1708,7 @@ options and their descriptions see \oracdrsun.
 \hline
 %-from/-to         & Number of first/last observation \\
 %-list             & Comma separated list of observation numbers \\
--file $<$mylist$>$ & Input data provided by a text file. Supply the
+-files $<$mylist$>$ & Input data provided by a text file. Supply the
                      file name (relative to current directory, or the full
                      path) of an ASCII text file containing a list of all
                      observation files to be reduced, one file per line. \\
@@ -1717,13 +1717,14 @@ options and their descriptions see \oracdrsun.
 \multicolumn{2}{l}{\textbf{Looping}} \\
 \hline
 %-loop list & Default when using the -list option. The pipeline will stop once
-              the observations in the list have been reduced. \\
--loop file  & Loop over all the lines in the file supplied by the \param{-file}
-              option. \\
+%             the observations in the list have been reduced. \\
+-loop file  & Loop over all the lines in the file supplied by the \param{-files}
+              option. (This is the default if a list of files has been given.) \\
 \hline
 \multicolumn{2}{l}{\textbf{Group processing}} \\
 \hline
-\param{-batch}    & Delays group processing until the individual files have been reduced.  \\
+\param{-batch}    & Delays group processing until the individual files have been reduced.
+                    (This is the default if not in QL or summit mode, or processing today's data.) \\
 %\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
 \param{-onegroup} & Forces all the observations into the same group. Useful if
                     building up a map from rasters with different target co-ordinates
@@ -4127,7 +4128,7 @@ with \wcsmosaic.
 There are a number of options available when running \picard\ recipes.
 The example below illustrates most of them.
 \begin{terminalv}
-% picard -recpars params.ini MOSAIC_JCMT_IMAGES `cat myfilelist.lis` -log sfx
+% picard -recpars params.ini MOSAIC_JCMT_IMAGES -files myfilelist.lis -log sfx
 \end{terminalv}
 
 \begin{itemize}
@@ -4137,10 +4138,7 @@ It is called by the \param{recpars} option. This file has the same
 \cref{Section}{sec:recpars}{Setting recipe parameters}).
 \item The recipe name need to be in uppercase.
 \item If you need to supply multiple files you can do so by listing
-them in a file (\file{myfilelist.lis} in this example) and running cat on it.
-The input file must be in the current directory, or a directory
-defined by the environment variable \file{ORAC\_DATA\_IN}. Note the
-back-quotes.
+them in a file (\file{myfilelist.lis} in this example).
 \item Like the \ORACDR\ pipeline, the \param{-log} option specifies
 whether the log file should be written to the screen [\param{s}], a
 file [\param{f}] or an xwindow [\param{x}].
