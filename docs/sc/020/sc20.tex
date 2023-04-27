@@ -1099,8 +1099,11 @@ identify the affected time range.
 \begin{terminalv}
 % chpix in=raw out=raw_masked section="',1:1,18:33'" newval=bad
 \end{terminalv}
-Note that the numbering for the 16 HARP receptors here is 1--16; this is in
-contrast to 0--15 that you will encounter with the pipeline.
+Note that the numbering for the HARP receptors here is from
+1 to the number of enabled receptors; this is in
+contrast to numbering from 0 that you may encounter with the pipeline.
+(You may examine the .MORE.ACSIS.RECEPTORS component of the
+file with \HDSTRACE\ to see which receptors were enabled.)
 
 For jiggle maps, where the receptors do not cover multiple sky
 positions, bad receptors can be identified in the reduced cubes. For
