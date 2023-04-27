@@ -71,8 +71,6 @@
    \newcommand{\kms}{\,km~s$^{-1}$}   % km/s
 \fi
 
-\newcommand{\trs}{$T_{\textnormal{R}}^{*}$}
-
 % arcminute symbol
 
 % arcsec symbol
@@ -651,8 +649,8 @@ position. For frequency switched observations it is 1.414 instead.
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
-itself (known as \trs).  \trs\ can
-be determined by measuring the effects on $T_{\textnormal{sys}}$ when
+itself (known as receiver temperature, $T_{\textnormal{rx}}$).
+The receiver temperature can be determined by measuring the effect of
 looking at hot and cold loads, where the cold load is black-body
 source.
 
@@ -662,7 +660,7 @@ in the spectrum in kelvin.
 
 
 \begin{tip}
-Both $T_{\textnormal{sys}}$ and \trs\ are stored in
+Both $T_{\textnormal{sys}}$ and $T_{\textnormal{rx}}$ are stored in
 the raw data files. This information is stored in the .MORE.ACSIS.TSYS
 and .MORE.ACSIS.TRX extensions respectively, and can be viewed using
 \HDSTRACE\ (see \cref{Section}{sec:fitslist}{How can I view the
@@ -2374,7 +2372,7 @@ the advanced method outlined above.
 Your cube will come out of \makecube\, and the pipeline, in units of
 $T_{\textnormal{A}}^*$. To convert this to main-beam brightness temperature, $T_{\textnormal{MB}}$
 divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
-to convert to receiver temperature, $T_{R^{*}}$, divide by the forward
+to convert to corrected radiation temperature, $T_{\textnormal{R}}^*$, divide by the forward
 scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
