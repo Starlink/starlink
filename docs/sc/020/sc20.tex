@@ -978,9 +978,10 @@ aUTDATE\_OBSNUMBER\_SUBSYSTEM\_SUBSCAN
 For example, \file{a20131115\_00055\_03\_0001.sdf}. The first `a' represents
 ACSIS. The UT date and observation number (OBSNUM) serve as an
 identifier for any given night of observing. ACSIS observations may
-include up to four frequency settings given by the different
-subsystems (00-03), while long observations may require multiple
-subscans to avoid a file size $>$512\,GB.
+include up to eight frequency settings given by the different
+subsystems (01--08, or 00 in very old data), while long observations may require multiple
+subscans to avoid an excessive file size
+(currently 384\,GB, previously 512\,GB).
 
 Within each data file each receptor is named. The naming system is
 zero-based. For HARP the receptor are labelled: H00, H01, H03... H015.
