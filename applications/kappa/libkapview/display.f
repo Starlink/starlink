@@ -1622,7 +1622,7 @@
 *  First create the key if required.
       IF( KEY ) THEN
 
-*  Create a label, nidicating the array component and NDF name (without
+*  Create a label, indicating the array component and NDF name (without
 *  directory path to reduce the length of the label).
          CALL KPG1_NDFNM( INDF1, NDFNAM, NC, STATUS )
 

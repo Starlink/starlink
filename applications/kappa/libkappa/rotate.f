@@ -1025,7 +1025,7 @@
 *  90-degree multiple.
 *  ===================
 
-*  Nothing to do for the zero-degree case.  It has been handdled by the
+*  Nothing to do for the zero-degree case.  It has been handled by the
 *  earlier propagation.
       ELSE IF ( NUMRA .NE. 0 ) THEN
 
