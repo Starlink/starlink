@@ -489,7 +489,7 @@ Ubuntu:
    mesa-common-dev
    zlib1g-dev
    curl
-   libssl-devl
+   libssl-dev
    libexpat1-dev
    libjpeg-turbo8-dev
 
