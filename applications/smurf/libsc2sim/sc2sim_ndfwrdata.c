@@ -491,7 +491,7 @@ void sc2sim_ndfwrdata
   astSetFitsS ( fitschan, "SEQ_TYPE", "SCIENCE",
                 "Fudged to make simulator work with makemap", 0 );
 
-  astSetFitsF ( fitschan, "DUT1", inx->dut1, "[d] UT1 - UTC correction", 0 );
+  astSetFitsF ( fitschan, "DUT1", inx->dut1 / SPD, "[d] UT1 - UTC correction", 0 );
   astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
   astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x,
                 "[arcsec] X focal plane offset", 0 );
