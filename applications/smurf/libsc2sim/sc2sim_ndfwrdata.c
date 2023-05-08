@@ -721,7 +721,7 @@ void sc2sim_ndfwrdata
   /* Telescope parameters */
   telpar.latdeg = (sinx->telpos)[1];
   telpar.longdeg = -(sinx->telpos)[0];
-  telpar.dut1 = SPD * inx->dut1;
+  telpar.dut1 = inx->dut1;
   telpar.dtai = VAL__BADD;
 
   /* Store the timestream data */
