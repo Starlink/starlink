@@ -28,6 +28,7 @@ Astro::WaveBand
 HTTP::Daemon
 Parse::RecDescent
 Astro::VEX
+Text::CSV
 Astro::Catalog
 App::SourcePlot
 XML::LibXML
