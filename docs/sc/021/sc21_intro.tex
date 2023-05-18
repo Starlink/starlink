@@ -244,9 +244,9 @@ number of \textsc{Picard} recipes will be demonstrated in
 
 Other command-line options include \texttt{-log xsf} where the log
 file is written to any combination of the screen [\texttt{s}], a file
-[\texttt{f}] or an X-window [\texttt{x}]. \texttt{s} or \texttt{sf} is
-recommended as the recipes are short and the X-window automatically
-closes upon completion. To ensure an X-window does not open, you
+[\texttt{f}] or an X-window [\texttt{x}].  Usage of \texttt{s} or \texttt{sf} is
+recommended as the recipes are often short.
+To ensure additional graphics X-windows do not open, you
 can use the command-line option: \texttt{-nodisplay}.
 
 You do not specify an output filename for \picard, instead the output
@@ -255,16 +255,12 @@ filename. If there is more than one input file then the name of the
 last file is used.
 
 You can create a file which lists the input files to be passed to
-\picard\ for processing. this file is read by \picard\ via the
-Linux/Unix \task{cat} command. For example:
+\picard\ for processing via the
+\texttt{-files} option. For example:
 
 \begin{terminalv}
-% picard -log s RECIPE_NAME `cat myfilestoprocess.lis`
+% picard -log s RECIPE_NAME -files myfilestoprocess.lis
 \end{terminalv}
-
-To execute the \task{cat} command you must enclose it in back
-quotes. You must also include the \file{.sdf} extension on any files
-passed to \picard.
 
 \begin{tip}
   Unlike other Starlink packages, the .sdf extension must be included
@@ -344,5 +340,5 @@ group of repeat observations for each night. These are reduced using
 the \oracdr\ pipeline with the recipe specified in the MSB.
 \cref{Chapter}{sec:pipe}{The SCUBA-2 Pipeline} gives instruction on
 retrieving reduced data from the \htmladdnormallink{JCMT Science
-  Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} at
+  Archive}{https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/jcmt/} at
 CADC.

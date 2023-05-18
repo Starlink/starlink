@@ -62,12 +62,12 @@ Described below are the six main \oracdr\ science recipes.
 \textbf{Note:} the ``dimmconfig*'' files can be found in:
 
 \begin{terminalv}
-% ls $STARLINK_DIR/share/smurf/
+% ls $STARLINK_DIR/share/smurf
 \end{terminalv}
 
 \subsection{\xlabel{extsources}\drrecipe{REDUCE\_SCAN}}
 
-\textbf{configuration file: \file{dimmconfig\_jsa\_generic.lis}}
+\textbf{Configuration file: \file{dimmconfig\_jsa\_generic.lis}}
 
 This recipe uses the configuration file \jsageneric\ for \makemap, unless
 the sources is identified as a calibrator in which case \file{dimmconfig\_bright\_compact.lis} is used and
@@ -184,7 +184,7 @@ given in \pipelinesun\ but the three main ones are:
 \item \envvar{STARLINK\_DIR} -- Location of your Starlink installation.
 \item \envvar{ORAC\_DATA\_IN} -- The location where the data should be read from.
 If you are supplying a text file listing the raw data this should be the
-location of that file.
+location of the files listed, unless they are given as full path names.
 \item \envvar{ORAC\_DATA\_OUT} -- The location where the data products should be
 written. Also used as the location for a user-specified configuration file.
 \end{itemize}
@@ -193,7 +193,7 @@ Example: Setting \envvar{ORAC\_DATA\_IN} to be the current
 directory for C shells (csh, tcsh):
 
 \begin{terminalv}
-% setenv ORAC_DATA_IN ./
+% setenv ORAC_DATA_IN .
 \end{terminalv}
 
 \newpage
@@ -201,7 +201,7 @@ directory for C shells (csh, tcsh):
 and for Bourne shells (sh, bash, zsh):
 
 \begin{terminalv}
-% export ORAC_DATA_IN=./
+% export ORAC_DATA_IN=.
 \end{terminalv}
 
 
@@ -210,7 +210,7 @@ and for Bourne shells (sh, bash, zsh):
 
 This is done by:
 \begin{terminalv}
-% oracdr  -loop file -files <list_of_files>
+% oracdr -files <list_of_files>
 \end{terminalv}
 
 \vspace{0.2cm}
@@ -229,8 +229,10 @@ with full path names).
  of reduction. This is particularly recommended for new users.
 \end{tip}
 
-When executing the \oracdr command, unless ``-nodisplay'' is specified,
-a new Xwindow will appear within which
+When executing the \oracdr\ command, unless ``-nodisplay'' is specified,
+various graphical windows may appear showing the pipeline results.
+Also with the default ``-log'' option (including ``x'')
+a new Xwindow will appear which
 will contain the pipeline output, as shown in \cref{Figures}
 {pipeline-oracdr-1}{}--\cref{}{pipeline-oracdr-4}{}.
 
@@ -292,7 +294,7 @@ To run the pipeline and obtain all messages from the Starlink engines
 (rather than just \oracdr\ messages) you will need to run with verbose (\emph{recommended})
 
 \begin{terminalv}
-% oracdr -loop file -files <list_of_files>  -verbose
+% oracdr -files <list_of_files> -verbose
 \end{terminalv}
 
 
@@ -302,7 +304,7 @@ where NNNN is the current process ID. It is written to \$ORAC\_DATA\_OUT
 and is a hidden file) is specified using the \param{-log} command.
 
 \begin{terminalv}
-% oracdr -files <list_of_files> -loop file  -log sf -verbose
+% oracdr -files <list_of_files> -log sf -verbose
 \end{terminalv}
 
 
@@ -313,7 +315,7 @@ and is a hidden file) is specified using the \param{-log} command.
 You can override the recipe set in the header by listing any different
 one on the command line when starting \oracdr. For example
 \begin{terminalv}
-% oracdr -file <list_of_files> -loop file -log sf REDUCE_SCAN_CHECKRMS
+% oracdr -files <list_of_files> -log sf REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
 You can find out which recipe is set in the data header via the FITS
@@ -345,7 +347,7 @@ MAKEMAP_CONFIG = myconfig.lis
 Then run the pipeline calling the parameter file via the
 \texttt{-recpars} option.
 \begin{terminalv}
-% oracdr -file <list_of_files> -loop file -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
+% oracdr -files <list_of_files> -log sf -recpars myparams.ini REDUCE_SCAN_CHECKRMS
 \end{terminalv}
 
 \subsection{Parameter-file options}
@@ -523,7 +525,7 @@ the co-added map(s).
 The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science
 pipeline are made available to PIs and co-Is through the CADC
-interface (\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
+interface (\url{https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
 registered by the EAO and thereby associated with the project code.

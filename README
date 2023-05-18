@@ -469,7 +469,7 @@ Ubuntu:
    libx11-dev
    libxt-dev
    xutils-dev
-   libncurses5-dev
+   libncurses-dev
    flex
    bison
    byacc
@@ -487,6 +487,11 @@ Ubuntu:
    libglu1-mesa-dev
    freeglut3-dev
    mesa-common-dev
+   zlib1g-dev
+   curl
+   libssl-dev
+   libexpat1-dev
+   libjpeg-turbo8-dev
 
 Fedora:
    Mainly as for Ubuntu, but note that package names are usually changed
@@ -587,6 +592,22 @@ CentOS 7:
    libxml2-devel
    ncurses-devel
    texlive-multirow
+
+Rocky Linux 8:
+   Group: "Development Tools"
+   gfortran
+   libX11-devel
+   libXext-devel
+   libXt-devel
+   libxml2-devel
+   ncurses-devel
+   texinfo
+   libglvnd-opengl
+   mesa-libGLw
+   freeglut-devel
+   openssl-devel
+   expat-devel
+   libjpeg-turbo-devel
 
 macOS:
     gfortran

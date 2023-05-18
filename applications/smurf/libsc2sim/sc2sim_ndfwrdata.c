@@ -491,7 +491,7 @@ void sc2sim_ndfwrdata
   astSetFitsS ( fitschan, "SEQ_TYPE", "SCIENCE",
                 "Fudged to make simulator work with makemap", 0 );
 
-  astSetFitsF ( fitschan, "DUT1", inx->dut1, "[d] UT1 - UTC correction", 0 );
+  astSetFitsF ( fitschan, "DUT1", inx->dut1 / SPD, "[d] UT1 - UTC correction", 0 );
   astSetFitsS ( fitschan, "INSTAP", inx->instap, "Instrument aperture", 0 );
   astSetFitsF ( fitschan, "INSTAP_X", inx->instap_x,
                 "[arcsec] X focal plane offset", 0 );
@@ -721,7 +721,7 @@ void sc2sim_ndfwrdata
   /* Telescope parameters */
   telpar.latdeg = (sinx->telpos)[1];
   telpar.longdeg = -(sinx->telpos)[0];
-  telpar.dut1 = SPD * inx->dut1;
+  telpar.dut1 = inx->dut1;
   telpar.dtai = VAL__BADD;
 
   /* Store the timestream data */

@@ -13,3 +13,9 @@ LATEX_SOURCES = sc21_app_clean.tex sc21_calib.tex sc21_cog.tex \
                 sc21_tweak.tex sc21_using_smurf.tex
 
 CLEANFILES = sc21.htx_tar sc21.ps sc21.lof sc21.lot sc21.toc
+
+selected_params.tex selected_params_categorised.tex:
+	../../../applications/smurf/defaults/make_pardocs \
+	    selected_params.lis \
+	    selected_params.tex \
+	    ../../../applications/smurf/defaults

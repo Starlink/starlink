@@ -41,6 +41,8 @@
 *     for example: s8aheat20060301_00001.sdf.
 
 *  ADAM Parameters:
+*     BADBOL = _CHAR (Read)
+*          ARD Description File for Bad Bolometer mask. [!]
 *     MAXWRITE = INTEGER (Read)
 *          Number of samples to write in output file.
 *     MSG_FILTER = _CHAR (Read)
@@ -157,8 +159,17 @@
 *       of the observation. [00:00:00.0]
 *     distfac (DOUBLE)
 *       Distortion factor, where 0 = no distortion. [0.0]
+*     dut1 (DOUBLE)
+*       Value of UT1 - UTC for current date in seconds. [0.0]
+*     externobs (CHAR)
+*       File name of external SCUBA-2 observation from which to generate
+*       scan pattern. [none]
 *     flatname (CHAR)
 *       Name of flatfield correction technique, either TABLE or POLYNOMIAL.
+*     focstart (DOUBLE)
+*       Starting focus position in mm. [-3.0]
+*     focstep (DOUBLE)
+*       Interval between focus positions in mm. [1.0]
 *     grid_max_x (INTEGER)
 *       DREAM reconstruction grid max x. [1]
 *     grid_max_y (INTEGER)
@@ -177,6 +188,14 @@
 *       Initial heater setting in pW. [0.0]
 *     heatstep (DOUBLE)
 *       Increment of heater setting in pW. [0.0]
+*     height (DOUBLE)
+*       Minimum height of pattern in arcseconds. [2000.0]
+*     instap (CHAR)
+*       Name of instrument aperture. []
+*     instap_x (DOUBLE)
+*       X focal plane offset in arcseconds. [0.0]
+*     instap_y (DOUBLE)
+*       Y focal plane offset in arcseconds. [0.0]
 *     jig_step_x (DOUBLE) : 6.28 (arcseconds)
 *       The DREAM step size in the x-direction between
 *       jiggle positions.
@@ -227,16 +246,22 @@
 *       the width of the Lissajous pattern in arcseconds. [2000.0]
 *     mjdaystart (DOUBLE)
 *       Modified Julian date at start of observation. [53795.0]
-*     mstap_x (DOUBLE)
+*     mspat_x (DOUBLE)
 *       Array of microstep X-offsets in the focal plane.
 *       Units are arcseconds. Multiple values can be
 *       supplied as comma-separated list of offsets
 *       surrounded by parentheses, e.g "(10,20)". [0.0]
-*     mstap_y (DOUBLE)
+*     mspat_y (DOUBLE)
 *       Array of microstep Y-offsets in the focal plane.
 *       Units are arcseconds. Multiple values can be
 *       supplied as comma-separated list of offsets
 *       surrounded by parentheses, e.g "(10,20)". [0.0]
+*     nfocstep (INTEGER)
+*       Number of focus positions. [7]
+*     nmaps (DOUBLE)
+*       Number of times to repeat pattern. [1]
+*     nmicstep (INTEGER)
+*       Number of microsteps. [1]
 *     numsamples (INTEGER)
 *       For the STARE obsmode, this is the number of
 *       samples. [128]
@@ -273,9 +298,13 @@
 *                 sky by filling the box with a Lissajous
 *                 pattern.
 *       -   EXTERN : Recreates the scanning pattern of a real
-*                   SCUBA2 observation.
+*                   SCUBA-2 observation.
 *
 *       [PONG]
+*     obstype (CHAR)
+*       Observation type (POINT, FOCUS or SCIENCE). [SCIENCE]
+*     planet (CHAR)
+*       Planet (MARS, URANUS, VENUS, JUPITER, MOON, SATURN or NEPTUNE). []
 *     platenum (INTEGER)
 *       The number of waveplate rotations. [1]
 *     platerev (DOUBLE)
@@ -343,12 +372,18 @@
 *       SMU phase shift. [0.0]
 *     smu_samples (INTEGER)
 *       Number of samples per jiggle vertex. [1]
+*     spacing (DOUBLE)
+*       Grid spacing in arcseconds. [240.0]
 *     steptime (DOUBLE)
 *       Sample interval time in seconds. [0.005]
 *     subsysnr (INTEGER)
 *       Subsystem number. [1]
 *     targetpow (DOUBLE)
 *       Target bolometer power input in pW. [25.0]
+*     vmax (DOUBLE)
+*       Telescope maximum velocity in arcseconds/second. [200.0]
+*     width (DOUBLE)
+*       Minimum width of pattern in arcseconds. [2000.0]
 
 *  Simulation Parameters:
 *     add_atm (INTEGER)
@@ -380,6 +415,10 @@
 *     atmname (CHAR)
 *       Name of the input file containing atmospheric
 *       sky image.
+*     atmrefnu (DOUBLE)
+*       ATM reference corner frequency in Hz. [0.5]
+*     atmrefvel (DOUBLE)
+*       ATM reference velocity in meters/second. [15.0]
 *     atmxvel (DOUBLE)
 *       Atmospheric background velocity in arcseconds/second in the X
 *       direction. [5000.0]
@@ -416,6 +455,8 @@
 *       image. See docs for astResample in SUN/210. [NEAREST]
 *     meanatm (DOUBLE)
 *       Mean expeected atmospheric signal in pW. [7.0]
+*     jy2pw (DOUBLE)
+*       Jy to pW conversion modulo atmospheric transmission. [2.3e-3]
 *     nasang (DOUBLE)
 *       Polarisation angle of Nasmyth optics in degrees. [90.0]
 *     naspol (DOUBLE)
@@ -433,8 +474,20 @@
 *       Name of the second parameter for the sky interpolation scheme
 *       specified by "interp". See docs for astResample in
 *       SUN/210. [2.0]
+*     refload (DOUBLE)
+*       Reference load in pW. [7.4]
+*     refnoise (DOUBLE)
+*       Reference NEP in pW/sqrt(Hertz). [6.5e-5]
 *     smu_terr (DOUBLE)
 *       SMU timing error in seconds. [0.0]
+*     spike_alpha (DOUBLE)
+*        Index of spike p-law distribution. [-1.5]
+*     spike_p0 (DOUBLE)
+*        Minimum spike power in Jy. [1.0]
+*     spike_p1 (DOUBLE)
+*        Peak spike power in Jy. [1000.0]
+*     spike_t0 (DOUBLE)
+*        Mean time between spikes in seconds. [20.0]
 *     subname (CHAR)
 *       Subarray names for the simulation. Any number of subarrays
 *       can be selected in any order. A single subarray can be named

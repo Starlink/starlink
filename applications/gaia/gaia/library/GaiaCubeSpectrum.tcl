@@ -391,8 +391,8 @@ itcl::class gaia::GaiaCubeSpectrum {
                 -spec_coords $itk_option(-spec_coords) \
                 -spec_sor $itk_option(-spec_sor) \
                 -spec_writer [code $spec_writer_] \
-                -ref_line_changed_cmd [code $cube ref_line_moved_] \
-                -ref_range_changed_cmd [code $cube ref_range_moved_] \
+                -ref_line_changed_cmd [code {*}$cube ref_line_moved_] \
+                -ref_range_changed_cmd [code {*}$cube ref_range_moved_] \
                 -colour_changed_cmd [code $this spec_colour_changed_] \
                 -component $itk_option(-component) \
                 -shorthelpwin $itk_option(-gaia) \

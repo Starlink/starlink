@@ -71,8 +71,6 @@
    \newcommand{\kms}{\,km~s$^{-1}$}   % km/s
 \fi
 
-\newcommand{\trs}{$T_{\textnormal{R}}^{*}$}
-
 % arcminute symbol
 
 % arcsec symbol
@@ -136,7 +134,8 @@ This guide covers the following:
 \item \cref{Chapter}{sec:analyse}{Chapter 8} -- Analysing your reduced cube.
 \item \cref{Chapter}{sec:advanced}{Chapter 9} -- Advanced analysis techniques such as changing co-ordinate frames.
 \item \cref{Chapter}{sec:gaia}{Chapter 10} -- Using \gaia\ to analyse your data.
-\item \cref{Chapter}{sec:fromcadc}{Chapter 11} -- Getting your data from CADC.
+\item \cref{Chapter}{sec:splat}{Chapter 11} -- Plotting spectra using \splat.
+\item \cref{Chapter}{sec:fromcadc}{Chapter 12} -- Getting your data from CADC.
 \end{itemize}
 
 \textbf{Style convention}\\
@@ -145,7 +144,7 @@ In this cookbook the following styles are followed:
 \item \texttt{\%} represents the command-line prompt.
 \item Command-line examples are shown in \texttt{\color{MidnightBlue}{navy typewriter font.}}
 \item Parameters, FITS keywords, parameters and their values are presented in \texttt{typewriter font}.
-\item The names of Starlink commands appear as in \task{san serif font}.
+\item The names of Starlink commands appear as in \task{sans serif font}.
 \item The names of commands, menu items, tabs, or buttons within graphical tools (such as \gaia\ or
 \splat) appear \guithing{like this}.
 \item The names of windows produced by graphical tools appear \guiwindow{like this}.
@@ -222,7 +221,7 @@ a UNIX shell.
            reduction of the raw data following pre-defined recipes.
          & \texttt{\%\,oracdr\_acsis} & \oracdrsun \\
 \hline
-\textsc{Picard} & \textsc{Picard} uses a similar pipeline system as \ORACDR\ but
+\picard\        & \textsc{Picard} uses a similar pipeline system as \ORACDR\ but
                   for the post-processing of reduced data. While mainly implemented
                   for SCUBA-2 data, there are a few recipes that are heterodyne
                   compatible. See \cref{Appendix}{app:picard}{Picard} for more details
@@ -239,7 +238,7 @@ a UNIX shell.
        & \texttt{\%\,gaia} & \gaiasun\ \gaiasc\ \\
 
 \hline
-\HDSTRACE\ & This tool lets you examine the contents of Starlink data files.
+\HDSTRACEref\ & This tool lets you examine the contents of Starlink data files.
            & \texttt{\%\,hdstrace $<$file$>$} & \hdstracesun\ \\
 
 \hline
@@ -279,7 +278,7 @@ manual approach.
 While you have the option of running the pipeline yourself, you can
 find pipeline reduced files for individual and co-added observations by
 night in the \htmladdnormallink{JCMT Science
-Archive}{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/} (JSA).
+Archive}{https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/jcmt/} (JSA).
 
 These have been reduced using the \ORACDR\ pipeline with the recipe
 specified in the MSB or with the Legacy Survey recipe.  Principal
@@ -651,8 +650,8 @@ position. For frequency switched observations it is 1.414 instead.
 describes the total noise of the system. It includes contributions
 from the background sky temperature, the Earth's atmosphere, ground
 spillover picked up by the side lobes and the noise from the receiver
-itself (known as \trs).  \trs\ can
-be determined by measuring the effects on $T_{\textnormal{sys}}$ when
+itself (known as receiver temperature, $T_{\textnormal{rx}}$).
+The receiver temperature can be determined by measuring the effect of
 looking at hot and cold loads, where the cold load is black-body
 source.
 
@@ -662,7 +661,7 @@ in the spectrum in kelvin.
 
 
 \begin{tip}
-Both $T_{\textnormal{sys}}$ and \trs\ are stored in
+Both $T_{\textnormal{sys}}$ and $T_{\textnormal{rx}}$ are stored in
 the raw data files. This information is stored in the .MORE.ACSIS.TSYS
 and .MORE.ACSIS.TRX extensions respectively, and can be viewed using
 \HDSTRACE\ (see \cref{Section}{sec:fitslist}{How can I view the
@@ -689,7 +688,7 @@ Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calib
 
 The N\=amakanui instrument is a spare receiver for the Greenland
 Telescope (GLT) on loan for use on the JCMT courtesy of ASIAA.
-N\=amakanui contains three inserts: Ala$`$ihi, $`$\=U$`$\=u, and
+N\=amakanui contains three inserts: $`$Ala$`$ihi, $`$\=U$`$\=u, and
 $`$\=Aweoweo operating around 86, 230, and 345\,GHz. Each of the three
 inserts receive dual linear polarizations which are labelled using a
 zero-based system: P0, P1. Each insert has a separate optical path and
@@ -727,10 +726,10 @@ saw first light on 2021 January 14.  Due to its sensitivity
 $`$\=Aweoweo's most-common observing mode is stare. For larger areas,
 HARP becomes more efficient for jiggle and raster mapping.
 
-\subsection{Ala$`$ihi frontend (future)}
+\subsection{$`$Ala$`$ihi frontend (in commissioning)}
 
-Ala$`$ihi is the other insert held within the N\=amakanui instrument.
-Unlike $`$\=U$`$\=u and $`$\=Aweoweo, Ala$`$ihi is a Single SideBand
+$`$Ala$`$ihi is the other insert held within the N\=amakanui instrument.
+Unlike $`$\=U$`$\=u and $`$\=Aweoweo, $`$Ala$`$ihi is a Single SideBand
 (SSB) instrument. It will operate at frequencies around 77 to 88\,GHz
 with dual linear polarizations. Its primary function at the JCMT will
 be as part of VLBI observations.
@@ -739,7 +738,7 @@ be as part of VLBI observations.
 \subsection{\xlabel{harp}HARP frontend}
 
 The Heterodyne Receiver Array Programme (HARP) is single-sideband
-receiver (SSB) comprised of a16-receptor array
+receiver (SSB) comprised of a 16-receptor array
 arranged on a 4$\times$4 grid \cite{harp}. It operates in the B-band
 between 325 and 375 GHz. The receptors are adjacent on the focal plane
 but separated on the sky by 30 arcseconds (or approximately twice the
@@ -935,7 +934,7 @@ limited to targets which have a blank reference position within
 
 \item[\textbf{Frequency-switch}]
 In frequency-switch (FSW) mode the telescope does not move but the
-centre of the spectral band is shifted, typically by 8 or 16\,Mhz,
+centre of the spectral band is shifted, typically by 8 or 16\,MHz,
 to a line-free region of the spectrum. It is very efficient with no
 off-source time and can be
 useful when no emission-free reference position can be found.
@@ -965,8 +964,8 @@ Subsystems are normally arranged to cover different spectral lines and
 would be processed independently.  However, there is also a mode in
 which the subsystems overlap in frequency, called \textbf{hybrid}.
 Such data are combined to yield a broader spectral coverage, say where
-there multiple lines in proximity.  The number of subsystems is a
-power of two up to a maximum of four.
+there multiple lines in proximity.  The number of subsystems is
+up to a maximum of four.
 
 \clearpage
 \chapter{\xlabel{data_files}Raw ACSIS Data}
@@ -980,9 +979,10 @@ aUTDATE\_OBSNUMBER\_SUBSYSTEM\_SUBSCAN
 For example, \file{a20131115\_00055\_03\_0001.sdf}. The first `a' represents
 ACSIS. The UT date and observation number (OBSNUM) serve as an
 identifier for any given night of observing. ACSIS observations may
-include up to four frequency settings given by the different
-subsystems (00-03), while long observations may require multiple
-subscans to avoid a file size $>$512\,GB.
+include up to eight frequency settings given by the different
+subsystems (01--08, or 00 in very old data), while long observations may require multiple
+subscans to avoid an excessive file size
+(currently 384\,GB, previously 512\,GB).
 
 Within each data file each receptor is named. The naming system is
 zero-based. For HARP the receptor are labelled: H00, H01, H03... H015.
@@ -992,7 +992,7 @@ Instrument\_Insert\_Polarisation\_Sideband
 
 For example $`$\=U$`$\=u receptors are: NU0L, NU0U, NU1L, NU1U,
 with U denoting the insert. For $`$\=Aweoweo, W denotes the insert:
-e.g. NW0L, NW0U, NW1L, NW1U; and for Ala$`$ihi, A denotes the insert.
+e.g. NW0L, NW0U, NW1L, NW1U; and for $`$Ala$`$ihi, A denotes the insert.
 
 \section{\xlabel{visualise}Visualising raw data}
 \label{sec:exam}
@@ -1100,8 +1100,11 @@ identify the affected time range.
 \begin{terminalv}
 % chpix in=raw out=raw_masked section="',1:1,18:33'" newval=bad
 \end{terminalv}
-Note that the numbering for the 16 HARP receptors here is 1--16; this is in
-contrast to 0--15 that you will encounter with the pipeline.
+Note that the numbering for the HARP receptors here is from
+1 to the number of enabled receptors; this is in
+contrast to numbering from 0 that you may encounter with the pipeline.
+(You may examine the .MORE.ACSIS.RECEPTORS component of the
+file with \HDSTRACE\ to see which receptors were enabled.)
 
 For jiggle maps, where the receptors do not cover multiple sky
 positions, bad receptors can be identified in the reduced cubes. For
@@ -1240,7 +1243,7 @@ command-line option.
 
 \begin{enumerate}[label=(\textbf{\arabic*})]
 
-\item The raw data is copied to the local directory. Typically,
+\item The raw data are copied to the local directory. Typically,
 subsystems are treated as individual and separate observations by
 \ORACDR\ except for hybrid-mode observations.
 
@@ -1381,7 +1384,7 @@ You can use either of the options below:
 You can override the recipe set in the FITS header by listing any different
 one on the command line when starting \ORACDR. For example:
 \begin{terminalv}
-% oracdr -file mylist -loop file -log x REDUCE_SCIENCE_GRADIENT
+% oracdr -files mylist -log x REDUCE_SCIENCE_GRADIENT
 \end{terminalv}
 
 \section{Setting recipe parameters (optional)}
@@ -1567,7 +1570,7 @@ description of all available QA parameters.
 If certain receptors are known to be bad for the full length of an
 observations (e.g. dead receptors), processing time can be reduced by
 not having the pipeline attempt to reduce those data. The ability to
-masking bad receptors also provides an additional tool for those wishing
+mask bad receptors also provides an additional tool for those wishing
 to examine data in more detail (e.g. when looking at data from an
 instrument that has yet to be fully commissioned).
 
@@ -1644,7 +1647,7 @@ receptors}.
 % oracdr_acsis
 \end{terminalv}
 
-\item Define environment variables to ensure the data is read from,
+\item Define environment variables to ensure the data are read from,
 and written to, the right place. Many are set automatically when the
 pipeline is initialised but others must be set manually. Details of
 the optional variables are given in \acsispipelinesun\ but you should
@@ -1663,12 +1666,11 @@ following command.
 \end{terminalv}
 
 The \param{cwd} option requests that the current working directory is
-used for all input and output, which is most likely what you require.
+used for output, which is most likely what you require.
 
 If you are supplying a text file listing the raw data
-\file{\$ORAC\_DATA\_IN} should be the location of this file. If
-supplying an external configuration file it should also be in this
-location.
+\file{\$ORAC\_DATA\_IN} should be the location of the files
+listed, unless they are given as absolute paths.
 
 If you wish to keep the intermediate files produced by the pipeline
 you should also set \param{ORAC\_KEEP}.
@@ -1689,7 +1691,7 @@ recipe name on the end ensures that all data being processed using
 \narrowline.
 
 \begin{terminalv}
-% oracdr -files list.txt -loop file -batch -log xf -calib qaparams=myqa.ini \
+% oracdr -files list.txt -batch -log xf -calib qaparams=myqa.ini \
   bad_receptors=index -recpars mypar.ini -nodisplay REDUCE_SCIENCE_NARROWLINE
 \end{terminalv}
 \end{enumerate}
@@ -1706,7 +1708,7 @@ options and their descriptions see \oracdrsun.
 \hline
 %-from/-to         & Number of first/last observation \\
 %-list             & Comma separated list of observation numbers \\
--file $<$mylist$>$ & Input data provided by a text file. Supply the
+-files $<$mylist$>$ & Input data provided by a text file. Supply the
                      file name (relative to current directory, or the full
                      path) of an ASCII text file containing a list of all
                      observation files to be reduced, one file per line. \\
@@ -1715,13 +1717,14 @@ options and their descriptions see \oracdrsun.
 \multicolumn{2}{l}{\textbf{Looping}} \\
 \hline
 %-loop list & Default when using the -list option. The pipeline will stop once
-              the observations in the list have been reduced. \\
--loop file  & Loop over all the lines in the file supplied by the \param{-file}
-              option. \\
+%             the observations in the list have been reduced. \\
+-loop file  & Loop over all the lines in the file supplied by the \param{-files}
+              option. (This is the default if a list of files has been given.) \\
 \hline
 \multicolumn{2}{l}{\textbf{Group processing}} \\
 \hline
-\param{-batch}    & Delays group processing until the individual files have been reduced.  \\
+\param{-batch}    & Delays group processing until the individual files have been reduced.
+                    (This is the default if not in QL or summit mode, or processing today's data.) \\
 %\param{-skip}    & Allow the data detection loop to skip missing observations.  \\
 \param{-onegroup} & Forces all the observations into the same group. Useful if
                     building up a map from rasters with different target co-ordinates
@@ -1765,7 +1768,7 @@ created. In addition PNG images are made of the reduced files at a
 variety of resolutions.
 
 \begin{tip}
-TIP: Even if just a single observation is processed, a group file is
+Even if just a single observation is processed, a group file is
 created so long as the observation passes the QA check.
 \end{tip}
 
@@ -2363,7 +2366,7 @@ Intensity-weighted co-ordinate (\param{Iwc}) to get the velocity field
 velocity dispersion (second moment).
 
 \begin{tip}
-TIP: You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
+You can also use the \picard\ recipe CREATE\_MOMENTS\_MAPS. See
 \cref{Appendix}{app:picard}{Picard} for details. This recipe follows
 the advanced method outlined above.
 \end{tip}
@@ -2375,7 +2378,7 @@ the advanced method outlined above.
 Your cube will come out of \makecube\, and the pipeline, in units of
 $T_{\textnormal{A}}^*$. To convert this to main-beam brightness temperature, $T_{\textnormal{MB}}$
 divide your cube by the main-beam efficiency, $\eta_{\textnormal{MB}}$. Alternatively,
-to convert to receiver temperature, $T_{R^{*}}$, divide by the forward
+to convert to corrected radiation temperature, $T_{\textnormal{R}}^*$, divide by the forward
 scattering and spillover efficiency, $\eta_{\textnormal{\,fss}}$.  See
 \cref{Section}{sec:instruments}{Heterodyne instruments} for efficiency
 values for RxA and HARP, and the JCMT webpages for further information
@@ -2714,7 +2717,7 @@ time, the effective time and, if \param{spread=nearest} when running
 the top level and click the \guithing{Data} button.
 
 \begin{tip}
-TIP: You can write out the error component into a new file using
+You can write out the error component into a new file using
 \ndfcopy.
 \begin{terminalv}
 % ndfcopy map comp=err noisemap
@@ -3488,7 +3491,7 @@ over your HARP maps in \gaia.
 
 
 \clearpage
-\chapter{\xlabel{gaia}Using SPLAT}
+\chapter{\xlabel{splat}Using SPLAT}
 \label{sec:splat}
 
 \splat\ is a graphical spectral-analysis tool. \splat\ offers tools for
@@ -3912,7 +3915,7 @@ The JCMT Science Archive is hosted by The Canadian Astronomy Data
 Centre (CADC). Both raw data and data processed by the science pipeline
 are made available to PIs and co-Is through the CADC Advanced Search
 interface linked from the JCMT landing page
-(\url{http://www3.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/jcmt/}).
+(\url{https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/jcmt/}).
 
 To access proprietary data you will need to have your CADC username
 registered by the EAO and thereby associated with the project code.
@@ -3960,7 +3963,7 @@ Here is are some examples:
 \file{jcmth20070728\_00066\_02\_rsp001\_pro\_000.fits}.
 
 For a detailed guide to using the Advanced Search see
-\htmladdnormallink{JSA User's Guide}{http://www.eaobservatory.org/jcmt/science/archive/guide/}.
+\htmladdnormallink{JSA User's Guide}{https://www.eaobservatory.org/jcmt/science/archive/guide/}.
 
 
 \clearpage
@@ -4048,7 +4051,7 @@ MNRAS, 453, 73 (DOI:10.1093/mnras/stv1545)
 \newpage
 \appendix
 
-\chapter{PICARD}
+\chapter{\xlabel{picard}PICARD}
 \label{app:picard}
 There are two \picard\ recipes which can be used with ACSIS data and are of general interest:
 
@@ -4125,7 +4128,7 @@ with \wcsmosaic.
 There are a number of options available when running \picard\ recipes.
 The example below illustrates most of them.
 \begin{terminalv}
-% picard -recpars params.ini MOSAIC_JCMT_IMAGES `cat myfilelist.lis` -log sfx
+% picard -recpars params.ini MOSAIC_JCMT_IMAGES -files myfilelist.lis -log sfx
 \end{terminalv}
 
 \begin{itemize}
@@ -4135,17 +4138,14 @@ It is called by the \param{recpars} option. This file has the same
 \cref{Section}{sec:recpars}{Setting recipe parameters}).
 \item The recipe name need to be in uppercase.
 \item If you need to supply multiple files you can do so by listing
-them in a file (\file{myfilelist.lis} in this example) and running cat on it.
-The input file must be in the current directory, or a directory
-defined by the environment variable \file{ORAC\_DATA\_IN}. Note the
-back-quotes.
+them in a file (\file{myfilelist.lis} in this example).
 \item Like the \ORACDR\ pipeline, the \param{-log} option specifies
 whether the log file should be written to the screen [\param{s}], a
 file [\param{f}] or an xwindow [\param{x}].
 \end{itemize}
 
 \begin{tip}
-TIP: The \file{.sdf} extension on filenames is required by \textsc{Picard}.
+The \file{.sdf} extension on filenames is required by \textsc{Picard}.
 \end{tip}
 
 \begin{tip}

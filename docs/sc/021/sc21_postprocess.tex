@@ -118,7 +118,7 @@ file with a \file{\_cal} suffix and will change the units in the map
 header.
 
 \begin{terminalv}
-% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA  mapinpW.sdf
+% picard -recpars cal.ini CALIBRATE_SCUBA2_DATA mapinpW.sdf
 \end{terminalv}
 
 Note that the recipe will also take account of the pixel size when
@@ -284,12 +284,6 @@ Currently there is no advantage in terms of data quality to reducing
 all observations simultaneously or separately. However, the latter
 does allow the option of assessing the individual maps before co-adding.
 
-\begin{tip}
-  The list of files can be the output from \texttt{cat}. Remember
-  to include the back quotes.  For example, \texttt{\% picard
-    MOSAIC\_JCMT\_IMAGES \`{}cat myfiles.txt\`{}}.
-\end{tip}
-
 
 \subsection{Registering maps}
 
@@ -301,7 +295,7 @@ present in \textit{all} of the input maps. This should be done before
 combining your maps.
 
 \begin{terminalv}
-% picard -recpars myparams.ini SCUBA2_REGISTER_IMAGES `cat listoffiles.txt`
+% picard -recpars myparams.ini SCUBA2_REGISTER_IMAGES -files listoffiles.txt
 \end{terminalv}
 
 Here the parameter file contains the equatorial position of the
