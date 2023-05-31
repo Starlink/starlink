@@ -61,5 +61,5 @@
 F77_LOGICAL_FUNCTION(kpg1_isfind)( DOUBLE(val) )
 {
    GENPTR_DOUBLE(val)
-   return finite( *val ) ? F77_TRUE : F77_FALSE;
+   return isfinite( *val ) ? F77_TRUE : F77_FALSE;
 }

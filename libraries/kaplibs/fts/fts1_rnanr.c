@@ -88,7 +88,7 @@ F77_SUBROUTINE(fts1_rnanr)( INTEGER(el), REAL(buf), INTEGER(status) )
 
 /* Check for not a number (NaN) or +/- Infinity, and assign
    the element the bad-pixel value if necessary. */
-        if ( !finite( buf[ i ]) || isnan( buf[ i ] ) ) buf[ i ] = VAL__BADR;
+        if ( !isfinite( buf[ i ]) || isnan( buf[ i ] ) ) buf[ i ] = VAL__BADR;
     }
 }
 
