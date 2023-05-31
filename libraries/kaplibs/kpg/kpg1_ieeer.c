@@ -89,7 +89,7 @@ F77_SUBROUTINE(kpg1_ieeer)( INTEGER(el), REAL(val), REAL_ARRAY(in),
    it with the supplied replacement value in the output array. Otherwise,
    store the input value in the output array. Increment the pointer to the
    next element of the output array. */
-      if( !finite( (double) *pin ) ) {
+      if( !isfinite( (double) *pin ) ) {
          *(pout++) = *val;
       } else {
          *(pout++) = *pin;

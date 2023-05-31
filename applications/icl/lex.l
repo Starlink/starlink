@@ -345,7 +345,7 @@ e				([Ee][+-]?[0-9]+)
 <EXP>({d}\.{i}{e}?|{i}(\.{d})?{e}|{i}\.{d}{e}?)	{ /* floating point constants */
 					(void) sscanf( (char *)yytext, 
 					   	      "%lf", &yylval.real);
-			 		if(!finite(yylval.real))
+			 		if(!isfinite(yylval.real))
 			   		{
 			   		 errormessage = "real number too large";
 			   		 return ERROR;

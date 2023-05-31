@@ -458,7 +458,7 @@ do_operator(value left, int op, value right)
 	    jmp_float_setup = 0;
 	} else
 	    val = dorealop(op, l, r);
-	if (isrealtype(val) && !finite(real_part(val)))
+	if (isrealtype(val) && !isfinite(real_part(val)))
 	    return exception("FLTOVF  Floating point overflow");
 	else
 	    return val;
@@ -1035,7 +1035,7 @@ func_real (value arg)
 {
     double res;
     res = real_part(numeric_as_real(arg));
-    if (!finite (res))
+    if (!isfinite (res))
 	return exception ("FLTOVFL  Floating point overflow");
     else
 	if (isnan (res))
@@ -1067,7 +1067,7 @@ func_sin(value arg)
     double res;
 
     res = sin(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to sin()");
@@ -1089,7 +1089,7 @@ func_cos(value arg)
     double res;
 
     res = cos(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to cos()");
@@ -1111,7 +1111,7 @@ func_tan(value arg)
     double res;
 
     res = tan(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to tan()");
@@ -1133,7 +1133,7 @@ func_atan(value arg)
     double res;
 
     res = atan(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to atan()");
@@ -1155,7 +1155,7 @@ func_exp(value arg)
     double res;
 
     res = exp(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to exp()");
@@ -1177,7 +1177,7 @@ func_sinh(value arg)
     double res;
 
     res = sinh(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to sinh()");
@@ -1199,7 +1199,7 @@ func_cosh(value arg)
     double res;
 
     res = cosh(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to cosh()");
@@ -1221,7 +1221,7 @@ func_tanh(value arg)
     double res;
 
     res = tanh(real_part(numeric_as_real(arg)));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to tanh()");
@@ -1248,7 +1248,7 @@ func_sind(value arg)
 	return val;
     else
 	res = sin(real_part(val));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to sind()");
@@ -1275,7 +1275,7 @@ func_cosd(value arg)
 	return val;
     else
 	res = cos(real_part(val));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to cosd()");
@@ -1302,7 +1302,7 @@ func_tand(value arg)
 	return val;
     else
 	res = tan(real_part(val));
-    if (!finite(res))
+    if (!isfinite(res))
 	return exception("FLTOVFL  Floating point overflow");
     else if (isnan(res))
 	return exception("INVARGMAT Invalid argument to tand()");

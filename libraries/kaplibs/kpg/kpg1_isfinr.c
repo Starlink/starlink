@@ -61,5 +61,5 @@
 F77_LOGICAL_FUNCTION(kpg1_isfinr)( REAL(val) )
 {
    GENPTR_REAL(val)
-   return finite( (double) *val ) ? F77_TRUE : F77_FALSE;
+   return isfinite( (double) *val ) ? F77_TRUE : F77_FALSE;
 }
