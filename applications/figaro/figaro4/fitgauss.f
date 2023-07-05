@@ -367,6 +367,11 @@
 *        This is done to help ORAC-DR to prevent many ignorable error
 *        from filling the stderr feed. Currently not configurable by parameter
 *        but it could be if there are problems with doing it this way.
+*     2023 Jul 5 (GSB):
+*        Ensure the routine exits with bad status if fitting was
+*        not successful.  (ORAC-DR expects this to happen in order
+*        to know not to try to read pointing results from the
+*        output parameters.)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -522,6 +527,7 @@
       CALL NDF_BEGIN
       PLOT   = .FALSE.
       FILE   = .FALSE.
+      FITTED = .FALSE.
       REPLY  = .FALSE.
       FITPAR = 0
       FITDIM = 1
@@ -989,6 +995,13 @@
          IF ( NDF(I) .NE. NDF__NOID ) CALL NDF_ANNUL( NDF(I), STATUS )
  5    CONTINUE
       CALL NDF_END( STATUS )
+
+*  Exit with bad status if fitting failed?
+      IF ( STATUS .EQ. SAI__OK .AND. .NOT. FITTED ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'FITGAUSS_E01', 'FITGAUSS: Error: ' //
+     :      'Fitting may not have been successful.', STATUS )
+      END IF
 
 *  Return.
       END
