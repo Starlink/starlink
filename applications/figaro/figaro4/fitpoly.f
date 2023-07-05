@@ -217,6 +217,9 @@
 *        Fix CNF_PVAL pointer offsetting
 *     2007 April 2 (BEC):
 *        Return fitted polynomial coefficients via parameter system.
+*     2023 Jul 5 (GSB):
+*        Ensure the routine exits with bad status if fitting was
+*        not successful.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -733,6 +736,13 @@
 
 *  Close down NDF.
       CALL NDF_END( STATUS )
+
+*  Exit with bad status if fitting failed?
+      IF ( STATUS .EQ. SAI__OK .AND. .NOT. FITTED ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'FITPOLY_E01', 'FITPOLY: Error: ' //
+     :      'Fitting may not have been successful.', STATUS )
+      END IF
 
 *  Return.
       END
