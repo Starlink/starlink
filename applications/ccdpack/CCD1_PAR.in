@@ -79,7 +79,7 @@
 
 *  Maximum number of NDFs that can be accessed.
       INTEGER CCD1__MXNDF
-      PARAMETER ( CCD1__MXNDF = 1000 )
+      PARAMETER ( CCD1__MXNDF = 5000 )
 
 *  Maximum length of normal input string.
       INTEGER CCD1__SZSTR
