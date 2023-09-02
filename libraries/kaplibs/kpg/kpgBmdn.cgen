@@ -39,7 +39,7 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
 *     kpgBmdn<T>
 
 *  Purpose:
-*     Smooths an n-dimensional image using box filter.
+*     Smooths an n-dimensional array using a block median filter.
 
 *  Synopsis:
 *     void kpgBmdn<T>( ThrWorkForce *wf, int bad, int sambad, int var,
@@ -48,17 +48,20 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
 *                      int *badout, int *status )
 
 *  Description:
-*     This function smooths an n-dimensional array using an n-dimensional
-*     box filter; each pixel is replaced by the mean of those good
-*     neighbours which lie within a box of specified size.
+*     The input array is filtered by replacing every pixel with the median
+*     of the pixel values contained in an n-dimemsional rectangular region
+*     centred on the required output pixel.  If the box is so large in
+*     either dimension that an entire cube, plane, line, or column is
+*     included for all output pixels, then the output values will be the
+*     same and so can be copied rather than re-calculated.
 
 *  Parameters:
 *     wf
 *        Pointer to a pool of worker threads created by the thr library,
 *        or NULL (in which case the code will run in a single thread).
 *     bad
-*        Whether it is necessary to check for bad pixels in the input
-*        image.
+*        Whether or not it is necessary to check for bad pixels in the
+*        input image.
 *     sambad
 *        If a non-zero value is given for this parameter, then bad input
 *        pixels will be propagated to the output image unchanged (a
@@ -67,20 +70,17 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
 *        whether an output pixel is good or bad.  The value of "sambad" is
 *        not relevant if "bad" is zero.
 *     var
-*        If a zero value is given for this parameter, then the smoothing
-*        applied will be appropriate to a data image. If a non-zero value
-*        is given, then the smoothing will be appropriate to an image
-*        containing variance values. In the latter case the output values
-*        will be (on average) smaller than the input values to take account
-*        of the variance-reducing effect which smoothing produces.
+*        Indicates if the input image holds data values or variance values.
+*        This parameter is currently ignored (input values are assumed to
+*        be data values).
 *     ndim
 *        The number of dimensions of the array to be smoothed.
 *     dims
-*        The dimensions of the array to be smoothed. The supplied "dims"
-*        array should have at least "ndim" elements.
+*        The dimensions of the input array to be smoothed and the smoothed
+*        array. The supplied "dims" array should have at least "ndim"
+*        elements.
 *     in
-*        Input array to be smoothed.  Its dimensions are given by parameter
-*        "dims".
+*        The input array, whose dimensions are given by parameter "dims".
 *     hb
 *        The half-width of the filter block along the each dimension, in
 *        pixels. The supplied "hb" array should have at least "ndim"
@@ -89,22 +89,22 @@ void CGEN_FUNCTION( kpgBmdn )( ThrWorkForce *wf, int bad, int sambad, int var,
 *        Minimum number of good pixels which must be present in the
 *        smoothing box in order to calculate a smoothed output pixel. If
 *        this minimum number is not satisfied, then a bad output pixel will
-*        result. "a" value between 1 and the total number of pixels in the
+*        result.  A value between 1 and the total number of pixels in the
 *        smoothing box should be supplied.
 *     out
-*        Returned holding the smoothed output array.  It has the same
-*        dimensions as "in".
-*     *badout
-*        Returned holding a flag indicating whether bad pixels are present
-*        in the output image.
-*     *status
+*        Returned holding the output array, whose dimensions are given by
+*        parameter "dims".
+*     badout
+*        Returned holding the whether bad pixels are present in the output
+*        image.
+*     status
 *        The global status.
 
 *  Notes:
 *     -  There is a function for processing single- and double-precision
-*     arrays; replace "x" in the function name by R or D as appropriate.
-*     The data type of the "a", "b" and "asum" arguments must match the
-*     function used.
+*     arrays; replace <T> in the function name by F or D as appropriate.
+*     The data type of the "in" and "out" arguments must match
+*     the function used.
 
 *  Copyright:
 *     Copyright (C) 2022 East Asian Observatory
