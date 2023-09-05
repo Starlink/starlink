@@ -213,8 +213,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* The final dimension spans just the supplied section. */
    idim[ ndim - 1 ] = seclo;
-   lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ i ] );
-   hi[ ndim - 1 ] = NDF_MIN( dims[ i ], seclo + hb[ i ] );
+   lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ ndim - 1 ] );
+   hi[ ndim - 1 ] = NDF_MIN( dims[ ndim - 1 ], seclo + hb[ ndim - 1 ] );
 
 /* Data containing bad values.
    =========================== */
