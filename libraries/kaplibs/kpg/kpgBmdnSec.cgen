@@ -197,10 +197,6 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    m0 = el*( seclo - 1 );
    el *= sechi;
 
-/* Convert these two indices from one-based to zero-based. */
-   m0--;
-   el--;
-
 /* Prepare to extract the box.
    =========================== */
 
@@ -229,13 +225,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element in the section being smoothed.
    ========================================================== */
-/* m is initialised to -1 so needs to be a signed integer value, but el is
-   unsigned. Simply comparing them using "m < el" would cause the inital
-   m value of -1 to be cast to a huge unsigned value thus causing the
-   expression value to be zero. So we check for negative m values
-   separately. */
       m = m0;
-      while( m < 0 || m < el ){
+      while( m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
    dimension copying values within the box neighbourhood into the work
