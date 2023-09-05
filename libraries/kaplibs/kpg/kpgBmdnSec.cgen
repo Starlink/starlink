@@ -443,7 +443,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element.
    ============================= */
-      m = 0;
+      m = m0;
       while( m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
@@ -464,9 +464,15 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
             if( idim[ cdim - 1 ] > dims[ cdim - 1 ] ) {
 
 /* Reset index and box limits to the start within current dimension. */
-               idim[ cdim - 1 ] = 1;
-               lo[ cdim - 1 ] = 1;
-               hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], hb[ cdim - 1 ] + 1 );
+               if( cdim < ndim ){
+                  idim[ cdim - 1 ] = 1;
+                  lo[ cdim - 1 ] = 1;
+                  hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], hb[ cdim - 1 ] + 1 );
+               } else {
+                  idim[ ndim - 1 ] = seclo;
+                  lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ ndim - 1 ] );
+                  hi[ ndim - 1 ] = NDF_MIN( dims[ ndim - 1 ], seclo + hb[ ndim - 1 ] );
+               }
 
 /* Initialise the bounds of the filter box used to create the
    `previous" output column. */
@@ -477,6 +483,10 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    dimension's smoothing block, go to the next higher dimension.  There
    must be one since there are still output elements to be computed. */
                cdim++;
+               if( cdim > ndim ) {
+                  cdim = ndim;
+                  end = 1;
+               }
 
             } else {
 
