@@ -315,6 +315,12 @@ void CGEN_FUNCTION(cupidSumClumps)( ThrWorkForce *wf, CGEN_TYPE *in, int ndim,
          if( pdata ) {
             datLock( pdata->cloc, 1, 0, status );
             datAnnul( &(pdata->cloc), status );
+            if (pdata->clbnd) {
+               astFree(pdata->clbnd);
+            }
+            if (pdata->cubnd) {
+               astFree(pdata->cubnd);
+            }
             pdata = astFree( pdata );
          }
       }
@@ -331,6 +337,12 @@ void CGEN_FUNCTION(cupidSumClumps)( ThrWorkForce *wf, CGEN_TYPE *in, int ndim,
       if( pdata ) {
          datLock( pdata->cloc, 1, 0, status );
          datAnnul( &(pdata->cloc), status );
+         if (pdata->clbnd) {
+            astFree(pdata->clbnd);
+         }
+         if (pdata->cubnd) {
+            astFree(pdata->cubnd);
+         }
          pdata = astFree( pdata );
       }
 
@@ -370,8 +382,8 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
    double *ipd;       /* Pointer to data array in clump NDF */
    double *m;         /* Pointer to next clump data value */
    float *rmask;
-   hdsdim clbnd[ 3 ]; /* Lower pixel bounds of clump NDF */
-   hdsdim cubnd[ 3 ]; /* Upper pixel bounds of clump NDF */
+   hdsdim *clbnd;     /* Lower pixel bounds of clump NDF */
+   hdsdim *cubnd;     /* Upper pixel bounds of clump NDF */
    hdsdim *lbnd;      /* Lower pixel bounds of main NDF */
    hdsdim *step;      /* 1D step between adjacent pixels on each axis */
    hdsdim cdim[ 3 ];  /* Pixel axis dimensions within clump NDF */
@@ -501,6 +513,8 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       if( indf != NDF__NOID ) {
 
 /* Get the bounds and dimensions of the clump's NDF. */
+         clbnd = astMalloc(3 * sizeof(*clbnd));
+         cubnd = astMalloc(3 * sizeof(*cubnd));
          ndfBound( indf, 3, clbnd, cubnd, &cndim, status );
          for( k = 0; k < ndim; k++ ) cdim[ k ] = cubnd[ k ] - clbnd[ k ] + 1;
 
