@@ -438,7 +438,6 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       step = pdata->step;
       out = pdata->out;
       rmask = pdata->rmask;
-      rmask = pdata->rmask;
 
 /* Store a pointer of the relevant type to the output array. */
       if( alg == GAUSSCLUMPS ) {
