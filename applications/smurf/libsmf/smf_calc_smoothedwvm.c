@@ -156,8 +156,6 @@ void smf__calc_wvm_job( void *job_data, int *status );
 
 #define FUNC_NAME "smf_calc_smoothedwvm"
 
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-
 void smf_calc_smoothedwvm ( ThrWorkForce *wf, const smfArray * alldata,
                             smfData * adata, AstKeyMap* extpars, double **wvmtau,
                             dim_t *nelems, dim_t *ngoodvals,
