@@ -170,10 +170,10 @@
 *          1984.0 and as a Julian epoch otherwise.
 *     CROTA = _REAL (Read)
 *          Only accessed if a null value is supplied for parameter REF.
-*          The angle, in degrees, from north through east (in the
-*          co-ordinate system specified by the SYSTEM parameter) to the second
-*          pixel axis in the output cube. The dynamic default value is
-*          determined by the AUTOGRID parameter. []
+*          The angle, in degrees, from the second pixel axis in the output cube
+*          to north (in the co-ordinate system specified by the SYSTEM
+*          parameter), measured north through east. The dynamic default value
+*          is determined by the AUTOGRID parameter. []
 *     DETECTORS = LITERAL (Read)
 *          A group of detector names to include in, or exclude from, the
 *          output cube. If the first name starts with a minus sign, then

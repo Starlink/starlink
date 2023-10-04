@@ -447,7 +447,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          }
 
 /* Convert the autogrid CROTA value from rads to degs and set as the
-   dynamic default for parameter CROTA (the position angle of the output
+   dynamic default for parameter CROTA (the angle of north from the output
    Y axis, in degrees). The get the CROTA value and convert to rads. */
          if( par[ 6 ] != AST__BAD ) {
             autorot = par[ 6 ]*AST__DR2D;

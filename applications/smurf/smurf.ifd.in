@@ -3333,7 +3333,7 @@ package @PACKAGE@ {
 
             parameter crota {
                 type _REAL
-                prompt {Position angle of second pixel axis in output (degs)}
+                prompt {Angle of north from second pixel axis in output (degs)}
                 ppath DYNAMIC
                 vpath DYNAMIC
                 helpkey *
@@ -3822,7 +3822,7 @@ package @PACKAGE@ {
 
             parameter crota {
                 type _REAL
-                prompt {Position angle of second pixel axis in output (degs)}
+                prompt {Angle of north from second pixel axis in output (degs)}
                 ppath DYNAMIC
                 vpath DYNAMIC
                 helpkey *
