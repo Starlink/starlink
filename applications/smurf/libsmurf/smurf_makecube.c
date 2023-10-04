@@ -77,7 +77,7 @@
 *          are determined by adjusting the grid until as many data samples as
 *          possible fall close to the centre of pixels in the output cube. If
 *          FALSE, REFLON/REFLAT are set to the first pointing BASE position,
-*          CROTA is set to the MAP_PA value in the FITS header (converted
+*          CROTA is set to minus the MAP_PA value in the FITS header (converted
 *          to the requested sky co-ordinate system), PIXSIZE is set to 6
 *          arcseconds, and REFPIX1/REFPIX2 are both set to zero. [FALSE]
 *     REFPIX1 = _DOUBLE (Read)
