@@ -166,7 +166,7 @@ AstRegion *smf_mapregion_approx( Grp *igrp, int *status ){
       if( *status == SAI__OK ) {
          smf_smfFile_msg( data->file, "FILE", 1, "<unknown>" );
          *status = SAI__ERROR;
-         errRepf( "", "smf_mapbounds_approx: Cannot determine the region "
+         errRepf( "", "smf_mapregion_approx: Cannot determine the region "
                   "covered by ^FILE.", status );
       }
    }
