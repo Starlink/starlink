@@ -113,7 +113,7 @@ void ndf1UnlockDCB( NdfDCB *dcb, int *status ){
 
 /* Report an error if the object is locked by another thread. */
       } else {
-         *status = NDF__FATIN;
+         *status = NDF__THREAD;
          ndf1Dmsg( "NDF", dcb );
          errRep( " ", "The NDF '^NDF' is locked by another thread "
                  "(programming error).", status );
