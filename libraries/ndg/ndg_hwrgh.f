@@ -114,6 +114,6 @@
       IF(UDHKMP) CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
 
 *  Unlock the mutex that serialises access to NDG globals
-      CALL NDG1_GLOCK( .TRUE. )
+      CALL NDG1_GLOCK( .FALSE. )
 
       END

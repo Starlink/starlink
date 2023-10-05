@@ -53,7 +53,7 @@ F77_SUBROUTINE(ndg1_glock)( LOGICAL(lock) ){
    GENPTR_LOGICAL(lock)
 
    if( *lock ) {
-      pthread_mutex_unlock( &ndg_mutex );
+      pthread_mutex_lock( &ndg_mutex );
    } else {
       pthread_mutex_unlock( &ndg_mutex );
    }
