@@ -23,6 +23,10 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
+*  Notes:
+*     - The NDG globals mutex should be locked with NDG1_GLOCK before
+*     calling this routine.
+
 *  Copyright:
 *     Copyright (C) 2009 Science & Technology Facilities Council.
 *     All Rights Reserved.
@@ -126,9 +130,6 @@
 
 *  Check inherited status
       IF( STATUS .NE. SAI__OK ) RETURN
-
-*  Lock the mutex that serialises access to NDG globals
-      CALL NDG1_GLOCK( .TRUE. )
 
 *  Now lock the required global AST objects
       CALL NDG1_ALOCK( .TRUE., DHKMP_COM2, UDHKMP, STATUS )
@@ -257,8 +258,5 @@
 *  thread, but only if they were unlocked on entry.
       IF(UDHKMP) CALL NDG1_ALOCK( .FALSE., DHKMP_COM2, UDHKMP, STATUS )
       IF(UGHKMP) CALL NDG1_ALOCK( .FALSE., GHKMP_COM2, UGHKMP, STATUS )
-
-*  Unlock the mutex that serialises access to NDG globals
-      CALL NDG1_GLOCK( .FALSE. )
 
       END
