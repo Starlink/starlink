@@ -87,9 +87,9 @@ void *ary1Rls( AryObject *object, int *status ) {
    } else if( object->type == ARY__ACBTYPE ) {
       type = "ACB";
    } else if( object->type == ARY__MCBTYPE ) {
-      type = "ACB";
+      type = "MCB";
    } else if( object->type == ARY__PCBTYPE ) {
-      type = "ACB";
+      type = "PCB";
    } else {
       *status = ARY__FATIN;
       msgSeti( "T", object->type );
