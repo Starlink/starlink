@@ -174,6 +174,8 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 
 /* Loop through all the entries in the ACB to make adjustments to any
    which referred to the DCB entry which has just been removed. */
+               ARY__ACB_LOCK_MUTEX;
+
                iacbt = -1;
                next = 0;
                while( 1 ) {
@@ -188,6 +190,8 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
                      break;
                   }
                }
+
+               ARY__ACB_UNLOCK_MUTEX;
             }
          }
       }
