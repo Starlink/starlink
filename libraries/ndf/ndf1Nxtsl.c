@@ -15,7 +15,7 @@ extern int Ndf_NACB;    /* Number of ACBs in above array */
 extern int Ndf_NFCB;    /* Number of FCBs in above array */
 extern int Ndf_NPCB;    /* Number of PCBs in above array */
 
-void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
+void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status ) {
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
 *     block.
 
 *  Synopsis:
-*     void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status )
+*     void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status )
 
 *  Description:
 *     This function finds the next used slot in an array following

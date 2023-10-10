@@ -6,7 +6,7 @@
 #include "ndf_err.h"
 #include "ndf_ast.h"
 
-void *ndf1Ffs( NdfBlockType type, int *status ) {
+void *ndf1Ffs( const NdfBlockType type, int *status ) {
 /*
 *+
 *  Name:
@@ -16,7 +16,7 @@ void *ndf1Ffs( NdfBlockType type, int *status ) {
 *     Allocate an NDF "block" structure of any type.
 
 *  Synopsis:
-*     void *ndf1Ffs( NdfBlockType type, int *status )
+*     void *ndf1Ffs( const NdfBlockType type, int *status )
 
 *  Description:
 *     The routine finds a free slot in one of the arrays holding pointers

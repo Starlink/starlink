@@ -15,7 +15,7 @@ extern int Ndf_NPCB;
 extern NdfACB **Ndf_ACB;
 extern NdfPCB **Ndf_PCB;
 
-NdfObject *ndf1Id2ac( int id, int isacb ) {
+NdfObject *ndf1Id2ac( int id, const int isacb ) {
 /*
 *+
 *  Name:
@@ -25,7 +25,7 @@ NdfObject *ndf1Id2ac( int id, int isacb ) {
 *     Convert an identifier into the associated ACB or PCB pointer.
 
 *  Synopsis:
-*     NdfObject *ndf1Id2ac( int id, int isacb )
+*     NdfObject *ndf1Id2ac( int id, const int isacb )
 
 *  Description:
 *     The routine converts an identifier (NDF or placeholder), previously

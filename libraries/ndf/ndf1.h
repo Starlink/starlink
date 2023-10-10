@@ -68,10 +68,10 @@ void ndf1Cmpbl( int lead,
 int ndf1Expid( NdfObject *object,
                int *status );
 
-void *ndf1Ffs( NdfBlockType type,
+void *ndf1Ffs( const NdfBlockType type,
                int *status );
 
-void *ndf1Nxtsl( NdfBlockType type,
+void *ndf1Nxtsl( const NdfBlockType type,
                  int slot,
                  int *next,
                  int *status );
@@ -638,7 +638,7 @@ void ndf1Expfn( const char *in,
 int ndf1Expid( NdfObject *acb,
                int *status );
 
-void *ndf1Ffs( NdfBlockType type,
+void *ndf1Ffs( const NdfBlockType type,
                int *status );
 
 void ndf1Filac( const char *fname,
@@ -846,7 +846,7 @@ void ndf1Hwrt( NdfDCB *dcb,
                int *status );
 
 NdfObject *ndf1Id2ac( int id,
-                      int isacb );
+                      const int isacb );
 
 void ndf1Imp( HDSLoc *loc,
               NdfACB **acb,
@@ -1006,7 +1006,7 @@ void ndf1Ntfor( const char *forfil,
                 size_t *lnam,
                 int *status );
 
-void *ndf1Nxtsl( NdfBlockType type,
+void *ndf1Nxtsl( const NdfBlockType type,
                  int slot,
                  int *next,
                  int *status );
