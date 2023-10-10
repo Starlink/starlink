@@ -59,8 +59,8 @@ void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status ) {
 *     Since this function accesses global variables, each calling
 *     function must ensure that only one thread (the current thread)
 *     is searching a list using this function at any one time. To do
-*     this, the private NDF macros NDF1__xCB_LOCK_SLOT_MUTEX and
-*     NDF1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appropriate
+*     this, the private NDF macros NDF__xCB_LOCK_MUTEX and
+*     NDF__xCB_UNLOCK_MUTEX should be used to lock the appropriate
 *     mutex prior to calling this function, and to unlock it afterwards
 *     ("x" should be replaced by "A", "D", "F" or "P").
 
