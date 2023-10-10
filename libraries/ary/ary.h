@@ -54,17 +54,12 @@ typedef union AryIdUnion {
    void *pointer;
 } AryIdUnion;
 
-/* These are declared in ary1Expid. */
-extern AryIdUnion work1;
-extern AryIdUnion work2;
-extern AryIdUnion work3;
-
-/* Macros that allow C routines to import and export Ary pointers to F77
+/* Functions that allow C routines to import and export Ary pointers to F77
    as integers (e.g. used by NDF fortran interface). */
 #define ARY__NOID 0
-#define aryI2A(iary) (((iary)!=ARY__NOID)?(work1.i=(iary),work1.pointer):NULL)
-#define aryI2A2(iary) (((iary)!=ARY__NOID)?(work2.i=(iary),work2.pointer):NULL)
-#define aryA2I(ary) (ary?(work3.pointer=(ary),work3.i):ARY__NOID)
+void* aryI2A(const int iary);
+void* aryI2A2(const int iary);
+int aryA2I(void* const ary);
 
 
 
