@@ -22,7 +22,7 @@ pthread_mutex_t Ary_ACB_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Ary_MCB_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Ary_PCB_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void *ary1Ffs( AryBlockType type, int *status ) {
+void *ary1Ffs( const AryBlockType type, int *status ) {
 /*
 *+
 *  Name:
@@ -32,7 +32,7 @@ void *ary1Ffs( AryBlockType type, int *status ) {
 *     Allocate an ARY "block" structure of any type.
 
 *  Synopsis:
-*     void *ary1Ffs( AryBlockType type, int *status )
+*     void *ary1Ffs( const AryBlockType type, int *status )
 
 *  Description:
 *     The routine finds a free slot in one of the arrays holding pointers

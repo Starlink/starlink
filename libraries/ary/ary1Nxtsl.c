@@ -15,7 +15,7 @@ extern int Ary_NACB;    /* Number of ACBs in above array */
 extern int Ary_NMCB;    /* Number of MCBs in above array */
 extern int Ary_NPCB;    /* Number of PCBs in above array */
 
-void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
+void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status ) {
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 *     block.
 
 *  Synopsis:
-*     void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status )
+*     void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status )
 
 *  Description:
 *     The routine finds the next used slot in an array following

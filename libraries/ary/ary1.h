@@ -52,8 +52,8 @@
 
 /* Prototypes for private functions */
 AryACB *ary1Anl( AryACB *acb, int *status );
-AryObject *ary1Id2ac( const void *id_ptr, int isacb );
-AryObject *ary1Impid( const void *id_ptr, int checklock, int readonly, int isacb, int *status );
+AryObject *ary1Id2ac( const void *id_ptr, const int isacb );
+AryObject *ary1Impid( const void *id_ptr, int checklock, int readonly, const int isacb, int *status );
 char *ary1Get0C( const HDSLoc *loc, int *status );
 int ary1DCBLock( AryDCB *DCB, int oper, int rdonly, int *status );
 int ary1MCBLock( AryMCB *MCB, int oper, int rdonly, int *status );
@@ -61,8 +61,8 @@ int ary1Defr( const AryDCB *dcb, int *status );
 int ary1Intyp( const char *type, int *status );
 int ary1IsValid( AryObject *object, int *status );
 void *ary1Expid( AryObject *acb, int *status );
-void *ary1Ffs( AryBlockType type, int *status );
-void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status );
+void *ary1Ffs( const AryBlockType type, int *status );
+void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status );
 void *ary1Rls( AryObject *object, int *status );
 void ary1Accok( AryACB *acb, const char *access, int *ok, int *status );
 void ary1Annpl( int erase, AryPCB **pcb, int *status );
