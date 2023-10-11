@@ -9,12 +9,6 @@ typedef union IdUnion {
    unsigned u;
 } IdUnion;
 
-/* These globals are declared in ndf1Ffs.c */
-extern int Ndf_NACB;
-extern int Ndf_NPCB;
-extern NdfACB **Ndf_ACB;
-extern NdfPCB **Ndf_PCB;
-
 NdfObject *ndf1Id2ac( int id, const int isacb ) {
 /*
 *+

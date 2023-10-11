@@ -4,12 +4,6 @@
 #include "mers.h"
 #include "ndf_err.h"
 
-/* These global variables are declared in file ndf1Ffs.c */
-extern NdfDCB **Ndf_DCB;  /* Pointer to array of all DCB pointers */
-extern NdfACB **Ndf_ACB;  /* Pointer to array of all ACB pointers */
-extern NdfFCB **Ndf_FCB;  /* Pointer to array of all FCB pointers */
-extern NdfPCB **Ndf_PCB;  /* Pointer to array of all PCB pointers */
-
 int ndf1IsValid( NdfObject *object ) {
 /*
 *+

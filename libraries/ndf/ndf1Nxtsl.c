@@ -4,17 +4,6 @@
 #include "mers.h"
 #include "ndf_err.h"
 
-/* These global variables are declared in file ndf1Ffs.c */
-extern NdfDCB **Ndf_DCB;  /* Pointer to array of all DCB pointers */
-extern NdfACB **Ndf_ACB;  /* Pointer to array of all ACB pointers */
-extern NdfFCB **Ndf_FCB;  /* Pointer to array of all FCB pointers */
-extern NdfPCB **Ndf_PCB;  /* Pointer to array of all PCB pointers */
-
-extern int Ndf_NDCB;    /* Number of DCBs in above array */
-extern int Ndf_NACB;    /* Number of ACBs in above array */
-extern int Ndf_NFCB;    /* Number of FCBs in above array */
-extern int Ndf_NPCB;    /* Number of PCBs in above array */
-
 void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status ) {
 /*
 *+
