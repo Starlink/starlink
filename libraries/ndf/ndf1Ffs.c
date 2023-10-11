@@ -180,7 +180,9 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
             *pn = 16;
          }
 
+         astBeginPM;
          parray = astGrow( parray, *pn, sizeof(*parray) );
+         astEndPM;
 
 /* Store the new pointer to the re-allocated array back in the correct
    global variable. */
