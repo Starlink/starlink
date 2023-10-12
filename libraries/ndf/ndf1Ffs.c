@@ -235,117 +235,125 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
          }
       }
 
+/* Initialise the returned object. */
+      if( *status == SAI__OK ) {
+         if( type == NDF__DCBTYPE ){
+            NdfDCB *dcb = (NdfDCB *) result;
+
+            dcb->refct = 0;
+            dcb->nmap = 0;
+            dcb->loc = NULL;
+            star_strlcpy( dcb->mod, "READ", sizeof( dcb->mod ) );
+            star_strlcpy( dcb->dsp, "KEEP", sizeof( dcb->dsp ) );
+
+            star_strlcpy( dcb->file, " ", sizeof( dcb->file ) );
+            star_strlcpy( dcb->path, " ", sizeof( dcb->path ) );
+
+            dcb->did = NULL;
+            dcb->kd = 0;
+            dcb->ndmap = 0;
+
+            for( i = 0; i < NDF__MXCCN; i++ ){
+               dcb->kc[ i ] = 0;
+            }
+
+            dcb->qid = NULL;
+            dcb->kq = 0;
+            dcb->nqmap = 0;
+            dcb->qbb = 0;
+            dcb->isqbb = 0;
+            dcb->ovqbb = 0;
+
+            dcb->vid = NULL;
+            dcb->kv = 0;
+            dcb->nvmap = 0;
+
+            dcb->qloc = NULL;
+            dcb->xloc = NULL;
+            dcb->kx = 0;
+
+            dcb->ka = 0;
+            for( iax = 0; iax < NDF__MXDIM; iax++ ){
+               dcb->kad[ iax ] = 0;
+               dcb->nadmp[ iax ] = 0;
+               for( i = 0; i < NDF__MXACN; i++ ){
+                  dcb->kac[ iax ][ i ] = 0;
+               }
+
+               dcb->kav[ iax ] = 0;
+               dcb->navmp[ iax ] = 0;
+
+               dcb->kaw[ iax ] = 0;
+               dcb->nawmp[ iax ] = 0;
+
+               dcb->kan[ iax ] = 0;
+               dcb->kax[ iax ] = 0;
+            }
+
+            dcb->kh = 0;
+            dcb->hloc = NULL;
+            dcb->hrloc = NULL;
+            dcb->hsort = 0;
+            dcb->hnrec = 0;
+            dcb->hext = 5;
+            dcb->hdef = 1;
+            dcb->htlen = 0;
+            dcb->htime = -1.0;
+            dcb->humod = NDF__HNORM;
+
+            dcb->fcb = 0;
+            star_strlcpy( dcb->forid, " ", sizeof( dcb->forid ) );
+            dcb->forex = 0;
+            dcb->forkp = 0;
+
+            dcb->kw = 0;
+            dcb->iwcs = NULL;
+
+/* Ensure the DCB is locked by the current thread. */
+            ndf1LockDCB( dcb, status );
+
+         } else if( type == NDF__ACBTYPE ){
+            NdfACB *acb = (NdfACB *) result;
+
+            acb->access = 0;
+            acb->cut = 0;
+
+            acb->dcb = 0;
+            acb->dmap = 0;
+            acb->vmap = 0;
+            acb->qmap = 0;
+            acb->qmf = 1;
+            acb->qbb = 0;
+            acb->isqbb = 0;
+
+            for( iax = 0; iax < NDF__MXDIM; iax++ ){
+               acb->admap[ iax ] = 0;
+               acb->avmap[ iax ] = 0;
+               acb->awmap[ iax ] = 0;
+            }
+
+         } else if( type == NDF__FCBTYPE ){
+            NdfFCB *fcb = (NdfFCB *) result;
+            fcb->name[0] = 0;
+            fcb->ext[0] = 0;
+            fcb->infmt = 1;
+
+         } else if( type == NDF__PCBTYPE ){
+            NdfPCB *pcb = (NdfPCB *) result;
+            pcb->loc = NULL;
+            pcb->new = 1;
+            pcb->tmp = 0;
+            pcb->fcb = 0;
+            pcb->prfmt = 0;
+            pcb->forkp = 0;
+            star_strlcpy( pcb->forid, " ", sizeof( pcb->forid ) );
+
+         }
+      }
+
 /* Release the lock on the array, this allowing any waiting threads
    to proceed. */
       pthread_mutex_unlock( mutex );
-   }
-
-/* Initialise the returned object. */
-   if( *status == SAI__OK ) {
-      if( type == NDF__DCBTYPE ){
-         NdfDCB *dcb = (NdfDCB *) result;
-
-         dcb->refct = 0;
-         dcb->nmap = 0;
-         dcb->loc = NULL;
-         star_strlcpy( dcb->mod, "READ", sizeof( dcb->mod ) );
-         star_strlcpy( dcb->dsp, "KEEP", sizeof( dcb->dsp ) );
-
-         dcb->kd = 0;
-         dcb->ndmap = 0;
-
-         for( i = 0; i < NDF__MXCCN; i++ ){
-            dcb->kc[ i ] = 0;
-         }
-
-         dcb->kq = 0;
-         dcb->nqmap = 0;
-         dcb->qbb = 0;
-         dcb->isqbb = 0;
-         dcb->ovqbb = 0;
-
-         dcb->kv = 0;
-         dcb->nvmap = 0;
-
-         dcb->kx = 0;
-
-         dcb->ka = 0;
-         for( iax = 0; iax < NDF__MXDIM; iax++ ){
-            dcb->kad[ iax ] = 0;
-            dcb->nadmp[ iax ] = 0;
-            for( i = 0; i < NDF__MXACN; i++ ){
-               dcb->kac[ iax ][ i ] = 0;
-            }
-
-            dcb->kav[ iax ] = 0;
-            dcb->navmp[ iax ] = 0;
-
-            dcb->kaw[ iax ] = 0;
-            dcb->nawmp[ iax ] = 0;
-
-            dcb->kan[ iax ] = 0;
-            dcb->kax[ iax ] = 0;
-         }
-
-         dcb->kh = 0;
-         dcb->hloc = NULL;
-         dcb->hrloc = NULL;
-         dcb->hsort = 0;
-         dcb->hnrec = 0;
-         dcb->hext = 5;
-         dcb->hdef = 1;
-         dcb->htlen = 0;
-         dcb->htime = -1.0;
-         dcb->humod = NDF__HNORM;
-
-         dcb->fcb = 0;
-         star_strlcpy( dcb->forid, " ", sizeof( dcb->forid ) );
-         dcb->forex = 0;
-         dcb->forkp = 0;
-
-         dcb->kw = 0;
-         dcb->iwcs = NULL;
-
-/* Ensure the DCB is locked by the current thread. */
-         ndf1LockDCB( dcb, status );
-
-      } else if( type == NDF__ACBTYPE ){
-         NdfACB *acb = (NdfACB *) result;
-
-         acb->access = 0;
-         acb->cut = 0;
-
-         acb->dcb = 0;
-         acb->dmap = 0;
-         acb->vmap = 0;
-         acb->qmap = 0;
-         acb->qmf = 1;
-         acb->qbb = 0;
-         acb->isqbb = 0;
-
-         for( iax = 0; iax < NDF__MXDIM; iax++ ){
-            acb->admap[ iax ] = 0;
-            acb->avmap[ iax ] = 0;
-            acb->awmap[ iax ] = 0;
-         }
-
-      } else if( type == NDF__FCBTYPE ){
-         NdfFCB *fcb = (NdfFCB *) result;
-         fcb->name[0] = 0;
-         fcb->ext[0] = 0;
-         fcb->infmt = 1;
-
-      } else if( type == NDF__PCBTYPE ){
-         NdfPCB *pcb = (NdfPCB *) result;
-         pcb->loc = NULL;
-         pcb->new = 1;
-         pcb->tmp = 0;
-         pcb->fcb = 0;
-         pcb->prfmt = 0;
-         pcb->forkp = 0;
-         star_strlcpy( pcb->forid, " ", sizeof( pcb->forid ) );
-
-      }
    }
 
 /* Call error tracing routine and exit. */
