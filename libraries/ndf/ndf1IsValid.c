@@ -66,6 +66,7 @@ int ndf1IsValid( NdfObject *object ) {
 
 /* Local variables: */
    int result;
+   int* pn;
    NdfObject ***array;
    pthread_mutex_t *mutex;
 
@@ -79,15 +80,19 @@ int ndf1IsValid( NdfObject *object ) {
    helps to guard against random addresses being supplied since such are
    unlikely to have a valid type value. */
    if( object->type == NDF__DCBTYPE ) {
+      pn = &Ndf_NDCB;
       array = (NdfObject ***) &Ndf_DCB;
       mutex = &Ndf_DCB_mutex;
    } else if( object->type == NDF__ACBTYPE ) {
+      pn = &Ndf_NACB;
       array = (NdfObject ***) &Ndf_ACB;
       mutex = &Ndf_ACB_mutex;
    } else if( object->type == NDF__FCBTYPE ) {
+      pn = &Ndf_NFCB;
       array = (NdfObject ***) &Ndf_FCB;
       mutex = &Ndf_FCB_mutex;
    } else if( object->type == NDF__PCBTYPE ) {
+      pn = &Ndf_NPCB;
       array = (NdfObject ***) &Ndf_PCB;
       mutex = &Ndf_PCB_mutex;
    } else {
@@ -98,7 +103,9 @@ int ndf1IsValid( NdfObject *object ) {
    is consistent with the object pointer stored in the slot. */
    if( array ) {
       pthread_mutex_lock( mutex );
-      result = ( (*array)[ object->slot ] == object );
+      if (object->slot >= 0 && object->slot < *pn) {
+         result = ( (*array)[ object->slot ] == object );
+      }
       pthread_mutex_unlock( mutex );
    }
 
