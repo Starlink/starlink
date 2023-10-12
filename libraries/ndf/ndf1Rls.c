@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include "sae_par.h"
 #include "ndf1.h"
 #include "mers.h"
@@ -69,6 +70,7 @@ void *ndf1Rls( NdfObject *object, int *status ) {
 */
 
 /* Local variables: */
+   pthread_mutex_t *mutex = 0;
    const char *type;
    int tstat;
 
@@ -85,13 +87,17 @@ void *ndf1Rls( NdfObject *object, int *status ) {
    DCB, unlock it. */
    if( object->type == NDF__DCBTYPE ) {
       type = "DCB";
+      mutex = &Ndf_DCB_mutex;
       ndf1UnlockDCB( (NdfDCB *) object, status );
    } else if( object->type == NDF__ACBTYPE ) {
       type = "ACB";
+      mutex = &Ndf_ACB_mutex;
    } else if( object->type == NDF__FCBTYPE ) {
       type = "FCB";
+      mutex = &Ndf_FCB_mutex;
    } else if( object->type == NDF__PCBTYPE ) {
       type = "PCB";
+      mutex = &Ndf_PCB_mutex;
    } else {
       *status = NDF__FATIN;
       msgSeti( "T", object->type );
@@ -112,7 +118,9 @@ void *ndf1Rls( NdfObject *object, int *status ) {
 
 /* Otherwise, release the slot. */
    } else {
+      pthread_mutex_lock( mutex );
       object->used = 0;
+      pthread_mutex_unlock( mutex );
    }
 
 /* Annul any error if STATUS was previously bad, otherwise let the new
