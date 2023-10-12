@@ -659,7 +659,9 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       }
 
 /* Unlock the HDS object. */
+      errBegin( status );
       datUnlock( pdata->cloc, 1, status );
+      errEnd( status );
 
    } else {
       *status = SAI__ERROR;
