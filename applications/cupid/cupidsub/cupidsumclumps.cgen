@@ -518,7 +518,7 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       errEnd( status );
 
 /* Process the NDF if it is usable. */
-      if( indf != NDF__NOID ) {
+      if( indf != NDF__NOID && *status == SAI__OK ) {
 
 /* Get the bounds and dimensions of the clump's NDF. */
          clbnd = astMalloc(3 * sizeof(*clbnd));
@@ -651,8 +651,10 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
                }
             }
          }
+      }
 
 /* Annul the NDF identifier. */
+      if( indf != NDF__NOID  ) {
          ndfAnnul( &indf, status );
       }
 
