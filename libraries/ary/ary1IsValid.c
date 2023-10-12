@@ -10,6 +10,11 @@ extern AryACB **Ary_ACB;  /* Pointer to array of all ACB pointers */
 extern AryMCB **Ary_MCB;  /* Pointer to array of all MCB pointers */
 extern AryPCB **Ary_PCB;  /* Pointer to array of all PCB pointers */
 
+extern int Ary_NDCB;    /* Number of DCBs in above array */
+extern int Ary_NACB;    /* Number of ACBs in above array */
+extern int Ary_NMCB;    /* Number of MCBs in above array */
+extern int Ary_NPCB;    /* Number of PCBs in above array */
+
 int ary1IsValid( AryObject *object, int *status ) {
 /*
 *+
@@ -72,6 +77,7 @@ int ary1IsValid( AryObject *object, int *status ) {
 
 /* Local variables: */
    int result;
+   int* pn;
    AryObject ***array;
    pthread_mutex_t *mutex;
 
@@ -85,15 +91,19 @@ int ary1IsValid( AryObject *object, int *status ) {
    helps to guard against random addresses being supplied since such are
    unlikely to have a valid type value. */
    if( object->type == ARY__DCBTYPE ) {
+      pn = &Ary_NDCB;
       array = (AryObject ***) &Ary_DCB;
       mutex = &Ary_DCB_mutex;
    } else if( object->type == ARY__ACBTYPE ) {
+      pn = &Ary_NACB;
       array = (AryObject ***) &Ary_ACB;
       mutex = &Ary_ACB_mutex;
    } else if( object->type == ARY__MCBTYPE ) {
+      pn = &Ary_NMCB;
       array = (AryObject ***) &Ary_MCB;
       mutex = &Ary_MCB_mutex;
    } else if( object->type == ARY__PCBTYPE ) {
+      pn = &Ary_NPCB;
       array = (AryObject ***) &Ary_PCB;
       mutex = &Ary_PCB_mutex;
    } else {
@@ -104,7 +114,9 @@ int ary1IsValid( AryObject *object, int *status ) {
    is consistent with the object pointer stored in the slot. */
    if( *array ) {
       pthread_mutex_lock( mutex );
-      result = ( (*array)[ object->slot ] == object );
+      if (object->slot >= 0 && object->slot < *pn) {
+         result = ( (*array)[ object->slot ] == object );
+      }
       pthread_mutex_unlock( mutex );
    }
 
