@@ -476,6 +476,11 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
          if( !strcmp( unit, "BAD" ) ) ndfAnnul( &indf, status );
       }
 
+/* Start new error context to ensure clump numbering proceeds properly, with
+   thrMutexLock and thrCondWait operating, even if an error has been
+   encountered. */
+      errBegin( status );
+
 /* We now know if the NDF is unusable (indicated by its identifier being
    NDF__NOID). If it is usable, we want to claim the next clump index.
    Otherwise, we indicate that the next job is free to claim the next clump
@@ -508,6 +513,9 @@ static void CGEN_FUNCTION(cupidSumClumpsPar)( void *job_data_ptr, int *status ) 
       iclump_next++;
       thrCondBroadcast( &next_iclump, status );
       thrMutexUnlock( &iclump_mutex, status );
+
+/* End clump-numbering error context. */
+      errEnd( status );
 
 /* Process the NDF if it is usable. */
       if( indf != NDF__NOID ) {
