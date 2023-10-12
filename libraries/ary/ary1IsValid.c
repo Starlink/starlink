@@ -72,7 +72,7 @@ int ary1IsValid( AryObject *object, int *status ) {
 
 /* Local variables: */
    int result;
-   AryObject **array;
+   AryObject ***array;
    pthread_mutex_t *mutex;
 
 /* Initialise */
@@ -85,16 +85,16 @@ int ary1IsValid( AryObject *object, int *status ) {
    helps to guard against random addresses being supplied since such are
    unlikely to have a valid type value. */
    if( object->type == ARY__DCBTYPE ) {
-      array = (AryObject **) Ary_DCB;
+      array = (AryObject ***) &Ary_DCB;
       mutex = &Ary_DCB_mutex;
    } else if( object->type == ARY__ACBTYPE ) {
-      array = (AryObject **) Ary_ACB;
+      array = (AryObject ***) &Ary_ACB;
       mutex = &Ary_ACB_mutex;
    } else if( object->type == ARY__MCBTYPE ) {
-      array = (AryObject **) Ary_MCB;
+      array = (AryObject ***) &Ary_MCB;
       mutex = &Ary_MCB_mutex;
    } else if( object->type == ARY__PCBTYPE ) {
-      array = (AryObject **) Ary_PCB;
+      array = (AryObject ***) &Ary_PCB;
       mutex = &Ary_PCB_mutex;
    } else {
       array = NULL;
@@ -102,9 +102,9 @@ int ary1IsValid( AryObject *object, int *status ) {
 
 /* If the type was legal, check that the slot number stored in the object
    is consistent with the object pointer stored in the slot. */
-   if( array ) {
+   if( *array ) {
       pthread_mutex_lock( mutex );
-      result = ( array[ object->slot ] == object );
+      result = ( (*array)[ object->slot ] == object );
       pthread_mutex_unlock( mutex );
    }
 
