@@ -86,7 +86,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 */
 
 /* Local variables: */
-   NdfObject **parray;        /* Pointer to start of pointer array */
+   NdfObject ***parray;       /* Pointer to pointer to start of pointer array */
    NdfObject **head;          /* Pointer to next pointer */
    NdfObject *result;         /* The returned pointer */
    const char *name;          /* Pointer to name string */
@@ -111,7 +111,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 
 /* A pointer to the first structure in the array of allocated structures
    of the required type. */
-      parray = (NdfObject **) Ndf_DCB;
+      parray = (NdfObject ***) &Ndf_DCB;
 
 /* Pointer to variable holding the current length of the array. */
       pn = &Ndf_NDCB;
@@ -124,21 +124,21 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 
    } else if( type == NDF__ACBTYPE ){
       mutex = &Ndf_ACB_mutex;
-      parray = (NdfObject **) Ndf_ACB;
+      parray = (NdfObject ***) &Ndf_ACB;
       pn = &Ndf_NACB;
       size = sizeof(NdfACB);
       name = "ACB";
 
    } else if( type == NDF__FCBTYPE ){
       mutex = &Ndf_FCB_mutex;
-      parray = (NdfObject **) Ndf_FCB;
+      parray = (NdfObject ***) &Ndf_FCB;
       pn = &Ndf_NFCB;
       size = sizeof(NdfFCB);
       name = "FCB";
 
    } else if( type == NDF__PCBTYPE ){
       mutex = &Ndf_PCB_mutex;
-      parray = (NdfObject **) Ndf_PCB;
+      parray = (NdfObject ***) &Ndf_PCB;
       pn = &Ndf_NPCB;
       size = sizeof(NdfPCB);
       name = "PCB";
@@ -161,7 +161,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 /* Loop through the array looking for an element that is not currently in
    use. If found, use it as the returned result and indicate it is now in
    use. */
-      head = parray;
+      head = *parray;
       for( i = 0; i < *pn; i++,head++ ){
          if( !(*head)->used ){
             result = *head;
@@ -181,20 +181,8 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
          }
 
          astBeginPM;
-         parray = astGrow( parray, *pn, sizeof(*parray) );
+         *parray = astGrow( *parray, *pn, sizeof(**parray) );
          astEndPM;
-
-/* Store the new pointer to the re-allocated array back in the correct
-   global variable. */
-         if( type == NDF__DCBTYPE ){
-            Ndf_DCB = (NdfDCB **) parray;
-         } else if( type == NDF__ACBTYPE ){
-            Ndf_ACB = (NdfACB **) parray;
-         } else if( type == NDF__FCBTYPE ){
-            Ndf_FCB = (NdfFCB **) parray;
-         } else if( type == NDF__PCBTYPE ){
-            Ndf_PCB = (NdfPCB **) parray;
-         }
 
 /* Report an error if the array could not be extended. */
          if( *status != SAI__OK ) {
@@ -207,7 +195,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
    currently in use. If it is a DCB, initialise its mutex and indicate it
    is not currently locked. */
          } else {
-            head = parray + oldsize;
+            head = *parray + oldsize;
             for( i = oldsize; i < *pn; i++ ) {
                astBeginPM;
                result = *(head++) = astCalloc( 1, size );
@@ -229,7 +217,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 /* If the new structures were created successfully, return the first of
    the new elements. */
             if( *status == SAI__OK ) {
-               result = parray[ oldsize ];
+               result = (*parray)[ oldsize ];
                result->used = 1;
             }
          }
