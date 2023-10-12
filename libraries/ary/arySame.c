@@ -101,6 +101,8 @@ void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status ) {
 
 /* Obtain indices to the two data object entries in the DCB. */
    if( *status == SAI__OK ) {
+      ARY__DCB_LOCK_MUTEX;
+
       dcb1 = acb1->dcb;
       dcb2 = acb2->dcb;
 
@@ -132,6 +134,8 @@ void arySame( Ary *ary1, Ary *ary2, int *same, int *isect, int *status ) {
             }
          }
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the

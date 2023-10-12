@@ -33,6 +33,9 @@ void ary1Crnba( AryDCB *dcb, AryACB **acb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     The DCB mutex must be locked.
+
 *  Notes:
 *     -  If STATUS is set on entry, then the routine will return a
 *     value of NULL for the ACB pointer, although no further
@@ -70,6 +73,7 @@ void ary1Crnba( AryDCB *dcb, AryACB **acb, int *status ) {
 
 *-
 */
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Local variables: */
    int i;                     /* Loop counter for dimensions */
@@ -88,6 +92,8 @@ void ary1Crnba( AryDCB *dcb, AryACB **acb, int *status ) {
    ary1Dmod( dcb, status );
    ary1Dbad( dcb, status );
    ary1Dsta( dcb, status );
+
+   ARY__ACB_LOCK_MUTEX;
 
 /* Allocate a new ACB. */
    *acb = ary1Ffs( ARY__ACBTYPE, status );
@@ -143,6 +149,8 @@ void ary1Crnba( AryDCB *dcb, AryACB **acb, int *status ) {
    } else {
       *acb = ary1Rls( (AryObject *) *acb, status );
    }
+
+   ARY__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Crnba", status );

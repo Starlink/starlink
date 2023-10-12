@@ -67,6 +67,19 @@ extern pthread_mutex_t Ary_MCB_mutex;
 #define ARY__MCB_LOCK_MUTEX pthread_mutex_lock( &Ary_MCB_mutex );
 #define ARY__MCB_UNLOCK_MUTEX pthread_mutex_unlock( &Ary_MCB_mutex );
 
+#define THREAD_DEBUG 0
+#if THREAD_DEBUG
+void ary1AssertLocked(pthread_mutex_t* mutex, char* name);
+#define ARY__ACB_ASSERT_MUTEX ary1AssertLocked(&Ary_ACB_mutex, "ACB");
+#define ARY__DCB_ASSERT_MUTEX ary1AssertLocked(&Ary_DCB_mutex, "DCB");
+#define ARY__PCB_ASSERT_MUTEX ary1AssertLocked(&Ary_PCB_mutex, "PCB");
+#define ARY__MCB_ASSERT_MUTEX ary1AssertLocked(&Ary_MCB_mutex, "MCB");
+#else
+#define ARY__ACB_ASSERT_MUTEX
+#define ARY__DCB_ASSERT_MUTEX
+#define ARY__PCB_ASSERT_MUTEX
+#define ARY__MCB_ASSERT_MUTEX
+#endif
 
 /* Maximum number of dimensions for which the data system (HDS) is
    capable of "slicing" a primitive object. */

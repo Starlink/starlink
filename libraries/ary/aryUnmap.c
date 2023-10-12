@@ -75,7 +75,11 @@ void aryUnmap( Ary *ary, int *status ) {
 /* Import the array identifier and unmap the array. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ) {
+      ARY__DCB_LOCK_MUTEX;
+      ARY__ACB_LOCK_MUTEX;
       ary1Ump( acb, status );
+      ARY__ACB_UNLOCK_MUTEX;
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* Annul any error if STATUS was previously bad, otherwise let the new

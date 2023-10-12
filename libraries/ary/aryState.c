@@ -69,6 +69,7 @@ void aryState( Ary *ary, int *state, int *status ) {
 /* Inport the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Ensure that state information is available in the DCB. */
       dcb = acb->dcb;
@@ -78,6 +79,8 @@ void aryState( Ary *ary, int *state, int *status ) {
       if( *status == SAI__OK ){
          *state = dcb->state;
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

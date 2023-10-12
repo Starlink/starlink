@@ -96,8 +96,12 @@ void aryBad( Ary *ary, int check, int *bad, int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Determine whether bad pixels are present. */
    ary1Bad( acb, check, bad, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

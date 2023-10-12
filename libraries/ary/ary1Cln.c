@@ -28,6 +28,9 @@ void ary1Cln( AryACB *acb1, AryACB **acb2, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     The DCB mutex must be locked.
+
 *  Notes:
 *     -  If "status" is set on entry, then a value of NULL will be
 *     returned for the "acb2" argument, although no further processing
@@ -70,11 +73,15 @@ void ary1Cln( AryACB *acb1, AryACB **acb2, int *status ) {
    int i;                     /* Loop counter for dimensions */
    AryDCB *dcb;               /* Data Control Block */
 
+   ARY__DCB_ASSERT_MUTEX;
+
 /* Set an initial value of NULL for the "acb2" argument. */
    *acb2 = NULL;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
+
+   ARY__ACB_LOCK_MUTEX;
 
 /* Find a free slot in the ACB. Reset the IACB2 argument to zero if no slot
    could be found. */
@@ -119,6 +126,8 @@ void ary1Cln( AryACB *acb1, AryACB **acb2, int *status ) {
       (*acb2)->mcb = NULL;
       dcb->refcount++;
    }
+
+   ARY__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Cln", status );

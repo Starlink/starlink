@@ -196,6 +196,8 @@ void aryDelta( Ary *ary1, int zaxis, const char *type, float minrat,
       acbt = acb1;
    }
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check it is safe to de-reference pointer acbt. */
    if( *status != SAI__OK ) goto L999;
 
@@ -435,8 +437,14 @@ L999:
       *ary2 = ary1Expid( (AryObject *) acb2, status );
 
 /* If an error occurred, then annul the new ACB entry. */
-      if( ( *status != SAI__OK ) && acb2 ) acb2 = ary1Anl( acb2, status );
+      if( ( *status != SAI__OK ) && acb2 ) {
+         ARY__ACB_LOCK_MUTEX;
+         acb2 = ary1Anl( acb2, status );
+         ARY__ACB_UNLOCK_MUTEX;
+      }
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Annul any temporary base copy of the input array. */
    if( loct ) ary1Antmp( &loct, status );

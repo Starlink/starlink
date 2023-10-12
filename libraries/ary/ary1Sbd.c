@@ -35,6 +35,9 @@ void ary1Sbd( int bad, AryACB *acb, int *status ) {
 *     status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB and ACB mutexes must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -86,6 +89,9 @@ void ary1Sbd( int bad, AryACB *acb, int *status ) {
    int next;                  /* Next ACB slot which is in use */
    int whole;                 /* Whole data object to be mapped? */
 
+   ARY__DCB_ASSERT_MUTEX;
+   ARY__ACB_ASSERT_MUTEX;
+
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
@@ -130,9 +136,7 @@ void ary1Sbd( int bad, AryACB *acb, int *status ) {
 
 /* The effect on other ACB entries, whose mapping transfer regions may
    overlap must now be considered. Loop to consider all other ACB entries
-   which might be affected. We lock a mutex first to ensure that no other
-   thread is currently accessing the slot array. */
-               ARY__ACB_LOCK_MUTEX;
+   which might be affected. */
                iacbt = -1;
                next = 0;
                while( 1 ){
@@ -186,7 +190,6 @@ void ary1Sbd( int bad, AryACB *acb, int *status ) {
                      break;
                   }
                }
-               ARY__ACB_UNLOCK_MUTEX;
             }
          }
       }

@@ -104,6 +104,8 @@ void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
    *status = SAI__OK;
    pcb = (AryPCB *) ary1Impid( *place, 0, 0, 0, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* If there has been no error at all so far, then check the full type
    specification for validity. */
    if( ( *status == SAI__OK ) && ( tstat == SAI__OK ) ){
@@ -137,6 +139,8 @@ void aryNewp( const char *ftype, int ndim, const hdsdim *ubnd,
 /* Export an identifier for the array. */
       *ary = ary1Expid( (AryObject *) acb, status );
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Annul the placeholder, erasing the associated object if any error has
    occurred. */

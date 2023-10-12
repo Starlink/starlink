@@ -66,6 +66,9 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 *     The values returned for each operation are included in the
 *     description of the "oper" argument above.
 
+* Prior Requirements:
+*     - The DCB mutex must be locked.
+
 *  Notes:
 *     - If the version of HDS being used does not support object locking,
 *     this function will return without action for "oper" values 2 or 3
@@ -118,6 +121,8 @@ int ary1DCBLock( AryDCB *dcb, int oper, int rdonly, int *status ){
 
 /* Local Variables; */
    int result = 1;
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited status. */
    if( *status != SAI__OK ) return result;

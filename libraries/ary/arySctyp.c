@@ -80,6 +80,7 @@ void arySctyp( Ary *ary, char type[DAT__SZTYP+1], int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Get the DCB pointer. */
       dcb = acb->dcb;
@@ -89,6 +90,8 @@ void arySctyp( Ary *ary, char type[DAT__SZTYP+1], int *status ) {
 
 /* Copy the numeric type string to the output argument. */
       strcpy( type, dcb->type );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

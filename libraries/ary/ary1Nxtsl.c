@@ -118,14 +118,17 @@ void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status ) {
    if( type == ARY__DCBTYPE ){
       start = (AryObject **) Ary_DCB;
       nel = Ary_NDCB;
+      ARY__DCB_ASSERT_MUTEX;
 
    } else if( type == ARY__ACBTYPE ){
       start = (AryObject **) Ary_ACB;
       nel = Ary_NACB;
+      ARY__ACB_ASSERT_MUTEX;
 
    } else if( type == ARY__MCBTYPE ){
       start = (AryObject **) Ary_MCB;
       nel = Ary_NMCB;
+      ARY__MCB_ASSERT_MUTEX;
 
 /* If the common block specified is not valid, then report an error. */
    } else {

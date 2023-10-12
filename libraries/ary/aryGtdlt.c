@@ -102,11 +102,15 @@ void aryGtdlt( Ary *ary, int *zaxis, char ztype[DAT__SZTYP+1], float *zratio,
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Get the DCB entry associated with this ACB entry. */
    dcb = acb->dcb;
 
 /* Get the compression information from the data object. */
    ary1Gtdlt( dcb, zaxis, ztype, zratio, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

@@ -93,8 +93,12 @@ void aryUnlock( Ary *ary, int *status ) {
 /* Attempt to unlock the specified array. Test status first so that we know
    it is safe to deference "acb". */
    if( *status == SAI__OK ) {
+      ARY__DCB_LOCK_MUTEX;
+
       (void) ary1DCBLock( acb->dcb, 3, 0, status );
       (void) ary1MCBLock( acb->mcb, 3, 0, status );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the

@@ -123,6 +123,7 @@ int aryLocked( const Ary *ary, int *status ) {
 /* Get the value to return. Test status first so that we know it is safe
    to deference "acb". Assume the MCB has the same lock as the DCB. */
    if( *status == SAI__OK ) {
+      ARY__DCB_LOCK_MUTEX;
 
 /* Get the lock state of the DCB (there should always be a DCB). */
       result = ary1DCBLock( acb->dcb, 1, 0, status );
@@ -141,6 +142,8 @@ int aryLocked( const Ary *ary, int *status ) {
                     "for the DCB (^I) and MCB (^J)", status );
          }
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the

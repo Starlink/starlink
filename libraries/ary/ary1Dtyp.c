@@ -34,6 +34,9 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -70,6 +73,8 @@ void ary1Dtyp( AryDCB *dcb, int *status ) {
    HDSLoc *loc2 = NULL;       /* Component locator */
    char numer;                /* Whether the data type is numeric */
    int there;                 /* Does the named component exist? */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

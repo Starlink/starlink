@@ -78,6 +78,7 @@ void aryFtype( Ary *ary,  char ftype[ARY__SZFTP+1], int *status ) {
 /* Inport the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Get the DCB index for the data object. */
       dcb = acb->dcb;
@@ -98,6 +99,8 @@ void aryFtype( Ary *ary,  char ftype[ARY__SZFTP+1], int *status ) {
       } else {
          strcpy( ftype, ty );
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

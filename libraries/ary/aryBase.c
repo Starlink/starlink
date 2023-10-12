@@ -80,6 +80,7 @@ void aryBase( Ary *ary1, Ary**ary2, int *status ) {
 /* Import the input array identifier. */
    acb1 = (AryACB *) ary1Impid( ary1, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Obtain a pointer to the shared Data Control Block. */
       dcb = acb1->dcb;
@@ -95,8 +96,14 @@ void aryBase( Ary *ary1, Ary**ary2, int *status ) {
          *ary2 = ary1Expid( (AryObject *) acb2, status );
 
 /* If an error occurred, then annul the new ACB entry. */
-         if( *status != SAI__OK ) ary1Anl( acb2, status );
+         if( *status != SAI__OK ) {
+            ARY__ACB_LOCK_MUTEX;
+            ary1Anl( acb2, status );
+            ARY__ACB_UNLOCK_MUTEX;
+         }
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

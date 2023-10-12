@@ -119,6 +119,9 @@ void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status ) {
 /* Import the identifiers for the input arrays. */
    acb1 = (AryACB *) ary1Impid( ary1, 1, 1, 1, status );
    acb2 = (AryACB *) ary1Impid( ary2, 1, 1, 1, status );
+
+   ARY__DCB_LOCK_MUTEX;
+
    if( *status == SAI__OK ){
 
 /* Initialise the ACB for the output array. */
@@ -175,7 +178,9 @@ void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status ) {
    section from the IARY1 array, generating a new ACB entry to describe
    it. */
       if( acb1->cut || acb2->cut || !match ){
+         ARY__ACB_LOCK_MUTEX;
          ary1Cut( acb1, acb1->ndim, lbnd, ubnd, &acb3, status );
+         ARY__ACB_UNLOCK_MUTEX;
          if( *status == SAI__OK ){
 
 /* At this point, the new array section's data transfer window takes
@@ -231,9 +236,13 @@ void arySsect( Ary *ary1, Ary *ary2, Ary **ary3, int *status ) {
 /* If an error occurred, but a new ACB entry was allocated, then clean up
    by annulling it. */
       if( ( *status != SAI__OK ) && acb3 ){
+         ARY__ACB_LOCK_MUTEX;
          ary1Anl( acb3, status );
+         ARY__ACB_UNLOCK_MUTEX;
       }
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

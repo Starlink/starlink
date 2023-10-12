@@ -44,6 +44,9 @@ void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status 
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  A value of NULL will be returned for the "dcb2" argument if the
 *     routine is called with "status" set, although no further processing
@@ -87,6 +90,8 @@ void ary1Dcpy( AryDCB *dcb1, int temp, HDSLoc **loc, AryDCB **dcb2, int *status 
    char name[DAT__SZNAM+1];   /* Object name */
    int i;                     /* Loop counter for dimensions */
    int nlev;                  /* Levels in HDS path name */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Set an initial value of NULL for the dcb2 argument. */
    *dcb2 = NULL;

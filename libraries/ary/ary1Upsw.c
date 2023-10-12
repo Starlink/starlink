@@ -56,6 +56,9 @@ void ary1Upsw( AryACB *acb, const char *type, int bad, int copy,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  This routine attempts to execute even if 'status' is set on
 *     entry, although no additional error report will be made if it
@@ -97,6 +100,8 @@ void ary1Upsw( AryACB *acb, const char *type, int bad, int copy,
    AryDCB *dcb;               /* Pointer to the DCB */
    AryMCB *mcb;               /* Pointer to the MCB */
    int tstat;                 /* Temporary status value */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Save the STATUS value and mark the error stack. */
    tstat = *status;

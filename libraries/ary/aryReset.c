@@ -77,6 +77,9 @@ void aryReset( Ary *ary, int *status ) {
 /* Import the array identifier and check that WRITE access to the array is
    permitted. */
    acb = (AryACB *) ary1Impid( ary, 1, 0, 1, status );
+
+   ARY__DCB_LOCK_MUTEX;
+
    ary1Chacc( acb, "WRITE", status );
    if( *status == SAI__OK ){
 
@@ -112,10 +115,14 @@ void aryReset( Ary *ary, int *status ) {
             ary1Drst( dcb, status );
 
 /* Set its bad pixel flag to .TRUE.. */
+            ARY__ACB_LOCK_MUTEX;
             ary1Sbd( 1, acb, status );
+            ARY__ACB_UNLOCK_MUTEX;
          }
       }
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

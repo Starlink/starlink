@@ -78,8 +78,12 @@ void aryClone( Ary *ary1, Ary **ary2, int *status ) {
 /* Import the original array identifier. */
    acb1 = (AryACB *) ary1Impid( ary1, 1, 1, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Produce a cloned copy of its ACB entry. */
    ary1Cln( acb1, &acb2, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Export an identifier for the new array. */
    *ary2 = ary1Expid( (AryObject *) acb2, status );

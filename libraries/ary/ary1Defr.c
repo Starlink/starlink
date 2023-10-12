@@ -33,6 +33,9 @@ int ary1Defr( const AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Returned function value:
 *     If non-zero then the HDS arrays holding the real and imaginary
 *     array values have not yet been created.
@@ -75,6 +78,8 @@ int ary1Defr( const AryDCB *dcb, int *status ) {
    int ncomp;                 /* Number of components */
    int prim;                  /* Is the locator primitive? */
    int result;                /* Returned value */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Initialise */
    result = 0;

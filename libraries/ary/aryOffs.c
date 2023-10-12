@@ -92,6 +92,7 @@ void aryOffs( Ary *ary1, Ary *ary2, int mxoffs, hdsdim *offs, int *status ) {
    acb1 = (AryACB *) ary1Impid( ary1, 1, 1, 1, status );
    acb2 = (AryACB *) ary1Impid( ary2, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Obtain pointers to the data objects. */
       dcb1 = acb1->dcb;
@@ -106,6 +107,8 @@ void aryOffs( Ary *ary1, Ary *ary2, int mxoffs, hdsdim *offs, int *status ) {
          offs[ i ] = ( acb2->shift[ i ] - dcb2->shift[ i ] ) -
                      ( acb1->shift[ i ] - dcb1->shift[ i ] );
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
 
 /* Pad remaining values with zero. */
       for( ; i < mxoffs; i++ ) offs[ i ] = 0;

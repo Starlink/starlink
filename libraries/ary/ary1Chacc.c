@@ -32,6 +32,9 @@ void ary1Chacc( AryACB *acb, const char *access, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -67,6 +70,8 @@ void ary1Chacc( AryACB *acb, const char *access, int *status ) {
    char uacc[ARY__SZACC+1];   /* Upper case version of ACCESS */
    AryDCB *dcb;               /* The data object (DCB) */
    int ok;                    /* Whether requested access is permitted */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

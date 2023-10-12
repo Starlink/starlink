@@ -77,6 +77,7 @@ void aryForm( Ary *ary, char form[ARY__SZFRM+1], int *status ) {
 /* Inport the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Get the DCB index for the data object. */
       dcb = acb->dcb;
@@ -86,6 +87,8 @@ void aryForm( Ary *ary, char form[ARY__SZFRM+1], int *status ) {
 
 /* Copy the form string to the output argument. */
       if( *status == SAI__OK ) strcpy( form, dcb->form );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

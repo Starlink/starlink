@@ -48,6 +48,9 @@ void ary1Danl( int dispos, AryDCB **dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     - The DCB mutex must be locked.
+
 *  Notes:
 *     -  The routine attempts to execute even if STATUS is set on entry,
 *     although no further error report will be made if it subsequently
@@ -93,6 +96,8 @@ void ary1Danl( int dispos, AryDCB **dcb, int *status ) {
 
 /* Local variables: */
    int tstat;                 /* Temporary status variable */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Save the STATUS value and mark the error stack. */
    tstat = *status;

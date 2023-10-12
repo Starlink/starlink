@@ -101,6 +101,8 @@ void arySbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *ary,
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 0, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check that BOUNDS access to the array is available. */
    ary1Chacc( acb, "BOUNDS", status );
 
@@ -108,6 +110,8 @@ void arySbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, Ary *ary,
    if( *status == SAI__OK ){
       ary1Sbnd( ndim, lbnd, ubnd, acb, status );
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

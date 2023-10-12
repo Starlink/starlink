@@ -82,7 +82,9 @@ void ary1Annpl( int erase, AryPCB **pcb, int *status ) {
    }
 
 /* Release the PCB slot. */
+   ARY__PCB_LOCK_MUTEX;
    *pcb = ary1Rls( (AryObject *) *pcb, status );
+   ARY__PCB_UNLOCK_MUTEX;
 
 /* Annul any error if STATUS was previously bad, otherwise let the new
    error report stand. */

@@ -110,24 +110,29 @@ AryObject *ary1Impid( const void *id, int checklock, int readonly,
 
 /* If required, check that the array is locked appropriately by the
    current thread. */
-   } else if( result->type == ARY__ACBTYPE && checklock &&
-              ((AryACB *)result)->dcb ){
-      lock_status = ary1DCBLock( ((AryACB *)result)->dcb, 1, 0, status );
-      if( *status == SAI__OK ) {
-         if( readonly ){
-            if( lock_status == 0 || lock_status == 2 || lock_status == 4 ) {
-               *status = ARY__THREAD;
-               errRep( " ", "The supplied array is not locked for use by "
-                       "the current thread.", status );
-            }
-         } else {
-            if( lock_status != -1 && lock_status != 1 ) {
-               *status = ARY__THREAD;
-               errRep( " ", "The supplied array is not locked for writing by "
-                       "the current thread.", status );
+   } else if( result->type == ARY__ACBTYPE && checklock ){
+      ARY__DCB_LOCK_MUTEX;
+
+      if ( ((AryACB *)result)->dcb ){
+         lock_status = ary1DCBLock( ((AryACB *)result)->dcb, 1, 0, status );
+         if( *status == SAI__OK ) {
+            if( readonly ){
+               if( lock_status == 0 || lock_status == 2 || lock_status == 4 ) {
+                  *status = ARY__THREAD;
+                  errRep( " ", "The supplied array is not locked for use by "
+                          "the current thread.", status );
+               }
+            } else {
+               if( lock_status != -1 && lock_status != 1 ) {
+                  *status = ARY__THREAD;
+                  errRep( " ", "The supplied array is not locked for writing by "
+                          "the current thread.", status );
+               }
             }
          }
       }
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* Call error tracing routine and exit. */

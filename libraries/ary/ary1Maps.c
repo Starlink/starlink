@@ -51,6 +51,9 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  This function may also be used to map a scaled, delta or
 *     primitive array.
@@ -100,6 +103,8 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
    int idce;                  /* Imaginary data conversion error? */
    size_t el;                 /* Number of array elements to be mapped */
 
+   ARY__DCB_ASSERT_MUTEX;
+
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
@@ -113,6 +118,8 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
 /* If a value has been supplied for "inopt", use it. Otherwise, use the
    init option read fomr "mmod". */
    if( !inopt ) inopt = tinop;
+
+   ARY__MCB_LOCK_MUTEX;
 
 /* Check to see if the array is already mapped for access. Report an error
    if it is. */
@@ -325,6 +332,8 @@ void ary1Maps( AryACB *acb, const char *type, int cmplx, const char *mmod,
          }
       }
    }
+
+   ARY__MCB_UNLOCK_MUTEX;
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Maps", status );

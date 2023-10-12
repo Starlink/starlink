@@ -33,6 +33,9 @@ void ary1Chbpp( AryACB *acb, int *bad, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  If the array is mapped for access when this routine is called,
 *     then checking will be performed on the actual mapped data values
@@ -85,6 +88,8 @@ void ary1Chbpp( AryACB *acb, int *bad, int *status ) {
    size_t el;                 /* Number of data elements in the array */
    void *dpntr;               /* Pointer to mapped non-imaginary data */
    void *ipntr;               /* Pointer to mapped imaginary data */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
@@ -151,7 +156,9 @@ void ary1Chbpp( AryACB *acb, int *bad, int *status ) {
             }
 
 /* Unmap the array. */
+            ARY__ACB_LOCK_MUTEX;
             ary1Umps( acb, status );
+            ARY__ACB_UNLOCK_MUTEX;
          }
       }
    }

@@ -110,8 +110,10 @@ void aryDim( Ary *ary, int ndimx, hdsdim *dim, int *ndim, int *status ) {
       for( ; i < *ndim; i++ ){
          if( acb->ubnd[ i ] != acb->lbnd[ i ] ){
             *status = ARY__XSDIM;
+            ARY__DCB_LOCK_MUTEX;
             dcb = acb->dcb;
             datMsg( "ARRAY", dcb->loc );
+            ARY__DCB_UNLOCK_MUTEX;
             msgSeti( "NDIMX", ndimx );
             errRep( " ", "The array structure ^ARRAY has more than ^NDIMX "
                     "significant dimension(s).", status );

@@ -114,10 +114,14 @@ void aryShift( int nshift, const hdsdim *shift, Ary *ary, int *status ) {
 
 /* Check that SHIFT access to the array is available. */
          } else {
+            ARY__DCB_LOCK_MUTEX;
+
             ary1Chacc( acb, "SHIFT", status );
 
 /* Apply the shifts to the array's ACB entry. */
             ary1Sft( nshift, shift, acb, status );
+
+            ARY__DCB_UNLOCK_MUTEX;
          }
       }
    }

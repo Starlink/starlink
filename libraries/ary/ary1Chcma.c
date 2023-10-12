@@ -40,6 +40,7 @@ void ary1Chcma( AryACB *acb, const char *mode, int *status ) {
 *  Prior requirements:
 *     -  The array mapping region information must first have been set
 *     up in the MCB for the new array to be mapped.
+*     -  The DCB mutex must be locked.
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
@@ -85,6 +86,8 @@ void ary1Chcma( AryACB *acb, const char *mode, int *status ) {
    int iacbt;                 /* Index of ACB entry to test */
    int isect;                 /* Whether array bounds intersect */
    int next;                  /* Next ACB slot number */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

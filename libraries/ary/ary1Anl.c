@@ -31,6 +31,9 @@ AryACB *ary1Anl( AryACB *acb, int *status ) {
 *  Returned function value:
 *     A NULL pointer is always returned.
 
+* Prior Requirements:
+*     -   The DCB and ACB mutexes must be locked.
+
 *  Notes:
 *     -  This routine attempts to execute even if 'status' is set on
 *     entry, although no further error report will be made if it
@@ -66,6 +69,8 @@ AryACB *ary1Anl( AryACB *acb, int *status ) {
 
 *-
 */
+   ARY__DCB_ASSERT_MUTEX;
+   ARY__ACB_ASSERT_MUTEX;
 
 /* Local variables: */
    int tstat;                 /* Temporary status variable */

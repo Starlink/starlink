@@ -105,7 +105,11 @@ void arySect( Ary *ary1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 
 /* Create an ACB entry for the new array. */
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
+      ARY__ACB_LOCK_MUTEX;
       ary1Cut( acb1, ndim, lbnd, ubnd, &acb2, status );
+      ARY__ACB_UNLOCK_MUTEX;
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* Export an identifier for the new array. */

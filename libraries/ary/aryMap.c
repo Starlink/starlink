@@ -95,8 +95,12 @@ void aryMap( Ary *ary, const char *type, const char *mmod, void **pntr,
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, !strcmp( mode, "READ" ), 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Map the array data. */
    ary1Maps( acb, type, 0, mode, inopt, pntr, NULL, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Check we can de-reference "acb" safely. */
    if( *status == SAI__OK ) {

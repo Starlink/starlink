@@ -34,6 +34,9 @@ void ary1Stp( const char *type, int cmplx, AryACB *acb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  This routine has no effect if the array is not a base array.
 
@@ -76,6 +79,8 @@ void ary1Stp( const char *type, int cmplx, AryACB *acb, int *status ) {
    int dce;                   /* Data conversion error occurred? */
    AryDCB *dcb;               /* Pointer to the data object */
 
+   ARY__DCB_ASSERT_MUTEX;
+
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
@@ -110,7 +115,11 @@ void ary1Stp( const char *type, int cmplx, AryACB *acb, int *status ) {
 
 /* If data conversion errors occurred, then set the bad pixel flag for the
    array. */
-            if( dce ) ary1Sbd( 1, acb, status );
+            if( dce ) {
+               ARY__ACB_LOCK_MUTEX;
+               ary1Sbd( 1, acb, status );
+               ARY__ACB_UNLOCK_MUTEX;
+            }
          }
       }
    }

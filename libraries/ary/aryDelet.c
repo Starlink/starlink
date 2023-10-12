@@ -80,6 +80,8 @@ void aryDelet( Ary **ary, int *status ) {
    *status = SAI__OK;
    acb = (AryACB *) ary1Impid( *ary, 1, 0, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check that DELETE access to the array is available. */
    ary1Chacc( acb, "DELETE", status );
 
@@ -87,6 +89,8 @@ void aryDelet( Ary **ary, int *status ) {
    entry. Reset the identifier value. */
    if( *status == SAI__OK ) ary1Del( &acb, status );
    *ary = NULL;
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Annul any error if "status" was previously bad, otherwise let the new
    error report stand. Release the error stack. */

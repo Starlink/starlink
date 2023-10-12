@@ -57,6 +57,9 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -99,6 +102,8 @@ void ary1Dsbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryDCB *dcb,
    int defer;                 /* Creation of data array deferred? */
    int i;                     /* Loop counter for dimensions */
    int there;                 /* Whether origin component present */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

@@ -71,11 +71,15 @@ void aryMsg( const char *token, Ary *ary ) {
 
 /* If this succeeded, then obtain a pointer to the data object. */
    if( acb ){
+      ARY__DCB_LOCK_MUTEX;
+
       dcb = acb->dcb;
 
 /* Use the data object locator to assign the object name to the message
    token. */
       datMsg( token, dcb->loc );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 }
