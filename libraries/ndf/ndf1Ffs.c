@@ -285,7 +285,6 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
                dcb->nawmp[ iax ] = 0;
 
                dcb->kan[ iax ] = 0;
-               dcb->kax[ iax ] = 0;
             }
 
             dcb->kh = 0;

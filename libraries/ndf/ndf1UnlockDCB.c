@@ -93,7 +93,6 @@ void ndf1UnlockDCB( NdfDCB *dcb, int *status ){
          if( dcb->qloc ) ndf1UnlockLoc( dcb->qloc, status );
          for( i = 0; i < NDF__MXDIM; i++ ) {
             if( dcb->ka && dcb->aloc[ i ] ) ndf1UnlockLoc( dcb->aloc[ i ], status );
-            if( dcb->kax[ i ] && dcb->axloc[ i ] ) ndf1UnlockLoc( dcb->axloc[ i ], status );
             for( j = 0; j < NDF__MXACN; j++ ) {
                if( dcb->kac[ i ][ j ] && dcb->acloc[ i ][ j ] ) {
                   ndf1UnlockLoc( dcb->acloc[ i ][ j ], status );

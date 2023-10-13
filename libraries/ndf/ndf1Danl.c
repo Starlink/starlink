@@ -197,15 +197,6 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
 /* Annul the individual axis structure locators. */
                if( (*dcb)->aloc[ iax ] ) datAnnul( (*dcb)->aloc + iax, status );
 
-/* Axis extensions.
-   ===============
-   If axis extension locators have been acquired, then annul them. */
-               if( (*dcb)->kax[ iax ] ) {
-                  if( (*dcb)->axloc[ iax ] ) datAnnul( (*dcb)->axloc + iax,
-                                                             status );
-                  (*dcb)->kax[ iax ] = 0;
-               }
-
 /* Axis character components.
    =========================
    If axis character component locators have been acquired, then annul

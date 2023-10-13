@@ -527,12 +527,6 @@ typedef struct NdfDCB {
 
 /* Axes (individual).
    ================= */
-/* Whether axis extension information is available, and the axis
-   extension locators. NOTE - THIS IS A HANGOVER FROM FORTRAN NDF. IN FACT
-   NO USE IS MADE OF THIS FACILITY IN EITHER THE F77 OR C LIBRARY. */
-   int kax[ NDF__MXDIM ];
-   HDSLoc *axloc[ NDF__MXDIM ];
-
 /* Whether character axis component name information is available,
    names of the character axis components, and character component
    locators. */
