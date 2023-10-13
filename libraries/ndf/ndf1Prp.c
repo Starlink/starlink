@@ -107,7 +107,9 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
    dcb1 = acb1->dcb;
 
 /* Obtain a free slot in the DCB for the output data object. */
+   NDF__DCB_LOCK_MUTEX;
    dcb2 = ndf1Ffs( NDF__DCBTYPE, status );
+   NDF__DCB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Propagate foreign format information from the input NDF to the

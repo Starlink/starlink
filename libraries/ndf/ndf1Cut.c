@@ -124,7 +124,9 @@ void ndf1Cut( NdfACB *acb1, int ndim, const hdsdim lbnd[],
    }
 
 /* Obtain an index to a free slot for the new NDF in the ACB. */
+   NDF__ACB_LOCK_MUTEX;
    *acb2 = ndf1Ffs( NDF__ACBTYPE, status );
+   NDF__ACB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Mark the new entry as a section. */
@@ -190,7 +192,9 @@ void ndf1Cut( NdfACB *acb1, int ndim, const hdsdim lbnd[],
          aryAnnul( &(*acb2)->did, status );
          aryAnnul( &(*acb2)->qid, status );
          aryAnnul( &(*acb2)->vid, status );
+         NDF__ACB_LOCK_MUTEX;
          *acb2 = ndf1Rls( ( NdfObject * ) *acb2, status );
+         NDF__ACB_UNLOCK_MUTEX;
 
 /* Otherwise, increment the data object reference count. */
       } else {

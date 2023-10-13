@@ -114,7 +114,9 @@ void ndf1Anl( NdfACB **acb, int *status ){
       (*acb)->dcb = 0;
 
 /* Release the ACB slot. */
+      NDF__ACB_LOCK_MUTEX;
       *acb = ndf1Rls( ( NdfObject * ) *acb, status );
+      NDF__ACB_UNLOCK_MUTEX;
    }
 
 /* Reset the ACB index. */

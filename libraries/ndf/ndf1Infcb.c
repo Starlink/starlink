@@ -119,7 +119,9 @@ void ndf1Infcb( int *status ){
             ndf1Psfmt( fmt, &f1, &f2, &e1, &e2, status );
 
 /* Get a pointer to a new FCB structure in which to store the information. */
+            NDF__FCB_LOCK_MUTEX;
             fcb = ndf1Ffs( NDF__FCBTYPE, status );
+            NDF__FCB_UNLOCK_MUTEX;
 
 /* Quit looping if an error occurs. */
             if( *status != SAI__OK ) break;
@@ -209,7 +211,9 @@ void ndf1Infcb( int *status ){
             fmt = ndf1Strip( fmt, fmts, f, l, NULL, NULL, status );
 
 /* Get a pointer to a new FCB structur in which to store the information. */
+            NDF__FCB_LOCK_MUTEX;
             fcb = ndf1Ffs( NDF__FCBTYPE, status );
+            NDF__FCB_UNLOCK_MUTEX;
 
 /* Indicate this is an output format. */
             if( fcb ) {

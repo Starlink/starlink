@@ -83,7 +83,9 @@ void ndf1Dcrep( const char *ftype, int ndim, const hdsdim ubnd[],
    if( *status != SAI__OK ) return;
 
 /* Obtain a free slot in the DCB. */
+   NDF__DCB_LOCK_MUTEX;
    dcb = ndf1Ffs( NDF__DCBTYPE, status );
+   NDF__DCB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Take the default for any wild-carded foreign format information in
@@ -126,7 +128,9 @@ void ndf1Dcrep( const char *ftype, int ndim, const hdsdim ubnd[],
          datAnnul( &dcb->loc, status );
 
 /* Release the allocated DCB slot. */
+         NDF__DCB_LOCK_MUTEX;
          dcb = ndf1Rls( ( NdfObject * ) dcb, status );
+         NDF__DCB_UNLOCK_MUTEX;
       }
    }
 

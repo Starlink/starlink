@@ -322,7 +322,9 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
       ndf1Clfor( dispos, *dcb, status );
 
 /* Release the DCB slot associated with the data object. */
+      NDF__DCB_LOCK_MUTEX;
       *dcb = ndf1Rls( ( NdfObject * ) *dcb, status );
+      NDF__DCB_UNLOCK_MUTEX;
    }
 
 /* Call the error tracing function if appropriate. */

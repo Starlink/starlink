@@ -194,6 +194,8 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
       }
    }
 
+   NDF__DCB_LOCK_MUTEX;
+
 /* Obtain an index to a free slot in the DCB. */
    *dcb = ndf1Ffs( NDF__DCBTYPE, status );
    if( *status == SAI__OK ) {
@@ -220,6 +222,8 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
          *dcb = ndf1Rls( ( NdfObject * ) *dcb, status );
       }
    }
+
+   NDF__DCB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Dimp", status );

@@ -6,6 +6,19 @@
 #include "ndf_err.h"
 #include "ndf_ast.h"
 
+#if THREAD_DEBUG
+#include <stdlib.h>
+#include <stdio.h>
+void ndf1AssertLocked(pthread_mutex_t* mutex, char* name) {
+   if (! pthread_mutex_trylock(mutex)) {
+      pthread_mutex_unlock(mutex);
+      fprintf(stderr, "ndf1AssertLocked: %s mutex not locked\n", name);
+      fflush(stderr);
+      abort();
+   }
+}
+#endif
+
 void *ndf1Ffs( const NdfBlockType type, int *status ) {
 /*
 *+
@@ -43,6 +56,9 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 *     A pointer to the object held in the allocated slot of the array.
 *     The returned pointer should be cast to the required type (NdfDCB,
 *     NdfACB, etc).
+
+*  Prior Requirements:
+*     -  The relevant block mutex must be locked.
 
 *  Notes:
 *     -  The returned pointer should be released using ndf1Rls when it is
@@ -94,7 +110,6 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
    int i;                     /* Loop counter for slots */
    int iax;                   /* Axis index */
    int oldsize;               /* Original size of array */
-   pthread_mutex_t *mutex;    /* Pointer to mutex for selected array */
    size_t size;               /* Size of each structure in array */
 
 /* Set an initial value for the returned pointer. */
@@ -105,9 +120,7 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 
 /* Store info about the required type of block. */
    if( type == NDF__DCBTYPE ){
-
-/* A mutex to serialise access to the array of structure pointers */
-      mutex = &Ndf_DCB_mutex;
+      NDF__DCB_ASSERT_MUTEX;
 
 /* A pointer to the first structure in the array of allocated structures
    of the required type. */
@@ -123,21 +136,21 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
       name = "DCB";
 
    } else if( type == NDF__ACBTYPE ){
-      mutex = &Ndf_ACB_mutex;
+      NDF__ACB_ASSERT_MUTEX;
       parray = (NdfObject ***) &Ndf_ACB;
       pn = &Ndf_NACB;
       size = sizeof(NdfACB);
       name = "ACB";
 
    } else if( type == NDF__FCBTYPE ){
-      mutex = &Ndf_FCB_mutex;
+      NDF__FCB_ASSERT_MUTEX;
       parray = (NdfObject ***) &Ndf_FCB;
       pn = &Ndf_NFCB;
       size = sizeof(NdfFCB);
       name = "FCB";
 
    } else if( type == NDF__PCBTYPE ){
-      mutex = &Ndf_PCB_mutex;
+      NDF__PCB_ASSERT_MUTEX;
       parray = (NdfObject ***) &Ndf_PCB;
       pn = &Ndf_NPCB;
       size = sizeof(NdfPCB);
@@ -154,9 +167,6 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 
 /* Only proceed if the block type was recognised. */
    if( *status == SAI__OK ){
-
-/* Wait until the current thread has exclusive access to the array. */
-      pthread_mutex_lock( mutex );
 
 /* Loop through the array looking for an element that is not currently in
    use. If found, use it as the returned result and indicate it is now in
@@ -338,10 +348,6 @@ void *ndf1Ffs( const NdfBlockType type, int *status ) {
 
          }
       }
-
-/* Release the lock on the array, this allowing any waiting threads
-   to proceed. */
-      pthread_mutex_unlock( mutex );
    }
 
 /* Call error tracing routine and exit. */

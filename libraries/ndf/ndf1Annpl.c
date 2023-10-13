@@ -97,7 +97,9 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
       }
 
 /* Release the PCB slot. */
+      NDF__PCB_LOCK_MUTEX;
       *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
+      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the PCB index. */

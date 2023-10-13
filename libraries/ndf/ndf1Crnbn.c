@@ -85,7 +85,9 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
    if( *status != SAI__OK ) ndf1Danl( 1, &dcb, status );
 
 /* Obtain an index to a free slot in the ACB. */
+   NDF__ACB_LOCK_MUTEX;
    *acb = ndf1Ffs( NDF__ACBTYPE, status );
+   NDF__ACB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Initialise the ACB entry to point to the DCB entry. */
@@ -142,7 +144,9 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
          aryAnnul( &(*acb)->did, status );
          aryAnnul( &(*acb)->qid, status );
          aryAnnul( &(*acb)->vid, status );
+         NDF__ACB_LOCK_MUTEX;
          *acb = ndf1Rls( ( NdfObject * ) *acb, status );
+         NDF__ACB_UNLOCK_MUTEX;
 
 /* Otherwise, increment the DCB reference count. */
       } else {

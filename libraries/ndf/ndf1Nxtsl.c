@@ -106,18 +106,22 @@ void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status ) {
 
 /* Check the supplied type, and save info about the type. */
    if( type == NDF__DCBTYPE ){
+      NDF__DCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_DCB;
       nel = Ndf_NDCB;
 
    } else if( type == NDF__ACBTYPE ){
+      NDF__ACB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_ACB;
       nel = Ndf_NACB;
 
    } else if( type == NDF__PCBTYPE ){
+      NDF__PCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_PCB;
       nel = Ndf_NPCB;
 
    } else if( type == NDF__FCBTYPE ){
+      NDF__FCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_FCB;
       nel = Ndf_NFCB;
 
