@@ -10,7 +10,7 @@ void ndf1Rmblk( char *text ){
 /*
 *+
 *  Name:
-*     ndf1Dh
+*     ndf1Rmblk
 
 *  Purpose:
 *     Remove all spaces from a string.
