@@ -1049,11 +1049,13 @@ void ndf1AssertLocked(pthread_mutex_t* mutex, char* name);
 #define NDF__DCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_DCB_mutex, "DCB");
 #define NDF__PCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_PCB_mutex, "PCB");
 #define NDF__FCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_FCB_mutex, "FCB");
+#define NDF__DCB_ASSERT_ASTMUTEX ndf1AssertLocked(&Ndf_DCB_astmutex, "DCB AST");
 #else
 #define NDF__ACB_ASSERT_MUTEX
 #define NDF__DCB_ASSERT_MUTEX
 #define NDF__PCB_ASSERT_MUTEX
 #define NDF__FCB_ASSERT_MUTEX
+#define NDF__DCB_ASSERT_ASTMUTEX
 #endif
 
 

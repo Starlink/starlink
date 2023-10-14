@@ -100,6 +100,8 @@ const char *ndf1Rdast( void ){
    static hdsdim dim;    /* Dimension size of HDS object */
    static size_t length; /* Length of HDS object in characters */
 
+   NDF__DCB_ASSERT_ASTMUTEX;
+
 /* Start a new error reporting context. */
    status = SAI__OK;
    errMark();
