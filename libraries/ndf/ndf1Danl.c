@@ -50,6 +50,9 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     This function attempts to execute even if "status" is set on entry,
 *     although no further error report will be made if it subsequently
@@ -95,6 +98,8 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
    int ndim;             /* Number of data object dimensions */
    double *ipw1;         /* Work space */
    int *ipw2;            /* Work space */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Begin a new error reporting environment. */
    errBegin( status );
@@ -313,9 +318,7 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
       ndf1Clfor( dispos, *dcb, status );
 
 /* Release the DCB slot associated with the data object. */
-      NDF__DCB_LOCK_MUTEX;
       *dcb = ndf1Rls( ( NdfObject * ) *dcb, status );
-      NDF__DCB_UNLOCK_MUTEX;
    }
 
 /* Call the error tracing function if appropriate. */

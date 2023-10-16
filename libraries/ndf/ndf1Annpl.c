@@ -29,6 +29,9 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The PCB mutex must be locked.
+
 *  Notes:
 *     -  Regardless of the value of the "erase" parameter, the associated
 *     placeholder object will not be deleted unless its entry in the PCB
@@ -73,6 +76,8 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
 *-
 */
 
+   NDF__PCB_ASSERT_MUTEX;
+
 /* Begin a new error reporting environment. */
    errBegin( status );
 
@@ -97,9 +102,7 @@ void ndf1Annpl( int erase, NdfPCB **pcb, int *status ){
       }
 
 /* Release the PCB slot. */
-      NDF__PCB_LOCK_MUTEX;
       *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
-      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the PCB index. */

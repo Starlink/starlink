@@ -108,7 +108,9 @@ void ndfCrepl_( const char *param, int *place, int *status ){
    while( *status == SAI__OK ){
 
 /* Create a placeholder entry for the object in the PCB. */
+      NDF__DCB_LOCK_MUTEX;
       ndf1Plfor( NULL, name, &pcb, status );
+      NDF__DCB_UNLOCK_MUTEX;
 
 /* If this failed, then the user must be re-prompted. Report contextual
    information and flush any error messages. */
@@ -136,7 +138,11 @@ void ndfCrepl_( const char *param, int *place, int *status ){
       *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-      if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+      if( *status != SAI__OK ) {
+         NDF__PCB_LOCK_MUTEX;
+         ndf1Annpl( 1, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
+      }
    }
 
 /* If an error occurred, then classify it... */

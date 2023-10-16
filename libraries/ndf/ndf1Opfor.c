@@ -535,7 +535,9 @@ void ndf1Opfor( HDSLoc *loc, const char *name, const char *mode,
 /* If the access modes are compatible, then simply create a new base
    NDF entry in the ACB to refer to the existing DCB entry. */
                } else {
+                  NDF__DCB_LOCK_MUTEX;
                   ndf1Crnbn( dcb, acb, status );
+                  NDF__DCB_UNLOCK_MUTEX;
                }
 
 /* If conversion of a foreign format file is definitely required... */

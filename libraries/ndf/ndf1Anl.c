@@ -110,8 +110,10 @@ void ndf1Anl( NdfACB **acb, int *status ){
 
 /* Annul the associated data object and set the data object index in
    the ACB to zero. */
+      NDF__DCB_LOCK_MUTEX;
       ndf1Danl( 1, &(*acb)->dcb, status );
       (*acb)->dcb = 0;
+      NDF__DCB_UNLOCK_MUTEX;
 
 /* Release the ACB slot. */
       NDF__ACB_LOCK_MUTEX;

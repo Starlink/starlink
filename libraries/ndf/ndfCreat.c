@@ -128,12 +128,16 @@ void ndfCreat_( const char *param, const char *ftype, int ndim,
 
 /* Create a placeholder entry for the object in the PCB and use this to
    create the new NDF. */
+         NDF__DCB_LOCK_MUTEX;
          ndf1Plfor( NULL, name, &pcb, status );
          ndf1Dcre( ftype, ndim, lbnd, ubnd, pcb, &acb, status );
+         NDF__DCB_UNLOCK_MUTEX;
 
 /* Annul the PCB entry when done, erasing the object if there has been
    an error. */
+         NDF__PCB_LOCK_MUTEX;
          ndf1Annpl( *status != SAI__OK, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
 
 /* If this failed, then the user must be re-prompted. Report contextual
    information and flush any error messages. */

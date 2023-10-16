@@ -45,6 +45,9 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *     Copyright (C) 2018 East Asian Observatory
 *     All rights reserved.
@@ -80,6 +83,8 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
    AryPlace *place;      /* ARY_ placeholder for data array */
    NdfDCB *dcb;          /* Pointer to data object entry in the DCB */
 
+   NDF__DCB_ASSERT_MUTEX;
+
 /* Set an initial value for the "dcb" parameter. */
    dcb = NULL;
 
@@ -87,9 +92,7 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
    if( *status != SAI__OK ) return;
 
 /* Obtain a free slot in the DCB. */
-   NDF__DCB_LOCK_MUTEX;
    dcb = ndf1Ffs( NDF__DCBTYPE, status );
-   NDF__DCB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Take the default for any wild-carded foreign format information in
@@ -136,9 +139,7 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
          datAnnul( &dcb->loc, status );
 
 /* Release the allocated DCB slot. */
-         NDF__DCB_LOCK_MUTEX;
          dcb = ndf1Rls( ( NdfObject * ) dcb, status );
-         NDF__DCB_UNLOCK_MUTEX;
       }
    }
 

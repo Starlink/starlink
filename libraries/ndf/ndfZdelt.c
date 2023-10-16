@@ -383,7 +383,9 @@ void ndfZdelt_( int indf1, const char *comp, float minrat, int zaxis,
    error has occurred. */
    if( pcb ) {
       erase = ( *status != SAI__OK );
+      NDF__PCB_LOCK_MUTEX;
       ndf1Annpl( erase, &pcb, status );
+      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the "place" parameter. */

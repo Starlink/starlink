@@ -76,11 +76,11 @@ void ndf1Cln( NdfACB *acb1, NdfACB **acb2, int *status ){
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   NDF__ACB_LOCK_MUTEX;
+
 /* Find a free slot in the ACB. Reset the "acb2" parameter to NULL if no
    slot could be found. */
-   NDF__ACB_LOCK_MUTEX;
    *acb2 = ndf1Ffs( NDF__ACBTYPE, status );
-   NDF__ACB_UNLOCK_MUTEX;
    if( *status != SAI__OK ) {
       *acb2 = NULL;
 
@@ -145,9 +145,7 @@ void ndf1Cln( NdfACB *acb1, NdfACB **acb2, int *status ){
          aryAnnul( &(*acb2)->did, status );
          aryAnnul( &(*acb2)->qid, status );
          aryAnnul( &(*acb2)->vid, status );
-         NDF__ACB_LOCK_MUTEX;
          *acb2 = ndf1Rls( ( NdfObject * ) *acb2, status );
-         NDF__ACB_UNLOCK_MUTEX;
 
 /* Otherwise, increment the data object reference count in the DCB. */
       } else {
@@ -155,6 +153,8 @@ void ndf1Cln( NdfACB *acb1, NdfACB **acb2, int *status ){
          dcb->refct++;
       }
    }
+
+   NDF__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Cln", status );

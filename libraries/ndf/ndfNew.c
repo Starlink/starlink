@@ -120,7 +120,9 @@ void ndfNew_( const char *ftype, int ndim, const hdsdim lbnd[],
 
 /* Create a new simple NDF in place of the placeholder object,
    obtaining an ACB entry which refers to it. */
+         NDF__DCB_LOCK_MUTEX;
          ndf1Dcre( ftype, ndim, lbnd, ubnd, pcb, &acb, status );
+         NDF__DCB_UNLOCK_MUTEX;
 
 /* Export an identifier for the NDF. */
          *indf = ndf1Expid( ( NdfObject * ) acb, status );
@@ -135,7 +137,9 @@ void ndfNew_( const char *ftype, int ndim, const hdsdim lbnd[],
    occurred. */
    if( pcb ) {
       erase = ( ( *status != SAI__OK ) || ( tstat != SAI__OK ) );
+      NDF__PCB_LOCK_MUTEX;
       ndf1Annpl( erase, &pcb, status );
+      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the "place" parameter. */

@@ -109,7 +109,11 @@ void ndfTemp_( int *place, int *status ){
       *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-      if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+      if( *status != SAI__OK ) {
+         NDF__PCB_LOCK_MUTEX;
+         ndf1Annpl( 1, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
+      }
    }
 
 /* If an error occurred, then report context information and call the

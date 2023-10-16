@@ -170,12 +170,18 @@ void ndfOpen_( const HDSLoc *loc, const char *name, const char *mode,
    a PCB entry for the new NDF and export a placeholder for it. */
       } else if( !strcmp( vstat, "NEW" ) ) {
          if( strcmp( vmode, "READ" ) ) {
+            NDF__DCB_LOCK_MUTEX;
             ndf1Plfor( (HDSLoc *) loc, name, &pcb, status );
+            NDF__DCB_UNLOCK_MUTEX;
             if( *status == SAI__OK ) {
                *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-               if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+               if( *status != SAI__OK ) {
+                  NDF__PCB_LOCK_MUTEX;
+                  ndf1Annpl( 1, &pcb, status );
+                  NDF__PCB_UNLOCK_MUTEX;
+               }
             }
 
 /* Report an error if READ access was requested. */
@@ -206,12 +212,18 @@ void ndfOpen_( const HDSLoc *loc, const char *name, const char *mode,
 /* If READ access is not required, then obtain a PCB entry for a new
    NDF and export a placeholder for it. */
             if( strcmp( vmode, "READ" ) ) {
+               NDF__DCB_LOCK_MUTEX;
                ndf1Plfor( (HDSLoc *) loc, name, &pcb, status );
+               NDF__DCB_UNLOCK_MUTEX;
                if( *status == SAI__OK ) {
                   *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-                  if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+                  if( *status != SAI__OK ) {
+                     NDF__PCB_LOCK_MUTEX;
+                     ndf1Annpl( 1, &pcb, status );
+                     NDF__PCB_UNLOCK_MUTEX;
+                  }
                }
 
 /* Report an error if READ access was requested and the NDF didn't

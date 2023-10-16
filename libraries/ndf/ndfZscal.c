@@ -272,7 +272,9 @@ void ndfZscal_( int indf1, const char *type, double scale[], double zero[],
    occurred. */
    if( pcb ) {
       erase = ( *status != SAI__OK );
+      NDF__PCB_LOCK_MUTEX;
       ndf1Annpl( erase, &pcb, status );
+      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the "place" parameter. */

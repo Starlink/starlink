@@ -86,6 +86,8 @@ void ndf1Imp( HDSLoc *loc, NdfACB **acb, int *status ){
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   NDF__DCB_LOCK_MUTEX;
+
 /* Import the data object into the DCB, occupying a new DCB slot, and
    create a new ACB base NDF entry to describe the new data object. */
    ndf1Dimp( loc, &dcb, status );
@@ -97,7 +99,6 @@ void ndf1Imp( HDSLoc *loc, NdfACB **acb, int *status ){
       dupe = 0;
       next = 0;
       islot = -1;
-      NDF__DCB_LOCK_MUTEX;
       dcbt = ndf1Nxtsl( NDF__DCBTYPE, islot, &next, status );
       while( ( *status == SAI__OK ) && ( next != -1 ) ){
          islot = next;
@@ -111,7 +112,6 @@ void ndf1Imp( HDSLoc *loc, NdfACB **acb, int *status ){
          }
          dcbt = ndf1Nxtsl( NDF__DCBTYPE, islot, &next, status );
       }
-      NDF__DCB_UNLOCK_MUTEX;
 
 /* If duplicate DCB entries exist, then they must be combined into a
    single entry, but account must be taken of possible differences in
@@ -216,6 +216,8 @@ void ndf1Imp( HDSLoc *loc, NdfACB **acb, int *status ){
          }
       }
    }
+
+   NDF__DCB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Imp", status );

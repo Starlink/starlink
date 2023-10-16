@@ -33,6 +33,9 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  The function makes a "cloned" copy of the HDS locator supplied;
 *     the latter may later be annulled without affecting the operation of
@@ -83,6 +86,8 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
    hdsdim dim[ DAT__MXDIM ];       /* Object dimensions */
    int ndim;             /* Number of object dimensions */
    int nlev;             /* Levels in HDS path name */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Set an initial value of zero for the "dcb" parameter. */
    *dcb = 0;
@@ -194,8 +199,6 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
       }
    }
 
-   NDF__DCB_LOCK_MUTEX;
-
 /* Obtain an index to a free slot in the DCB. */
    *dcb = ndf1Ffs( NDF__DCBTYPE, status );
    if( *status == SAI__OK ) {
@@ -222,8 +225,6 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
          *dcb = ndf1Rls( ( NdfObject * ) *dcb, status );
       }
    }
-
-   NDF__DCB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Dimp", status );
