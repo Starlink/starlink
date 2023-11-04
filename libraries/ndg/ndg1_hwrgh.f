@@ -188,7 +188,7 @@
                   NREM = NDF__SZHMX - IAT
 
 *  If this is too small, start a new line.
-                  IF( NREM .LE. NLEFT ) THEN
+                  IF( NREM .LE. NLEFT + 1 ) THEN
                      ILINE = ILINE + 1
                      IAT = 0
                      NREM = NDF__SZHMX
@@ -206,6 +206,7 @@
 
 *  Note the number of characters to write.
                      NC = MIN( NLEFT, NREM )
+
 *  Write them.
                      CALL CHR_APPND( ELEM( JAT:JAT + NC - 1 ),
      :                               LINES( ILINE ), IAT )
