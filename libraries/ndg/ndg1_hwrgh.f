@@ -103,7 +103,7 @@
 
 *  Local Constants:
       INTEGER MXLINE
-      PARAMETER ( MXLINE = 20 )
+      PARAMETER ( MXLINE = 40 )
 
 *  Local Variables:
       CHARACTER ELEM*(GRP__SZNAM)
