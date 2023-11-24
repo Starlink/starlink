@@ -90,11 +90,15 @@ void aryStype( const char *ftype, Ary *ary, int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 0, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check that TYPE access to the array is available. */
    ary1Chacc( acb, "TYPE", status );
 
 /* Set the new array type. */
    ary1Stp( type, cmplx, acb, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

@@ -63,6 +63,7 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
 *     called.
 *     -  Type, bounds and dimensionality information for the data object
 *     being mapped must already be available in the DCB.
+*     -  The DCB mutex must be locked.
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
@@ -110,6 +111,8 @@ void ary1Mpsr( AryACB *acb, HDSLoc *loc, const char *type,
    int ndimd;                 /* Number of data object dimensions */
    size_t el;                 /* Number of data elements to be mapped */
    void *tpntr;               /* Pointer to temporary uncompressed values */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Set an initial value for the MLOC argument. */
    *mloc = NULL;

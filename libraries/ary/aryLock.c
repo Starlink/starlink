@@ -118,6 +118,7 @@ void aryLock( Ary *ary, int readonly, int *status ) {
 
 /* Check we can de-reference "acb" safely. */
    if( *status == SAI__OK ) {
+      ARY__DCB_LOCK_MUTEX;
 
 /* Attempt to lock the DCB in the specified array. An error will be reported
    if the DCB could not be locked because it was already locked by another
@@ -128,6 +129,8 @@ void aryLock( Ary *ary, int readonly, int *status ) {
    if the MCB could not be locked because it was already locked by another
    thread. */
       ary1MCBLock( acb->mcb, 2, readonly, status );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the

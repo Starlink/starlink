@@ -30,6 +30,9 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -65,6 +68,8 @@ void ary1Dobj( AryDCB *dcb, int *status ) {
    char name[ DAT__SZNAM + 1 ]; /* Name of data object */
    hdsdim dim[ARY__MXDIM];      /* Dimensions of array */
    int i;                       /* Loop counter for dimensions */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

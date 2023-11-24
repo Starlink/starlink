@@ -46,6 +46,9 @@ void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  The bounds of an array section cannot be changed while mapped
 *     access to it is in effect. In the case of a base array, no access
@@ -111,6 +114,8 @@ void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb,
    int iacbt;                 /* Index of test ACB */
    int next;                  /* Next ACB entry to test */
    int same;                  /* New bounds same as the old ones? */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
@@ -241,7 +246,11 @@ void ary1Sbnd( int ndim, const hdsdim *lbnd, const hdsdim *ubnd, AryACB *acb,
                }
 
 /* If bad pixels may have been introduced, then set the bad pixel flag. */
-               if( bad ) ary1Sbd( 1, acb, status );
+               if( bad ) {
+                  ARY__ACB_LOCK_MUTEX;
+                  ary1Sbd( 1, acb, status );
+                  ARY__ACB_UNLOCK_MUTEX;
+               }
             }
          }
       }

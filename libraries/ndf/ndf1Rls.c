@@ -32,6 +32,9 @@ void *ndf1Rls( NdfObject *object, int *status ) {
 *  Returned function value:
 *     A NULL pointer is always returned.
 
+*  Prior Requirements:
+*     -  The relevant block mutex must be locked.
+
 *  Notes:
 *     -  This routine attempts to execute even if STATUS is set on
 *     entry, although no error report will be made if it subsequently
@@ -84,13 +87,17 @@ void *ndf1Rls( NdfObject *object, int *status ) {
    helps to guard against random addresses being supplied. If it is a
    DCB, unlock it. */
    if( object->type == NDF__DCBTYPE ) {
+      NDF__DCB_ASSERT_MUTEX;
       type = "DCB";
       ndf1UnlockDCB( (NdfDCB *) object, status );
    } else if( object->type == NDF__ACBTYPE ) {
+      NDF__ACB_ASSERT_MUTEX;
       type = "ACB";
    } else if( object->type == NDF__FCBTYPE ) {
+      NDF__FCB_ASSERT_MUTEX;
       type = "FCB";
    } else if( object->type == NDF__PCBTYPE ) {
+      NDF__PCB_ASSERT_MUTEX;
       type = "PCB";
    } else {
       *status = NDF__FATIN;

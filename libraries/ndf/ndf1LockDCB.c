@@ -101,8 +101,6 @@ void ndf1LockDCB( NdfDCB *dcb, int *status ){
       for( i = 0; i < NDF__MXDIM; i++ ) {
          if( dcb->ka && dcb->aloc[ i ] ) ndf1LockLoc( dcb->aloc[ i ],
                                                       status );
-         if( dcb->kax[ i ] && dcb->axloc[ i ] ) ndf1LockLoc( dcb->axloc[ i  ],
-                                                             status );
          for( j = 0; j < NDF__MXACN; j++ ) {
             if( dcb->kac[ i ][ j ] && dcb->acloc[ i ][ j ] ) {
                ndf1LockLoc( dcb->acloc[ i ][ j ], status );

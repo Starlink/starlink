@@ -10,6 +10,11 @@ extern AryACB **Ary_ACB;  /* Pointer to array of all ACB pointers */
 extern AryMCB **Ary_MCB;  /* Pointer to array of all MCB pointers */
 extern AryPCB **Ary_PCB;  /* Pointer to array of all PCB pointers */
 
+extern int Ary_NDCB;    /* Number of DCBs in above array */
+extern int Ary_NACB;    /* Number of ACBs in above array */
+extern int Ary_NMCB;    /* Number of MCBs in above array */
+extern int Ary_NPCB;    /* Number of PCBs in above array */
+
 int ary1IsValid( AryObject *object, int *status ) {
 /*
 *+
@@ -72,7 +77,8 @@ int ary1IsValid( AryObject *object, int *status ) {
 
 /* Local variables: */
    int result;
-   AryObject **array;
+   int* pn;
+   AryObject ***array;
    pthread_mutex_t *mutex;
 
 /* Initialise */
@@ -85,16 +91,20 @@ int ary1IsValid( AryObject *object, int *status ) {
    helps to guard against random addresses being supplied since such are
    unlikely to have a valid type value. */
    if( object->type == ARY__DCBTYPE ) {
-      array = (AryObject **) Ary_DCB;
+      pn = &Ary_NDCB;
+      array = (AryObject ***) &Ary_DCB;
       mutex = &Ary_DCB_mutex;
    } else if( object->type == ARY__ACBTYPE ) {
-      array = (AryObject **) Ary_ACB;
+      pn = &Ary_NACB;
+      array = (AryObject ***) &Ary_ACB;
       mutex = &Ary_ACB_mutex;
    } else if( object->type == ARY__MCBTYPE ) {
-      array = (AryObject **) Ary_MCB;
+      pn = &Ary_NMCB;
+      array = (AryObject ***) &Ary_MCB;
       mutex = &Ary_MCB_mutex;
    } else if( object->type == ARY__PCBTYPE ) {
-      array = (AryObject **) Ary_PCB;
+      pn = &Ary_NPCB;
+      array = (AryObject ***) &Ary_PCB;
       mutex = &Ary_PCB_mutex;
    } else {
       array = NULL;
@@ -102,9 +112,11 @@ int ary1IsValid( AryObject *object, int *status ) {
 
 /* If the type was legal, check that the slot number stored in the object
    is consistent with the object pointer stored in the slot. */
-   if( array ) {
+   if( *array ) {
       pthread_mutex_lock( mutex );
-      result = ( array[ object->slot ] == object );
+      if (object->slot >= 0 && object->slot < *pn) {
+         result = ( (*array)[ object->slot ] == object );
+      }
       pthread_mutex_unlock( mutex );
    }
 

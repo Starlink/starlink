@@ -32,6 +32,9 @@ void *ary1Rls( AryObject *object, int *status ) {
 *  Returned function value:
 *     A NULL pointer is always returned.
 
+* Prior Requirements:
+*     The relevant "block" mutex must be locked.
+
 *  Notes:
 *     -  This routine attempts to execute even if STATUS is set on
 *     entry, although no error report will be made if it subsequently
@@ -83,13 +86,17 @@ void *ary1Rls( AryObject *object, int *status ) {
 /* Get the type of the supplied object - DCB, ACB, MCB or PCB. This also
    helps to guard against random addresses being supplied. */
    if( object->type == ARY__DCBTYPE ) {
+      ARY__DCB_ASSERT_MUTEX;
       type = "DCB";
    } else if( object->type == ARY__ACBTYPE ) {
+      ARY__ACB_ASSERT_MUTEX;
       type = "ACB";
    } else if( object->type == ARY__MCBTYPE ) {
-      type = "ACB";
+      ARY__MCB_ASSERT_MUTEX;
+      type = "MCB";
    } else if( object->type == ARY__PCBTYPE ) {
-      type = "ACB";
+      ARY__PCB_ASSERT_MUTEX;
+      type = "PCB";
    } else {
       *status = ARY__FATIN;
       msgSeti( "T", object->type );

@@ -41,7 +41,7 @@
 *        the minimum pixel size.
 *     map_pa = double (Given)
 *        Map position angle in output coordinate system (radians).
-*        Used as dynamic default of CROTA parameter.
+*        Used as dynamic default of minus the CROTA parameter.
 *     par = double[ 7 ] (Given and Returned)
 *        An array holding the parameters describing the spatial
 *        projection between celestial (longitude,latitude) in the
@@ -254,7 +254,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
            par[ 4 ] = (fbpixsize/3600.0)*AST__DD2R;
            par[ 5 ] = (fbpixsize/3600.0)*AST__DD2R;
          }
-         par[ 6 ] = map_pa;
+         par[ 6 ] = - map_pa;
       }
 
 /* Ensure the default pixel sizes have the correct signs. */
@@ -447,14 +447,14 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
          }
 
 /* Convert the autogrid CROTA value from rads to degs and set as the
-   dynamic default for parameter CROTA (the position angle of the output
+   dynamic default for parameter CROTA (the angle of north from the output
    Y axis, in degrees). The get the CROTA value and convert to rads. */
          if( par[ 6 ] != AST__BAD ) {
             autorot = par[ 6 ]*AST__DR2D;
             parDef0d( "CROTA", autorot, status );
 
          } else {
-            parDef0d( "CROTA", map_pa*AST__DR2D, status );
+            parDef0d( "CROTA", - map_pa*AST__DR2D, status );
             autorot = AST__BAD;
          }
 

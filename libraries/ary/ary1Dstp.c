@@ -45,6 +45,9 @@ void ary1Dstp( const char *type, int cmplx, AryDCB *dcb, int *dce,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -86,6 +89,8 @@ void ary1Dstp( const char *type, int cmplx, AryDCB *dcb, int *dce,
    int idce;                  /* Imaginary data conversion error? */
    size_t el;                 /* Number of data elements in component */
    void *pntr;                /* Pointer to mapped component data */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

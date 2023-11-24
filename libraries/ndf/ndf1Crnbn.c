@@ -32,6 +32,9 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  If "status" is set on entry, then the function will return a value
 *     of zero for the "acb" parameter, although no further processing will
@@ -73,6 +76,8 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
 /* Local Variables: */
    int valid;            /* Whether array identifier is valid */
 
+   NDF__DCB_ASSERT_MUTEX;
+
 /* Set an initial value of zero for the "acb" parameter. */
    *acb = 0;
 
@@ -83,6 +88,8 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
    available in the DCB. If not, annul the DCB entry. */
    ndf1Dd( dcb, status );
    if( *status != SAI__OK ) ndf1Danl( 1, &dcb, status );
+
+   NDF__ACB_LOCK_MUTEX;
 
 /* Obtain an index to a free slot in the ACB. */
    *acb = ndf1Ffs( NDF__ACBTYPE, status );
@@ -149,6 +156,8 @@ void ndf1Crnbn( NdfDCB *dcb, NdfACB **acb, int *status ){
          dcb->refct++;
       }
    }
+
+   NDF__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Crnbn", status );

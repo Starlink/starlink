@@ -378,7 +378,11 @@ void ndf1Rdwcs( NdfACB *acb, AstFrameSet **iwcs, int *status ){
    entry to describe the base NDF, through which we will access its
    axis data. This is necessary to prevent any truncation or
    extrapolation of the axis data occurring. */
-         if( acb->cut ) ndf1Crnbn( dcb, &acbt, status );
+         if( acb->cut ) {
+            NDF__DCB_LOCK_MUTEX;
+            ndf1Crnbn( dcb, &acbt, status );
+            NDF__DCB_UNLOCK_MUTEX;
+         }
 
 /* Loop to access the axis centre array for each "acb" axis. */
          for( idim = 0; idim < ndima; idim++ ){

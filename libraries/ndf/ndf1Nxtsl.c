@@ -4,18 +4,7 @@
 #include "mers.h"
 #include "ndf_err.h"
 
-/* These global variables are declared in file ndf1Ffs.c */
-extern NdfDCB **Ndf_DCB;  /* Pointer to array of all DCB pointers */
-extern NdfACB **Ndf_ACB;  /* Pointer to array of all ACB pointers */
-extern NdfFCB **Ndf_FCB;  /* Pointer to array of all FCB pointers */
-extern NdfPCB **Ndf_PCB;  /* Pointer to array of all PCB pointers */
-
-extern int Ndf_NDCB;    /* Number of DCBs in above array */
-extern int Ndf_NACB;    /* Number of ACBs in above array */
-extern int Ndf_NFCB;    /* Number of FCBs in above array */
-extern int Ndf_NPCB;    /* Number of PCBs in above array */
-
-void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
+void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status ) {
 /*
 *+
 *  Name:
@@ -26,7 +15,7 @@ void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
 *     block.
 
 *  Synopsis:
-*     void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status )
+*     void *ndf1Nxtsl( const NdfBlockType type, int slot, int *next, int *status )
 
 *  Description:
 *     This function finds the next used slot in an array following
@@ -59,8 +48,8 @@ void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
 *     Since this function accesses global variables, each calling
 *     function must ensure that only one thread (the current thread)
 *     is searching a list using this function at any one time. To do
-*     this, the private NDF macros NDF1__xCB_LOCK_SLOT_MUTEX and
-*     NDF1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appropriate
+*     this, the private NDF macros NDF__xCB_LOCK_MUTEX and
+*     NDF__xCB_UNLOCK_MUTEX should be used to lock the appropriate
 *     mutex prior to calling this function, and to unlock it afterwards
 *     ("x" should be replaced by "A", "D", "F" or "P").
 
@@ -117,18 +106,22 @@ void *ndf1Nxtsl( NdfBlockType type, int slot, int *next, int *status ) {
 
 /* Check the supplied type, and save info about the type. */
    if( type == NDF__DCBTYPE ){
+      NDF__DCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_DCB;
       nel = Ndf_NDCB;
 
    } else if( type == NDF__ACBTYPE ){
+      NDF__ACB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_ACB;
       nel = Ndf_NACB;
 
    } else if( type == NDF__PCBTYPE ){
+      NDF__PCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_PCB;
       nel = Ndf_NPCB;
 
    } else if( type == NDF__FCBTYPE ){
+      NDF__FCB_ASSERT_MUTEX;
       start = (NdfObject **) Ndf_FCB;
       nel = Ndf_NFCB;
 

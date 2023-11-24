@@ -37,6 +37,7 @@ void ary1Umps( AryACB *acb, int *status ) {
 *     subsequently fails under these circumstances.
 
 *  Prior Requirements:
+*     -  The DCB and ACB mutexes must be locked.
 *     -  This routine should only be called for an ACB entry which has
 *     previously been used to obtain mapped access to an array and has
 *     not since been unmapped.
@@ -96,9 +97,14 @@ void ary1Umps( AryACB *acb, int *status ) {
    int tstat;                 /* Temporary status value */
    void *pntr;                /* Pointer to mapped imaginary data */
 
+   ARY__DCB_ASSERT_MUTEX;
+   ARY__ACB_ASSERT_MUTEX;
+
 /* Save the STATUS value and mark the error stack. */
    tstat = *status;
    errMark();
+
+   ARY__MCB_LOCK_MUTEX;
 
 /* Obtain pointers to the associated MCB and DCB. */
    *status = SAI__OK;
@@ -218,6 +224,8 @@ void ary1Umps( AryACB *acb, int *status ) {
       ary1Rls( (AryObject *) mcb, status );
       acb->mcb = NULL;
    }
+
+   ARY__MCB_UNLOCK_MUTEX;
 
 /* Annul any error if STATUS was previously bad, otherwise let the new
    error report stand. */

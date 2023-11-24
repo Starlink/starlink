@@ -44,6 +44,9 @@ void ndf1Prfor( NdfACB *acb, NdfPCB *pcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     This function operates in conjunction with ndf1Plfor, which should be
 *     kept in step with any changes.
@@ -97,6 +100,8 @@ void ndf1Prfor( NdfACB *acb, NdfPCB *pcb, int *status ){
    size_t t2;            /* Last character of type field */
    size_t v1;            /* First character of version field */
    size_t v2;            /* Last character of version field */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

@@ -53,6 +53,9 @@ void ary1Gmrb( AryACB *acb, int *mtrex, int *mrfull, int *whole,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -87,6 +90,8 @@ void ary1Gmrb( AryACB *acb, int *mtrex, int *mrfull, int *whole,
 /* Local variables: */
    int i;
    AryDCB *dcb;
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

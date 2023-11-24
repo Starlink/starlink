@@ -123,6 +123,8 @@ void ndf1Cut( NdfACB *acb1, int ndim, const hdsdim lbnd[],
               "sections to ^L pixels.", status );
    }
 
+   NDF__ACB_LOCK_MUTEX;
+
 /* Obtain an index to a free slot for the new NDF in the ACB. */
    *acb2 = ndf1Ffs( NDF__ACBTYPE, status );
    if( *status == SAI__OK ) {
@@ -198,6 +200,8 @@ void ndf1Cut( NdfACB *acb1, int ndim, const hdsdim lbnd[],
          dcb->refct++;
       }
    }
+
+   NDF__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Cut", status );

@@ -93,6 +93,7 @@ void ndfHappn_( const char *appn, int *status ){
 
 /* Find the first and last non-blank characters in the new application
    name and store the name, left-justified in the DCB. */
+   NDF__DCB_LOCK_APPMUTEX;
    astFandl( appn, 1, 0, &f, &l );
    if( f < l + 1 ) {
       star_strlcpy( Ndf_DCB_happn, appn + f, sizeof( Ndf_DCB_happn ));
@@ -102,6 +103,7 @@ void ndfHappn_( const char *appn, int *status ){
    } else {
       star_strlcpy( Ndf_DCB_happn, " ", sizeof( Ndf_DCB_happn ));
    }
+   NDF__DCB_UNLOCK_APPMUTEX;
 
 /* If an error occurred, then report context information and call the
    error tracing function. */

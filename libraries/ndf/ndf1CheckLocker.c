@@ -80,6 +80,6 @@ void ndf1CheckLocker( NdfACB *acb, int *status ){
    }
 
 /* Call error tracing routine if appropriate. */
-   if( *status != SAI__ERROR ) ndf1Trace( "ndf1CheckLocker", status );
+   if( *status != SAI__OK ) ndf1Trace( "ndf1CheckLocker", status );
 }
 

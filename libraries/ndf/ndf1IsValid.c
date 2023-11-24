@@ -4,12 +4,6 @@
 #include "mers.h"
 #include "ndf_err.h"
 
-/* These global variables are declared in file ndf1Ffs.c */
-extern NdfDCB **Ndf_DCB;  /* Pointer to array of all DCB pointers */
-extern NdfACB **Ndf_ACB;  /* Pointer to array of all ACB pointers */
-extern NdfFCB **Ndf_FCB;  /* Pointer to array of all FCB pointers */
-extern NdfPCB **Ndf_PCB;  /* Pointer to array of all PCB pointers */
-
 int ndf1IsValid( NdfObject *object ) {
 /*
 *+
@@ -72,7 +66,8 @@ int ndf1IsValid( NdfObject *object ) {
 
 /* Local variables: */
    int result;
-   NdfObject **array;
+   int* pn;
+   NdfObject ***array;
    pthread_mutex_t *mutex;
 
 /* Initialise */
@@ -85,16 +80,20 @@ int ndf1IsValid( NdfObject *object ) {
    helps to guard against random addresses being supplied since such are
    unlikely to have a valid type value. */
    if( object->type == NDF__DCBTYPE ) {
-      array = (NdfObject **) Ndf_DCB;
+      pn = &Ndf_NDCB;
+      array = (NdfObject ***) &Ndf_DCB;
       mutex = &Ndf_DCB_mutex;
    } else if( object->type == NDF__ACBTYPE ) {
-      array = (NdfObject **) Ndf_ACB;
+      pn = &Ndf_NACB;
+      array = (NdfObject ***) &Ndf_ACB;
       mutex = &Ndf_ACB_mutex;
    } else if( object->type == NDF__FCBTYPE ) {
-      array = (NdfObject **) Ndf_FCB;
+      pn = &Ndf_NFCB;
+      array = (NdfObject ***) &Ndf_FCB;
       mutex = &Ndf_FCB_mutex;
    } else if( object->type == NDF__PCBTYPE ) {
-      array = (NdfObject **) Ndf_PCB;
+      pn = &Ndf_NPCB;
+      array = (NdfObject ***) &Ndf_PCB;
       mutex = &Ndf_PCB_mutex;
    } else {
       array = NULL;
@@ -104,7 +103,9 @@ int ndf1IsValid( NdfObject *object ) {
    is consistent with the object pointer stored in the slot. */
    if( array ) {
       pthread_mutex_lock( mutex );
-      result = ( array[ object->slot ] == object );
+      if (object->slot >= 0 && object->slot < *pn) {
+         result = ( (*array)[ object->slot ] == object );
+      }
       pthread_mutex_unlock( mutex );
    }
 

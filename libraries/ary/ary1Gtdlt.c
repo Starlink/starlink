@@ -48,6 +48,9 @@ void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1],
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -82,6 +85,8 @@ void ary1Gtdlt( AryDCB *dcb, int *zaxis, char ztype[DAT__SZTYP+1],
 /* Local variables: */
    HDSLoc *locc=NULL;        /* Locator for component */
    int there;                /* Does the component exist? */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Initialise returned values */
    *zaxis = 0;

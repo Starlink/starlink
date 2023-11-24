@@ -1,7 +1,15 @@
 #include <pthread.h>
 #include "f77.h"
 
-static pthread_mutex_t ndg_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_once_t ndg_mutex_initialized = PTHREAD_ONCE_INIT;
+static pthread_mutexattr_t ndg_mutex_attr;
+static pthread_mutex_t ndg_mutex;
+
+static void ndg1LockInitialize( void ) {
+   pthread_mutexattr_init( &ndg_mutex_attr );
+   pthread_mutexattr_settype( &ndg_mutex_attr, PTHREAD_MUTEX_RECURSIVE );
+   pthread_mutex_init( &ndg_mutex, &ndg_mutex_attr );
+}
 
 F77_SUBROUTINE(ndg1_glock)( LOGICAL(lock) ){
 /*
@@ -53,7 +61,8 @@ F77_SUBROUTINE(ndg1_glock)( LOGICAL(lock) ){
    GENPTR_LOGICAL(lock)
 
    if( *lock ) {
-      pthread_mutex_unlock( &ndg_mutex );
+      pthread_once( &ndg_mutex_initialized, ndg1LockInitialize );
+      pthread_mutex_lock( &ndg_mutex );
    } else {
       pthread_mutex_unlock( &ndg_mutex );
    }

@@ -22,7 +22,20 @@ pthread_mutex_t Ary_ACB_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Ary_MCB_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Ary_PCB_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-void *ary1Ffs( AryBlockType type, int *status ) {
+#if THREAD_DEBUG
+#include <stdio.h>
+#include <stdlib.h>
+void ary1AssertLocked(pthread_mutex_t* mutex, char* name) {
+   if (! pthread_mutex_trylock(mutex)) {
+      pthread_mutex_unlock(mutex);
+      fprintf(stderr, "ary1AssertLocked: %s mutex not locked\n", name);
+      fflush(stderr);
+      abort();
+   }
+}
+#endif
+
+void *ary1Ffs( const AryBlockType type, int *status ) {
 /*
 *+
 *  Name:
@@ -32,7 +45,7 @@ void *ary1Ffs( AryBlockType type, int *status ) {
 *     Allocate an ARY "block" structure of any type.
 
 *  Synopsis:
-*     void *ary1Ffs( AryBlockType type, int *status )
+*     void *ary1Ffs( const AryBlockType type, int *status )
 
 *  Description:
 *     The routine finds a free slot in one of the arrays holding pointers
@@ -59,6 +72,9 @@ void *ary1Ffs( AryBlockType type, int *status ) {
 *     A pointer to the object held in the allocated slot of the array.
 *     The returned pointer should be cast to the required type (AryDCB,
 *     AryACB, etc).
+
+* Prior Requirements:
+*     -  The relevant "block" mutex must be locked.
 
 *  Notes:
 *     -  The returned pointer should be released using ary1Rls when it is
@@ -106,7 +122,6 @@ void *ary1Ffs( AryBlockType type, int *status ) {
    int *pn;                   /* Pointer to variable hold size of array */
    int i;                     /* Loop counter for slots */
    int oldsize;               /* Original size of array */
-   pthread_mutex_t *mutex;    /* Pointer to mutex for selected array */
    size_t size;               /* Size of each structure in array */
 
 /* Set an initial value for the returned pointer. */
@@ -117,9 +132,7 @@ void *ary1Ffs( AryBlockType type, int *status ) {
 
 /* Store info about the required type of block. */
    if( type == ARY__DCBTYPE ){
-
-/* A mutex to serialise access to the array of structure pointers */
-      mutex = &Ary_DCB_mutex;
+      ARY__DCB_ASSERT_MUTEX;
 
 /* A pointer to the first structure in the array of allocated structures
    of the required type. */
@@ -135,21 +148,21 @@ void *ary1Ffs( AryBlockType type, int *status ) {
       name = "DCB";
 
    } else if( type == ARY__ACBTYPE ){
-      mutex = &Ary_ACB_mutex;
+      ARY__ACB_ASSERT_MUTEX;
       parray = (AryObject **) Ary_ACB;
       pn = &Ary_NACB;
       size = sizeof(AryACB);
       name = "ACB";
 
    } else if( type == ARY__MCBTYPE ){
-      mutex = &Ary_MCB_mutex;
+      ARY__MCB_ASSERT_MUTEX;
       parray = (AryObject **) Ary_MCB;
       pn = &Ary_NMCB;
       size = sizeof(AryMCB);
       name = "MCB";
 
    } else if( type == ARY__PCBTYPE ){
-      mutex = &Ary_PCB_mutex;
+      ARY__PCB_ASSERT_MUTEX;
       parray = (AryObject **) Ary_PCB;
       pn = &Ary_NPCB;
       size = sizeof(AryPCB);
@@ -166,9 +179,6 @@ void *ary1Ffs( AryBlockType type, int *status ) {
 
 /* Only proceed if the block type was recognised. */
    if( *status == SAI__OK ){
-
-/* Wait until the current thread has exclusive access to the array. */
-      pthread_mutex_lock( mutex );
 
 /* Loop through the array looking for an element that is not currently in
    use. If found, use it as the returned result and indicate it is now in
@@ -241,10 +251,6 @@ void *ary1Ffs( AryBlockType type, int *status ) {
          }
       }
    }
-
-/* Release the lock on the array, this allowing any waiting threads
-   to proceed. */
-   pthread_mutex_unlock( mutex );
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Ffs", status );

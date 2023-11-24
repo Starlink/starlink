@@ -45,6 +45,9 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *     Copyright (C) 2018 East Asian Observatory
 *     All rights reserved.
@@ -79,6 +82,8 @@ void ndf1Dcre( const char *ftype, int ndim, const hdsdim lbnd[],
 /* Local Variables: */
    AryPlace *place;      /* ARY_ placeholder for data array */
    NdfDCB *dcb;          /* Pointer to data object entry in the DCB */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Set an initial value for the "dcb" parameter. */
    dcb = NULL;

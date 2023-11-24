@@ -84,7 +84,10 @@ void aryTemp( AryPlace **place, int *status ) {
    if( *status != SAI__OK ) return;
 
 /* Obtain a free slot in the PCB. */
+   ARY__PCB_LOCK_MUTEX;
    pcb = (AryPCB *) ary1Ffs( ARY__PCBTYPE, status );
+   ARY__PCB_UNLOCK_MUTEX;
+
    if( *status == SAI__OK ){
 
 /* Create a temporary array placeholder object, storing a locator to it in
@@ -106,7 +109,9 @@ void aryTemp( AryPlace **place, int *status ) {
 
 /* If an error occurred, then release the PCB slot. */
       } else {
+         ARY__PCB_LOCK_MUTEX;
          pcb = ary1Rls( (AryObject *) pcb, status );
+         ARY__PCB_UNLOCK_MUTEX;
       }
    }
 

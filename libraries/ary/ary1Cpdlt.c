@@ -33,6 +33,9 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -67,6 +70,8 @@ void ary1Cpdlt( AryDCB *dcb1, AryDCB *dcb2, int *status ) {
 /* Local variables: */
    int there;
    HDSLoc *loc2 = NULL;
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

@@ -88,7 +88,9 @@ void ndfTemp_( int *place, int *status ){
    NDF_INIT( status );
 
 /* Obtain a free slot in the PCB. */
+   NDF__PCB_LOCK_MUTEX;
    pcb = ndf1Ffs( NDF__PCBTYPE, status );
+   NDF__PCB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
 
 /* Create a temporary NDF placeholder object, storing a locator to it
@@ -107,7 +109,11 @@ void ndfTemp_( int *place, int *status ){
       *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-      if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+      if( *status != SAI__OK ) {
+         NDF__PCB_LOCK_MUTEX;
+         ndf1Annpl( 1, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
+      }
    }
 
 /* If an error occurred, then report context information and call the

@@ -76,6 +76,8 @@ void ndf1Cln( NdfACB *acb1, NdfACB **acb2, int *status ){
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   NDF__ACB_LOCK_MUTEX;
+
 /* Find a free slot in the ACB. Reset the "acb2" parameter to NULL if no
    slot could be found. */
    *acb2 = ndf1Ffs( NDF__ACBTYPE, status );
@@ -151,6 +153,8 @@ void ndf1Cln( NdfACB *acb1, NdfACB **acb2, int *status ){
          dcb->refct++;
       }
    }
+
+   NDF__ACB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Cln", status );

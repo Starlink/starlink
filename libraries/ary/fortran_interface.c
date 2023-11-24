@@ -5,12 +5,17 @@
 #include "ary_err.h"
 #include "star/hds_fortran.h"
 
-AryIdUnion work4;
-AryIdUnion work5;
-
 #define ARY__NOPL 0
-#define aryP2I(place) (place?(work4.pointer=(place),work4.i):ARY__NOPL)
-#define aryI2P(iplace) (((iplace)!=ARY__NOPL)?(work5.i=(iplace),work5.pointer):NULL)
+
+int aryP2I(void* const place) {
+   AryIdUnion work;
+   return place ? (work.pointer = place, work.i) : ARY__NOPL;
+}
+
+void* aryI2P(const int iplace) {
+   AryIdUnion work;
+   return (iplace != ARY__NOPL) ? (work.i = iplace, work.pointer) : NULL;
+}
 
 #define CHECK_DIM( IVAL, HDSDIMVAL, FUNC, IARY ) \
    if( *STATUS == SAI__OK && (hdsdim) (IVAL) != (HDSDIMVAL) ) { \

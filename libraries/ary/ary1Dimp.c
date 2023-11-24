@@ -29,6 +29,9 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  The routine makes a "cloned" copy of the HDS locator supplied;
 *     the latter may later be annulled without affecting the operation
@@ -74,6 +77,8 @@ void ary1Dimp( HDSLoc *loc, AryDCB **dcb, int *status ) {
    int i;                     /* Loop counter for dimensions */
    int lock_status;           /* Type of lock on supplied HDS object */
    int nlev;                  /* Levels in HDS path name */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Set an initial value of NULL for the returned DCB pointer. */
    if( dcb ) *dcb = NULL;

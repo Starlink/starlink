@@ -129,6 +129,9 @@ void ndfHndlr_( const char *evname, NdfEventHandler handlr, int set,
 *     - Any number of handlers can be registered with a given event type.
 *     They will each be invoked when an event occurs (the order in
 *     which they were invoked is unspecified).
+*     - Handlers should probably avoid making any calls back to the NDF
+*     library to avoid possible deadlock if any internal mutexes are locked
+*     when the event occurs.
 
 *  Copyright:
 *     Copyright (C) 2018 East Asian Obvservatory

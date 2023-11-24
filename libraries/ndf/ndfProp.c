@@ -165,12 +165,16 @@ void ndfProp_( int indf1, const char *clist, const char *param, int *indf2,
 
 /* Create a placeholder entry for the object in the PCB and selectively
    propagate the components of the input NDF to create a new base NDF. */
+         NDF__DCB_LOCK_MUTEX;
          ndf1Plfor( NULL, name, &pcb, status );
+         NDF__DCB_UNLOCK_MUTEX;
          ndf1Prp( acb1, nextn, extn, cpf, pcb, &acb2, status );
 
 /* Annul the PCB entry when done, erasing the object if there has been
    an error. */
+         NDF__PCB_LOCK_MUTEX;
          ndf1Annpl( *status != SAI__OK, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
 
 /* If this failed, then the user must be re-prompted. Report contextual
    information and flush any error messages. */

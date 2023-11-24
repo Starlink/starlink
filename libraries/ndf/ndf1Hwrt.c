@@ -196,14 +196,18 @@ void ndf1Hwrt( NdfDCB *dcb, const char *appn, int nlines,
                if( l > 0 ) {
                   /* Use lappn as-is */
 
-               } else if( Ndf_DCB_happn[0] != 0 ) {
-                  lappn = ndf1Strip( lappn, Ndf_DCB_happn, 1, 0, &l,
-                                     NULL, status );
                } else {
-                  ndf1Getap( lappn_buf, sizeof( lappn_buf ), status );
-                  (void) astFree( lappn );
-                  lappn = lappn_buf;
-                  l = astChrLen( lappn );
+                  NDF__DCB_LOCK_APPMUTEX;
+                  if( Ndf_DCB_happn[0] != 0 ) {
+                     lappn = ndf1Strip( lappn, Ndf_DCB_happn, 1, 0, &l,
+                                        NULL, status );
+                  } else {
+                     ndf1Getap( lappn_buf, sizeof( lappn_buf ), status );
+                     (void) astFree( lappn );
+                     lappn = lappn_buf;
+                     l = astChrLen( lappn );
+                  }
+                  NDF__DCB_UNLOCK_APPMUTEX;
                }
 
 /* Create a COMMAND component in the history record with the required

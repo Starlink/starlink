@@ -527,12 +527,6 @@ typedef struct NdfDCB {
 
 /* Axes (individual).
    ================= */
-/* Whether axis extension information is available, and the axis
-   extension locators. NOTE - THIS IS A HANGOVER FROM FORTRAN NDF. IN FACT
-   NO USE IS MADE OF THIS FACILITY IN EITHER THE F77 OR C LIBRARY. */
-   int kax[ NDF__MXDIM ];
-   HDSLoc *axloc[ NDF__MXDIM ];
-
 /* Whether character axis component name information is available,
    names of the character axis components, and character component
    locators. */
@@ -1048,6 +1042,21 @@ extern int Ndf_NACB;      /* Number of ACBs in above array */
 extern int Ndf_NFCB;      /* Number of FCBs in above array */
 extern int Ndf_NPCB;      /* Number of PCBs in above array */
 
+#define THREAD_DEBUG 0
+void ndf1AssertLocked(pthread_mutex_t* mutex, char* name);
+#if THREAD_DEBUG
+#define NDF__ACB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_ACB_mutex, "ACB");
+#define NDF__DCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_DCB_mutex, "DCB");
+#define NDF__PCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_PCB_mutex, "PCB");
+#define NDF__FCB_ASSERT_MUTEX ndf1AssertLocked(&Ndf_FCB_mutex, "FCB");
+#define NDF__DCB_ASSERT_ASTMUTEX ndf1AssertLocked(&Ndf_DCB_astmutex, "DCB AST");
+#else
+#define NDF__ACB_ASSERT_MUTEX
+#define NDF__DCB_ASSERT_MUTEX
+#define NDF__PCB_ASSERT_MUTEX
+#define NDF__FCB_ASSERT_MUTEX
+#define NDF__DCB_ASSERT_ASTMUTEX
+#endif
 
 
 

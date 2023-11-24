@@ -104,6 +104,8 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 /* Check inherited global status. */
    if( *status != SAI__OK || !acb ) return;
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Import the data object, obtaining a DCB structure describing it. */
    ary1Dimp( loc, &dcb, status );
    if( *status == SAI__OK ){
@@ -111,7 +113,6 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 /* Loop through all the existing DCBs to see whether the same data object
    has previously been imported. We use a mutex to ensure that this
    search is only being performed in one thread at any one time. */
-      ARY__DCB_LOCK_MUTEX;
       dupe = 0;
       next = 0;
       idcbt = -1;
@@ -174,6 +175,8 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
 
 /* Loop through all the entries in the ACB to make adjustments to any
    which referred to the DCB entry which has just been removed. */
+               ARY__ACB_LOCK_MUTEX;
+
                iacbt = -1;
                next = 0;
                while( 1 ) {
@@ -188,16 +191,18 @@ void ary1Imp( HDSLoc *loc, AryACB **acb, int *status ) {
                      break;
                   }
                }
+
+               ARY__ACB_UNLOCK_MUTEX;
             }
          }
       }
 
-/* Allow the next thread to proceed with the above search. */
-      ARY__DCB_UNLOCK_MUTEX;
-
 /* Create a new ACB base array entry to describe the new data object. */
       ary1Crnba( dcbk, acb, status );
    }
+
+/* Allow the next thread to proceed with the above search. */
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Imp", status );

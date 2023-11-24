@@ -197,10 +197,6 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    m0 = el*( seclo - 1 );
    el *= sechi;
 
-/* Convert these two indices from one-based to zero-based. */
-   m0--;
-   el--;
-
 /* Prepare to extract the box.
    =========================== */
 
@@ -217,8 +213,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* The final dimension spans just the supplied section. */
    idim[ ndim - 1 ] = seclo;
-   lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ i ] );
-   hi[ ndim - 1 ] = NDF_MIN( dims[ i ], seclo + hb[ i ] );
+   lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ ndim - 1 ] );
+   hi[ ndim - 1 ] = NDF_MIN( dims[ ndim - 1 ], seclo + hb[ ndim - 1 ] );
 
 /* Data containing bad values.
    =========================== */
@@ -229,13 +225,8 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element in the section being smoothed.
    ========================================================== */
-/* m is initialised to -1 so needs to be a signed integer value, but el is
-   unsigned. Simply comparing them using "m < el" would cause the inital
-   m value of -1 to be cast to a huge unsigned value thus causing the
-   expression value to be zero. So we check for negative m values
-   separately. */
       m = m0;
-      while( m < 0 || m < el ){
+      while( m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
    dimension copying values within the box neighbourhood into the work
@@ -452,7 +443,7 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
 
 /* Loop for every array element.
    ============================= */
-      m = 0;
+      m = m0;
       while( m < el ){
 
 /* This is effectively a "DO UNTIL" loop, which starts with the current
@@ -473,9 +464,15 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
             if( idim[ cdim - 1 ] > dims[ cdim - 1 ] ) {
 
 /* Reset index and box limits to the start within current dimension. */
-               idim[ cdim - 1 ] = 1;
-               lo[ cdim - 1 ] = 1;
-               hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], hb[ cdim - 1 ] + 1 );
+               if( cdim < ndim ){
+                  idim[ cdim - 1 ] = 1;
+                  lo[ cdim - 1 ] = 1;
+                  hi[ cdim - 1 ] = NDF_MIN( dims[ cdim - 1 ], hb[ cdim - 1 ] + 1 );
+               } else {
+                  idim[ ndim - 1 ] = seclo;
+                  lo[ ndim - 1 ] = NDF_MAX( 1, (hdsdim) seclo - hb[ ndim - 1 ] );
+                  hi[ ndim - 1 ] = NDF_MIN( dims[ ndim - 1 ], seclo + hb[ ndim - 1 ] );
+               }
 
 /* Initialise the bounds of the filter box used to create the
    `previous" output column. */
@@ -486,6 +483,10 @@ void CGEN_FUNCTION( kpgBmdnSec )( int bad, int sambad, int var, int ndim,
    dimension's smoothing block, go to the next higher dimension.  There
    must be one since there are still output elements to be computed. */
                cdim++;
+               if( cdim > ndim ) {
+                  cdim = ndim;
+                  end = 1;
+               }
 
             } else {
 

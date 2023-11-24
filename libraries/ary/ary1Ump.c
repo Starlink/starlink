@@ -29,10 +29,14 @@ void ary1Ump( AryACB *acb, int *status ) {
 *     status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB and ACB mutexes must be locked.
+
 *  Notes:
 *     -  The routine attempts to execute even if 'status' is set on
 *     entry, although no further error report will be made if it
 *     subsequently fails under these circumstances.
+*     -  The DCB mutex should be locked.
 
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
@@ -68,6 +72,9 @@ void ary1Ump( AryACB *acb, int *status ) {
 /* Local variables: */
    int tstat;                 /* Temporary status variable */
    AryDCB *dcb;               /* The data object entry for the ACB */
+
+   ARY__DCB_ASSERT_MUTEX;
+   ARY__ACB_ASSERT_MUTEX;
 
 /* Save the STATUS value and mark the error stack. */
    tstat = *status;

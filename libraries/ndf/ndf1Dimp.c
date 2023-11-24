@@ -33,6 +33,9 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  The function makes a "cloned" copy of the HDS locator supplied;
 *     the latter may later be annulled without affecting the operation of
@@ -83,6 +86,8 @@ void ndf1Dimp( HDSLoc *loc, NdfDCB **dcb, int *status ){
    hdsdim dim[ DAT__MXDIM ];       /* Object dimensions */
    int ndim;             /* Number of object dimensions */
    int nlev;             /* Levels in HDS path name */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Set an initial value of zero for the "dcb" parameter. */
    *dcb = 0;

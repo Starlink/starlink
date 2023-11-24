@@ -103,6 +103,8 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   NDF__DCB_LOCK_MUTEX;
+
 /* Obtain an index to the DCB entry of the input data object. */
    dcb1 = acb1->dcb;
 
@@ -115,6 +117,8 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
    information derived from the placeholder. */
       ndf1Prfor( acb1, pcb, status );
       ndf1Pldcb( pcb, dcb2, status );
+
+      NDF__DCB_UNLOCK_MUTEX;
 
 /* Obtain the input NDF bounds from the ARY_ system identifier for its
    data array, held in the ACB. */
@@ -345,7 +349,9 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
 
 /* Create a new base NDF entry in the ACB to describe the new data
    object. */
+      NDF__DCB_LOCK_MUTEX;
       ndf1Crnbn( dcb2, acb2, status );
+      NDF__DCB_UNLOCK_MUTEX;
 
 /* Assign the name of the data file to the MSG token "NDF_EVENT" */
       ndf1Evmsg( "NDF_EVENT", dcb2 );
@@ -361,9 +367,14 @@ void ndf1Prp( NdfACB *acb1, int nextn, char extn[][ DAT__SZNAM + 1 ],
 
 /* If there was an error, then annul the new DCB entry. */
       } else {
+         NDF__DCB_LOCK_MUTEX;
          ndf1Danl( 1, &dcb2, status );
          dcb2 = NULL;
+         NDF__DCB_UNLOCK_MUTEX;
       }
+   }
+   else {
+      NDF__DCB_UNLOCK_MUTEX;
    }
 
 /* Call error tracing function and exit. */

@@ -1602,11 +1602,6 @@ void smf_mapbounds( int fast, Grp *igrp,  int size, const char *system,
                     int *moving, smfBox ** boxes, fts2Port fts_port,
                     AstKeyMap *config, int *status );
 
-void smf_mapbounds_approx( Grp *igrp, int index, char *system,
-                           dim_t *lbnd_out, dim_t *ubnd_out,
-                           AstFrameSet **outframeset, int *moving,
-                           int *status );
-
 AstRegion *smf_mapregion_approx( Grp *igrp, int *status );
 
 void smf_mask_noisy( ThrWorkForce *wf, smfData *data, AstKeyMap *kmap, smfData **noise,

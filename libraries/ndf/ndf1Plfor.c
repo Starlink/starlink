@@ -42,6 +42,9 @@ void ndf1Plfor( HDSLoc *loc, const char *name, NdfPCB **pcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  If this function is called with "status" set, then a value of zero
 *     will be returned for the "pcb" parameter. The same value will also be
@@ -106,6 +109,8 @@ void ndf1Plfor( HDSLoc *loc, const char *name, NdfPCB **pcb, int *status ){
    size_t v2;            /* Last character of version field */
    size_t x1;            /* First character of foreign extension field */
    size_t x2;            /* Last character of foreign extension field */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Set an initial null value for the "pcb" parameter. */
    *pcb = 0;

@@ -4,6 +4,7 @@
 #include "star/hds.h"
 #include "prm_par.h"
 #include "ary.h"
+#include "ary1.h"
 #include "ary_err.h"
 #include "ary_dlt.h"
 
@@ -129,6 +130,9 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *     Copyright (C) 2017 East Asian Observatory
 *     All rights reserved.
@@ -220,6 +224,8 @@ void ary1S2dlt( HDSLoc *loc1, int zaxis, const char *type, HDSLoc *loc2,
    size_t size_outtype;
    size_t stride_indata[ ARY__MXDIM ];
    size_t zstride;
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Initialise */
    *zratio = 1.0;

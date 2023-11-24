@@ -50,6 +50,9 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     This function attempts to execute even if "status" is set on entry,
 *     although no further error report will be made if it subsequently
@@ -95,6 +98,8 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
    int ndim;             /* Number of data object dimensions */
    double *ipw1;         /* Work space */
    int *ipw2;            /* Work space */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Begin a new error reporting environment. */
    errBegin( status );
@@ -196,15 +201,6 @@ void ndf1Danl( int dispos, NdfDCB **dcb, int *status ){
 
 /* Annul the individual axis structure locators. */
                if( (*dcb)->aloc[ iax ] ) datAnnul( (*dcb)->aloc + iax, status );
-
-/* Axis extensions.
-   ===============
-   If axis extension locators have been acquired, then annul them. */
-               if( (*dcb)->kax[ iax ] ) {
-                  if( (*dcb)->axloc[ iax ] ) datAnnul( (*dcb)->axloc + iax,
-                                                             status );
-                  (*dcb)->kax[ iax ] = 0;
-               }
 
 /* Axis character components.
    =========================

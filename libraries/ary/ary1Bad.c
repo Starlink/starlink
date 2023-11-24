@@ -34,6 +34,9 @@ void ary1Bad( AryACB *acb, int check, int *bad, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -79,6 +82,8 @@ void ary1Bad( AryACB *acb, int check, int *bad, int *status ) {
    int mtrex;                 /* Mapping transfer region exists? */
    int sure;                  /* Whether bad pixel presence is certain */
    int whole;                 /* Mapping region is whole object? */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

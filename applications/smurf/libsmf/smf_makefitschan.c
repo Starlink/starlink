@@ -31,8 +31,8 @@
 *        radians. The correct sign will be applied automatically basedon
 *        on "system".
 *     crota2 = double (Given)
-*        The angle from north through east to the second pixel axis, in
-*        radians.
+*        The angle from the second pixel axis to north, measured
+*        north through east, in radians.
 *     fc = AstFitsChan * (Given)
 *        A pointer to a FitsCHan in which to put the FITS-WCS cards
 *        describing the tan plane projection.

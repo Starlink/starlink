@@ -6,10 +6,20 @@
 #include "mers.h"
 #include "ary_err.h"
 
-/* Variables reference as extern in ary.h */
-AryIdUnion work1;
-AryIdUnion work2;
-AryIdUnion work3;
+void* aryI2A(const int iary) {
+   AryIdUnion work;
+   return (iary != ARY__NOID) ? (work.i = iary, work.pointer) : NULL;
+}
+
+void* aryI2A2(const int iary) {
+   AryIdUnion work;
+   return (iary != ARY__NOID) ? (work.i = iary, work.pointer) : NULL;
+}
+
+int aryA2I(void* const ary) {
+   AryIdUnion work;
+   return ary ? (work.pointer = ary, work.i) : ARY__NOID;
+}
 
 /* The global variable that holds the count of identifiers that have
    been issued so far. */

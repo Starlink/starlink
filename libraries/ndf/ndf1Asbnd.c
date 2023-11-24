@@ -122,12 +122,6 @@ void ndf1Asbnd( int ndim, const hdsdim lbnd[], const hdsdim ubnd[],
             ndf1Avrst( iax, acb, status );
             ndf1Awrst( iax, acb, status );
 
-/* If axis extension information is available and the extension locator
-   is valid, then annul it. */
-            if( dcb->kax[ iax ] ) {
-               if( dcb->axloc[ iax ] ) datAnnul( dcb->axloc + iax, status );
-            }
-
 /* Ensure that axis normalisation information is available (to be
    retained in the DCB in case the axis is re-created). */
             ndf1Dan( iax, dcb, status );

@@ -31,6 +31,9 @@ void ary1Del( AryACB **acb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  This routine attempts to execute even if STATUS is set on
 *     entry, although no further error report will be made if it
@@ -78,9 +81,13 @@ void ary1Del( AryACB **acb, int *status ) {
    int next;                  /* Next active ACB slot number */
    int tstat;                 /* Temporary status variable */
 
+   ARY__DCB_ASSERT_MUTEX;
+
 /* Save the STATUS value and mark the error stack. */
    tstat = *status;
    errMark();
+
+   ARY__ACB_LOCK_MUTEX;
 
 /* If the ACB entry does not refer to a base array, then simply annul the
    entry. */
@@ -97,7 +104,6 @@ void ary1Del( AryACB **acb, int *status ) {
 
 /* Loop through all active entries in the ACB. We lock a mutex first to
    ensure that no other thread is currently accessing the slot array. */
-      ARY__ACB_LOCK_MUTEX;
       iacbt = -1;
       next = 0;
       while( 1 ){
@@ -114,11 +120,12 @@ void ary1Del( AryACB **acb, int *status ) {
             break;
          }
       }
-      ARY__ACB_UNLOCK_MUTEX;
    }
 
 /* Reset the initial ACB pointer to NULL. */
    *acb = NULL;
+
+   ARY__ACB_UNLOCK_MUTEX;
 
 /* Annul any error if "status" was previously bad, otherwise let the new
    error report stand. */

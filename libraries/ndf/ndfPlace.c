@@ -113,12 +113,18 @@ void ndfPlace_( const HDSLoc *loc, const char *name, int *place, int *status ){
 
 /* Obtain a PCB entry for the new NDF and export the required
    placeholder. */
+   NDF__DCB_LOCK_MUTEX;
    ndf1Plfor( (HDSLoc *) loc, name, &pcb, status );
+   NDF__DCB_UNLOCK_MUTEX;
    if( *status == SAI__OK ) {
       *place = ndf1Expid( ( NdfObject * ) pcb, status );
 
 /* If an error occurred, then annul the PCB entry. */
-      if( *status != SAI__OK ) ndf1Annpl( 1, &pcb, status );
+      if( *status != SAI__OK ) {
+         NDF__PCB_LOCK_MUTEX;
+         ndf1Annpl( 1, &pcb, status );
+         NDF__PCB_UNLOCK_MUTEX;
+      }
    }
 
 /* If an error occurred, then report context information and call the

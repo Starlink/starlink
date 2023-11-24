@@ -60,6 +60,9 @@ void ndf1Crfor( const char *file, NdfFCB *fcb, char *expfil,
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     An empty file with the specified name should always exist after a
 *     successful invocation of this function.
@@ -114,6 +117,8 @@ void ndf1Crfor( const char *file, NdfFCB *fcb, char *expfil,
    size_t v1;            /* First character of version field */
    size_t v2;            /* Last character of version field */
 
+   NDF__DCB_ASSERT_MUTEX;
+
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
@@ -150,7 +155,6 @@ void ndf1Crfor( const char *file, NdfFCB *fcb, char *expfil,
                active = 0;
                next = 0;
                islot = -1;
-               NDF__DCB_LOCK_MUTEX;
                dcb = ndf1Nxtsl( NDF__DCBTYPE, islot, &next, status );
                while( ( *status == SAI__OK ) && ( next != -1 ) ){
                   islot = next;
@@ -164,7 +168,6 @@ void ndf1Crfor( const char *file, NdfFCB *fcb, char *expfil,
                   }
                   dcb = ndf1Nxtsl( NDF__DCBTYPE, islot, &next, status );
                }
-               NDF__DCB_UNLOCK_MUTEX;
             }
 
 /* If necessary, also check the PCB in the same way, as it may also

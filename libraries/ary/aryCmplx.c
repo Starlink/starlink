@@ -69,6 +69,7 @@ void aryCmplx( Ary *ary, int *cmplx, int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Get the DCB index for the data object. */
       dcb = acb->dcb;
@@ -78,6 +79,8 @@ void aryCmplx( Ary *ary, int *cmplx, int *status ) {
 
 /* Assign the result. */
       *cmplx = dcb->complex;
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

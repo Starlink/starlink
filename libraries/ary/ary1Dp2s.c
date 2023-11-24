@@ -30,6 +30,9 @@ void ary1Dp2s( AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     - The DCB mutex must be locked.
+
 *  Implementation Deficiencies:
 *     -  This routine requires the data type of the HDS object to
 *     change. Therefore, it cannot be used if the object is a top level
@@ -73,6 +76,8 @@ void ary1Dp2s( AryDCB *dcb, int *status ) {
    char name[DAT__SZNAM+1];   /* Data object name */
    char tname[DAT__SZNAM+1];  /* Temporary component name */
    hdsdim dummy;              /* Dummy dimension array */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

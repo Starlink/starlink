@@ -17,6 +17,8 @@ ndfXpt0x.c
 ndf_cgen.h
 ndfCnulltest
 ndfCtest
+/ndf_ftest
+/ndf_ftest8
 ssn20.pdf
 sun33.pdf
 /make_h

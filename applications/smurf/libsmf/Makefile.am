@@ -331,7 +331,6 @@ smf_math_cmplxerrfunc.c \
 smf_map_or_malloc.c \
 smf_map_spikes.c \
 smf_mapbounds.c \
-smf_mapbounds_approx.c \
 smf_mapregion_approx.c \
 smf_mask_noisy.c \
 smf_maskacsis.c \

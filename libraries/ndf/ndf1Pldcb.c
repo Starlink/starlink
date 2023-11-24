@@ -31,6 +31,9 @@ void ndf1Pldcb( NdfPCB *pcb, NdfDCB *dcb, int *status ){
 *     *status
 *        The global status.
 
+*  Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     The PCB entry is not modified by this function.
 
@@ -68,6 +71,8 @@ void ndf1Pldcb( NdfPCB *pcb, NdfDCB *dcb, int *status ){
 /* Local Variables: */
    int nlev;             /* HDS object nesting level */
    int prmry;            /* Primary/secondary locator flag */
+
+   NDF__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

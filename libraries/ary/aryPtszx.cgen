@@ -84,6 +84,8 @@ void  CGEN_FUNCTION(aryPtsz)( Ary *ary, CGEN_TYPE scale, CGEN_TYPE zero,
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 0, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check that SCALE access to the array is available. */
    ary1Chacc( acb, "SCALE", status );
    if( *status == SAI__OK ){
@@ -148,6 +150,8 @@ void  CGEN_FUNCTION(aryPtsz)( Ary *ary, CGEN_TYPE scale, CGEN_TYPE zero,
          ary1Dscl( dcb, status );
       }
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

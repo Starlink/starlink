@@ -91,8 +91,12 @@ void aryMapz( Ary *ary, const char *type, const char *mmod, void **rpntr,
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, !strcmp( mode, "READ" ), 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Map the array data. */
    ary1Maps( acb, type, 1, mode, inopt, rpntr, ipntr, status );
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Calculate the number of mapped data elements. */
    ary1Nel( acb->ndim, acb->lbnd, acb->ubnd, el, status );

@@ -90,7 +90,9 @@ void ndfBase_( int indf1, int *indf2, int *status ){
       dcb = acb1->dcb;
 
 /* Create a new base NDF entry in the ACB to describe it. */
+      NDF__DCB_LOCK_MUTEX;
       ndf1Crnbn( dcb, &acb2, status );
+      NDF__DCB_UNLOCK_MUTEX;
       if( *status == SAI__OK ) {
 
 /* Transfer the access control flags from the old ACB entry to the new

@@ -226,7 +226,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 
   }
 
-  mapVars->scanPA = gsdVars->cellV2X;
-  mapVars->mapPA = mapVars->scanPA - 90.0;
+  mapVars->scanPA = - gsdVars->cellV2X;
+  mapVars->mapPA = mapVars->scanPA + 90.0;
 
 }

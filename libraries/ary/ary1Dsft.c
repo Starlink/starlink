@@ -39,6 +39,9 @@ void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -75,6 +78,8 @@ void ary1Dsft( int nshift, const hdsdim *shift, AryDCB *dcb, int *status ) {
    int i;                     /* Loop counter for dimensions */
    int n;                     /* Number of axes to use */
    int there;                 /* Whether there is an ORIGIN component */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

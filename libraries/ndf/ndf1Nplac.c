@@ -84,6 +84,8 @@ void ndf1Nplac( HDSLoc *loc, const char *name, NdfPCB **pcb, int *status ){
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   NDF__PCB_LOCK_MUTEX;
+
 /* Obtain a free slot in the PCB. */
    *pcb = ndf1Ffs( NDF__PCBTYPE, status );
    if( *status == SAI__OK ) {
@@ -92,8 +94,12 @@ void ndf1Nplac( HDSLoc *loc, const char *name, NdfPCB **pcb, int *status ){
       ndf1Plcre( loc, name, &(*pcb)->loc, &(*pcb)->new, status );
 
 /* If an error occurred, then release the PCB slot. */
-      if( *status != SAI__OK ) *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
+      if( *status != SAI__OK ) {
+         *pcb = ndf1Rls( ( NdfObject * ) *pcb, status );
+      }
    }
+
+   NDF__PCB_UNLOCK_MUTEX;
 
 /* Call error tracing function and exit. */
    if( *status != SAI__OK ) ndf1Trace( "ndf1Nplac", status );

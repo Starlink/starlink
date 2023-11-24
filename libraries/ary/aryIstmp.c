@@ -70,12 +70,15 @@ void aryIstmp( Ary *ary, int *temp, int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 1, 1, status );
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
 
 /* Obtain the data object. */
       dcb = acb->dcb;
 
 /* The object's disposal mode determines whether it is temporary. */
       *temp = !strcmp( dcb->dispose, "TEMP" );
+
+      ARY__DCB_UNLOCK_MUTEX;
    }
 
 /* If an error occurred, then report context information and call the error

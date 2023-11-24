@@ -43,6 +43,9 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -   The DCB and ACB mutexes must be locked.
+
 *  Notes:
 *     -  If the supplied array is locked read-only by the current thread
 *     an attempt will be made to promote the lock to a read-write lock
@@ -93,6 +96,9 @@ void ary1Cut( AryACB *acb1, int ndim, const hdsdim *lbnd, const hdsdim *ubnd,
    hdsdim ux[ARY__MXDIM];     /* Upper intersection region bounds */
    int exist;                 /* Whether intersection region exists */
    int i;                     /* Loop counter for dimensions */
+
+   ARY__DCB_ASSERT_MUTEX;
+   ARY__ACB_ASSERT_MUTEX;
 
 /* Set an initial value for the "acb2" argument. */
    *acb2 = NULL;

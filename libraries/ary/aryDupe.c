@@ -103,6 +103,7 @@ void aryDupe( Ary *ary1, AryPlace **place, Ary **ary2, int *status ) {
    if( ( *status == SAI__OK ) && ( tstat == SAI__OK ) ){
       acb1 = (AryACB *) ary1Impid( ary1, 1, 1, 1, status );
       if( *status == SAI__OK ){
+         ARY__DCB_LOCK_MUTEX;
 
 /* Obtain an index to the input data object entry in the DCB and ensure
    that storage form information is available for it. */
@@ -173,12 +174,16 @@ void aryDupe( Ary *ary1, AryPlace **place, Ary **ary2, int *status ) {
 
 /* Export an identifier for the new array. */
          *ary2 = ary1Expid( (AryObject *) acb2, status );
-      }
-   }
 
 /* If an error has occurred, then annul the new ACB entry. */
-   if( ( *status != SAI__OK ) && acb2 ){
-      acb2 = ary1Anl( acb2, status );
+         if( ( *status != SAI__OK ) && acb2 ){
+            ARY__ACB_LOCK_MUTEX;
+            acb2 = ary1Anl( acb2, status );
+            ARY__ACB_UNLOCK_MUTEX;
+         }
+
+         ARY__DCB_UNLOCK_MUTEX;
+      }
    }
 
 /* Annul the placeholder, erasing the associated object if any error has

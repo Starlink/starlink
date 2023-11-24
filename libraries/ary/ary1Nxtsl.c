@@ -15,7 +15,7 @@ extern int Ary_NACB;    /* Number of ACBs in above array */
 extern int Ary_NMCB;    /* Number of MCBs in above array */
 extern int Ary_NPCB;    /* Number of PCBs in above array */
 
-void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
+void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status ) {
 /*
 *+
 *  Name:
@@ -26,7 +26,7 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 *     block.
 
 *  Synopsis:
-*     void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status )
+*     void *ary1Nxtsl( const AryBlockType type, int slot, int *next, int *status )
 
 *  Description:
 *     The routine finds the next used slot in an array following
@@ -58,8 +58,8 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
 *     Since this function accesses global variables, each calling
 *     function must ensure that only one thread (the current thread)
 *     is searching a list using this function at any one time. To do
-*     this, the private ARY macros ARY1__xCB_LOCK_SLOT_MUTEX and
-*     ARY1__xCB_UNLOCK_SLOT_MUTEX should be used to lock the appropriate
+*     this, the private ARY macros ARY__xCB_LOCK_MUTEX and
+*     ARY__xCB_UNLOCK_MUTEX should be used to lock the appropriate
 *     mutex prior to calling this function, and to unlock it afterwards
 *     ("x" should be replaced by "A", "D", "M" or "P").
 
@@ -118,14 +118,17 @@ void *ary1Nxtsl( AryBlockType type, int slot, int *next, int *status ) {
    if( type == ARY__DCBTYPE ){
       start = (AryObject **) Ary_DCB;
       nel = Ary_NDCB;
+      ARY__DCB_ASSERT_MUTEX;
 
    } else if( type == ARY__ACBTYPE ){
       start = (AryObject **) Ary_ACB;
       nel = Ary_NACB;
+      ARY__ACB_ASSERT_MUTEX;
 
    } else if( type == ARY__MCBTYPE ){
       start = (AryObject **) Ary_MCB;
       nel = Ary_NMCB;
+      ARY__MCB_ASSERT_MUTEX;
 
 /* If the common block specified is not valid, then report an error. */
    } else {

@@ -114,6 +114,8 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Get the DCB for the data object to be copied. */
    dcb1 = acb1->dcb;
 
@@ -248,12 +250,16 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
                      }
 
 /* Unmap the (cloned) input and output arrays. */
+                     ARY__ACB_LOCK_MUTEX;
                      ary1Ump( acbc, status );
                      ary1Ump( *acb2, status );
+                     ARY__ACB_UNLOCK_MUTEX;
                   }
 
 /* Annul the cloned ACB entry. */
+                  ARY__ACB_LOCK_MUTEX;
                   ary1Anl( acbc, status );
+                  ARY__ACB_UNLOCK_MUTEX;
                }
             }
 
@@ -359,16 +365,22 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
                      }
 
 /* Unmap the (cloned) input and output arrays. */
+                     ARY__ACB_LOCK_MUTEX;
                      ary1Ump( acbc, status );
                      ary1Ump( *acb2, status );
+                     ARY__ACB_UNLOCK_MUTEX;
 
 /* Transfer the bad pixel flag to the new array. */
                      ary1Bad( acbc, 0, &bad, status );
+                     ARY__ACB_LOCK_MUTEX;
                      ary1Sbd( bad, *acb2, status );
+                     ARY__ACB_UNLOCK_MUTEX;
                   }
 
 /* Annul the cloned ACB entry. */
+                  ARY__ACB_LOCK_MUTEX;
                   ary1Anl( acbc, status );
+                  ARY__ACB_UNLOCK_MUTEX;
                }
             }
 
@@ -385,9 +397,14 @@ void ary1Cpy( AryACB *acb1, int temp, HDSLoc **loc, int expand,
 /* If an error occurred, then annul the new ACB entry and reset the acb2
    argument to NULL. */
    if( ( *status != SAI__OK ) && ( *acb2 ) ){
+      ARY__ACB_LOCK_MUTEX;
       ary1Anl( *acb2, status );
+      ARY__ACB_UNLOCK_MUTEX;
+
       *acb2 = NULL;
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* Call error tracing routine and exit. */
    if( *status != SAI__OK ) ary1Trace( "ary1Cpy", status );

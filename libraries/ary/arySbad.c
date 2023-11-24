@@ -81,6 +81,8 @@ void arySbad( int bad, Ary *ary, int *status ) {
 /* Import the array identifier. */
    acb = (AryACB *) ary1Impid( ary, 1, 0, 1, status );
 
+   ARY__DCB_LOCK_MUTEX;
+
 /* Check that WRITE access to the array is permitted. */
    ary1Chacc( acb, "WRITE", status );
    if( *status == SAI__OK ){
@@ -100,9 +102,13 @@ void arySbad( int bad, Ary *ary, int *status ) {
 /* If the array is not mapped, then set the bad pixel flag for the ACB
    entry directly. */
       } else {
+         ARY__ACB_LOCK_MUTEX;
          ary1Sbd( bad, acb, status );
+         ARY__ACB_UNLOCK_MUTEX;
       }
    }
+
+   ARY__DCB_UNLOCK_MUTEX;
 
 /* If an error occurred, then report context information and call the error
    tracing routine. */

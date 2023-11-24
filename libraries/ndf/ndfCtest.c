@@ -93,6 +93,7 @@ int main( int argc, char *argv[] ) {
    hdsdim dim[ 2 ] = { 10, 20 }; /* NDF dimensions                          */
    size_t el;                    /* Number of mapped elements               */
    size_t i;                     /* Loop counter for array elements         */
+   int hdsversion;               /* Version of HDS in use                   */
    int indf;                     /* NDF identifier                          */
    int indf2;                    /* NDF identifier                          */
    int isum = 0;                 /* Sum of array elements                   */
@@ -137,6 +138,7 @@ int main( int argc, char *argv[] ) {
 
 /* Create an extension                                                      */
    ndfXnew( indf, "TEST", "TESTME", 0, dim, &xloc, &status );
+   hdsInfoI( xloc, "VERSION", " ", &hdsversion, &status );
    datAnnul( &xloc, &status );
    ndfXpt0i( 42, indf, "TEST", "INT", &status );
 
@@ -164,104 +166,110 @@ int main( int argc, char *argv[] ) {
       }
    }
 
+   if (hdsversion < 5) {
+      msgSeti( "HDSV", hdsversion );
+      msgOut( " ", "Skipping threading test: HDS version is ^HDSV", &status );
+   }
+   else {
 /* Create a cloned identifier. */
-   ndfClone( indf, &indf2, &status );
+      ndfClone( indf, &indf2, &status );
 
 /* Unlock the NDF so  it can be accessed from another thread. */
-   ndfUnlock( indf, &status );
+      ndfUnlock( indf, &status );
 
 /* Check an error is reported if we now access the NDF using the same
    identifier in this thread. */
-   if( status == SAI__OK ) {
-      ndfSize( indf, &el, &status );
-      if( status == NDF__THREAD ) {
-         errAnnul( &status );
-      } else if( status != SAI__OK ){
-         errFlush( &status );
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got a different error.",
-                 &status );
-      } else {
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got no error.",
-                 &status );
+      if( status == SAI__OK ) {
+         ndfSize( indf, &el, &status );
+         if( status == NDF__THREAD ) {
+            errAnnul( &status );
+         } else if( status != SAI__OK ){
+            errFlush( &status );
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got a different error.",
+                    &status );
+         } else {
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got no error.",
+                    &status );
+         }
       }
-   }
 
 /* Check the cloned identifier is still valid, even though the base NDF
    has been unlocked. The id is still valid but using it will result in
    an error because the base NDF is unlocked. */
-   ndfValid( indf2, &valid, &status );
-   if( !valid && status == SAI__OK ) {
-      status = SAI__ERROR;
-      errRep( " ", "NDF is unexpectedly invalid.", &status );
-   }
+      ndfValid( indf2, &valid, &status );
+      if( !valid && status == SAI__OK ) {
+         status = SAI__ERROR;
+         errRep( " ", "NDF is unexpectedly invalid.", &status );
+      }
 
 /* Check an error is reported if we now access the NDF using the clone
    identifier in this thread. */
-   if( status == SAI__OK ) {
-      ndfSize( indf2, &el, &status );
-      if( status == NDF__THREAD ) {
-         errAnnul( &status );
-      } else if( status != SAI__OK ){
-         errFlush( &status );
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD from cloned id but got a different error.",
-                 &status );
-      } else {
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD from cloned id but got no error.",
-                 &status );
+      if( status == SAI__OK ) {
+         ndfSize( indf2, &el, &status );
+         if( status == NDF__THREAD ) {
+            errAnnul( &status );
+         } else if( status != SAI__OK ){
+            errFlush( &status );
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD from cloned id but got a different error.",
+                    &status );
+         } else {
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD from cloned id but got no error.",
+                    &status );
+         }
       }
-   }
 
 /* Try to do something with the NDF in another thread using the cloned
    identifier. It should report an error because the cloned identifier has
    not been unlocked. */
-   if( status == SAI__OK ) {
-      UseInThread( indf2, &status );
-      if( status == NDF__THREAD ){
-         errAnnul( &status );
-      } else if( status != SAI__OK ){
-         errFlush( &status );
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got a different error.",
-                 &status );
-      } else {
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got no error.",
-                 &status );
+      if( status == SAI__OK ) {
+         UseInThread( indf2, &status );
+         if( status == NDF__THREAD ){
+            errAnnul( &status );
+         } else if( status != SAI__OK ){
+            errFlush( &status );
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got a different error.",
+                    &status );
+         } else {
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got no error.",
+                    &status );
+         }
       }
-   }
 
 /* Do something with the NDF in another thread using the identifier that
    was unlocked. This should work OK. */
-   UseInThread( indf, &status );
+      UseInThread( indf, &status );
 
 /* Check an error is still reported if we access the NDF in this thread. */
-   if( status == SAI__OK ) {
-      ndfSize( indf, &el, &status );
-      if( status == NDF__THREAD ) {
-         errAnnul( &status );
-      } else if( status != SAI__OK ){
-         errFlush( &status );
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got a different error.",
-                 &status );
-      } else {
-         status = SAI__ERROR;
-         errRep( " ", "Expected error NDF__THREAD but got no error.",
-                 &status );
+      if( status == SAI__OK ) {
+         ndfSize( indf, &el, &status );
+         if( status == NDF__THREAD ) {
+            errAnnul( &status );
+         } else if( status != SAI__OK ){
+            errFlush( &status );
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got a different error.",
+                    &status );
+         } else {
+            status = SAI__ERROR;
+            errRep( " ", "Expected error NDF__THREAD but got no error.",
+                    &status );
+         }
       }
-   }
 
 /* Lock the NDF so it can be accessed from this thread. */
-   ndfLock( indf, &status );
+      ndfLock( indf, &status );
 
 /* Check no error is reported if we access the NDF in this thread, using
    either identifer. */
-   ndfSize( indf, &el, &status );
-   ndfSize( indf2, &el, &status );
+      ndfSize( indf, &el, &status );
+      ndfSize( indf2, &el, &status );
+   }
 
 /* Clean up.                                                                */
    ndfAnnul( &indf, &status );
@@ -270,8 +278,14 @@ int main( int argc, char *argv[] ) {
    ndfOpen( NULL, "ndf_test.sdf", "update", "old", &indf, &place, &status );
 
 /* Unlock and then lock the identifier */
-   ndfUnlock( indf, &status );
-   ndfLock( indf, &status );
+   if (hdsversion < 5) {
+      msgSeti( "HDSV", hdsversion );
+      msgOut( " ", "Skipping unlock and lock: HDS version is ^HDSV", &status );
+   }
+   else {
+      ndfUnlock( indf, &status );
+      ndfLock( indf, &status );
+   }
 
 /* Map its data array for update access. This should cause an error since
    the array is stored in scaled form.                                      */

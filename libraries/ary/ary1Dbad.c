@@ -31,6 +31,9 @@ void ary1Dbad( AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -68,6 +71,8 @@ void ary1Dbad( AryDCB *dcb, int *status ) {
    hdsdim dimb[DAT__MXDIM];   /* BAD_PIXEL component dimensions */
    int ndimb;                 /* Number of BAD_PIXEL dimensions */
    int there;                 /* Whether an HDS component is present */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

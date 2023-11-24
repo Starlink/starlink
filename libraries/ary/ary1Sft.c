@@ -40,6 +40,9 @@ void ary1Sft( int nshift, const hdsdim *shift, AryACB *acb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Notes:
 *     -  Note that applying a shift to a base array affects the pixel
 *     indices of all other direct references to the same base array,
@@ -86,6 +89,8 @@ void ary1Sft( int nshift, const hdsdim *shift, AryACB *acb, int *status ) {
    int iacbt;                 /* Index of test ACB */
    int n;                     /* Number of axes to use */
    int next;                  /* Index of next ACB entry */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

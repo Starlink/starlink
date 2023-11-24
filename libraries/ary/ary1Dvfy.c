@@ -29,6 +29,9 @@ void ary1Dvfy( AryDCB *dcb, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -63,6 +66,8 @@ void ary1Dvfy( AryDCB *dcb, int *status ) {
    char name[DAT__SZNAM+1];   /* Component name */
    int icomp;                 /* Loop counter for array components */
    int ncomp;                 /* Number of array components */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

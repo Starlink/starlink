@@ -34,6 +34,9 @@ void ary1Chmod( AryACB *acb, const char *mode, int *status ) {
 *     status
 *        The global status.
 
+* Prior Requirements:
+*     -  The DCB mutex must be locked.
+
 *  Copyright:
 *      Copyright (C) 2017 East Asian Observatory
 *      All rights reserved.
@@ -68,6 +71,8 @@ void ary1Chmod( AryACB *acb, const char *mode, int *status ) {
 /* Local variables: */
    char umode[ARY__SZACC+1];  /* Upper case version of MODE */
    AryDCB *dcb;               /* The data object (DCB) */
+
+   ARY__DCB_ASSERT_MUTEX;
 
 /* Check inherited global status. */
    if( *status != SAI__OK ) return;

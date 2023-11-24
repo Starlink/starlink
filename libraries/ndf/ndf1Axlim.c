@@ -175,7 +175,9 @@ void ndf1Axlim( int iax, NdfACB *acb, double value1, double value2,
    array, in case extrapolation outside the original NDF bounds is
    required. */
          if( acb->cut ) {
+            NDF__DCB_LOCK_MUTEX;
             ndf1Crnbn( dcb, &acb0, status );
+            NDF__DCB_UNLOCK_MUTEX;
 
 /* Map the required axis data array for the base NDF for reading as
    double precision values. */

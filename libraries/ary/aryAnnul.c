@@ -87,7 +87,11 @@ void aryAnnul( Ary **ary, int *status ) {
 
 /* Annul the associated ACB entry and reset the array pointer value. */
    if( *status == SAI__OK ){
+      ARY__DCB_LOCK_MUTEX;
+      ARY__ACB_LOCK_MUTEX;
       acb = ary1Anl( acb, status );
+      ARY__ACB_UNLOCK_MUTEX;
+      ARY__DCB_UNLOCK_MUTEX;
    }
    *ary = NULL;
 

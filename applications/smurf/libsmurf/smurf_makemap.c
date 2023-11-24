@@ -104,9 +104,9 @@
 *          condition. This is done to help find spelling mistakes.
 *          [current value]
 *     CROTA = _REAL (Read)
-*          The angle, in degrees, from north through east (in the
-*          coordinate system specified by the SYSTEM parameter) to the
-*          second pixel axis in the output cube.  Only accessed if a
+*          The angle, in degrees, from the second pixel axis in the output cube
+*          to north (in the coordinate system specified by the SYSTEM
+*          parameter), measured north through east.  Only accessed if a
 *          null value is supplied for parameter REF.
 *     FBL( ) = _DOUBLE (Write)
 *          Sky coordinates (radians) of the bottom left corner of the

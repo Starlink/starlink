@@ -122,7 +122,9 @@ void ndfCopy_( int indf1, int *place, int *indf2, int *status ){
    occurred. */
    if( pcb ) {
       erase = ( ( *status != SAI__OK ) || ( tstat != SAI__OK ) );
+      NDF__PCB_LOCK_MUTEX;
       ndf1Annpl( erase, &pcb, status );
+      NDF__PCB_UNLOCK_MUTEX;
    }
 
 /* Reset the "place" parameter. */
