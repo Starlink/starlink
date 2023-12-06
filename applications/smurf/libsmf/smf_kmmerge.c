@@ -361,7 +361,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, dim_t *index,
       key = astMapKey( keymap, i );
 
 /* Ignore discrepancies in ENVIRO_ items. */
-      ignore = (!key) || strncmp( key, "ENVIRO_", 7 );
+      ignore = ! (key && strncmp( key, "ENVIRO_", 7 ));
 
 /* Get the length of the vector of values in the KeyMap. */
       veclen = astMapLength( keymap, key );
