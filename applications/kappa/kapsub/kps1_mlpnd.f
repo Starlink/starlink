@@ -132,13 +132,14 @@
 *        greater than or less than the value supplied for YBOT.
 
 *  Copyright:
-*     Copyright (C) 1998, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Copyright (C) 1998, 2004, 2006 Central Laboratory of the Research
+*     Councils.  Copyright (C) 2023 Science & Technology Facilities
+*     Council.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -154,6 +155,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -163,6 +165,9 @@
 *        Use CNF_PVAL
 *     24-AUG-2006 (DSB):
 *        Avoid zero sized gaps between lines.
+*     2023 December 6 (MJC):
+*        Increased the maximum number of lines that can be displayed
+*        tenfold, matching the new value set in MLINPLOT.
 *     {enter_further_changes_here}
 
 *-
@@ -202,8 +207,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MXLIN              ! Max number of lines which can be handled
-      PARAMETER ( MXLIN = 100 )
+      INTEGER MXLIN              ! Max. number of lines that can be
+      PARAMETER ( MXLIN = 1000 ) ! handled, matching the constant
+                                 ! of the same name in MLINPLOT
 
 *  Local Variables:
       CHARACTER SPACE*8          ! Offset selection method

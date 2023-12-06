@@ -482,7 +482,7 @@
 *  Copyright:
 *     Copyright (C) 1999, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2010 Science & Technology
+*     Research Council.  Copyright (C) 2010, 2023 Science & Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -528,6 +528,10 @@
 *        Fix valgrind warning with IPVIN.
 *     2010 October 6 (MJC):
 *        Permit temporary style attributes.
+*     2023 December 6 (MJC):
+*        Increase the maximum number of plots tenfold.  While 100 is
+*        sensible for labelled plots, many more can be accommodated
+*        without labelling, say for examining time-series spectra.
 *     {enter_further_changes_here}
 
 *-
@@ -551,8 +555,8 @@
       INTEGER NDIM               ! Dimensionality of input array
       PARAMETER( NDIM = 2 )
 
-      INTEGER MXLIN              ! Max number of lines which can be
-      PARAMETER( MXLIN = 100 )   ! displayed
+      INTEGER MXLIN              ! Max. number of lines that can be
+      PARAMETER( MXLIN = 1000 )  ! displayed
 
       REAL KW                    ! Width of key as a fraction of width
       PARAMETER( KW = 0.15 )     ! of current picture
