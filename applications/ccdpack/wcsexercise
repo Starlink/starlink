@@ -116,7 +116,7 @@
 
 #  If we're going to use a device we need KAPPA.
       if ( "$device" != "NONE" ) then
-         kappa
+         source $KAPPA_DIR/kappa.csh
          gdset $device \\
          gdclear \\
          paldef \\
