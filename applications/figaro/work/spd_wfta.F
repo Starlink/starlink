@@ -320,10 +320,10 @@
 *  Make the spectral data available to objective function. Register
 *  with CNF for 64bit systems.
       NDATA = NELM
-#if HAVE_PERCENTLOC
-      DATAP = CNF_PREG( %LOC(XDWC), ISREG )
-#elif HAVE_INTRINSIC_LOC
+#if HAVE_INTRINSIC_LOC
       DATAP = CNF_PREG( LOC(XDWC), ISREG )
+#elif HAVE_PERCENTLOC
+      DATAP = CNF_PREG( %LOC(XDWC), ISREG )
 #else
       Do not have LOC or %LOC
 #endif
