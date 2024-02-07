@@ -86,7 +86,10 @@ SSN                           STARLINK SYSTEM NOTES                          SSN
 064.05  2002-09-03 AJC   13   ADAM - Organisation of application packages
 067.01  1996-11-27 SCR   28   Unix Security Cookbook
 068.03  1997-12-17 AJC   35   IFD - Interface definition files v1.2
+069.01  1998-07-06 MBT   ??   CCDBIG - assessing CCDPACK resource usage for large data sets
+070.00  1999-04-21 nxg   ??   The Starlink SGML Set
 072.02  2000-07-10 jfl   284  SURF programming interface
+073.02  2001-08-13 MBT   35   EXTREME - Handling extreme data sets
 075.01  2000-07-26 ACD   32   Writing Catalogue and Image servers for GAIA and CURSA
 076.01  2001-05-24 ACD   17   CATREMOTE - a tool for querying remote catalogues
 077.01  2001-08-16 ajc   14   ADAM - The control subsystem
@@ -98,6 +101,7 @@ SUG                            STARLINK USER GUIDE                           SUG
 
 SUN                            STARLINK USER NOTES                           SUN
 001.24  2003-08-05 MJB   125  Starlink software collection
+002.08  2012-10-11 dsb   81   NDG - Routines for Accessing Groups of NDFs
 005.18  2003-05-02 PTW   31   ASTROM - Basic astrometry program
 007.04  1993-03-31 pma   22   GENERIC - Utility for compiling generic subroutines
 009.07  1997-06-26 ACC   16   LATEX - Document preparation system v2e User's Guide
@@ -117,6 +121,7 @@ SUN                            STARLINK USER NOTES                           SUN
 038.08  1996-11-26 mjb   2    DOCFIND - Starlink document index search
 039.02  1995-02-28 RWS   25   PRIMDAT - Processing primitive numerical data 1.0, PG
 040.05  1995-08-02 acc   39   CHR - Character handling routines 2.0, PM
+041.04  1996-05-23 CAA   ??   IRCAMDR - IRCAM3 Data Reduction Software
 042.05  1996-12-06 gjp   6    DAOPHOT - Stellar photometry package V1.2
 045.13  2002-08-20 ne    38   PHOTOM - An aperture photometry package v1.8-3
 048.08  2002-01-30 bkm   51   AGI - Applications graphics interface
@@ -150,6 +155,7 @@ SUN                            STARLINK USER NOTES                           SUN
 104.11  2001-10-22 ajc   61   MERS (MSG/ERR) - Message and error reporting 1.6: PM
 107.04  1998-08-06 MJB   8    MAPLE - Mathematical manipulation language
 109.11  2002-10-23 ne    41   PISA - Position, intensity and shape analysis
+110.02  1990-10-05 RWS   21   SST - A Simple Software Tools Package
 111.02  1993-02-01 dlt   6    SPT - Software porting tools
 113.04  1995-07-19 ajc   16   ADAM graphics, PG
 114.04  1999-09-24 ajc   56   PAR - ADAM parameter system 2.3; PM
@@ -167,6 +173,7 @@ SUN                            STARLINK USER NOTES                           SUN
 136.06  1997-11-18 MJB   2    FITSIO - Disk FITS I/O routines 5.03
 137.07  2004-04-22 pah   102  PONGO - Interactive data plotting 2.0
 139.16  2002-09-05 pwd   220  CCDPACK - CCD data reduction package v4.0
+141.02  1995-12-06 AJP   ??   STARMAN - A Stellar Photometry and Image/Table Handling Package
 143.04  2001-07-20 ajc   34   FIO/RIO - Fortran file I/O routines 1.5, PM
 144.15  2001-08-17 AJC   18   ADAM - Unix version 4
 145.06  1996-07-12 bs    58   UNIX - An introduction
@@ -213,6 +220,7 @@ SUN                            STARLINK USER NOTES                           SUN
 203.03  1997-09-15 acd   83   SX & DX - IBM data explorer for data visualisation
 204.01  1996-01-15 TJH   16   POLMAP - Interactive linear spectropolarimetry analysi
 205.01  1995-12-12 djr   3    FORUM - Starlink conferencing software
+206.01  1996-08-19 pnd   ??   CGS3DR - CGS3 Data Reduction
 207.01  1996-02-21 JWP   1    AIPS - Astronomical Image Processing System
 208.01  1996-03-18 pam   19   REPACK - Handle ROSAT WFC survey data; UM
 209.06  2000-01-19 ajc   116  CNF and F77 Mixed Language Programming v4.0: PM.
