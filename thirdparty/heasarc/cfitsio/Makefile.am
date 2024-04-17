@@ -4,15 +4,15 @@
 dist_bin_SCRIPTS = cfitsio_link
 
 ## Create the imcopy, and fitscopy binaries, very useful.
-bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy
+bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/fitsverify
 
 ## The libraries, static and shared. Note shared needs special handling
 ## as automake doesn't like the unknown extension.
 lib_LIBRARIES = cfitsio/libcfitsio.a
 liblibdir = $(libdir)
 liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@ \
-	cfitsio/libcfitsio.10@SHLIB_SUFFIX@ \
-	cfitsio/libcfitsio.10.@PACKAGE_VERSION@@SHLIB_SUFFIX@ \
+	cfitsio/libcfitsio@SHLIB_SUFFIX@.10 \
+	cfitsio/libcfitsio@SHLIB_SUFFIX@.10.@PACKAGE_VERSION@ \
 	cfitsio/cfitsio.pc
 
 # There are no sources for libcfits in this directory.
@@ -24,11 +24,11 @@ include_HEADERS = \
     cfitsio/fitsio2.h \
     cfitsio/drvrsmem.h
 
-EXAMPLE_SOURCES = cfitsio/cookbook.c cfitsio/cookbook.f
+EXAMPLE_SOURCES = cfitsio/utilities/cookbook.c cfitsio/utilities/cookbook.f
 
 # Put examples in dist_pkgdata
 dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
- License.txt
+    cfitsio/licenses/NASA_Open_Source_Agreement_1.3.txt
 
 # Extra documentation for stardocs (not converted to hypertext).
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
@@ -46,11 +46,18 @@ $(liblib_SCRIPTS):
 	(cd cfitsio; export CFLAGS; unset CFLAGS; $(MAKE) shared)
 
 # The utility programs are created by cfitsio.
-cfitsio/imcopy: cfitsio/imcopy.c cfitsio/libcfitsio.a
-	(cd cfitsio; make imcopy )
+cfitsio/imcopy: cfitsio/utilities/imcopy.c cfitsio/libcfitsio.a
+	(cd cfitsio; make utils )
 
-cfitsio/fitscopy: cfitsio/fitscopy.c cfitsio/libcfitsio.a
-	(cd cfitsio; make fitscopy )
+cfitsio/fitscopy: cfitsio/utilities/fitscopy.c cfitsio/libcfitsio.a
+	(cd cfitsio; make utils )
+
+cfitsio/fitsverify: cfitsio/utilities/fitsverify.c \
+		cfitsio/utilities/fvrf_data.c cfitsio/utilities/fvrf_file.c \
+		cfitsio/utilities/fvrf_head.c cfitsio/utilities/fvrf_key.c \
+		cfitsio/utilities/fvrf_misc.c \
+		cfitsio/libcfitsio.a
+	(cd cfitsio; make utils )
 
 #  Clean recurses into cfitsio.
 clean-local:
