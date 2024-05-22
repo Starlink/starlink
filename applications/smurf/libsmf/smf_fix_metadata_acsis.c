@@ -78,6 +78,10 @@
 *     2022-10-14 (GSB):
 *        Added call to smf_validate_tcs_position based on TEL_POS_TOLERANCE
 *        value in global keymap.
+*     2024-05-21 (GSB):
+*        Updated test for missing ACS_EXPOSURE/ACS_OFFEXPOSURE
+*        to check all values.  (Otherwise a single low value could
+*        trigger the error if it happened to be at the start of a file.)
 
 *  Copyright:
 *     Copyright (C) 2009-2013 Science & Technology Facilities Council.
@@ -190,8 +194,8 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
   int has_dhsver = 0;        /* Do we have DHSVER header? */
   smfHead *hdr = NULL;       /* Data header struct */
   dim_t i;
-  int missing_exp = 0;       /* Are we missing ACS_EXPOSURE? */
-  int missing_off = 0;       /* Are we missing ACS_OFFEXPOSURE? */
+  int missing_exp = 1;       /* Are we missing ACS_EXPOSURE? */
+  int missing_off = 1;       /* Are we missing ACS_OFFEXPOSURE? */
   double posn_tolerance;     /* Tolerance for TCS position validation */
   int posn_valid = 1;        /* Did all TCS positions pass validation? */
   AstKeyMap * obsmap = NULL; /* Info from all observations */
@@ -814,14 +818,27 @@ int smf_fix_metadata_acsis ( msglev_t msglev, smfData * data, int have_fixed, in
    */
 
   /* Assumes that STEPTIME is correct... */
-  if ( (tmpState[0].acs_exposure == VAL__BADR) || (tmpState[0].acs_exposure < (0.80 * steptime)) ) {
-    missing_exp = 1;
+  for (i = 0; i < hdr->nframes; i++ ) {
+    if ((tmpState[i].acs_exposure != VAL__BADR) && ! (tmpState[i].acs_exposure < (0.80 * steptime))) {
+      missing_exp = 0;
+      break;
+    }
+  }
+  if ( missing_exp ) {
     msgOutif( msglev, "", INDENT "Missing ACS_EXPOSURE", status );
   }
   /* Skydips do not have off exposures */
-  if ( hdr->obstype != SMF__TYP_SKYDIP &&
-       ((tmpState[0].acs_offexposure == VAL__BADR) || (tmpState[0].acs_offexposure < (0.80 * steptime))) ) {
-    missing_off = 1;
+  if ( hdr->obstype == SMF__TYP_SKYDIP ) {
+    missing_off = 0;
+  } else {
+    for (i = 0; i < hdr->nframes; i++ ) {
+      if ((tmpState[i].acs_offexposure != VAL__BADR) && ! (tmpState[i].acs_offexposure < (0.80 * steptime))) {
+        missing_off = 0;
+        break;
+      }
+    }
+  }
+  if ( missing_off ) {
     msgOutif( msglev, "", INDENT "Missing ACS_OFFEXPOSURE", status );
   }
 
