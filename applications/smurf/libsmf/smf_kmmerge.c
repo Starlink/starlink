@@ -92,6 +92,8 @@
 *        of time spent accessing elements of KeyMap vector entries.
 *     2010-10-04 (TIMJ):
 *        Add support for short/word
+*     2024-05-22 (GSB):
+*        Also ignore discrepancies in WVM_ items.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -360,8 +362,10 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, dim_t *index,
    for( i = 0; i < nentry; i++ ) {
       key = astMapKey( keymap, i );
 
-/* Ignore discrepancies in ENVIRO_ items. */
-      ignore = ! (key && strncmp( key, "ENVIRO_", 7 ));
+/* Ignore discrepancies in ENVIRO_ and WVM_ items. */
+      ignore = (! key)
+         || (! strncmp( key, "ENVIRO_", 7 ))
+         || (! strncmp( key, "WVM_", 4 ));
 
 /* Get the length of the vector of values in the KeyMap. */
       veclen = astMapLength( keymap, key );
