@@ -27,8 +27,9 @@ include_HEADERS = \
 EXAMPLE_SOURCES = cfitsio/utilities/cookbook.c cfitsio/utilities/cookbook.f
 
 # Put examples in dist_pkgdata
-dist_pkgdata_DATA = $(EXAMPLE_SOURCES) cfitsio_changes.txt CFITSIO_CONDITIONS\
-    cfitsio/licenses/NASA_Open_Source_Agreement_1.3.txt
+dist_pkgdata_DATA = $(EXAMPLE_SOURCES) CFITSIO_CONDITIONS \
+    cfitsio/docs/changes.txt \
+    cfitsio/licenses/License.txt
 
 # Extra documentation for stardocs (not converted to hypertext).
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ mud162.tex mud167.tex mud166.tex
