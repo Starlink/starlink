@@ -33,6 +33,8 @@
 *     A() = _DOUBLE (Read)
 *        An array with one element for each Frame axis (Naxes attribute)
 *        containing the coordinates of the first point.
+*     ANGLE = _DOUBLE (Write)
+*        The calculated angle.  It is radians unless DEGS is TRUE.
 *     B() = _DOUBLE (Read)
 *        An array with one element for each Frame axis (Naxes attribute)
 *        containing the coordinates of the second point.
@@ -49,13 +51,13 @@
 *        descriptions will be used.
 
 *  Copyright:
-*     Copyright (C) 2011 Science & Technology Facilities Council.
+*     Copyright (C) 2011, 2024 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -70,11 +72,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-SEP-2011 (DSB):
 *        Original version.
+*     2024 July 1 (MJC):
+*        Write calculated angle to an output parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -137,6 +142,7 @@
       END IF
 
       CALL MSG_OUT( ' ', '^D', STATUS )
+      CALL PAR_PUT0D( 'ANGLE', ANG, STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
@@ -144,7 +150,7 @@
 *  Give a context message if anything went wrong.
       IF( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'ASTANGLE_ERR', 'Error finding the angle '//
-     :                 'subtended by two points at a third poind.',
+     :                 'subtended by two points at a third point.',
      :                  STATUS )
       END IF
 
