@@ -1,0 +1,106 @@
+#!/usr/bin/env starperl
+
+use strict;
+
+use IO::File;
+use File::Spec;
+use Getopt::Long;
+use HTML::Entities;
+
+my $clobber;
+GetOptions(
+    'clobber' => \$clobber,
+) or die 'Usage: docs_lis2index [--clobber]';
+
+my $starlink_dir = $ENV{'STARLINK_DIR'};
+die '$STARLINK_DIR not set' unless defined $starlink_dir;
+die '$STARLINK_DIR does not exist' unless -d $starlink_dir;
+
+my $docs_dir = File::Spec->catdir($starlink_dir, 'docs');
+die '$STARLINK_DIR/docs does not exist' unless -d $docs_dir;
+chdir $docs_dir or die "Could not change directory to $docs_dir";
+
+my $index = 'index.html';
+die "$docs_dir/$index already exists" if -e $index and not $clobber;
+
+my $fh = IO::File->new('docs_lis', 'r');
+die 'Could not open docs_lis' unless defined $fh;
+
+my @blocks = ();
+my $block = undef;
+while (<$fh>) {
+    chomp;
+    if (/^([A-Z]{1,3}) +(\w.*\w) +\1/) {
+        # Line is a block heading, starting a new type of document.
+        my $type = lc $1;
+        my $title = join ' ', map {ucfirst} split / /, lc $2;
+        $title =~ s/^Starlink *//;
+        push @blocks, $block = {
+            type => $type, title => $title, documents => []};
+    }
+    elsif (/^0*([1-9]\d*)\.\d\d / or /^()\.\d\d/) {
+        # Line describes a document, assumed to be of current block type.
+        unless (defined $block) {
+            printf STDERR "WARNING: document found before first heading\n";
+            next;
+        }
+        my $number = $1;
+        my $title = substr $_, 30;
+        my $name = uc $block->{'type'};
+        $name .= '/' . $number if $number;
+        my $pdf = $block->{'type'} . $number . '.pdf';
+        my $have_pdf = -e $pdf;
+        my $html = File::Spec->catfile(
+            $block->{'type'} . $number . '.htx',
+            $block->{'type'} . $number . '.html');
+        my $have_html = -e $html;
+        unless ($have_pdf || $have_html) {
+            printf STDERR "WARNING: document %s not present (%s)\n",
+                $name, $title;
+            next;
+        }
+        push @{$block->{'documents'}}, {
+            name => $name,
+            title => $title,
+            pdf => ($have_pdf ? $pdf : undef),
+            html => ($have_html ? $html : undef)};
+    }
+}
+
+$fh->close;
+
+$fh = IO::File->new($index, 'w');
+
+print $fh '<html><head>',
+    '<title>Starlink Documents</title>',
+    '<style type="text/css">',
+    'html {background: silver; font-family: serif;}',
+    'body {background: white; color: black; max-width: 45em; margin-left: auto; margin-right: auto; margin-top: 2em; margin-bottom: 2em; padding: 1em 3em;}',
+    'table {border-collapse: collapse; width: 100%;}',
+    'td, th {border: 1px solid #AAA; vertical-align: top; margin: 0px; padding: 5px;}',
+    'th {width: 6em;}',
+    'td.pdflink {width: 2.5em;}',
+    '</style>',
+    '</head><body>',
+    '<h1>Starlink Documents</h1>',
+    '<ul>',
+    (map {(
+        '<li><a href="#', $_->{'type'}, '">', $_->{'title'}, '</a></li>',
+    )} grep {scalar @{$_->{'documents'}}} @blocks),
+    '</ul>',
+    (map {
+        ('<h2 id="', $_->{'type'}, '">', $_->{'title'}, '</h2><table>',
+        (map {(
+            '<tr><th>',
+            (defined $_->{'html'} ? ('<a href="', $_->{'html'}, '">', $_->{'name'}, '</a>') : ($_->{'name'})),
+            '</th><td>',
+            encode_entities($_->{'title'}),
+            '</td><td class="pdflink">',
+            (defined $_->{'pdf'} ? ('<a href="', $_->{'pdf'}, '">PDF</a> ') : ('&nbsp;')),
+            '</td></tr>'
+        )} @{$_->{'documents'}}),
+        '</table>'
+    )} grep {scalar @{$_->{'documents'}}} @blocks),
+    '</body></html>';
+
+$fh->close;
