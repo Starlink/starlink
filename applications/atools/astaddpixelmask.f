@@ -52,9 +52,7 @@
 *     If no value has yet been set for the MaxOrder attribute, then this
 *     function will automatically set it to the smallest value that results
 *     in the cells in the Moc being no larger than half the size of the pixels
-*     in the centre of the array. Note, if the value set for attribute
-*     MinOrder is greater than or equal to MaxOrder, a value of
-*     (MaxOrder-1) will be used in place of MinOrder.
+*     in the centre of the array.
 
 *  Usage:
 *     astaddpixelmask this cmode value oper array result
