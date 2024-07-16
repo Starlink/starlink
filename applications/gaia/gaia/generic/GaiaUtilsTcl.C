@@ -156,6 +156,8 @@ static int GaiaUtilsShiftWcs( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsStcRegion( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsTextMocRead( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsUrlGet( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] );
 
@@ -292,6 +294,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::stcregion", GaiaUtilsStcRegion,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::textmocread",
+                          GaiaUtilsTextMocRead, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::urlget", GaiaUtilsUrlGet,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -2295,6 +2301,43 @@ static int GaiaUtilsFitsMocWrite( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
     return TCL_OK;
+}
+
+/**
+ * Create an AST MOC from a text file.
+ *
+ * Accepts one argument the name of a file containing the MOC.
+ * The result is the address of the new object.
+ */
+static int GaiaUtilsTextMocRead( ClientData clientData, Tcl_Interp *interp,
+                                 int objc, Tcl_Obj *CONST objv[] )
+{
+    const char *filename = NULL;
+    AstMocChan * mocchan = NULL;
+    AstMoc * moc = NULL;
+
+    /* Check arguments, need  1 the filename. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "text-file" );
+        return TCL_ERROR;
+    }
+
+    filename = Tcl_GetString( objv[1] );
+
+    mocchan = astMocChan( NULL, NULL, " " );
+    astSetC( mocchan, "SourceFile", filename );
+
+    moc = (AstMoc *) astRead( mocchan );
+
+    /* Export the new object as a long containing the address */
+    if ( astOK ) {
+        Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) moc ) );
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to create MOC from text file",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
 }
 
 /**

@@ -127,6 +127,13 @@ itcl::class gaia::GaiaMOC {
          {Open FITS MOC...} \
          {Read a MOC from a FITS file}
 
+      #  Add option to read MOC text file.
+      $File add command -label {Open text MOC...} \
+         -command [code $this read_text_file]
+      $short_help_win_ add_menu_short_help $File \
+         {Open text MOC...} \
+         {Read a MOC from an ASCII or JSON file}
+
       #  Set the exit menu item.
       $File add command -label Exit \
          -command [code $this close] \
@@ -268,9 +275,26 @@ itcl::class gaia::GaiaMOC {
       destroy $w
    }
 
+   #  Read MOC from a text file (ASCII or JSON).
+   public method read_text_file {} {
+      set w [util::FileSelect .\#auto -title "Read MOC from a text file"]
+      if {[$w activate]} {
+         add_text_file [$w get]
+      }
+      destroy $w
+   }
+
    #  Add a FITS MOC.
    public method add_file {filename} {
       set moc_($index_) [gaiautils::fitsmocread $filename]
+      incr index_
+      $itk_component(moctable) append_row [list $index_ $filename]
+      $itk_component(moctable) new_info
+   }
+
+   #  Add a text MOC.
+   public method add_text_file {filename} {
+      set moc_($index_) [gaiautils::textmocread $filename]
       incr index_
       $itk_component(moctable) append_row [list $index_ $filename]
       $itk_component(moctable) new_info
