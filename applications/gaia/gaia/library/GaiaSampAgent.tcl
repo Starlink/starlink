@@ -64,6 +64,7 @@ itcl::class gaia::GaiaSampAgent {
       return {
          image.load.fits
          coord.pointAt.sky
+         coverage.load.moc.fits
          table.load.votable
          table.select.rowList
          table.highlight.row
@@ -104,6 +105,31 @@ itcl::class gaia::GaiaSampAgent {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          $basegaia position_of_interest $ra $dec "deg J2000"
+      } else {
+         error "No GAIA window found for display"
+      }
+   }
+
+   #  Load a MOC map in FITS format.
+   public method coverage.load.moc.fits {sender_id param_list} {
+      array set params $param_list
+      set moc_url $params(url)
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+         set fname [get_file_ $moc_url]
+         if { $fname != {} } {
+            display_coverage_ $fname ""
+         } else {
+            #  Remote file, arrange to download this in the background, if not
+            #  already busy downloading...
+            if { $urlget_ == {} } {
+               set urlget_ \
+                  [gaia::GaiaUrlGet .\#auto -notify_cmd [code $this display_coverage_]]
+               $urlget_ get $moc_url
+            } else {
+               error "Already downloading - can't do two at once"
+            }
+         }
       } else {
          error "No GAIA window found for display"
       }
@@ -182,6 +208,19 @@ itcl::class gaia::GaiaSampAgent {
       set basegaia [get_gaia_]
       if { $basegaia != {} } {
          $basegaia open $filename
+      }
+      if { $urlget_ != {} } {
+         catch {delete object $urlget_}
+         set urlget_ {}
+      }
+   }
+
+   # Display a coverage map (MOC in FITS format).
+   protected method display_coverage_ {filename type} {
+      set basegaia [get_gaia_]
+      if { $basegaia != {} } {
+        set toolbox [$basegaia get_toolbox moc]
+        catch {$toolbox add_file $filename}
       }
       if { $urlget_ != {} } {
          catch {delete object $urlget_}

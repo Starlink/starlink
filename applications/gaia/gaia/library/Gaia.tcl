@@ -1046,6 +1046,12 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Retrieve the toolbox of the given type, making it first if required.
+   public method get_toolbox {type} {
+      make_toolbox $type
+      return $itk_component($type)
+   }
+
    #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
