@@ -2329,6 +2329,8 @@ static int GaiaUtilsTextMocRead( ClientData clientData, Tcl_Interp *interp,
 
     moc = (AstMoc *) astRead( mocchan );
 
+    mocchan = (AstMocChan *) astAnnul( mocchan );
+
     /* Export the new object as a long containing the address */
     if ( astOK ) {
         Tcl_SetObjResult( interp, Tcl_NewLongObj( (long) moc ) );
