@@ -118,6 +118,15 @@ itcl::class gaia::GaiaMOC {
       $short_help_win_ add_menu_short_help $File \
          {New window} {Create a new toolbox}
 
+      #  Add option to read MOC FITS file.
+      $File add command -label {Open FITS MOC...} \
+         -command [code $this read_file] \
+         -accelerator {Control-r}
+      bind $w_ <Control-r> [code $this read_file]
+      $short_help_win_ add_menu_short_help $File \
+         {Open FITS MOC...} \
+         {Read a MOC from a FITS file}
+
       #  Set the exit menu item.
       $File add command -label Exit \
          -command [code $this close] \
@@ -162,13 +171,6 @@ itcl::class gaia::GaiaMOC {
       }
       add_short_help $itk_component(close) {Close window}
 
-      #  Read MOC from a file.
-      itk_component add readfits {
-         button $itk_component(actionframe).readfits -text {FITS} \
-            -command [code $this read_file]
-      }
-      add_short_help $itk_component(readfits) {Read a MOC from a FITS file}
-
       #  Draw the MOCs.
       itk_component add draw {
          button $itk_component(actionframe).draw -text {Draw MOCs} \
@@ -176,11 +178,18 @@ itcl::class gaia::GaiaMOC {
       }
       add_short_help $itk_component(draw) {Draw MOCs}
 
+      #  Clear the MOC drawings.
+      itk_component add clear {
+         button $itk_component(actionframe).clear -text {Clear MOCs} \
+            -command [code $this clear_regions]
+      }
+      add_short_help $itk_component(clear) {Clear drawings of MOC regions}
+
       #  Pack all the components into place.
       pack $itk_component(actionframe) -side bottom -fill x -pady 5 -padx 5
       pack $itk_component(moctable) -side top -fill both -expand 1
       pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
-      pack $itk_component(readfits) -side left -expand 1 -pady 3 -padx 3
+      pack $itk_component(clear) -side right -expand 1 -pady 3 -padx 3
       pack $itk_component(draw) -side left -expand 1 -pady 3 -padx 3
 
       #  Initialise the graphics tag.
