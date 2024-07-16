@@ -220,11 +220,25 @@ itcl::class gaia::GaiaMOC {
       #  Remove the contours.
       catch {clear_regions}
 
+      #  Annul the MOC objects and empty the list.
+      catch {clear_moc_list}
+
       if { $itk_option(-really_die) } {
          delete object $this
       } else {
          wm withdraw $w_
       }
+   }
+
+   protected method clear_moc_list {} {
+      for {set i 0} {$i < $index_} {incr i} {
+         gaiautils::astannul $moc_($i)
+         unset moc_($i)
+      }
+
+      $itk_component(moctable) clear
+
+      set index_ 0
    }
 
    #  Public redraw method. Only used externally to this class, which
@@ -254,14 +268,12 @@ itcl::class gaia::GaiaMOC {
       destroy $w
    }
 
-   #  Add a FITS MOC filename.
+   #  Add a FITS MOC.
    public method add_file {filename} {
-      if { ! [info exists filename_($filename)] } {
-         set filename_($index_) $filename
-         incr index_
-         $itk_component(moctable) append_row [list $index_ $filename]
-         $itk_component(moctable) new_info
-      }
+      set moc_($index_) [gaiautils::fitsmocread $filename]
+      incr index_
+      $itk_component(moctable) append_row [list $index_ $filename]
+      $itk_component(moctable) new_info
    }
 
    #  Draw the regions.
@@ -281,9 +293,7 @@ itcl::class gaia::GaiaMOC {
 
          #  And draw...
          for {set i 0} {$i < $index_} {incr i} {
-            set moc [gaiautils::fitsmocread $filename_($i)]
-            $itk_option(-rtdimage) mocplot $moc $attributes
-            gaiautils::astannul $moc
+            $itk_option(-rtdimage) mocplot $moc_($i) $attributes
          }
          update
          set_width_ $width_
@@ -357,7 +367,7 @@ itcl::class gaia::GaiaMOC {
    protected variable index_ 0
 
    #  Name of MOC FITS files.
-   protected variable filename_
+   protected variable moc_
 
    #  Whether regions have been drawn.
    protected variable drawn_
