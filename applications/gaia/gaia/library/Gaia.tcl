@@ -1668,6 +1668,18 @@ itcl::class gaia::Gaia {
            [winfo exists $itk_component(positions) ] } {
          $itk_component(positions) redraw
       }
+
+      if { [info exists itk_component(stcs)] &&
+           [winfo exists $itk_component(stcs)] &&
+           [wm state $itk_component(stcs)] != "withdrawn" } {
+         $itk_component(stcs) redraw
+      }
+
+      if { [info exists itk_component(moc)] &&
+           [winfo exists $itk_component(moc)] &&
+           [wm state $itk_component(moc)] != "withdrawn" } {
+         $itk_component(moc) redraw
+      }
    }
 
    #  A real time event has been issued by the camera. Some tools may
