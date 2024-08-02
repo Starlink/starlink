@@ -1613,7 +1613,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
             astInvert( wcs );
         }
         AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky, NULL,
-                                    (coordArgc == 0), 0, region, 0 );
+                                    (coordArgc == 0), 0, region, 0, NULL );
         inerror = ( inerror || plot == (AstPlot *) NULL );
         if ( ! inerror ) {
 
@@ -4559,7 +4559,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
         //  Create an AstPlot that incorporates an additional FrameSet
         //  that describes an system we want to add.
         AstPlot *plot = createPlot( wcs, farwcs, domain, 1, ncoords != 0,
-                                    region, report );
+                                    region, report, NULL );
         inerror = ( inerror || plot == (AstPlot *) NULL );
 
         //  Initialise the interpreter and canvas name for the Tk plotting
@@ -4694,7 +4694,7 @@ int StarRtdImage::stcplotCmd( int argc, char *argv[] )
             AstRegion *wcsreg = (AstRegion *) astMapRegion( region, fs, fs );
 
             //  Create an AstPlot based on the full image WCS.
-            AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1 );
+            AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1, NULL );
 
             //  Set any attributes.
             astSet( plot, argv[1], " " );
@@ -4801,7 +4801,20 @@ int StarRtdImage::mocplotCmd( int argc, char *argv[] )
             AstRegion *wcsreg = (AstRegion *) astMapRegion( moc, fs, fs );
 
             //  Create an AstPlot based on the full image WCS.
-            AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1 );
+            AstRegion *bounds = NULL;
+            AstPlot *plot = createPlot( wcs, NULL, NULL, 1, 0, NULL, 1, &bounds );
+
+            if ( bounds != NULL ) {
+                // Find the intersection of the MOC with the plot bounds
+                // by adding the region in "and" mode.  Ensure that
+                // MinOrder = MaxOrder so the combination will be
+                // performed at the MOC's best resolution.
+                astSetI( wcsreg, "MinOrder", astGetI( wcsreg, "MaxOrder" ) );
+
+                astAddRegion( wcsreg, AST__AND, bounds );
+
+                bounds = (AstRegion *) astAnnul( bounds );
+            }
 
             //  Set any attributes.
             astSet( plot, argv[1], " " );
@@ -4952,6 +4965,10 @@ AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 //       connection between the framesets. If that fails then a default list
 //       of expected domains is tried.
 //
+//       If "bounds" is not NULL then it will be used to return an AST
+//       region describing the area covered by the plot in the frame
+//       given by "wcs".  The caller should annul this region object.
+//
 //    Return:
 //       An AstPlot, or NULL if failed.
 //
@@ -4962,7 +4979,8 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
                                    const char *domain,
                                    int full, int image,
                                    double region[],
-                                   int report )
+                                   int report,
+                                   AstRegion **bounds )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::createPlot" << std::endl;
@@ -5114,6 +5132,22 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
         astRemapFrame( plot, AST__BASE, perm );
         perm = (AstPermMap *) astAnnul( perm );
     }
+
+    //  If requested, construct the bounds region as a box in the plotting
+    //  coordinates and map to the plot's current frame.
+    if ( bounds ) {
+        double gpoint1[] = {gbox[2], gbox[3]};
+        double gpoint2[] = {gbox[0], gbox[1]};
+
+        AstFrame *base = (AstFrame *) astGetFrame( plot, AST__BASE );
+        AstRegion *bounds_base = (AstRegion *) astBox( base, 1, gpoint1, gpoint2, NULL, " " );
+
+        *bounds = (AstRegion *) astMapRegion( bounds_base, plot, plot );
+
+        bounds_base = (AstRegion *) astAnnul(bounds_base);
+        base = (AstFrame *) astAnnul( base );
+    }
+
     if ( astOK ) {
         return plot;
     }

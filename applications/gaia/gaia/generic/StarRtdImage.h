@@ -572,7 +572,7 @@ class StarRtdImage : public Skycat
    //  Create AST plot for drawing grids and contours to canvas.
    AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,
                         const char *domain, int full, int image,
-                        double region[], int report );
+                        double region[], int report, AstRegion **bounds );
 
    //  Implementation of hdu command for FITS files.
    int fitsHduCmd( const ImageIO &imio, int argc, char *argv[] );
