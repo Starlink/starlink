@@ -80,7 +80,7 @@
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
 *     Copyright (C) 2016, East Asian Observatory.
-*     Copyright (C) 2020 Science & Technology Facilities Council.
+*     Copyright (C) 2020, 2024 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -113,6 +113,10 @@
 *        Negative RJUST values make the Plot fill the current viewport
 *        along the respective axis, i.e. ignore creating room for
 *        annotations, tick marks, and gaps.
+*     2024 August 27 (MJC):
+*        The previous change did not always work because there was still
+*        unnecessary shrinkage of the plot after the initial allowance
+*        for labels had been incorporated.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -174,6 +178,7 @@
       INTEGER NPLOT              ! New Plot
       INTEGER NTRY               ! No of tries to fit it in with smaller text
       LOGICAL EXTLAB             ! Are numerical labels drawn around edge?
+      LOGICAL FULL               ! Use the full plotting area?
       LOGICAL MORE               ! Find another graphics box?
       LOGICAL NUMLB1             ! Are numerical labels drawn for Axis 1
       LOGICAL NUMLB2             ! Are numerical labels drawn for Axis 2
@@ -239,6 +244,9 @@
 *  co-ordinates)  into the current Frame.
       CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ),
      :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS )
+
+*  Is reducing the plot area required?
+      FULL = RJUST( 1 ) .LT. 0.0 .OR. RJUST( 2 ) .LT. 0.0
 
 *  Find the number of characters in a formatted Axis-1 value. This will
 *  not necessarily be the same as the number of digits which actually appear
@@ -306,9 +314,14 @@
 
 *  Anchor the required corner.
       IF( JUST( 1:1 ) .EQ. ' ' ) then
-         RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
-         GBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
-         GBOX( 4 ) = GBOX( 2 ) + HGT
+         IF ( RJUST( 1 ) .GE. 0.0 ) THEN
+            RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
+            GBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
+            GBOX( 4 ) = GBOX( 2 ) + HGT
+         ELSE
+            GBOX( 2 ) = Y1
+            GBOX( 4 ) = Y2
+         END IF
       ELSE IF( JUST( 1:1 ) .EQ. 'B' ) THEN
          GBOX( 2 ) = Y1
          GBOX( 4 ) = Y1 + HGT
@@ -322,9 +335,14 @@
       END IF
 
       IF( JUST( 2:2 ) .EQ. ' ' ) then
-         RJ = MAX( 0.0, MIN( 1.0, RJUST( 2 ) ) )
-         GBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID)*RJ
-         GBOX( 3 ) = GBOX( 1 ) + WID
+         IF ( RJUST( 2 ) .GE. 0.0 ) THEN
+            RJ = MAX( 0.0, MIN( 1.0, ABS( RJUST( 2 ) ) ) )
+            GBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID )*RJ
+            GBOX( 3 ) = GBOX( 1 ) + WID
+         ELSE
+            GBOX( 1 ) = X1
+            GBOX( 3 ) = X2
+         END IF
       ELSE IF( JUST( 2:2 ) .EQ. 'L' ) THEN
          GBOX( 1 ) = X1
          GBOX( 3 ) = X1 + WID
@@ -543,9 +561,14 @@
 *  Anchor the required corner. TBOX is the box enclosing the plotting
 *  area and the annotation.
          IF( JUST( 1:1 ) .EQ. ' ' ) then
-            RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
-            TBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
-            TBOX( 4 ) = TBOX( 2 ) + HGT
+            IF ( RJUST( 1 ) .GE. 0.0 ) THEN
+               RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
+               TBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
+               TBOX( 4 ) = TBOX( 2 ) + HGT
+            ELSE
+               TBOX( 2 ) = Y1
+               TBOX( 4 ) = Y2
+            END IF
          ELSE IF( JUST( 1:1 ) .EQ. 'B' ) THEN
             TBOX( 2 ) = Y1
             TBOX( 4 ) = Y1 + HGT
@@ -559,9 +582,14 @@
          END IF
 
          IF( JUST( 2:2 ) .EQ. ' ' ) then
-            RJ = MAX( 0.0, MIN( 1.0, RJUST( 2 ) ) )
-            TBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID)*RJ
-            TBOX( 3 ) = TBOX( 1 ) + WID
+            IF ( RJUST( 2 ) .GE. 0.0 ) THEN
+               RJ = MAX( 0.0, MIN( 1.0, ABS( RJUST( 2 ) ) ) )
+               TBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID )*RJ
+               TBOX( 3 ) = GBOX( 1 ) + WID
+            ELSE
+               TBOX( 1 ) = X1
+               TBOX( 3 ) = X2
+            END IF
          ELSE IF( JUST( 2:2 ) .EQ. 'L' ) THEN
             TBOX( 1 ) = X1
             TBOX( 3 ) = X1 + WID
@@ -594,6 +622,10 @@
                MORE = .TRUE.
             END IF
          END DO
+
+# No plot shrinkage is necessary using the full region.  The above has
+# already allowed room for the annotations.
+         MORE = MORE .AND. .NOT. FULL
 
       END DO
 
