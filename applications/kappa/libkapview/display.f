@@ -1639,7 +1639,7 @@
 *  Create the key.  The plus sign before the KEYSTYLE requests that
 *  temporary attributes be recognised.  Either use a shortened key
 *  to permit all annotations to fit with vertical alignment controlled
-*  by Paramter KEYPOS(2), or a key with zero gap size aligned with
+*  by Parameter KEYPOS(2), or a key with zero gap size aligned with
 *  thwe DATA picture.
          KJUST( 1 ) = KEYPOS( 2 )
          KJUST( 2 ) = 0.0

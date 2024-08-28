@@ -67,7 +67,7 @@
 *        unrecognised values are treated as "C".
 *     RJUST( 2 ) = REAL (Given)
 *        Each element is used only if the corresponding element in JUST
-*        is a apce. The first element gives the fractional vertical position
+*        is a space. The first element gives the fractional vertical position
 *        of the new plot: 0.0 means put the new plot as low as possible, 1.0
 *        means put it as high as possible. The second element gives the
 *        fractional horizontal position of the new plot: 0.0 means put the

@@ -241,7 +241,7 @@
       ASP0 = ( Y2 - Y1 )/( X2 - X1 )
 
 *  Transform the centre position of the specified area (in GRAPHICS
-*  co-ordinates)  into the current Frame.
+*  co-ordinates) into the current Frame.
       CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ),
      :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS )
 
@@ -295,7 +295,7 @@
 
 *  Start off with the plotting area being the maximum size (as if no
 *  margins were required).
-      IF( ASP .LE. 0.0  ) THEN
+      IF( ASP .LE. 0.0 ) THEN
          WID = X2 - X1
          HGT = Y2 - Y1
 
@@ -313,7 +313,7 @@
       END IF
 
 *  Anchor the required corner.
-      IF( JUST( 1:1 ) .EQ. ' ' ) then
+      IF( JUST( 1:1 ) .EQ. ' ' ) THEN
          IF ( RJUST( 1 ) .GE. 0.0 ) THEN
             RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
             GBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
@@ -334,7 +334,7 @@
          GBOX( 4 ) = CEN + 0.5*HGT
       END IF
 
-      IF( JUST( 2:2 ) .EQ. ' ' ) then
+      IF( JUST( 2:2 ) .EQ. ' ' ) THEN
          IF ( RJUST( 2 ) .GE. 0.0 ) THEN
             RJ = MAX( 0.0, MIN( 1.0, ABS( RJUST( 2 ) ) ) )
             GBOX( 1 ) = X1*( 1.0 - RJ ) + ( X2 - WID )*RJ
@@ -404,7 +404,7 @@
          END IF
 
 *  If text labels are being drawn on the bottom edge, see how far
-*  they extend. These do not depend on the nature of the labellign
+*  they extend. These do not depend on the nature of the labelling
 *  (Exterior or Interior).
          IF( TXTLB1 .AND. CHR_SIMLR( EDGE1, 'BOTTOM' ) ) THEN
             MBOT = MBOT + MAX( 0.0, TLGAP1*MINDIM + TLSIZE*HTHGT )
@@ -560,7 +560,7 @@
 
 *  Anchor the required corner. TBOX is the box enclosing the plotting
 *  area and the annotation.
-         IF( JUST( 1:1 ) .EQ. ' ' ) then
+         IF( JUST( 1:1 ) .EQ. ' ' ) THEN
             IF ( RJUST( 1 ) .GE. 0.0 ) THEN
                RJ = MAX( 0.0, MIN( 1.0, RJUST( 1 ) ) )
                TBOX( 2 ) = Y1*( 1.0 - RJ ) + ( Y2 - HGT )*RJ
