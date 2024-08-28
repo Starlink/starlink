@@ -696,7 +696,7 @@ static void kps1Lft_work<T>( void *job_data_ptr, int *status ){
 
 
 /* Service function for "qsort" function. It accepts points to two
-   "int64_t" vaalues and returns an integer indicatig if the first is
+   "int64_t" vaalues and returns an integer indicating if the first is
    smaller than, equal to, or greater than the second. */
 static int comp<T>(  const void *a, const void *b ) {
    const int64_t *ia = (int64_t *) a;
