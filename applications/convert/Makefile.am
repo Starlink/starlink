@@ -13,12 +13,17 @@ dist_bin_SCRIPTS = convertndf convertawk mtfits2ndf.tcsh
 
 dist_noinst_SCRIPTS = convert_link_adam iraf_link
 
+if HAVE_WORKING_IRAF_IMFORT
+  IRAFLIBS = `$(srcdir)/iraf_link`
+else
+  IRAFLIBS =
+endif
 
 bin_MONOLITHS = convert_mon
 
 convert_mon_SOURCES = convert_mon.f $(TASKS:=.f) $(FPP_TASKS:=.F)
 convert_mon_LDADD = libcoi/libcoi.la libcof/libcof.la libcon/libcon.la \
-             iraf/libconspp.la $(FIGLIBS) `$(srcdir)/iraf_link` \
+             iraf/libconspp.la $(FIGLIBS) $(IRAFLIBS) \
              `$(srcdir)/convert_link_adam`
 convert_mon_TASKS = $(TASKS) $(FPP_TASKS)
 

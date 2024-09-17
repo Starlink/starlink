@@ -99,6 +99,7 @@ if test -f "iraf/libimfort.a"; then
    LIBS=$iraf_save_LIBS
 fi
 AC_MSG_RESULT([$irafgood])
+AM_CONDITIONAL(HAVE_WORKING_IRAF_IMFORT, test x$irafgood = xyes)
 
 dnl    Old test.
 dnl AC_CHECK_FILES([iraf/libimfort.a])
