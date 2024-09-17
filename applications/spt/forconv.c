@@ -152,7 +152,7 @@ int *sae_par;
 	}
 }
 
-main(argc, argv)
+int main(argc, argv)
 int argc;
 char *argv[];
 {
