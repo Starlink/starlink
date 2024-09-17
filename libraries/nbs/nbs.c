@@ -1035,7 +1035,7 @@ int NBS_BEGIN_DEFINITION ( item_id *sid, W_INTEGER(status) )
    be greater than zero is to allow a distinction between a NIL pointer and a
    pointer that has been relocated to zero. */
 
-      if (NBS_INIT_ALLOC (max_defn_size,DATA_BASE) == NIL)
+      if (NBS_INIT_ALLOC (max_defn_size, (char*) DATA_BASE) == NIL)
          {
 	 *status = NBS__INITALLOCFAILED;
          emsRep( "NBS_BEGIN_DEFINITION_ALLOCFAIL",
