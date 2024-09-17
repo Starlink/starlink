@@ -569,7 +569,7 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
 /* Otherwise, note the current time and loop until the process
    terminates (as notified by the HandleSIGCHLD signal handler). */
       } else {
-         time1 = time( (time_t) NULL );
+         time1 = time( (time_t*) NULL );
 #if PRINT
          (void) fprintf(stderr,  "WaitK: Waiting for %s process %ld to terminate.\n",
                         task->detached ? "detached" : "attached",
@@ -580,7 +580,7 @@ static void WaitK( pid_t pid, int timeout, int *status ) {
 
 /* Determine how long we have been waiting, if time information is
    available. */
-            time2 = time( (time_t) NULL );
+            time2 = time( (time_t*) NULL );
             delay = 0.0;
             if ( ( time1 != (time_t) -1 ) && ( time2 != (time_t) -1 ) ) {
                delay = difftime( time2, time1 );
@@ -891,7 +891,7 @@ static pid_t LoadW( const char *name, const char *file, int detach,
 
 /* If this is the parent process, record the current time. */
             } else {
-               time1 = time( (time_t) NULL );
+               time1 = time( (time_t*) NULL );
 
 /* Insert the child PID into the active task list. */
                task = NewTask( pid, detach );
@@ -968,7 +968,7 @@ static pid_t LoadW( const char *name, const char *file, int detach,
 
 /* Check how long we have been waiting to make the connection. If this
    exceeds the timeout period, then report an error. */
-                  time2 = time( (time_t) NULL );
+                  time2 = time( (time_t*) NULL );
                   delay = 0.0;
                   if ( ( time1 != (time_t) -1 ) && ( time2 != (time_t) -1 ) ) {
                      delay = difftime( time2, time1 );
