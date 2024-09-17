@@ -1,5 +1,5 @@
 #include <stdlib.h>
-main () {
+int main () {
     /* Are we little or big endian?  Originally from Harbison and Steele. */
     union
     {
