@@ -261,6 +261,7 @@ itcl::class gaia::GaiaStartup {
 
       set values_(blank_color) black
       set values_(image_background) black
+      set values_(pos_interest_color) green
    }
 
    #  Update the properties object to the local values and cause a
@@ -313,6 +314,8 @@ itcl::class gaia::GaiaStartup {
             $values_(blank_color)
          $itk_option(-gaia) configure -image_background \
             $values_(image_background)
+         $itk_option(-gaia) configure -pos_interest_color \
+            $values_(pos_interest_color)
 
          $itk_option(-gaia) configure -unicoderadec \
             $values_(unicoderadec)
@@ -766,6 +769,26 @@ itcl::class gaia::GaiaStartup {
       $itk_component(backgroundcolour) configure \
          -value $values_(image_background)
 
+      #  Position of interest colour.
+      itk_component add posinterestcolour {
+         util::LabelMenu $parent.posinterestcolour \
+            -text "Position of interest colour:" \
+            -labelwidth $lwidth_ \
+            -variable [scope values_(pos_interest_color)]
+      }
+      foreach colour $colours_ {
+         $itk_component(posinterestcolour) add \
+            -label {    } \
+            -value $colour \
+            -background $colour \
+            -command [code $this set_value_ pos_interest_color $colour]
+      }
+      add_short_help $itk_component(posinterestcolour) \
+         {Colour for interop position of interest (requires restart)}
+      pack $itk_component(posinterestcolour) -side top -fill x -expand 0
+      $itk_component(posinterestcolour) configure \
+         -value $values_(pos_interest_color)
+
    }
 
    #  Add "font" controls.
@@ -897,6 +920,7 @@ itcl::class gaia::GaiaStartup {
       font_scale
       force_degrees
       image_background
+      pos_interest_color
       interop_menu
       isize
       labelfont
