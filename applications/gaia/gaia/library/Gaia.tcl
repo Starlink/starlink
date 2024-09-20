@@ -2415,6 +2415,32 @@ window gives you access to this."
 
       $m add separator
 
+      add_menuitem $m cascade "Position color" \
+         {Change the color of the position of interest} \
+         -menu [menu $m.position_color]
+      foreach colour $colours_ {
+         $m.position_color add radiobutton \
+            -background $colour \
+            -variable [scope itk_option(-pos_interest_color)] \
+            -value $colour \
+            -label {    } \
+            -command [code $this redraw_pos_interest_]
+      }
+
+      add_menuitem $m cascade "Position width" \
+         {Change the width of the position of interest} \
+         -menu [menu $m.position_width]
+      foreach i {1 2 3 4} {
+         $m.position_width add radiobutton \
+            -bitmap width$i \
+            -variable [scope itk_option(-pos_interest_width)] \
+            -value $i \
+            -label {    } \
+            -command [code $this redraw_pos_interest_]
+      }
+
+      $m add separator
+
       set samp_send_image_menu_ [menu $m.send_image]
       add_menuitem $m command "Broadcast Image" \
          {Send the current image to all SAMP-registered applications} \
@@ -2536,63 +2562,94 @@ window gives you access to this."
    public method position_of_interest {ra dec units} {
 
       #  If this is the same position remove marker.
-      if { "$ra,$dec" == $last_position_of_interest_ } {
-         if { $position_of_interest_ != {} } {
-            set canvas [$image_ get_canvas]
-            $canvas delete $position_of_interest_
-            set position_of_interest_ {}
-         }
-         set last_position_of_interest_ {}
+      if { "$ra" == "$last_pos_interest_ra_" &&
+           "$dec" == "$last_pos_interest_dec_" &&
+           "$units" == "$last_pos_interest_units_" } {
+         del_pos_interest_
+
+         set last_pos_interest_ra_ {}
+         set last_pos_interest_dec_ {}
+         set last_pos_interest_units_ {}
 
       } else {
-         set canvas [$image_ get_canvas]
-         set image [$image_ get_image]
-         lassign [$image scale] xs ys
-         if { $position_of_interest_ == {} } {
-            set position_of_interest_ [$canvas create rtd_mark 0 0 \
-                                          -type circle -scale $xs -fixscale 0 \
-                                          -minscale 1 -size 11 \
-                                          -outline "green"]
-         }
+         plot_pos_interest_ "$ra" "$dec" "$units"
+      }
+   }
 
-         #  Transform to canvas coordinates and move the marker to that
-         #  position.
-         if { ! [catch {$image convert coords $ra $dec $units \
-                           cx cy canvas} msg ] } {
-            #  Check for AST__BAD returns.
-            if { [expr abs($cx)] < 1.0E20 } {
-               $canvas coords $position_of_interest_ $cx $cy
-               set last_position_of_interest_ "$ra,$dec"
+   protected method plot_pos_interest_ {ra dec units} {
+      set canvas [$image_ get_canvas]
+      set image [$image_ get_image]
+      lassign [$image scale] xs ys
+      if { $position_of_interest_ == {} } {
+         set color $itk_option(-pos_interest_color)
+         set width $itk_option(-pos_interest_width)
+         set position_of_interest_ [$canvas create rtd_mark 0 0 \
+                                       -type circle -scale $xs -fixscale 0 \
+                                       -minscale 1 -size 11 \
+                                       -outline $color -width $width]
+      }
 
-               #  Make sure the position is visible, cannot succeed when the
-               #  image is zoomed and the position is off image.
-               set dw [$image dispwidth]
-               set dh [$image dispheight]
-               set cw [winfo width $canvas]
-               set ch [winfo height $canvas]
-               if { $cw != 1 && $dw && $dh } {
-                  set px [expr ($cx+0.0)/$dw]
-                  set py [expr ($cy+0.0)/$dh]
-                  set xrange [$canvas xview]
-                  set yrange [$canvas yview]
+      #  Transform to canvas coordinates and move the marker to that
+      #  position.
+      if { ! [catch {$image convert coords $ra $dec $units \
+                        cx cy canvas} msg ] } {
+         #  Check for AST__BAD returns.
+         if { [expr abs($cx)] < 1.0E20 } {
+            $canvas coords $position_of_interest_ $cx $cy
+            set last_pos_interest_ra_ "$ra"
+            set last_pos_interest_dec_ "$dec"
+            set last_pos_interest_units_ "$units"
 
-                  #  Only move if the position is not currently visible, and
-                  #  the image is larger than the window in at least one
-                  #  dimension.
-                  if { $dw > $cw || $dh > $ch } {
-                     if { $px < [lindex $xrange 0] || $px > [lindex $xrange 1] ||
-                          $py < [lindex $yrange 0] || $py > [lindex $yrange 1] } {
-                        $canvas xview moveto [expr (($cx-$cw/2.0)/$dw)]
-                        $canvas yview moveto [expr (($cy-$ch/2.0)/$dh)]
-                     }
+            #  Make sure the position is visible, cannot succeed when the
+            #  image is zoomed and the position is off image.
+            set dw [$image dispwidth]
+            set dh [$image dispheight]
+            set cw [winfo width $canvas]
+            set ch [winfo height $canvas]
+            if { $cw != 1 && $dw && $dh } {
+               set px [expr ($cx+0.0)/$dw]
+               set py [expr ($cy+0.0)/$dh]
+               set xrange [$canvas xview]
+               set yrange [$canvas yview]
+
+               #  Only move if the position is not currently visible, and
+               #  the image is larger than the window in at least one
+               #  dimension.
+               if { $dw > $cw || $dh > $ch } {
+                  if { $px < [lindex $xrange 0] || $px > [lindex $xrange 1] ||
+                       $py < [lindex $yrange 0] || $py > [lindex $yrange 1] } {
+                     $canvas xview moveto [expr (($cx-$cw/2.0)/$dw)]
+                     $canvas yview moveto [expr (($cy-$ch/2.0)/$dh)]
                   }
                }
-            } else {
-               error "Failed to set interest position: bad coordinates"
             }
          } else {
-            error "Failed to set interest position: $msg"
+            error "Failed to set interest position: bad coordinates"
          }
+      } else {
+         error "Failed to set interest position: $msg"
+      }
+   }
+
+   protected method del_pos_interest_ {} {
+      if { $position_of_interest_ != {} } {
+         set canvas [$image_ get_canvas]
+         $canvas delete $position_of_interest_
+         set position_of_interest_ {}
+      }
+   }
+
+   protected method redraw_pos_interest_ {} {
+      del_pos_interest_
+
+      if { $last_pos_interest_ra_ != {} &&
+           $last_pos_interest_dec_ != {} &&
+           $last_pos_interest_units_ != {} } {
+
+         plot_pos_interest_ \
+            "$last_pos_interest_ra_" \
+            "$last_pos_interest_dec_" \
+            "$last_pos_interest_units_"
       }
    }
 
@@ -2984,6 +3041,10 @@ window gives you access to this."
    #  Colour for image background. Usually black.
    itk_option define -image_background image_background Image_Background black
 
+   #  Colour/width for position of interest.  Usually green/1.
+   itk_option define -pos_interest_color pos_interest_color Pos_Interest_Color green
+   itk_option define -pos_interest_width pos_interest_width Pos_Interest_Width 1
+
    #  Font scale factor. See tk scaling command.
    itk_option define -font_scale font_scale Font_Scale 0.0 {
       if { $itk_option(-font_scale) > 0.0 } {
@@ -3056,7 +3117,9 @@ window gives you access to this."
    protected variable position_of_interest_ {}
 
    #  Last world coordinates of position of interest.
-   protected variable last_position_of_interest_ {}
+   protected variable last_pos_interest_ra_ {}
+   protected variable last_pos_interest_dec_ {}
+   protected variable last_pos_interest_units_ {}
 
    #  Whether or not debugging is already started.
    protected variable debug_started_ 0
