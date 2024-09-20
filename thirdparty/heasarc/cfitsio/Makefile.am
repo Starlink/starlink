@@ -11,8 +11,8 @@ bin_SCRIPTS = cfitsio/imcopy cfitsio/fitscopy cfitsio/fitsverify
 lib_LIBRARIES = cfitsio/libcfitsio.a
 liblibdir = $(libdir)
 liblib_SCRIPTS = cfitsio/libcfitsio@SHLIB_SUFFIX@ \
-	cfitsio/libcfitsio@SHLIB_SUFFIX@.10 \
-	cfitsio/libcfitsio@SHLIB_SUFFIX@.10.@PACKAGE_VERSION@ \
+	cfitsio/libcfitsio@SHLIB_SUFFIX_SONAME@ \
+	cfitsio/libcfitsio@SHLIB_SUFFIX_VERSION@ \
 	cfitsio/cfitsio.pc
 
 # There are no sources for libcfits in this directory.

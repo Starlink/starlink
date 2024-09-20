@@ -19,10 +19,15 @@ STAR_DEFAULTS
 
 dnl    Copied from CFITSIO configure.in. Find out the suffix used 
 dnl    for shareable libraries. Default is ".so".
+CFITSIO_SONAME=10
 SHLIB_SUFFIX=".so"
+SHLIB_SUFFIX_VERSION="${SHLIB_SUFFIX}.${CFITSIO_SONAME}.${PACKAGE_VERSION}"
+SHLIB_SUFFIX_SONAME="${SHLIB_SUFFIX}.${CFITSIO_SONAME}"
 case "`uname -s`" in
     Darwin*)
         SHLIB_SUFFIX=".dylib"
+        SHLIB_SUFFIX_VERSION=".${CFITSIO_SONAME}.${PACKAGE_VERSION}${SHLIB_SUFFIX}"
+        SHLIB_SUFFIX_SONAME=".${CFITSIO_SONAME}${SHLIB_SUFFIX}"
 	;;
     HP-UX*)
         SHLIB_SUFFIX=".sl"
@@ -33,6 +38,8 @@ case "`uname -s`" in
     *)
 esac
 AC_SUBST(SHLIB_SUFFIX)
+AC_SUBST(SHLIB_SUFFIX_VERSION)
+AC_SUBST(SHLIB_SUFFIX_SONAME)
 
 dnl    To configure CFITSIO proper we just run ./configure in the
 dnl    cfitsio sub-directory. Do not invoke AC_CONFIG_SUBDIRS,
