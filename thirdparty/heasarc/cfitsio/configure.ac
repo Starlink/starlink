@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([cfitsio],[4.4.1],[starlink@jiscmail.ac.uk])
+AC_INIT([cfitsio],[4.5.0],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([.])
 
 dnl    Require autoconf-2.50 at least
@@ -17,29 +17,9 @@ AC_CONFIG_SRCDIR([cfitsio.news])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
-dnl    Copied from CFITSIO configure.in. Find out the suffix used 
-dnl    for shareable libraries. Default is ".so".
-CFITSIO_SONAME=10
-SHLIB_SUFFIX=".so"
-SHLIB_SUFFIX_VERSION="${SHLIB_SUFFIX}.${CFITSIO_SONAME}.${PACKAGE_VERSION}"
-SHLIB_SUFFIX_SONAME="${SHLIB_SUFFIX}.${CFITSIO_SONAME}"
-case "`uname -s`" in
-    Darwin*)
-        SHLIB_SUFFIX=".dylib"
-        SHLIB_SUFFIX_VERSION=".${CFITSIO_SONAME}.${PACKAGE_VERSION}${SHLIB_SUFFIX}"
-        SHLIB_SUFFIX_SONAME=".${CFITSIO_SONAME}${SHLIB_SUFFIX}"
-	;;
-    HP-UX*)
-        SHLIB_SUFFIX=".sl"
-	;;
-    CYGWIN*)
-        SHLIB_SUFFIX=".dll"
-	;;
-    *)
-esac
-AC_SUBST(SHLIB_SUFFIX)
-AC_SUBST(SHLIB_SUFFIX_VERSION)
-AC_SUBST(SHLIB_SUFFIX_SONAME)
+dnl    Find required versions of the programs we need for configuration
+LT_INIT
+AC_PROG_MAKE_SET
 
 dnl    To configure CFITSIO proper we just run ./configure in the
 dnl    cfitsio sub-directory. Do not invoke AC_CONFIG_SUBDIRS,
@@ -50,10 +30,6 @@ dnl    automake to assume it's allowed to play there, too.
     ./configure --prefix=$prefix
 )
 
-dnl    Find required versions of the programs we need for configuration
-LT_INIT
-AC_PROG_MAKE_SET
-
 dnl    Check for libraries needed for network services. These are added 
 dnl    to the standard link script.
 AC_SEARCH_LIBS([gethostbyname], [nsl])
@@ -62,6 +38,14 @@ AC_SEARCH_LIBS([connect], [socket],,, [-lnsl])
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun227)
+
+dnl    Install using a staging area to get all files listed in
+dnl    in the manifest.
+STAR_SPECIAL_INSTALL_COMMAND([
+   ( cd cfitsio; $(MAKE) DESTDIR=$$DESTDIR install ); \
+   $(MAKE) DESTDIR=$$DESTDIR install-exec; \
+   $(MAKE) DESTDIR=$$DESTDIR install-data
+])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
