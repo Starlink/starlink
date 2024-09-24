@@ -22,7 +22,7 @@ dnl    since that prompts autoreconf to try to reconfigure that directory, and
 dnl    automake to assume it's allowed to play there, too.
 (
     cd hdf5
-    ./configure --prefix=$prefix --enable-threadsafe --disable-hl H5_CFLAGS="-fPIC -Wno-error=implicit-function-declaration"
+    ./configure --prefix=$prefix --enable-threadsafe --disable-hl H5_CFLAGS="-fPIC -Wno-error=implicit-function-declaration -Wno-error=incompatible-function-pointer-types"
 )
 
 dnl    Find required versions of the programs we need for configuration
