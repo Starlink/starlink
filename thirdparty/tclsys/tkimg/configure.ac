@@ -40,11 +40,19 @@ fi
 
 dnl    To configure TkImg, run ./configure in the subdirectory, passing on any
 dnl    command-line values. 
+dnl
+dnl    KLUDGE: to avoid picking up conflicting PNG library headers (e.g. on
+dnl    macOS when using CFLAGS="... -I/opt/X11/include ..."), prepend "-I." to
+dnl    CFLAGS and use a local config.cache file.
 (
+   if test -n "$CFLAGS"; then
+      export CFLAGS="-I. $CFLAGS"
+   fi
+
    cd tkimg; \
    cmd="./configure --prefix=$prefix \
                     --srcdir=. \
-                    --cache-file=../../config.cache \
+                    --cache-file=../config.cache \
                     --with-tcl=$with_tcl \
                     --with-tk=$with_tk \
                     $ac_configure_args"; \
