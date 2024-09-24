@@ -290,10 +290,10 @@ static void tkpg_update_clip(TkPgplot *tkpg);
 static void tkpg_update_border(TkPgplot *tkpg);
 
 static int PgplotCmd(ClientData context, Tcl_Interp *interp, int argc,
-		     char *argv[]);
+		     const char *argv[]);
 
 static int tkpg_InstanceCommand(ClientData context, Tcl_Interp *interp,
-				int argc, char *argv[]);
+				int argc, const char *argv[]);
 static int tkpg_InstanceCommand_return(ClientData context, int iret);
 
 static int tkpg_Configure(TkPgplot *tkpg, Tcl_Interp *interp,
@@ -446,7 +446,7 @@ int Tkpgplot_Init(Tcl_Interp *interp)
  *                          TCL_ERROR - Failure.
  */
 static int PgplotCmd(ClientData context, Tcl_Interp *interp, int argc,
-		     char *argv[])
+		     const char *argv[])
 {
   Tk_Window main_tkw = (Tk_Window)context; /* The application main window */
   TkPgplot *tkpg;                          /* The new widget instance object */
@@ -1434,7 +1434,7 @@ void DRIV(ifunc, rbuf, nbuf, chr, lchr, len)
  *                          TCL_ERROR - Failure.
  */
 static int tkpg_InstanceCommand(ClientData context, Tcl_Interp *interp,
-			       int argc, char *argv[])
+			       int argc, const char *argv[])
 {
   TkPgplot *tkpg = (TkPgplot *) context;
   char *widget;     /* The name of the widget */
