@@ -86,7 +86,7 @@ class FixupBase():
         '.tcl', '.pl', '.py', '.sh', '.csh', '.icl', '.pro',
         '.la', '.a', '.o')
 
-    pattern_so_filename = re.compile('\.so(\.\d+)*$')
+    pattern_so_filename = re.compile(r'\.so(\.\d+)*$')
 
     def find_files(self, starlink_dir):
         logger.critical('Looking for libraries and executables')
@@ -384,8 +384,8 @@ class FixupLinux(FixupBase):
     )
 
     pattern_executable = re.compile(b'ELF .* executable')
-    pattern_ldd_output = re.compile('=>\s*(\S+)\s*\(')
-    pattern_objdump_output = re.compile('(\S+)\s*(\S+)')
+    pattern_ldd_output = re.compile(r'=>\s*(\S+)\s*\(')
+    pattern_objdump_output = re.compile(r'(\S+)\s*(\S+)')
 
     def is_executable(self, filepath):
         if not super().is_executable(filepath):
