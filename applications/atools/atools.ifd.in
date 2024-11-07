@@ -2119,15 +2119,6 @@ iraf! {
       action astangle {
          helplib {$ATOOLS_HELP}
 
-         parameter fmt {
-            type LITERAL
-            prompt {Format for output text file}
-            ppath DEFAULT
-            vpath DEFAULT
-            default AST
-            helpkey *
-          }
-
           parameter a {
             position 2
             type _DOUBLE
@@ -2166,6 +2157,15 @@ iraf! {
             ppath CURRENT DEFAULT
             vpath DEFAULT
             default FALSE
+            helpkey *
+          }
+
+         parameter fmt {
+            type LITERAL
+            prompt {Format for output text file}
+            ppath DEFAULT
+            vpath DEFAULT
+            default AST
             helpkey *
           }
 
