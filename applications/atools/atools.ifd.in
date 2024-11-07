@@ -2136,6 +2136,14 @@ iraf! {
             helpkey *
           }
 
+          parameter angle {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+
           parameter b {
             position 3
             type _DOUBLE
