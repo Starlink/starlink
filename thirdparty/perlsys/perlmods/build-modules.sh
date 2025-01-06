@@ -92,10 +92,10 @@ do
         echo Mangling interpreter for ${i}.
         if [ -w $i ]
         then
-            ed $i < ${PERLMOD_DIR}/perlmods-starperl.ed
+            $starperl -pi ${PERLMOD_DIR}/perlmods-starperl.pl $i
         else
             chmod u+w $i
-            ed $i < ${PERLMOD_DIR}/perlmods-starperl.ed
+            $starperl -pi ${PERLMOD_DIR}/perlmods-starperl.pl $i
             chmod u-w $i
         fi
     else
