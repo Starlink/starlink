@@ -76,6 +76,8 @@
 *         Use DAT__FLEXT rather than hard coded ".sdf"
 *      Modified pwd 23/01/09
 *         Fix problem in keyboard_input introduced by last changes.
+*      Modified gsb 14/01/25
+*         Remove use of TIOCSTI (not available by default since Linux 6.2).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1507,8 +1509,6 @@ sig_handler( int signo )
 void
 initscreen(int nolines)
 {
-    char ch;
-    int i;
     struct sigaction act;
 
 /*
@@ -1519,40 +1519,6 @@ initscreen(int nolines)
 	tcgetattr(fileno(stdin), &init_tty);
 	if (!(init_tty.c_lflag & ICANON)) /* ensure restore to standard state */
 	    init_tty.c_lflag |= (ICANON | ECHO | ISIG);
-/*
- * We change the terminal mode to be single character input. This may clear
- * the tty driver type=ahead buffer so we pick up the contents of this buffer
- * (by simulating a '\n' typed on the terminal) and transfer the characters to
- * our own type-ahead buffer
- */
-
-/* Firstly turn off echo so our additional newline is not visible */
-        init_tty.c_lflag &= ~ECHO;
-        tcsetattr(fileno(stdin), TCSANOW, &init_tty);
-/* Restore the init_tty structure to provide echo when next used */
-        init_tty.c_lflag |= ECHO;
-
-/* Now simulate a 'newline' */
-        ch = '\n';
-/* Cygwin doesn't offer this, so just do nothing... */
-#ifdef TIOCSTI
-	if (ioctl(fileno(stdin), TIOCSTI, &ch) < 0) /* Simulate \n tty input */
-	    perror("initscreen - ioctl  error");
-	else {
-	    keyboard_input();             /* Read type-ahead into buffer */
-	    decinbuf_rpos(); /* Forget forced \n */
-	}
-#endif
-
-/*
- * Any typeahead input will have had '\r' converted to '\n' as the tty
- * is still in normal buffered mode. Undo this conversion before we process
- * the buffer.
- */
-        if (inbuf_rpos != 0)
-	   for( i = 0; i < inbuf_rpos; i++)
-		if (inbuff[i] == '\n')
-		    inbuff[i] = '\r';
 /*
  * icl-io uses curses/terminfo. Initially we are in LINEMODE so the terminfo
  * package is sufficient. Later we may need to initialise curses.

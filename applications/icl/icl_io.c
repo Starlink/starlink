@@ -28,6 +28,8 @@
  *       Now use autoconf test for atexit. GLOB_NOMATCH is not standard.
  *     24-OCT-2008 (PWD):
  *       Increase a buffer from 255 to the standard 256 in keyboard_input.
+ *     14-JAN-2025 (GSB):
+ *       Remove use of TIOCSTI (not available by default since Linux 6.2).
  *
  * Source file for the basic ICL input/output subsystem. This is a separate
  * processs forked by ICL which handles terminal I/O. It does this by
@@ -2379,8 +2381,7 @@ sig_handler( int signo )
 *
 *******************************************************************************/
 void initscreen(int nolines) {
-char ch;
-int i, nochars;
+int nochars;
 struct sigaction act;
 
     if (screenstate == 0) { /* ICL startup */
@@ -2400,37 +2401,6 @@ struct sigaction act;
 #else
 # error "Do not know how to register an exit handler"
 #endif
-/*
- * We change the terminal mode to be single character input. This may clear
- * the tty driver type=ahead buffer so we pick up the contents of this buffer
- * (by simulating a '\n' typed on the terminal) and transfer the characters to
- * our own type-ahead buffer
- */
-#ifdef TIOCSTI
-/* Firstly turn off echo so our additional newline is not visible */
-        init_tty.c_lflag &= ~ECHO;
-        tcsetattr(fileno(stdin), TCSANOW, &init_tty);
-/* Restore the init_tty structure to provide echo when next used */
-        init_tty.c_lflag |= ECHO;
-
-/* Now simulate a 'newline' */
-        ch = '\n';
-	if (ioctl(fileno(stdin), TIOCSTI, &ch) < 0) /* Simulate \n tty input */
-	    perror("initscreen - ioctl  error");
-	else {
-	    keyboard_input();             /* Read type-ahead into buffer */
-	    decinbuf_rpos(); /* Forget forced \n */
-	}
-#endif
-/*
- * Any typeahead input will have had '\r' converted to '\n' as the tty
- * is still in normal buffered mode. Undo this conversion before we process
- * the buffer.
- */
-        if (inbuf_rpos != 0)
-	   for( i = 0; i < inbuf_rpos; i++)
-		if (inbuff[i] == '\n')
-		    inbuff[i] = '\r';
 /*
  * icl-io uses curses/terminfo. Initially we are in LINEMODE so the terminfo
  * package is sufficient. Later we may need to initialise curses.
