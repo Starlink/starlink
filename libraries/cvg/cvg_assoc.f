@@ -120,7 +120,7 @@
          STATUS = PAR__ABORT
          CALL MSG_SETC( 'PARAM', PARAM )
          CALL ERR_REP( ' ', 'Aborted attempt to associate an '//
-     :                 'existing FITS file the the ''%^PARAM'' '//
+     :                 'existing FITS file with the ''%^PARAM'' '//
      :                 'parameter.', STATUS )
 
 *  If an "null" NDF was specified, then annul any error messages and
