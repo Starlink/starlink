@@ -1,17 +1,18 @@
 \documentclass[11pt,oneside,chapters]{starlink}
 
 \usepackage{amsfonts}
+\usepackage{graphbox}
 
 \stardoccategory    {Starlink Cookbook}
 \stardocinitials    {SC}
 \stardocsource      {sc\stardocnumber}
-\stardoccopyright   {Copyright \copyright\ 2015-2021 Science and Technology Facilities Council,\\
+\stardoccopyright   {Copyright \copyright\ 2015-2025 Science and Technology Facilities Council,\\
                     \& East Asian Observatory}
-\stardocnumber      {20.3}
+\stardocnumber      {20.4}
 \stardocauthors     {H.\ S.\ Thomas, Malcolm J.\ Currie, \& H.\ A.\ L.\ Parsons}
-\stardocdate        {2021 June 22}
+\stardocdate        {2025 January 26}
 \stardoctitle       {The Heterodyne Data Reduction Cookbook}
-\stardocversion     {1.3}
+\stardocversion     {1.4}
 \stardocmanual      {\ }
 \stardocabstract    {
       This cookbook provides a short introduction to Starlink
@@ -44,6 +45,7 @@
 \providecommand{\cadd}{\xref{\task{cadd}}{sun95}{CADD}}
 \providecommand{\chanmap}{\xref{\task{chanmap}}{sun95}{CHANMAP}}
 \providecommand{\contour}{\xref{\task{contour}}{sun95}{CONTOUR}}
+\providecommand{\fillbad}{\xref{\task{contour}}{sun95}{FILLBAD}}
 \providecommand{\gdstate}{\xref{\task{gdstate}}{sun95}{GDSTATE}}
 \providecommand{\mfittrend}{\xref{\task{mfittrend}}{sun95}{MFITTREND}}
 \providecommand{\nomagic}{\xref{\task{nomagic}}{sun95}{NOMAGIC}}
@@ -380,6 +382,7 @@ if possible to have a clean exit.
 \end{tip}
 
 \subsection{Extracting a value for scripting}
+\label{sec:parget}
 
 \parget\ is designed to make life easier when passing values between
 shell scripts. In the C-shell scripting example below, the median
@@ -685,6 +688,7 @@ Efficiencies}{http://www.eaobservatory.org/jcmt/instrumentation/heterodyne/calib
 
 
 \subsection{N\=amakanui frontend}
+\label{sec:namakanui}
 
 The N\=amakanui instrument is a spare receiver for the Greenland
 Telescope (GLT) on loan for use on the JCMT courtesy of ASIAA.
@@ -695,6 +699,7 @@ zero-based system: P0, P1. Each insert has a separate optical path and
 so only one receiver/frequency range can be used at any one time.
 
 \subsection{$`$\=U$`$\=u frontend (in commissioning)}
+\label{sec:uu}
 
 $`$\=U$`$\=u is one of three inserts held within the N\=amakanui
 instrument. $`$\=U$`$\=u is a dual linear polarizations Sideband
@@ -2286,6 +2291,151 @@ of the noise and can contain sharp edges. These problems can be
 mitigated but extra steps are required. See \cupidsun\ for more
 details.
 
+\section{Removing standing waves from spectra}
+
+Spectra in raster maps obtained with the
+\htmlref{$`$\=U$`$\=u}{sec:uu} insert of
+\htmlref{N\=amakanui}{sec:namakanui} commonly exhibit strong wave
+patterns, often with amplitudes that dwarf the emission line under
+scrutiny.  These originate from reflections in the optics and cables.
+If the optics or cables move as telescope travels between the ON and
+OFF positions, the wave pattern will alter, and the difference leaves
+the standing waves.  Large throws to the OFF location, as often
+demanded for Galactic Plane observations, are particularly prone to
+this artefact.  An example is shown in
+\cref{Figure}{fig:swexample}{}.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[align=c,width=0.375\linewidth]{sc20_swimage}
+\includegraphics[align=c,width=0.525\linewidth]{sc20_swspectrum}
+\typeout{sc20_swimage inserted on Page \arabic{page}}
+\typeout{sc20_swspectrum inserted on Page \arabic{page}}
+\caption[A reduced spectral cube with standing waves]
+{\label{fig:swexample}
+  The left panel is a position-position-velocity cube displayed at
+  the 59.5\kms\ plane. While it looks of reasonable quality, the right
+  panel, which plots the mean spectrum along the blue horizontal line,
+  shows otherwise, revealing standing waves.}
+\end{center}
+\end{figure}
+
+
+The solution to remove of the waves lies in the fact then the motion
+to the OFF position occurs only at the end of a scan row.  Thus the wave
+pattern is the same for all spectra in a scan row.  Taking the median
+of spectra devoid of emission should provide a good estimate of the
+standing-wave signal.  So first, you need to ascertain the scan direction
+from the FITS header SCAN\_PA.
+
+\begin{terminalv}
+% fitsval ppvcube SCAN_PA
+\end{terminalv}
+
+This will be either 0 or 90 degrees.  If there is no field rotation,
+90 means the scan is along the first pixel axis (longitude or right
+ascension), and 0 indicates scanning along the second pixel axis
+(latitude or declination).  For SCAN\_PA=90 and a spectral cube
+called ppvcube
+
+\begin{terminalv}
+% collapse in=ppvcube axis=1 estimator=median out=waves
+\end{terminalv}
+
+will create a new two-dimensional waves NDF that comprises the median
+spectra along each scan row.  Substitute \texttt{axis=2} if SCAN\_PA
+is 0.  Next grow this into the shape of ppvcube, duplicating the
+spectra along the scan axis.  For this you will need to know the
+original bounds of NDF cube, obtained with \ndftrace.  For
+programmatic access run \htmlref{\parget}{sec:parget}, for parameters
+\param{LBOUND} and \param{UBOUND} returned by \ndftrace.  Note that
+these are arrays, and you need to extract the bounds for the axis
+collapsed above.  The example below assumes that you have stored these
+bounds in variables \param{\$lbnd} and \param{\$ubnd}.
+
+\begin{terminalv}
+% manic in=waves out=waves_cube axes="[0,1,2]" lbound=$lbnd ubound=$ubnd
+\end{terminalv}
+
+When SCAN\_PA is 0, set \param{axes="[1,0,2]"} to recover the second
+axis.
+
+Then subtract the waves from the original ppvcube.
+\begin{terminalv}
+% sub in1=ppvcube in2=waves_cube out=ppvcube_nosw
+\end{terminalv}
+
+After this correction, the revised image displayed in
+\cref{Figure}{fig:noswexample}{} has a flatter and darker background.
+The standing waves are virtually gone from the spectrum, in which a
+weak emission line pokes out of the noise at 59\kms. The emission at
+that velocity is better seen in \cref{Figure}{fig:allspectra}{}.
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[align=c,width=0.375\linewidth]{sc20_noswimage}
+\includegraphics[align=c,width=0.525\linewidth]{sc20_noswspectrum}
+\typeout{sc20_noswimage inserted on Page \arabic{page}}
+\typeout{sc20_noswspectrum inserted on Page \arabic{page}}
+\caption[A reduced spectral cube with standing waves removed]
+{\label{fig:noswexample}
+  This shows the same data with identical scaling as in
+  \cref{Figure}{fig:swexample}{}, but after the subtraction of the
+  standing-wave signal.}
+\end{center}
+\end{figure}
+
+\begin{figure}[ht!]
+\begin{center}
+\includegraphics[align=c,width=0.48\linewidth]{sc20_swspectrum_all}
+\includegraphics[align=c,width=0.48\linewidth]{sc20_noswspectrum_all}
+\typeout{sc20_swspectrum_all inserted on Page \arabic{page}}
+\typeout{sc20_noswspectrum_all inserted on Page \arabic{page}}
+\caption[The mean spectrum before and after standing waves removal]
+{\label{fig:allspectra}
+  This shows the mean spectra of the entire cube depicted
+  in \cref{Figure}{fig:swexample}{}, showing the uncorrected spectrum
+  to the left and after standing-wave removal to the right.}
+\end{center}
+\end{figure}
+
+
+There is an additional complication should your data not be aligned
+along the pixel axes.  In such cases you will need to rotate the
+spectral cube such that scan rows are parallel to one of the pixel
+axes.  The rotation angle in degrees may be obtained from the FITS
+header MAP\_PA with \fitsval.
+
+\begin{terminalv}
+% rotate in=ppvcube out=rotatedcube angle=19.5
+\end{terminalv}
+
+Then after the subtraction of the waves, rotate the cube back to its
+original rotation, multiply the angle by --1.
+
+\begin{terminalv}
+% rotate in=rotated_ppvcube_nosw out=ppvcube_nosw angle=-19.5
+\end{terminalv}
+
+The outline example was for a row where the weak emission would not
+influence the median estimate of the standing wave.  Where the spectra
+contain significant emission signal, such spectra should be masked
+prior to the collapse step.  This could be via object detection (cf.
+\cref{Section}{sec:clumpfind}{}), possibly iteratively, having a first
+stab at the standing-wave signal, thereby refining the baseline
+subtract, and then run \findclumps\ again to improve the mask, and
+then refine the estimate of the standing-wave pattern.  Another method
+sets a threshold in the integ \htmlref{moments map}{sec:momentsmap}
+above which values are set to bad, in order to form a mask of the
+emission regions.
+
+This method breaks down when there are no valid spectra in a scan row.
+The velocity range(s) where the emission is located can be masked, and
+hence the standing-wave pattern in the baseline regions removed.  Some
+form of interpolation, such as \fillbad, across a narrow line may
+approximate the standing-wave signal there.  More-sophisticated
+approaches are beyond the scope of this cookbook.
+
 \section{Collapsing your map}
 
 An integrated intensity map can be created by collapsing your cube
@@ -2357,6 +2507,7 @@ regions set to 1.
 \end{enumerate}
 
 \subsection{Moments maps}
+\label{sec:momentsmap}
 
 You can use \collapse\ to generate the moments maps by selecting the
 appropriate \param{estimator} option---Integrated value
