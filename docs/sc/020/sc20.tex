@@ -665,7 +665,7 @@ The receiver temperature can be determined by measuring the effect of
 looking at hot and cold loads, where the cold load is black-body
 source.
 
-\item $T^*_{\textnormal{A}}({\textnormal{rms}})$ is the rms value of the noise observed
+\item $T^*_{\textnormal{A}}({\textnormal{rms}})$ is the RMS value of the noise observed
 in the spectrum in kelvin.
 \end{itemize}
 
@@ -5185,7 +5185,7 @@ BASELINE\_LINEARITY & If set to true, receptors with mostly or all non-linear
 
 BASELINE\_LINEARITY\_CLIP & This is used to reject receptors that have non-linear
                             baselines. It is the maximum number of standard deviations
-                            above the median rms deviations for which a detector's
+                            above the median RMS deviations for which a detector's
                             non-linearity is regarded as acceptable.\\
 
 BASELINE\_LINEARITY\_LINEWIDTH  & This is used to reject receptors that have non-linear
@@ -5196,7 +5196,7 @@ BASELINE\_LINEARITY\_LINEWIDTH  & This is used to reject receptors that have non
 BASELINE\_LINEARITY\_MINRMS & This is used to retain receptors that have noisy or
                               slightly non-linear baselines, or transient bad baselines
                               (cf. LOWFREQ\_INTERFERENCE).  The parameter is the minimum
-                              rms deviation from linearity, measured in antenna
+                              RMS deviation from linearity, measured in antenna
                               temperature, for a receptor to be flagged as bad.\\
 
 BASELINE\_LINEARITY\_SCALELENGTH & This is used to reject receptors that have non-linear
@@ -5351,12 +5351,12 @@ TSYSMAX        & Median T$_{\textnormal{sys}}>$ per receptor after flagging by F
                  must be $<$TSYSMAX \\
 TSYSVAR        & Maximum allowable receptor-to-receptor T$_{\textnormal{sys}}$ variation \\
 RMSVAR\_RCP    & Maximum allowable receptor-to-receptor RMS variation \\
-RMSVAR\_SPEC   & The average rms noise shall not vary by more than RMSVAR\_SPEC
+RMSVAR\_SPEC   & The average RMS noise shall not vary by more than RMSVAR\_SPEC
                  from one end of a spectrum to the other. \\
-RMSVAR\_MAP    & The rms noise in the map over the region with uniform sampling
+RMSVAR\_MAP    & The RMS noise in the map over the region with uniform sampling
                  shall not vary by more than RMSVAR\_MAP from one pixel to the
                  next. \\
-RMSTSYSTOL     & The rms that is measured for each receptor should agree with the
+RMSTSYSTOL     & The RMS that is measured for each receptor should agree with the
                  value expected from the system temperature, spectral resolution,
                  and integration time to within RMSTOL. \\
 RMSMEANTSYSTOL & Data with an RMS $>$ RMSMEANTSYSTOL\% of the mean RMS will get
