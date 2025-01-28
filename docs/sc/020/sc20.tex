@@ -907,7 +907,7 @@ The central panel of \cref{Figure}{fig:harpmodes}{} shows a
 HARP 3$\times$3 jiggle pattern.
 
 Each of these patterns can be pixel-centered, where the target
-co-ordinates fall on one of the central four pixels, or map-centered where
+co-ordinates fall on one of the central four pixels, or map-centred where
 the target co-ordinates lie at the centre of the map between the four
 central pixels. See \cref{Figure}{fig:jiggle}{} for an illustration of the
 different jiggle patterns. Although designed for HARP this mode can be
@@ -1329,7 +1329,7 @@ data.  This can be a higher-order polynomial (up to
 15$^{\textnormal{th}}$ order), although a linear fit is often used.
 
 \item A flat field, i.e. the relative responsivities of the detectors,
-is optionally created and applied.  It involes making cubes for each
+is optionally created and applied.  It involves making cubes for each
 each receptor combining all observations on a given date to improve
 the accuracy.  There is a choice of analysis methods, but an
 iterative approach of thresholding---to exclude the noisy baseline
@@ -2618,7 +2618,8 @@ pipeline also does this).  If you want to align using
 a non-heliocentric standard of rest, you should set the
 \att{AlignStdOfRest} attribute for your NDFs using \wcsattrib\
 before running \wcsmosaic.
-The following example sets the alignment to the kinematic LSR.
+The following example sets the alignment to the kinematic local
+standard of rest (LSR).
 
 \begin{terminalv}
 % wcsattrib <list_of_separate_cubes> set AlignStdOfRest LSRK
@@ -3251,10 +3252,10 @@ We then use the drop-down menu next to \guithing{Standard of rest} to select
 
 Now we see the unexpected line is at 0\kms, and is therefore likely to be
 contamination from telluric lines. To confirm a telluric line we can compare the
-frequency of the unidentified line to the frequency of known telluric lines. 
+frequency of the unidentified line to the frequency of known telluric lines.
 To get the frequency of the line again go to \guithing{Analysis} and click
 on \guithing{Change units} and then change the units to \guithing{Coordinates:
-Gigahertz}. Finally read off the position of the line. 
+Gigahertz}. Finally read off the position of the line.
 
 
 \clearpage
@@ -3701,7 +3702,7 @@ and also a spectral window.
 \section{Display synopsis of spectrum}
 \label{sec:splat-synopsis}
 
-When you initially open a specrum in \splat\ the synopsis of that spectrum
+When you initially open a spectrum in \splat\ the synopsis of that spectrum
 will automatically be overlaid on the spectrum displayed, if the metadata are
 known to \splat. The following are a list of possible properties
 than can be displayed, with a brief description. Names in parenthesis
@@ -3786,7 +3787,7 @@ button in your current spectral window.
 
 
 \item From the Coordinates drop-down menu select the desired unit
-(in this case we select \guithing{Kilometers-per-sec (radio)}).
+(in this case we select \guithing{Kilometres-per-sec (radio)}).
 Then click \guithing{Apply}.
 
 \begin{figure}[h!]
@@ -3937,7 +3938,7 @@ new window.
 \end{figure}
 
 \item Click and drag the regions you calculate the statistics over.
-As we wish to include baselines eithersie of the spectral line seen
+As we wish to include baselines either side of the spectral line seen
 in the data we click on the \guithing{Add} button a second time.
 
 \begin{figure}[h!]
