@@ -397,10 +397,17 @@ set med = `parget median histat`
 \end{terminalv}
 
 If the parameter comprises a vector of values these can be stored in a
-C-shell array. For other scripting languages such as Python, the
-alternative vector format produced by setting parameter VECTOR to TRUE
-may be more appropriate. Single elements of a parameter array may also
-be accessed using the array index in parentheses.
+C-shell array.
+
+In bash, the syntax is slightly different.
+\begin{terminalv}
+med=`parget median histat`
+\end{terminalv}
+
+For other scripting languages such as Python, the alternative vector
+format produced by setting parameter \param{VECTOR} to TRUE may be more
+appropriate. Single elements of a parameter array may also be accessed
+using the array index in parentheses.
 
 In addition to running \task{hdstrace} on the ADAM file, you can find
 a list of all parameter names that can be returned with \parget\ in
