@@ -2441,7 +2441,11 @@ The velocity range(s) where the emission is located can be masked, and
 hence the standing-wave pattern in the baseline regions removed.  Some
 form of interpolation, such as \fillbad, across a narrow line may
 approximate the standing-wave signal there.  More-sophisticated
-approaches are beyond the scope of this cookbook.
+approaches are beyond the scope of this cookbook, but some are
+embodied in an \ORACDR\ recipe \narrowline.  See
+\cref{Table}{tab:standing_params}{} for a list of its associated
+recipe parameters.
+
 
 \section{Collapsing your map}
 
@@ -5328,6 +5332,68 @@ REF\_SPECTRUM\_REGIONS & A comma-separated list of line extents ($v$2:$v$2) of t
   artefacts, either automatically or specified manually.  These methods are still experimental,
   although the manual identication is more reliable for known lines.  Therefore these parameters
   are currently available only in the \narrowline\ recipe.}
+\end{table}
+
+\begin{table}[h!]
+\begin{small}
+\begin{tabular}{|p{6.8cm}|p{8.6cm}|}
+\hline
+\textbf{Parameter} & \textbf{Description} \\
+\hline
+
+STANDING\_WAVE & If true (\texttt{1}), the recipe will attempt to remove standing waves. \\
+
+STANDING\_WAVE\_EMISSION\_MASK & If true (\texttt{1}), use the group integ map to
+                                 select the spectra that are free of emission. \\
+
+STANDING\_WAVE\_EMISSION\_REGIONS & A comma-separated list of velocity ranges,
+                                    $v$1:$v$2,\ to mask and interpolate across. \\
+
+STANDING\_WAVE\_EMISSION\_THRESHOLD & The temperature threshold above which pixels in
+                                      the integ map are deemed to have emission.  It
+                                      only applies if STANDING\_WAVE\_EMISSION\_MASK
+                                      is true.  This will usually be a small positive
+                                      value like \texttt{0.002}. \\
+
+STANDING\_WAVE\_EMISSION\_INTERPOLATE & If true (\texttt{1}), then interpolation will be
+                                        applied to the estimated standing-wave spectra, both
+                                        spatially across blank spectra and spectrally across
+                                        emission gaps. \\
+
+STANDING\_EMISSION\_INTERPOLATE\_WIDTH & When STANDING\_WAVE\_EMISSION\_INTERPOLATE is true,
+                                         this is the initial scale length in channels for smooth
+                                         interpolation.  If interpolation is requested, but
+                                         this parameter is undefined, the initial interpolation
+                                         scale length is determined empirically. \\
+
+STANDING\_WAVE\_REFINE & If true (\texttt{1}), the recipe will refine its estimated standing-wave
+                         spectra along each scan row.  How this is achieved is controlled by
+                         STANDING\_WAVE\_REFINE\_METHOD. \\
+
+STANDING\_WAVE\_REFINE\_METHOD & This decides which source position-position-velocity (PPV) cube
+                                 is refined.  The default is \texttt{"Original"} (may be
+                                 abbreviated to \texttt{"O"}), where the original PPV cubes are
+                                 reused.  The alternative is \texttt{"Corrected"} (may be
+                                 abbreviated to \texttt{"C"}), where the standing-wave filtered PPV
+                                 is refined.  In both methods, each PPV has an improved emission
+                                 mask, thanks to the initial estimate of the standing waves being
+                                 subtracted. \\
+
+STANDING\_WAVE\_SMOOTH & If set, a block smooth is applied to the spectra before
+                         subtraction.  This is normally a single positive odd integer
+                         specifying the smoothing kernel width in spectral channels,
+                         but there is also a multiscale facility available, if
+                         a comma-separated list is assigned to this parameter. \\
+
+\hline
+\end{tabular}
+\end{small}
+\caption{\label{tab:standing_params}
+  The recipe parameters associated with the filtering of standing
+  waves.  These methods are still experimental, although they have
+  been used successfully for a pair of large surveys.  These parameters
+  are currently available only in the \narrowline\ recipe.  They are
+  unsuited to emission that is broad spectrally.}
 \end{table}
 
 
