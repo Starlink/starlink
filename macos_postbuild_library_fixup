@@ -126,6 +126,14 @@ class FixupBase():
             if filepath.startswith(starperl_lib_dir):
                 continue
 
+            wrong_arch = False
+            for arch in ['/lib/x86/', '/lib/i386/', '/lib/sparc/']:
+                if arch in filepath:
+                    wrong_arch = True
+            if wrong_arch:
+                logger.warning('Old architecture: %s', filepath)
+                continue
+
             # Skip .dylib.dSYM?
             if '.dylib.dSYM/' in filepath:
                 continue
