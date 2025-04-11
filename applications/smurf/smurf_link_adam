@@ -111,7 +111,7 @@
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
            `gsd_link_adam` `thr_link_adam` \
-           -lgsl -lgslcblas -lfftw3_threads -lfftw3 -lpal -lsofa_c \
+           -lgsl -lgslcblas -lfftw3_threads -lfftw3 -lpal -lerfa \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

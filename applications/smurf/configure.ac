@@ -140,8 +140,8 @@ AC_CHECK_HEADERS(mach/mach.h)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae;
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq sofa pal one cfitsio thr sla ctg])
-STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq sofa pal one cfitsio thr sla ctg])
+STAR_DECLARE_DEPENDENCIES([build], [ast sae pcs mers ndf shl gsl ndg fftw ard kaplibs pda gsd irq erfa pal one cfitsio thr sla ctg])
+STAR_DECLARE_DEPENDENCIES([link], [ndf ast hlp ndg shl pda gsd irq erfa pal one cfitsio thr sla ctg])
 dnl We use the sst package to build documentation (prohlp and prolat)
 STAR_DECLARE_DEPENDENCIES([sourceset], [sst])
 

@@ -96,8 +96,8 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   /* Use the old instap values as the defaults for the new values. These
      defaults will be used if the FITS keywords have undefined values in the
      header. */
-  instapx = hdr->instap[ 0 ]/DAS2R;
-  instapy = hdr->instap[ 0 ]/DAS2R;
+  instapx = hdr->instap[ 0 ]/ERFA_DAS2R;
+  instapy = hdr->instap[ 0 ]/ERFA_DAS2R;
 
   /* Try getting INSTAP keywords. An error is reported (but then annulled)
      if either keyword is not present in the header. The values in instapx
@@ -110,7 +110,7 @@ void smf_instap_get( smfHead * hdr, int * status ) {
   if( *status == SMF__NOKWRD ) errAnnul( status );
 
   /* Convert from arc-secs to rads and store the values in the smfHead. */
-  hdr->instap[ 0 ] = instapx*DAS2R;
-  hdr->instap[ 1 ] = instapy*DAS2R;
+  hdr->instap[ 0 ] = instapx*ERFA_DAS2R;
+  hdr->instap[ 1 ] = instapy*ERFA_DAS2R;
 
 }

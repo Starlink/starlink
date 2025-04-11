@@ -268,8 +268,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   if ( *status != SAI__OK ) return;
 
   /* Get the cartesian coordinates of the telescope's location. */
-  smf_terr( gsdVars->telLatitude * DD2R, gsdVars->telHeight * 1000.0,
-            -gsdVars->telLongitude * DD2R, obsgeo );
+  smf_terr( gsdVars->telLatitude * ERFA_DD2R, gsdVars->telHeight * 1000.0,
+            -gsdVars->telLongitude * ERFA_DD2R, obsgeo );
 
   /* Get the telescope efficiency and convert from percentage to decimal */
   etal = gsdVars->etal / 100.0;

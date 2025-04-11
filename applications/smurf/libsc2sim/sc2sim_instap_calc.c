@@ -149,8 +149,8 @@ void sc2sim_instap_calc
   inx->instap_x = instap_arr[0] + instap_ms[0];
   inx->instap_y = instap_arr[1] + instap_ms[1];
 
-  instap[0] = DAS2R * inx->instap_x;
-  instap[1] = DAS2R * inx->instap_y;
+  instap[0] = ERFA_DAS2R * inx->instap_x;
+  instap[1] = ERFA_DAS2R * inx->instap_y;
 
 }
 

@@ -85,7 +85,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "ast.h"
-#include "sofa.h"
+#include "erfa.h"
 #include "star/one.h"
 #include "one_err.h"
 #include "mers.h"
@@ -112,10 +112,10 @@ void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filte
   if ( inx->planetnum < 0 ) {
     /* We have a fixed target so use RA, Dec */
     /* Return RA as HHMMSS - first arg means zero dp */
-    iauA2tf( 0, inx->ra, sign, iamsf );
+    eraA2tf( 0, inx->ra, sign, iamsf );
     sprintf( drgroup, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
     /* Return Dec as DDMMSS */
-    iauA2af( 0, inx->dec, sign, iamsf );
+    eraA2af( 0, inx->dec, sign, iamsf );
     one_strlcat( drgroup, sign, maxlen, status );
     sprintf( decstr, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
     one_strlcat( drgroup, decstr, maxlen, status);

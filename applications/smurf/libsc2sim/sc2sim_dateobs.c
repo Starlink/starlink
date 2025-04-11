@@ -87,8 +87,8 @@
 
 /* STARLINK includes */
 #include "sae_par.h"
-#include "sofa.h"
-#include "sofam.h"
+#include "erfa.h"
+#include "erfam.h"
 
 /* Simulator includes */
 #include "sc2sim.h"
@@ -108,10 +108,10 @@ void sc2sim_dateobs ( double mjdaystart, char *dateobs, int *status ) {
   if ( *status != SAI__OK) return;
 
   /* Convert this MJD to something more readable */
-  (void) iauJd2cal( DJM0, mjdaystart, &yy, &mm, &dd, &df );
+  (void) eraJd2cal( ERFA_DJM0, mjdaystart, &yy, &mm, &dd, &df );
 
   /* Convert day fraction to hh:mm:ss */
-  iauD2tf( 3, df, sign, ihmsf );
+  eraD2tf( 3, df, sign, ihmsf );
 
   /* Store this in dateobs as YYYY-MM-DDThh:mm:ss.sss */
   sprintf( dateobs, "%d-%02d-%02dT%02d:%02d:%02d.%03d",

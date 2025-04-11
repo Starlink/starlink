@@ -112,10 +112,10 @@ error can not determine PI
 
 /* Assume we now have access to the standard POSIX definitions */
 
-/* Use the SOFA conversion constants since we know those are going
+/* Use the ERFA conversion constants since we know those are going
    to be available */
 
-#include "sofam.h"
+#include "erfam.h"
 
 /* And some from slamac.h that SOFA did not always define */
 

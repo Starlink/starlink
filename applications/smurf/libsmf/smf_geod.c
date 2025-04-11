@@ -37,7 +37,7 @@
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 
 *  Notes:
-*     This routine is a thin wrapper around the SOFA function. It exists
+*     This routine is a thin wrapper around the ERFA function. It exists
 *     simply to enforce the use of WGS84 reference ellipsoid.
 
 *  History:
@@ -78,19 +78,20 @@
 /* SMURF includes */
 #include "smurf_par.h"
 #include "smf.h"
-#include "sofa.h"
+#include "erfa.h"
+#include "erfam.h"
 
 /* Constants */
 #define FUNC_NAME "smf_geod"
 
 void smf_geod( const double pos[3], double *phi, double *h, double *lambda ){
-  /* SOFA does not like to const */
+  /* ERFA does not like to const */
   double lpos[3];
 
   lpos[0] = pos[0];
   lpos[1] = pos[1];
   lpos[2] = pos[2];
 
-  iauGc2gd( 1 /* WGS84 */, lpos, lambda, phi, h );
+  eraGc2gd( ERFA_WGS84, lpos, lambda, phi, h );
 }
 

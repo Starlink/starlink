@@ -128,8 +128,8 @@ void sc2sim_getexternal
     astTran2( fs, 1, &temp1a, &temp2a, 0, &temp1b, &temp2b );
 
     /* Copy the coordinates to the position array */
-    (*posptr)[frame*2]= temp1b / DAS2R;
-    (*posptr)[frame*2+1]= temp2b / DAS2R;
+    (*posptr)[frame*2]= temp1b / ERFA_DAS2R;
+    (*posptr)[frame*2+1]= temp2b / ERFA_DAS2R;
 
 //    if( frame == 0 )
 //    {

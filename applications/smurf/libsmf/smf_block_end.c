@@ -106,7 +106,7 @@
 #include <stdio.h>
 
 /* Starlink includes */
-#include "sofa.h"
+#include "erfa.h"
 #include "star/pal.h"
 #include "sae_par.h"
 #include "mers.h"
@@ -388,9 +388,9 @@ static int smf1_hasmoved( double alpha_start, double beta_start, double ang_star
    parallel to tracking north. */
    if( moving ) {
       palDeuler( "ZY", state->tcs_tr_bc1, -state->tcs_tr_bc2, 0.0, rmat );
-      iauS2p( state->tcs_tr_ac1, state->tcs_tr_ac2, 1.0, p );
-      iauRxp( rmat, p, rp );
-      iauP2s( rp, alpha, beta, &r );
+      eraS2p( state->tcs_tr_ac1, state->tcs_tr_ac2, 1.0, p );
+      eraRxp( rmat, p, rp );
+      eraP2s( rp, alpha, beta, &r );
 
 /* If the target is not moving, just use the actual telescope position in
    the tracking system. */
@@ -402,7 +402,7 @@ static int smf1_hasmoved( double alpha_start, double beta_start, double ang_star
 /* Return the flag indicating if the focal plane has moved significantly
    with respect to the target object. */
    *angle = state->tcs_tr_ang;
-   return ( iauSeps( alpha_start, beta_start, *alpha, *beta ) > arcerror ||
+   return ( eraSeps( alpha_start, beta_start, *alpha, *beta ) > arcerror ||
             fabs( ang_start - *angle ) > angerror );
 }
 

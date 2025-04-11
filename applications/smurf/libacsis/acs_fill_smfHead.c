@@ -72,7 +72,7 @@
 #include "mers.h"
 #include "star/hds.h"
 #include "ndf.h"
-#include "sofa.h"
+#include "erfa.h"
 
 #include "libsmf/smf.h"
 #include "smurf_par.h"
@@ -250,8 +250,8 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
        stored in arcsec in the ACSIS data files. */
     if (fplanex && fplaney) {
       for (i = 0; i < sizex; i++) {
-	fplanex[i] = fpntrx[i] * DAS2R;
-	fplaney[i] = fpntry[i] * DAS2R;
+	fplanex[i] = fpntrx[i] * ERFA_DAS2R;
+	fplaney[i] = fpntry[i] * ERFA_DAS2R;
       }
     }
 
@@ -313,8 +313,8 @@ acs_fill_smfHead( smfHead * hdr, int indf, int * status ) {
 
     /* Find the arc-distance between the receppos position and the tr_AC1
        position. */
-                trd = iauSeps( rx, ry, trac1, trac2 );
-                azd = iauSeps( rx, ry, azac1, azac2 );
+                trd = eraSeps( rx, ry, trac1, trac2 );
+                azd = eraSeps( rx, ry, azac1, azac2 );
 
     /* If the receppos values are closer to the TRACKING values, then
        set a flag indicating that the receppos values should be treated

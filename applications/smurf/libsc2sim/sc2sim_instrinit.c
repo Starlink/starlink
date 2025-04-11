@@ -268,8 +268,8 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
     /* xbc and ybc are in radians at this point. Convert to arcsec */
     for ( j=0; j<nbol; j++ ) {
-      (*xbc)[j] *= DR2AS;
-      (*ybc)[j] *= DR2AS;
+      (*xbc)[j] *= ERFA_DR2AS;
+      (*ybc)[j] *= ERFA_DR2AS;
     }
 
     sc2sim_getspread ( nbol, *pzero, *heater, status );

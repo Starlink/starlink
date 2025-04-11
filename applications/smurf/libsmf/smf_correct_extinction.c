@@ -740,7 +740,7 @@ static int is_large_delta_atau ( double airmass1, double elevation1, double tau,
   double elevation2; /* elevation at edge of array */
   double airmass2;   /* airmass at edge of array */
   double delta;      /* difference between airmass1 and airmass2 times the tau  */
-  const double footprint = 10.0 * DD2R / 60.0;  /* 10 arcmin */
+  const double footprint = 10.0 * ERFA_DD2R / 60.0;  /* 10 arcmin */
   const double corrthresh = 0.02; /* threshold to switch from quick to slow as fraction */
 
   if (*status != SAI__OK) return 0;

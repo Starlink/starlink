@@ -120,7 +120,7 @@ double smf_map_getpixsize( const smfData *data, int *status ) {
   kpgPixsc( data->hdr->wcs, at, pixscl, NULL, NULL, 0, status );
   if( *status == SAI__OK ) {
     pixsize = (pixscl[0] + pixscl[1])/2.;
-    pixsize *= DR2AS;
+    pixsize *= ERFA_DR2AS;
 
     msgOutiff( MSG__DEBUG, "", FUNC_NAME
                ": determined pixel size from WCS at map coordinates (%g,%g) "

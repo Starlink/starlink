@@ -109,7 +109,7 @@
 #include "ndf.h"
 #include "sae_par.h"
 #include "star/ndg.h"
-#include "sofa.h"
+#include "erfa.h"
 #include "prm_par.h"
 #include "par_par.h"
 
@@ -230,8 +230,8 @@ void smf_flag_slewspeed( smfData *data, double smin, double smax,
        pos3_ac2 = allState[i+1].tcs_tr_ac2;
 
        /* calculate angular separations between sets of positions in arcsec */
-       sep1 = iauSeps( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * DR2AS;
-       sep2 = iauSeps( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * DR2AS;
+       sep1 = eraSeps( pos1_ac1, pos1_ac2, pos2_ac1, pos2_ac2 ) * ERFA_DR2AS;
+       sep2 = eraSeps( pos2_ac1, pos2_ac2, pos3_ac1, pos3_ac2 ) * ERFA_DR2AS;
 
        /* Check for zero step time. These can occur at the start and end of
           the timstream because padding samples are given identical TCS_TAI
