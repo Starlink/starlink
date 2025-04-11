@@ -141,7 +141,7 @@
 *     FIX = _LOGICAL (Read)
 *        If TRUE, then attempt to fix up the data to take account of the
 *        POL-2 triggering issue that causes extra POL_ANG values to be
-*        introduced into JCMTSTATE. [FALSE]
+*        introduced into JCMTSTATE. [TRUE]
 *     FLATUSENEXT = _LOGICAL (Read)
 *        If true the previous and following flatfield will be used to
 *        determine the overall flatfield to apply to a sequence. If false
@@ -168,7 +168,7 @@
 *        of the requested harmonic. Note, the reference direction for
 *        LSQFIT Stokes vectors is specified by parameter NORTH, whereas
 *        the reference direction for non-LSQFIT Stokes vectors is always
-*        focal plane Y. [FALSE]
+*        focal plane Y. [TRUE]
 *     MAXSIZE = _INTEGER (Read)
 *        The maximum number of time slices to include in any block. No upper
 *        limit is imposed on block size if MAXSIZE is zero or negative. Only
