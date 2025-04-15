@@ -1,13 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = libflu
 
 # These are modified on copy from the scripts directory
 bin_SCRIPTS = fluxes.sh fluxnow.sh
 dist_noinst_SCRIPTS = fluxes_link_adam scripts/fluxes.sh scripts/fluxnow.sh
 
 bin_MONOLITHS = fluxes
-fluxes_SOURCES = fluxes.f
-fluxes_LDADD = `$(srcdir)/fluxes_link_adam`
+fluxes_SOURCES = fluxes.c
+fluxes_LDADD = libflu/libflu.la `$(srcdir)/fluxes_link_adam`
 
 dist_starnews_DATA = fluxes.news
 dist_pkgdata_DATA = FLUXES_CONDITIONS
