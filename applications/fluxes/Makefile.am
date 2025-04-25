@@ -27,9 +27,11 @@ IFL_FILES = fluxes.ifl
 
 
 edit = sed \
+	-e 's,@@,_LITERAL_AT_SIGN_,g' \
 	-e 's,@bindir\@,$(bindir),g' \
 	-e 's,@staretcdir\@,$(staretcdir),g' \
-	-e 's,@sh\@,$(SH),g'
+	-e 's,@sh\@,$(SH),g' \
+	-e 's,_LITERAL_AT_SIGN_,@,g'
 
 fluxes.sh: scripts/fluxes.sh
 	-rm -f fluxes.sh
