@@ -54,20 +54,20 @@ The Jupiter brightness temperatures are obtained from the measurements of
 Griffin et al. (1986, Icarus 65, 244). The errors in brightness tempera-
 tures are the rms internal errors of the observations. For MJD's between 46040
 through 50000 the Martian temperatures are derived from the model developed by
-Wright (1976, Ap.J., 210, 250). Outside these MJD's (i.e., in particular after 
-10 October 1995) a simplified model of a rotating cratered asteroid is used 
-(Wright, E. L, 2007, astro-ph/0703640v1). Since the results for 
+Wright (1976, Ap.J., 210, 250). Outside these MJD's (i.e., in particular after
+10 October 1995) a simplified model of a rotating cratered asteroid is used
+(Wright, E. L, 2007, astro-ph/0703640v1). Since the results for
 Mars are derived from models no errors are quoted; however the Martian bright-
-ness temperatures are probably uncertain at the 5% level and this uncertainty 
-must be added to obtain the absolute errors. Over the interval for which both 
-the original Wright model and the simplified model are valid, the differences 
-in brightness temperatures have an rms error of 0.13 K (i.e. negligible). The 
-flux densities for Saturn are for the planetary disk only; an additional flux 
-is expected when the rings present an open aspect, and at such times Saturn 
-should not be used as a calibration object. Individuals using these data in 
+ness temperatures are probably uncertain at the 5% level and this uncertainty
+must be added to obtain the absolute errors. Over the interval for which both
+the original Wright model and the simplified model are valid, the differences
+in brightness temperatures have an rms error of 0.13 K (i.e. negligible). The
+flux densities for Saturn are for the planetary disk only; an additional flux
+is expected when the rings present an open aspect, and at such times Saturn
+should not be used as a calibration object. Individuals using these data in
 published works should reference the appropriate papers as noted above.
 
-The filter frequencies are the effective frequencies for 1mm of water vapour. 
+The filter frequencies are the effective frequencies for 1mm of water vapour.
 These are the SCUBA-2 filters.
 
 1300, 868, and 434 micron (234.5, 345.8, 691.5 GHz) are for heterodyne

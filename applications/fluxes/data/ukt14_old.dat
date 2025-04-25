@@ -46,7 +46,7 @@ al. (1986, Icarus 65, 244) and G.S. Orton et al. (1986, Icarus 67, 289). The
 errors in brightness temperatures are the rms internal errors of the observ-
 ations. The flux densities for Saturn are for the planetary disk only; an add-
 itional flux is expected when the rings present an open aspect, and at such
-times Saturn should not be used as a calibration object. 
+times Saturn should not be used as a calibration object.
 
 For MJD's between 46040 through 50000 the Martian temperatures are derived from
 the model developed by Wright (1976, Ap.J., 210, 250). Before MJD = 46040 a
@@ -56,12 +56,12 @@ models no errors are quoted; however the Martian bright-ness temperatures are
 probably uncertain at the 5% level and this uncertainty must be added to obtain
 the absolute errors. Over the interval for which both the original Wright model
 and the simplified model are valid, the differences in brightness temperatures
-have an rms error of 0.13 K (i.e. negligible). 
+have an rms error of 0.13 K (i.e. negligible).
 
-Individuals using these data in published works should reference the 
+Individuals using these data in published works should reference the
 appropriate papers as noted above.
 
-The filter frequencies are the effective frequencies for 1mm of water vapour. 
+The filter frequencies are the effective frequencies for 1mm of water vapour.
 
 
 Version 27-October-1995 (HEM)
