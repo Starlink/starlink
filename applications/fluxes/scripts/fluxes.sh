@@ -36,7 +36,7 @@
 #       Forward arguments to fluxes executable and print fewer messages
 #       if the arglist contains screen=n.
 #     14-JUL-2004 (TIMJ):
-#       Uses @bindir@ rather than INSTALL_BIN
+#       Uses @@bindir@@ rather than INSTALL_BIN
 #       Uses FLUXES_DIR and JPL_DIR environment variable if set
 #     2012-08-10 (TIMJ):
 #       Remove JPL logic.

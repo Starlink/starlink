@@ -34,7 +34,7 @@
 #     07-FEB-1997 (BLY):
 #       Modified setting of FLUXPWD since $PWD not guranteed on Dec-Unix.
 #     14-JUL-2004 (TIMJ):
-#       Uses @bindir@ rather than INSTALL_BIN
+#       Uses @@bindir@@ rather than INSTALL_BIN
 #       Uses FLUXES_DIR and JPL_DIR environment variable if set
 #     2012-08-10 (TIMJ):
 #       Remove JPL logic.
