@@ -558,6 +558,23 @@ sub acsis_header {
       $mode =~ s/GRID/GRD/;
     }
 
+    my $mode_extra = '-';
+    if ($mode =~ /focus/i) {
+      $mode_extra = $fitsitem->{'FOCAXIS'};
+    }
+    elsif ($mode =~ /pointing/i) {
+      my $n = $fitsitem->{'JIGL_CNT'};
+      unless (defined $n) {
+        $mode_extra = '?';
+      }
+      elsif ($n < 10) {
+        $mode_extra = $n;
+      }
+      else {
+        $mode_extra = 'M';
+      }
+    }
+
 #    print "$A{RUN} $mode $A{UT} \'$A{OBJECT}\' $A{PROJECT} $rx $boloms $filter $A{CSOTAU} $A{SEEING}\n";
 
     # Declare formats here since it has to be in scope of the lexical variables
@@ -567,7 +584,7 @@ $origin
 .
 
 format STDOUT_LONG_ACS =
-@<<<<< UT Projid   Mode     InBeam Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys Dome    Az    El   Uaz    Uel  Bwmode       Simulate
+@<<<<< UT Projid   X Mode     InBeam Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys Dome    Az    El   Uaz    Uel  Bwmode       Simulate
 $origin
 .
 
@@ -577,8 +594,8 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, 
 .
 
 format LONG_ACS =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<< @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>> @<<<<<<<
-$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{DOMESTATE}, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode, $A{SIMULATE}
+@<< @<<<< @<<<<<<< @ @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<< @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>> @<<<<<<<
+$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode_extra, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{DOMESTATE}, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode, $A{SIMULATE}
 .
 
     # Set format
@@ -667,6 +684,11 @@ sub scuba2_header {
       $mode =~ s/FIELD/FLD/i;
     }
 
+    my $mode_extra = '-';
+    if ($mode =~ /focus/i) {
+      $mode_extra = $fitsitem->{'FOCAXIS'};
+    }
+
     # Prepend in-beam information to mode unless the shutter is closed
     my $inbeam =  '';
     $inbeam = $S{INBEAM} unless $fitsitem->{SHUTTER} < 0.5;
@@ -680,7 +702,7 @@ $origin
 .
 
 format STDOUT_LONG_SCU2 =
-@<<<<< UT Projid   Mode     InBeam Source                   Map      Secs    Tau    WVM   See Dome      Az    El   Uaz    Uel  Simulate
+@<<<<< UT Projid   X Mode     InBeam Source                   Map      Secs    Tau    WVM   See Dome      Az    El   Uaz    Uel  Simulate
 $origin
 .
 
@@ -691,8 +713,8 @@ $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{O
 .
 
 format LONG_SCU2 =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<< @<<<  @<<<<< @<<<< @<<<<< @<<<<< @<<<<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{DOMESTATE}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}, $S{SIMULATE}
+@<< @<<<< @<<<<<<< @ @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<< @<<<  @<<<<< @<<<< @<<<<< @<<<<< @<<<<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode_extra, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{DOMESTATE}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}, $S{SIMULATE}
 .
 
     # Set format
