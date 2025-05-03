@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="xerces-c" support="U">
-  <version>3.1.1</version>
+  <version>3.3.0</version>
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <!-- <abstract><p></p></abstract> -->
