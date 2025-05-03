@@ -100,46 +100,8 @@ dist_starnews_DATA = atools.news
 MISC_FILES = asttest dtask_applic.lo atools.shl history.help \
 atools_mon version.dat atools.csh atools.icl atools.sh
 
-IFC_FILES = astaddframe.ifc astclear.ifc astcmpframe.ifc astcmpmap.ifc \
-astratemap.ifc astconvert.ifc astcopy.ifc astdsbframe.ifc astellipse.ifc \
-astfindframe.ifc astmatchaxes.ifc astfluxframe.ifc astformat.ifc astunformat.ifc astframe.ifc \
-astframeset.ifc astgetactunit.ifc astgetframe.ifc astget.ifc \
-astgetmapping.ifc astgetrefpos.ifc astinvert.ifc astlutmap.ifc \
-astmapbox.ifc astmathmap.ifc astmatrixmap.ifc astpcdmap.ifc astbox.ifc \
-astpermaxes.ifc astpermmap.ifc astpickaxes.ifc astpolygon.ifc \
-astinterval.ifc astpolymap.ifc astremapframe.ifc astremoveframe.ifc \
-astsetactunit.ifc astset.ifc astsetrefpos.ifc astsfluxframe.ifc \
-astshiftmap.ifc astsimplify.ifc astskyframe.ifc asttimeframe.ifc astspecframe.ifc \
-asttest.ifc asttran1.ifc asttran2.ifc astswitchmap.ifc asttranmap.ifc asttrann.ifc \
-astunitmap.ifc astwinmap.ifc atlhelp.ifc astmapsplit.ifc atools_mon.ifc \
-astselectormap.ifc astmapregion.ifc astcmpregion.ifc astgetregbounds.ifc \
-astgetregframe.ifc astshowmesh.ifc astzoommap.ifc astdistance.ifc astcircle.ifc \
-astlinearapprox.ifc astnegate.ifc astremoveregion.ifc astdownsize.ifc \
-astoutline.ifc astrate.ifc astoverlap.ifc astmask.ifc asttrangrid.ifc \
-astquadapprox.ifc astwcsmap.ifc astangle.ifc asttohds.ifc astfromhds.ifc \
-astsphmap.ifc astaddvariant.ifc astmirrorvars.ifc astprism.ifc astgetunc.ifc \
-astconvex.ifc astchebymap.ifc astchebydomain.ifc astmoc.ifc \
-astaddpixelmask.ifc astaddregion.ifc astgetregdisc.ifc  astdecompose.ifc
+IFC_FILES = $(addsuffix .ifc,$(atools_mon_TASKS)) atools_mon.ifc
 
-IFL_FILES = astaddframe.ifl astclear.ifl astcmpframe.ifl astcmpmap.ifl \
-astratemap.ifl astconvert.ifl astcopy.ifl astdsbframe.ifl astellipse.ifl \
-astfindframe.ifl astmatchaxes.ifl astfluxframe.ifl astformat.ifl astunformat.ifl astframe.ifl \
-astframeset.ifl astgetactunit.ifl astgetframe.ifl astget.ifl \
-astgetmapping.ifl astgetrefpos.ifl astinvert.ifl astlutmap.ifl \
-astmapbox.ifl astmathmap.ifl astmatrixmap.ifl astpcdmap.ifl astbox.ifl \
-astpermaxes.ifl astpermmap.ifl astpickaxes.ifl astpolygon.ifl \
-astinterval.ifl astpolymap.ifl astremapframe.ifl astremoveframe.ifl \
-astsetactunit.ifl astset.ifl astsetrefpos.ifl astsfluxframe.ifl \
-astshiftmap.ifl astsimplify.ifl astskyframe.ifl astspecframe.ifl asttimeframe.ifl \
-asttest.ifl asttran1.ifl asttran2.ifl astswitchmap.ifl asttranmap.ifl asttrann.ifl \
-astmapsplit.ifl astunitmap.ifl astwinmap.ifl atlhelp.ifl atools_mon.ifl \
-astselectormap.ifl astmapregion.ifl astcmpregion.ifl astgetregbounds.ifl \
-astgetregframe.ifl astshowmesh.ifl astzoommap.ifl astdistance.ifl astcircle.ifl \
-astlinearapprox.ifl astnegate.ifl astremoveregion.ifl astdownsize.ifl \
-astoutline.ifl astrate.ifl astoverlap.ifl astmask.ifl asttrangrid.ifl \
-astquadapprox.ifl astwcsmap.ifl astangle.ifl asttohds.ifl astfromhds.ifl \
-astsphmap.ifl astaddvariant.ifl astmirrorvars.ifl astprism.ifl astgetunc.ifl \
-astconvex.ifl astchebymap.ifl astchebydomain.ifl astmoc.ifl \
-astaddpixelmask.ifl astaddregion.ifl astgetregdisc.ifl astdecompose.ifl
+IFL_FILES = $(addsuffix .ifl,$(atools_mon_TASKS)) atools_mon.ifl
 
 CLEANFILES = $(MISC_FILES) $(IFC_FILES) $(IFL_FILES)
