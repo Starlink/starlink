@@ -567,7 +567,7 @@ $origin
 .
 
 format STDOUT_LONG_ACS =
-@<<<<< UT Projid   Mode     InBeam Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys Dome    Az    El   Uaz    Uel  Bwmode
+@<<<<< UT Projid   Mode     InBeam Source               Intt/Stp   Tau   WVM  Rx/Freq   Vel/Velsys Dome    Az    El   Uaz    Uel  Bwmode       Simulate
 $origin
 .
 
@@ -577,8 +577,8 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, 
 .
 
 format LONG_ACS =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<< @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>>
-$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{DOMESTATE}, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @>>>/@<< @<<<< @<<<< @<<<<<<< @>>>>>>>>>>> @<<< @<<<< @<<<< @<<<<< @<<<<< @>>>>>>>>>>> @<<<<<<<
+$A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode, $A{INBEAM}, $A{OBJECT}, $intt, $step, $A{LCSOTAU}, $A{LWVMTAU}, $cfreq, $cvref, $A{DOMESTATE}, $A{AZ}, $A{EL}, $A{UAZ}, $A{UEL}, $bwmode, $A{SIMULATE}
 .
 
     # Set format
@@ -680,7 +680,7 @@ $origin
 .
 
 format STDOUT_LONG_SCU2 =
-@<<<<< UT Projid   Mode     InBeam Source                   Map      Secs    Tau    WVM   See Dome      Az    El   Uaz    Uel
+@<<<<< UT Projid   Mode     InBeam Source                   Map      Secs    Tau    WVM   See Dome      Az    El   Uaz    Uel  Simulate
 $origin
 .
 
@@ -691,8 +691,8 @@ $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{O
 .
 
 format LONG_SCU2 =
-@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<< @<<<  @<<<<< @<<<< @<<<<< @<<<<<
-$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{DOMESTATE}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}
+@<< @<<<< @<<<<<<< @<<<<<<< @<<<<< @<<<<<<<<<<<<<<<<<<< @<<<<<<<<<<< @<<<< @<<<<  @<<<< @<<<< @<<<  @<<<<< @<<<< @<<<<< @<<<<< @<<<<<<
+$S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode, $inbeam, $S{OBJECT}, $map, $S{OBSTIME}, $S{LCSOTAU}, $S{LWVMTAU}, $S{LSEEING}, $S{DOMESTATE}, $S{AZ}, $S{EL}, $S{UAZ}, $S{UEL}, $S{SIMULATE}
 .
 
     # Set format
@@ -1115,6 +1115,7 @@ sub calc_shared_scuba2_acsis {
   my $lcsotau = " n/a";
   my $lwvmtau = " n/a";
   my $domestate = " n/a";
+  my $simulate = '?';
 
   $obstime = sprintf("%4d", $genitem2{UTEND} - $genitem{UTSTART})
     if (defined $genitem2{UTEND} and defined $genitem{UTSTART});
@@ -1145,6 +1146,24 @@ sub calc_shared_scuba2_acsis {
       $domestate = $genitem{'DOME_OPEN'} ? 'Open' : 'Clsd';
     }
   }
+  if (defined $fitsitem->{'SIMULATE'}) {
+    unless ($fitsitem->{'SIMULATE'}) {
+      $simulate = '-',
+    }
+    else {
+      my %simsys;
+      foreach my $simhdr (keys %$fitsitem) {
+        next unless $simhdr =~ /^SIM_([A-Z])/;
+        undef $simsys{$1} if $fitsitem->{$simhdr};
+      }
+      unless (%simsys) {
+        $simulate = '!';
+      }
+      else {
+        $simulate = join ',', sort keys %simsys;
+      }
+    }
+  }
 
   %results = ( %results,
                OBSTIME => $obstime,
@@ -1156,6 +1175,7 @@ sub calc_shared_scuba2_acsis {
                LWVMTAU => $lwvmtau,
                INBEAM => $inbeam,
                DOMESTATE => $domestate,
+               SIMULATE => $simulate,
              );
 
   return %results;
