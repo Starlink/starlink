@@ -1197,6 +1197,7 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
 		$(MANIFESTS)/ems \
+		$(MANIFESTS)/erfa \
 		$(MANIFESTS)/fio \
 		$(MANIFESTS)/generic \
 		$(MANIFESTS)/gks \
@@ -1217,13 +1218,13 @@ $(MANIFESTS)/fluxes: \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
+		$(MANIFESTS)/pal \
 		$(MANIFESTS)/par \
 		$(MANIFESTS)/pcs \
 		$(MANIFESTS)/prm \
 		$(MANIFESTS)/psx \
 		$(MANIFESTS)/sae \
 		$(MANIFESTS)/sgs \
-		$(MANIFESTS)/sla \
 		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
