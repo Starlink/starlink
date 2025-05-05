@@ -604,7 +604,7 @@ beam-sizes employed by the UKT14 and SCUBA receivers on the
 JCMT telescope based on Mauna Kea, Hawaii.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>sae</build><build>mers</build><build>fio</build><build>par</build><build>sla</build><build>grp</build><build>kaplibs</build><build>ast</build><build>ndf</build><link>fio</link><link>sla</link><link>mers</link><sourceset>star2html</sourceset>
+    <build>pcs</build><build>sae</build><build>mers</build><build>par</build><build>pal</build><build>erfa</build><build>grp</build><build>kaplibs</build><build>ast</build><build>ndf</build><build>chr</build><link>pal</link><link>erfa</link><link>mers</link><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -4984,7 +4984,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="xerces-c" support="U">
-  <version>3.1.1</version>
+  <version>3.3.0</version>
   <path>thirdparty/apache/xerces-c</path>
   <description>Apache Xerces-c library for parsing XML</description>
   <dependencies >
