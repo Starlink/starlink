@@ -18,7 +18,6 @@ Image::ExifTool
 Number::Interval
 Number::Range
 LWP::Protocol::https
-Astro::FITS::CFITSIO
 Astro::PAL
 Astro::Telescope
 Astro::Coords

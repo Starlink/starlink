@@ -187,3 +187,6 @@
 [submodule "thirdparty/perlsys/perlmods/perl-JAC-OCS-Config"]
 	path = thirdparty/perlsys/perlmods/perl-JAC-OCS-Config
 	url = https://github.com/eaobservatory/perl-JAC-OCS-Config.git
+[submodule "thirdparty/perlsys/perlmods/perl-Astro-FITS-CFITSIO"]
+	path = thirdparty/perlsys/perlmods/perl-Astro-FITS-CFITSIO
+	url = ../perl-Astro-FITS-CFITSIO.git

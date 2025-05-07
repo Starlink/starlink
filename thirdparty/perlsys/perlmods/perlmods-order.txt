@@ -2,6 +2,7 @@ perl-Starlink-Config
 perl-Starlink-Versions
 perl-GSD
 perl-NDF
+perl-Astro-FITS-CFITSIO
 perl-Starlink-Prologue
 perl-Starlink-HDSPACK
 perl-Starlink-EMS
