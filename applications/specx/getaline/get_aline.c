@@ -166,6 +166,7 @@ __________________________________________________________________________
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #if HAVE_STRINGS_H
 # include <strings.h>
