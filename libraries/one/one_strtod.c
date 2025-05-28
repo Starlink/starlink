@@ -130,7 +130,7 @@ one_strtod( const char * instr, int * status ) {
     retval = strtod( tempbuf, &endptr );
     if (retval == 0.0 && endptr == tempbuf) {
       retval = VAL__BADD;
-      *status = SAI__ERROR;
+      *status = ONE__CNVERR;
       emsRepf( " ", "Error converting '%s' to double", status, instr);
     }
   }
