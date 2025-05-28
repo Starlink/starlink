@@ -2333,16 +2333,17 @@ to the OFF position occurs only at the end of a scan row.  Thus the wave
 pattern is the same for all spectra in a scan row.  Taking the median
 of spectra devoid of emission should provide a good estimate of the
 standing-wave signal.  So first, you need to ascertain the scan direction
-from the FITS header SCAN\_PA.
+from the FITS headers SCAN\_PA and MAP\_PA.
 
 \begin{terminalv}
+% fitsval ppvcube MAP_PA
 % fitsval ppvcube SCAN_PA
 \end{terminalv}
 
-This will be either 0 or 90 degrees.  If there is no field rotation,
+These will either be similar or differ by about 90 degrees.  A difference of
 90 means the scan is along the first pixel axis (longitude or right
-ascension), and 0 indicates scanning along the second pixel axis
-(latitude or declination).  For SCAN\_PA=90 and a spectral cube
+ascension if MAP\_PA is 0), and 0 indicates scanning along the second pixel axis
+(latitude or declination if MAP\_PA is 0).  For a difference of 90 and a spectral cube
 called ppvcube
 
 \begin{terminalv}
@@ -2350,7 +2351,7 @@ called ppvcube
 \end{terminalv}
 
 will create a new two-dimensional waves NDF that comprises the median
-spectra along each scan row.  Substitute \texttt{axis=2} if SCAN\_PA
+spectra along each scan row.  Substitute \texttt{axis=2} if the difference
 is 0.  Next grow this into the shape of ppvcube, duplicating the
 spectra along the scan axis.  For this you will need to know the
 original bounds of NDF cube, obtained with \ndftrace.  For
@@ -2364,7 +2365,7 @@ bounds in variables \param{\$lbnd} and \param{\$ubnd}.
 % manic in=waves out=waves_cube axes="[0,1,2]" lbound=$lbnd ubound=$ubnd
 \end{terminalv}
 
-When SCAN\_PA is 0, set \param{axes="[1,0,2]"} to recover the second
+When the angle difference is 0, set \param{axes="[1,0,2]"} to recover the second
 axis.
 
 Then subtract the waves from the original ppvcube.
