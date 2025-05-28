@@ -144,6 +144,10 @@ int flu_customfilt(
         helper("AMP2", reqbody, &first, status);
         parGdr0d("AMP2", -1.0e3, -1.0e3, 1.0e3, 0, amp2, status);
     }
+    else {
+        *hpbw2 = 0.0;
+        *amp2 = 0.0;
+    }
 
     if (strcmp(reqbody, "MARS")) {
        helper("BTEMP", reqbody, &first, status);
