@@ -81,6 +81,8 @@
 #include "erfam.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
+#include "star/one.h"
+#include "one_err.h"
 
 #include "flu.h"
 
@@ -96,7 +98,6 @@ int flu_customfilt(
         int* status) {
     char* note_ptr[FLU_MAXNOTE];
     char text[255];
-    char* endptr;
     const char* unit;
     double x;
     double y;
@@ -153,32 +154,36 @@ int flu_customfilt(
        helper("BTEMP", reqbody, &first, status);
        parGet0c("BTEMP", text, sizeof(text), status);
        if (*status == SAI__OK) {
-          tbnorm[0] = strtod(text, &endptr);
+            tbnorm[0] = one_strtod(text, status);
 
-          if (text == endptr) {
-             ndfFind(0, text, &indf, status);
-             ndfMap(indf, "DATA", "_DOUBLE", "READ", (void**) &ipd, &nel, status);
-             ndfDim(indf, 1, &dim, &ndim, status);
-             ndfGtwcs(indf, &iwcs, status);
-             unit = astGetC(iwcs, "UNIT(1)");
+           if (*status == ONE__CNVERR) {
+               errAnnul(status);
 
-             if (! strcmp(unit, "GHz")) {
-                astTran1(iwcs, 1, &freq[0][0], 0, &x);
-                tbnorm[0] = interp(dim, x - 1, ipd, status);
-             }
-             else if (*status == SAI__OK) {
-                *status = SAI__ERROR;
-                ndfMsg("N", indf);
-                msgSetc("U", unit);
-                errRep("",
-                        "Supplied NDF '^N' has axis units '^U' - must be 'GHz'.",
-                        status);
-             }
+               ndfFind(0, text, &indf, status);
+               ndfMap(indf, "DATA", "_DOUBLE", "READ", (void**) &ipd, &nel, status);
+               ndfDim(indf, 1, &dim, &ndim, status);
+               ndfGtwcs(indf, &iwcs, status);
+               unit = astGetC(iwcs, "UNIT(1)");
 
-             astAnnul(iwcs);
-             ndfAnnul(&indf, status);
-          }
-       }
+               if (*status == SAI__OK) {
+                   if (! strcmp(unit, "GHz")) {
+                       astTran1(iwcs, 1, &freq[0][0], 0, &x);
+                       tbnorm[0] = interp(dim, x - 1, ipd, status);
+                   }
+                   else {
+                       *status = SAI__ERROR;
+                       ndfMsg("N", indf);
+                       msgSetc("U", unit);
+                       errRep("",
+                               "Supplied NDF '^N' has axis units '^U' - must be 'GHz'.",
+                               status);
+                   }
+               }
+
+               astAnnul(iwcs);
+               ndfAnnul(&indf, status);
+           }
+        }
     }
 
     *inote = 0;
