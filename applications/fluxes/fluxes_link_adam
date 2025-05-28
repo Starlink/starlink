@@ -53,7 +53,7 @@
 #-
 
 
-      echo `fio_link_adam` `err_link_adam`\
+      echo `fio_link_adam` `err_link_adam` `one_link_adam` \
            `kaplibs_link_adam -nogrf` `ndf_link_adam` `ast_link_adam` `grp_link_adam` \
            -lpal -lerfa \
            | awk 'BEGIN{RS=" ";FS="\n"}
