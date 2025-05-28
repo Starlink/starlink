@@ -2411,7 +2411,10 @@ that velocity is better seen in \cref{Figure}{fig:allspectra}{}.
 There is an additional complication should your data not be aligned
 along the pixel axes.  In such cases you will need to rotate the
 spectral cube such that scan rows are parallel to one of the pixel
-axes.  The rotation angle in degrees may be obtained from the FITS
+axes.  For example if the map had a non-zero MAP\_PA but was forced
+to be upright in the same coordinate system
+by running \makecube{} with \param{crota=0} then
+the rotation angle in degrees may be obtained from the FITS
 header MAP\_PA with \fitsval.
 
 \begin{terminalv}
