@@ -14,6 +14,7 @@
 #include "merswrap.h"
 #include "parwrap.h"
 #include "sae_par.h"
+#include "star/one.h"
 
 #include "flu.h"
 
@@ -88,7 +89,7 @@ void flu_pbflux(double omega, double freq[][2], double tb[],
         if ((! strcmp(filter, "ALL")) || (! strncasecmp(fname[i], filter, 4))) {
             if (((! strncmp(body, "JUP", 3)) || (! strncmp(body, "SAT", 3)))
                      && (! strncmp(fname[i], "600", 3))) {
-                strncpy(string2, "  600     no flux", sizeof(string2));
+                one_strlcpy(string2, "  600     no flux", sizeof(string2), status);
             }
             else {
                 /* Create output string. */

@@ -177,6 +177,7 @@
 #include "merswrap.h"
 #include "msg_par.h"
 #include "parwrap.h"
+#include "star/one.h"
 #include "star/pal.h"
 
 #include "libflu/flu.h"
@@ -419,7 +420,7 @@ void fluxes(int* status) {
                     dt.iy += 1900;
                 }
 
-                strncpy(dt.cmon, sysmo[dt.m - 1], sizeof(dt.cmon));
+                one_strlcpy(dt.cmon, sysmo[dt.m - 1], sizeof(dt.cmon), status);
             }
 
             /* Time section */
@@ -486,7 +487,7 @@ void fluxes(int* status) {
             dt.iy = timeres.tm_year + 1900;
 
             dt.s = (double) dt.is;
-            strncpy(dt.cmon, sysmo[dt.m - 1], sizeof(dt.cmon));
+            one_strlcpy(dt.cmon, sysmo[dt.m - 1], sizeof(dt.cmon), status);
         }
     }
 
@@ -509,7 +510,7 @@ void fluxes(int* status) {
             && strcmp(reqbody, "all")
             && strcmp(reqbody, ""))) {
         valid = 1;
-        strncpy(reqbody, "ALL", sizeof(reqbody));
+        one_strlcpy(reqbody, "ALL", sizeof(reqbody), status);
     }
     else {
         for (i = 0; i < FLU_NPLANET; i ++) {
@@ -536,16 +537,16 @@ void fluxes(int* status) {
          * Should really be using FIO but this is historical.
          * SCUBA-2 starts in 2007 */
         if (date > 1070101) {
-            snprintf(path, sizeof(path), "%s/scuba2.dat", directory);
+            one_snprintf(path, sizeof(path), "%s/scuba2.dat", status, directory);
         }
         else if (date > 960523) {
-            snprintf(path, sizeof(path), "%s/scuba.dat", directory);
+            one_snprintf(path, sizeof(path), "%s/scuba.dat", status, directory);
         }
         else if (date >= 920807 && date <= 960523) {
-            snprintf(path, sizeof(path), "%s/ukt14.dat", directory);
+            one_snprintf(path, sizeof(path), "%s/ukt14.dat", status, directory);
         }
         else {
-            snprintf(path, sizeof(path), "%s/ukt14_old.dat", directory);
+            one_snprintf(path, sizeof(path), "%s/ukt14_old.dat", status, directory);
         }
 
         flu_read_data(
@@ -575,15 +576,15 @@ void fluxes(int* status) {
             freq[0][1] = 0.0;
         }
         else if (! (strcmp(reqfilt, "ALL") && strcmp(reqfilt, ""))) {
-            strncpy(reqfilt, "ALL", sizeof(reqfilt));
+            one_strlcpy(reqfilt, "ALL", sizeof(reqfilt), status);
             valid = 1;
         }
         else {
             for (i = 0; i < nf; i ++) {
-                strncpy(filt, fname[i], sizeof(filt));
+                one_strlcpy(filt, fname[i], sizeof(filt), status);
                 chrUcase(filt);
                 if (! strncmp(filt, reqfilt, len)) {
-                    strncpy(reqfilt, filt, sizeof(reqfilt));
+                    one_strlcpy(reqfilt, filt, sizeof(reqfilt), status);
                     valid = 1;
                 }
             }
@@ -595,7 +596,7 @@ void fluxes(int* status) {
                  * have a 1350 entry */
 
                 if (! strncmp(reqfilt, "1350", len)) {
-                    strncpy(reqfilt, "1300", sizeof(reqfilt));
+                    one_strlcpy(reqfilt, "1300", sizeof(reqfilt), status);
                     valid = 1;
                 }
                 else {

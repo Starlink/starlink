@@ -12,6 +12,7 @@
 #include "erfam.h"
 #include "merswrap.h"
 #include "sae_par.h"
+#include "star/one.h"
 #include "star/pal.h"
 
 #include "flu.h"
@@ -199,9 +200,9 @@ void flu_topeph(
         msgFmt("P9", "%7.4f", dlen4);
 
         /* Expand string. */
-        snprintf(string1, sizeof(string1),
+        one_snprintf(string1, sizeof(string1),
                 "%-7s ^P1 ^P2 ^P3 ^P8   ^P10^P4 ^P5 ^P6  ^P9   ^P7  ^P11",
-                planet[i]);
+                status, planet[i]);
         msgLoad("", string1, string2, sizeof(string2), &junk, status);
 
         /* Place output on the screen or in the file. */

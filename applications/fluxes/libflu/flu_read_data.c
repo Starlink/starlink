@@ -10,6 +10,7 @@
 #include "chr.h"
 #include "merswrap.h"
 #include "sae_par.h"
+#include "star/one.h"
 
 #include "flu.h"
 
@@ -62,7 +63,7 @@ void flu_read_data(
         }
         filt[sizeof(filt) - 1] = '\0';
         chrRmblk(filt);
-        strncpy(fname[i], filt, FLU_FILTLEN);
+        one_strlcpy(fname[i], filt, FLU_FILTLEN, status);
         freq[i][0] = frequency;
         freq[i][1] = width;
         hpbw[i] = bw;
