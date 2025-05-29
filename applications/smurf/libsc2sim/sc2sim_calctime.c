@@ -179,7 +179,7 @@ void sc2sim_calctime
 
       /* Calculate LAST from GMST using telescope longitude and equation
          of equinoxes */
-      last[i] = fmod( gmst - lon + eqeqx + D2PI, D2PI );
+      last[i] = fmod( gmst - lon + eqeqx + ERFA_D2PI, ERFA_D2PI );
     }
   }
 }

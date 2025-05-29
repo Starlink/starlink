@@ -420,8 +420,8 @@ void sc2sim_ndfwrdata
   astSetFitsS ( fitschan, "ORIGIN", "SMURF SCUBA-2 simulator",
                 "Origin of file", 0 );
 
-  smf_terr( (sinx->telpos)[1]*DD2R, (sinx->telpos)[2],
-            -(sinx->telpos)[0]*DD2R, obsgeo );
+  smf_terr( (sinx->telpos)[1]*ERFA_DD2R, (sinx->telpos)[2],
+            -(sinx->telpos)[0]*ERFA_DD2R, obsgeo );
 
   astSetFitsF ( fitschan, "OBSGEO-X", obsgeo[0], //-5464545.04,
                 "x,y,z triplet for JCMT", 0 );
@@ -770,8 +770,8 @@ void sc2sim_ndfwrdata
     state.smu_az_chop_y = 0.0;
 
     /*smf_calc_telpos( NULL, "JCMT", telpos, status );*/
-    instap[0] = DAS2R * inx->instap_x;
-    instap[1] = DAS2R * inx->instap_y;
+    instap[0] = ERFA_DAS2R * inx->instap_x;
+    instap[1] = ERFA_DAS2R * inx->instap_y;
 
     /* Set coordinate system */
     one_strlcpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1, status );

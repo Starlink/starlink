@@ -149,8 +149,8 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
-#include "sofa.h"
-#include "sofam.h"
+#include "erfa.h"
+#include "erfam.h"
 
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
@@ -207,7 +207,7 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
   sc2store_force_initialised( status );
 
   /* Calculate year/month/day corresponding to MJD at start */
-  (void) iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
+  (void) eraJd2cal( ERFA_DJM0, inx->mjdaystart, &date_yr, &date_mo,
                     &date_da, &date_df );
 
   numsamples = inx->heatnum;

@@ -14,7 +14,7 @@ reduce your SCUBA-2 data. It can also be used to make maps obtained
 with the ACSIS correlator at JCMT.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>sofa</build><build>pal</build><build>one</build><build>cfitsio</build><build>thr</build><build>sla</build><build>ctg</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>sofa</link><link>pal</link><link>one</link><link>cfitsio</link><link>thr</link><link>sla</link><link>ctg</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
+    <build>pcs</build><sourceset>messgen</sourceset><build>ast</build><build>sae</build><build>pcs</build><build>mers</build><build>ndf</build><build>shl</build><build>gsl</build><build>ndg</build><build>fftw</build><build>ard</build><build>kaplibs</build><build>pda</build><build>gsd</build><build>irq</build><build>erfa</build><build>pal</build><build>one</build><build>cfitsio</build><build>thr</build><build>sla</build><build>ctg</build><link>ndf</link><link>ast</link><link>hlp</link><link>ndg</link><link>shl</link><link>pda</link><link>gsd</link><link>irq</link><link>erfa</link><link>pal</link><link>one</link><link>cfitsio</link><link>thr</link><link>sla</link><link>ctg</link><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

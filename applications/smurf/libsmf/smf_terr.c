@@ -30,7 +30,7 @@
 *        Array holding the returned (x,y,z) values, in metres.
 
 *  Notes:
-*     This routine is a thin wrapper around the SOFA function. It exists
+*     This routine is a thin wrapper around the ERFA function. It exists
 *     simply to enforce the use of WGS84 reference ellipsoid.
 
 *  Authors:
@@ -70,7 +70,8 @@
 /* System includes */
 
 /* Starlink includes */
-#include "sofa.h"
+#include "erfa.h"
+#include "erfam.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -80,7 +81,7 @@
 void smf_terr( double phi, double h, double lambda, double pos[3] ) {
 
   /* Calculate cartesian coordinates in metres */
-  iauGd2gc( 1 /* WGS84 */, lambda, phi, h, pos );
+  eraGd2gc( ERFA_WGS84, lambda, phi, h, pos );
 
 }
 

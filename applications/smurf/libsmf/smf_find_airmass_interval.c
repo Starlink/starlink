@@ -131,8 +131,8 @@ void smf_find_airmass_interval( const smfHead *hdr, double * oamstart, double *o
     smf_getfitsd( hdr, "ELSTART", &elstart, status );
     smf_getfitsd( hdr, "AMEND", &amend, status );
     smf_getfitsd( hdr, "ELEND", &elend, status );
-    if (elstart != VAL__BADD) elstart *= DD2R;
-    if (elend != VAL__BADD) elend *= DD2R;
+    if (elstart != VAL__BADD) elstart *= ERFA_DD2R;
+    if (elend != VAL__BADD) elend *= ERFA_DD2R;
 
   }
 

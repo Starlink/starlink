@@ -339,8 +339,8 @@
 #include "star/grp.h"
 #include "star/one.h"
 #include "star/pal.h"
-#include "sofa.h"
-#include "sofam.h"
+#include "erfa.h"
+#include "erfam.h"
 
 /* JCMT includes */
 #include "jcmt/state.h"
@@ -535,7 +535,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   if( *status == SAI__OK ) {
     /* Calculate year/month/day corresponding to MJD at start.
        Remember that inx->mjdaystart is a UTC date */
-    date_status = iauJd2cal( DJM0, inx->mjdaystart, &date_yr, &date_mo,
+    date_status = eraJd2cal( ERFA_DJM0, inx->mjdaystart, &date_yr, &date_mo,
                              &date_da, &date_df );
     if( date_status ) {
       *status = SAI__ERROR;
@@ -644,7 +644,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       kpgPixsc( fitswcs, gridc, pixsc, NULL, NULL, 0, status );
       if (*status == SAI__OK) {
         astscale = (pixsc[0] + pixsc[1]) / 2.0;
-        astscale *= DR2AS;
+        astscale *= ERFA_DR2AS;
       } else {
         errFlush(status);
         errAnnul( status );
@@ -982,7 +982,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   palMappa( 2000.0, inx->mjdaystart, amprms );
 
   /* Telescope latitude */
-  phi = DD2R*(sinx->telpos)[1];
+  phi = ERFA_DD2R*(sinx->telpos)[1];
   /* determine values of variables used for looping: nmicstp,
      frmperms, chunks, maxwrite */
 
@@ -1043,7 +1043,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           * samptime;
         start_time = inx->mjdaystart + (totaltime / SPD);
         taiutc = palDat( start_time );
-        sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
+        sc2sim_calctime( (sinx->telpos[0])*ERFA_DD2R, start_time, inx->dut1, samptime,
                          lastframe, mjuldate, lst, status );
 
         /* If we're not simulating a planet observation then we only need
@@ -1070,7 +1070,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from palDtt */
               tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
 
-              palRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0],
+              palRdplan( tt, inx->planetnum, -ERFA_DD2R*(sinx->telpos)[0],
                          phi, &raapp, &decapp, &diam );
 
               /* Store RA Dec in inx struct so they can be written as FITS
@@ -1124,8 +1124,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             case FRAME__NASMYTH:
               /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
-              bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
-              bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
+              bor_x_nas = (posptr[curframe*2] - instap[0])*ERFA_DAS2R;
+              bor_y_nas = (posptr[curframe*2+1] - instap[1])*ERFA_DAS2R;
 
               /* Calculate boresight offsets in horizontal coord. */
               bor_x_hor =  bor_x_nas*cos(base_el[frame]) -
@@ -1135,12 +1135,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
               /* Calculate jiggle offsets in horizontal coord. */
               /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-              jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+              jig_x_hor[frame] = ERFA_DAS2R*(jigpat[curframe%jigsamples][0]*
                                         cos(base_el[frame]) -
                                         jigpat[curframe%jigsamples][1]*
                                         sin(base_el[frame]));
 
-              jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+              jig_y_hor[frame] = ERFA_DAS2R*(jigpat[curframe%jigsamples][0]*
                                         sin(base_el[frame]) +
                                         jigpat[curframe%jigsamples][1]*
                                         cos(base_el[frame]));
@@ -1149,18 +1149,18 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
             case FRAME__AZEL:
               /* posptr and jigpat already give the azel tanplane offsets */
-              bor_x_hor = (posptr[curframe*2])*DAS2R;
-              bor_y_hor = (posptr[curframe*2+1])*DAS2R;
+              bor_x_hor = (posptr[curframe*2])*ERFA_DAS2R;
+              bor_y_hor = (posptr[curframe*2+1])*ERFA_DAS2R;
 
               /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-              jig_x_hor[frame] = DAS2R*jigpat[curframe%jigsamples][0];
-              jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
+              jig_x_hor[frame] = ERFA_DAS2R*jigpat[curframe%jigsamples][0];
+              jig_y_hor[frame] = ERFA_DAS2R*jigpat[curframe%jigsamples][1];
               break;
 
             case FRAME__RADEC:
               /* posptr and jigpat give the RADec tanplane offsets */
-              bor_x_cel = (posptr[curframe*2])*DAS2R;
-              bor_y_cel = (posptr[curframe*2+1])*DAS2R;
+              bor_x_cel = (posptr[curframe*2])*ERFA_DAS2R;
+              bor_y_cel = (posptr[curframe*2+1])*ERFA_DAS2R;
 
               /* Rotate by the parallactic angle to get offsets in AzEl */
               bor_x_hor =  bor_x_cel*cos(-base_p[frame]) -
@@ -1170,12 +1170,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 bor_y_cel*cos(-base_p[frame]);
 
               /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-              jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+              jig_x_hor[frame] = ERFA_DAS2R*(jigpat[curframe%jigsamples][0]*
                                         cos(base_p[frame]) -
                                         jigpat[curframe%jigsamples][1]*
                                         sin(base_p[frame]));
 
-              jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+              jig_y_hor[frame] = ERFA_DAS2R*(jigpat[curframe%jigsamples][0]*
                                         sin(base_p[frame]) +
                                         jigpat[curframe%jigsamples][1]*
                                         cos(base_p[frame]));
@@ -1251,7 +1251,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             }
             /* Calculate equatorial from horizontal */
             palDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
-            raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
+            raapp1 = fmod(lst[frame] - raapp1 + ERFA_D2PI, ERFA_D2PI );
             /* Convert apparent RA Dec to Mean RA, Dec for current epoch */
             palAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
             /* Store the mean RA, Dec */
@@ -1570,10 +1570,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                   nimage = maxwrite / 200;
                 }
                 /* LST start/end */
-                iauA2tf(4, lst[0], sign, ihmsf);
+                eraA2tf(4, lst[0], sign, ihmsf);
                 sprintf( lststart, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
-                iauA2tf(4, lst[lastframe-1], sign, ihmsf);
+                eraA2tf(4, lst[lastframe-1], sign, ihmsf);
                 sprintf( lstend, "%02d:%02d:%02d.%04d",
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
                 /* HST start/end */

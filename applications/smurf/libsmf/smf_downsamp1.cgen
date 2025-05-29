@@ -384,9 +384,9 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
         if (isang && fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
-            val -= D2PI;
+            val -= ERFA_D2PI;
           } else {
-            val += D2PI;
+            val += ERFA_D2PI;
           }
           prevval = val;
         }
@@ -425,7 +425,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
 
     /* If the penultimate input value has a jump compared
        to the final measurement we need to correct the final
-       measurement by D2PI */
+       measurement by 2 pi */
     if (isang) {
       pi = CPTROFF(in,inlen-1,ibstride);
 
@@ -435,9 +435,9 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
         if (fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
-            *po -= D2PI;
+            *po -= ERFA_D2PI;
           } else {
-            *po += D2PI;
+            *po += ERFA_D2PI;
           }
         }
       }
@@ -450,7 +450,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
 
       if( *po != CGEN_BAD ) {
         *po *= step;
-        if (gotstep && isang && *po < 0.0) *po += D2PI;
+        if (gotstep && isang && *po < 0.0) *po += ERFA_D2PI;
       }
     }
 
@@ -522,9 +522,9 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
         if (isang && fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
-            val -= D2PI;
+            val -= ERFA_D2PI;
           } else {
-            val += D2PI;
+            val += ERFA_D2PI;
           }
           prevval = val;
         }
@@ -566,7 +566,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
 
     /* If the penultimate input value has a jump compared
        to the final measurement we need to correct the final
-       measurement by D2PI */
+       measurement by 2 pi */
     if (isang) {
       pi = CPTROFF(in,inlen-1,ibstride);
       if( *pi != CGEN_BAD ) {
@@ -575,9 +575,9 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
         if (fabs((double)val-prevval) > M_PI) {
           gotstep = 1;
           if (val-prevval > 0) {
-            *pod -= D2PI;
+            *pod -= ERFA_D2PI;
           } else {
-            *pod += D2PI;
+            *pod += ERFA_D2PI;
           }
         }
       }
@@ -590,7 +590,7 @@ static void CGEN_FUNCTION(smf1_downsamp1)( const CGEN_TYPE *in, dim_t instride,
       if( *pod != VAL__BADD ) {
         *pod *= step;
         if (gotstep && isang && *pod < 0.0) {
-          *pod += D2PI;
+          *pod += ERFA_D2PI;
         }
       }
     }

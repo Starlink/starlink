@@ -446,16 +446,16 @@ smfCreateLutwcsCache *smf_create_lutwcs( int clearcache, const double *fplane_x,
          them to radians from arcsec */
 
          if( state->smu_az_jig_x == VAL__BADD ) temp_jig_x = 0;
-         else temp_jig_x = state->smu_az_jig_x/DR2AS;
+         else temp_jig_x = state->smu_az_jig_x/ERFA_DR2AS;
 
          if( state->smu_az_jig_y == VAL__BADD ) temp_jig_y = 0;
-         else temp_jig_y = state->smu_az_jig_y/DR2AS;
+         else temp_jig_y = state->smu_az_jig_y/ERFA_DR2AS;
 
          if( state->smu_az_chop_x == VAL__BADD ) temp_chop_x = 0;
-         else temp_chop_x = state->smu_az_chop_x/DR2AS;
+         else temp_chop_x = state->smu_az_chop_x/ERFA_DR2AS;
 
          if( state->smu_az_chop_y == VAL__BADD ) temp_chop_y = 0;
-         else temp_chop_y = state->smu_az_chop_y/DR2AS;
+         else temp_chop_y = state->smu_az_chop_y/ERFA_DR2AS;
 
 
          /* Calculate final mapping with SMU position correction only if needed */

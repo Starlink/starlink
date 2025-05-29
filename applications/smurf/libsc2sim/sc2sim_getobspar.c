@@ -226,7 +226,7 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
        convert from degrees to radians */
     one_strlcpy ( convert, temp, sizeof(convert), status );
     sc2sim_sex2double ( convert, &dec, status );
-    dec *= DD2R;
+    dec *= ERFA_DD2R;
     inx->dec = dec;
   }
 
