@@ -122,7 +122,7 @@ int flu_customfilt(
                 status);
     }
 
-    strncpy(fname[0], "CUSTOM", FLU_FILTLEN);
+    one_strlcpy(fname[0], "CUSTOM", FLU_FILTLEN, status);
     *nf = 1;
     *error = 0.0;
 

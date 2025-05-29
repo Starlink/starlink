@@ -87,6 +87,7 @@
 #include "parwrap.h"
 #include "par_err.h"
 #include "sae_par.h"
+#include "star/one.h"
 
 #include "flu.h"
 
@@ -113,10 +114,16 @@ FILE* flu_asfio(
     /* If $FLUXPWD is set we use it, else we write to CWD */
     directory = getenv("FLUXPWD");
     if (directory) {
-        strncpy(path, directory, sizeof(path));
+        one_strlcpy(path, directory, sizeof(path), status);
     }
     else {
-        getcwd(path, sizeof(path));
+        directory = getcwd(path, sizeof(path));
+        if (! directory) {
+            *status = SAI__ERROR;
+            errRep("",
+                "Name of current directory is too long to copy to buffer.",
+                status);
+        }
     }
     if (*status != SAI__OK) return 0;
 
@@ -134,10 +141,10 @@ FILE* flu_asfio(
         /* Access the file (appending original directory name). */
         parGet0c(pnfile, aline, sizeof(aline), status);
         if (aline[0] == '/') {
-            strncpy(path2, aline, sizeof(path2));
+            one_strlcpy(path2, aline, sizeof(path2), status);
         }
         else {
-            snprintf(path2, sizeof(path2), "%s/%s", path, aline);
+            one_snprintf(path2, sizeof(path2), "%s/%s", status, path, aline);
         }
         parPut0c(pnfile, path2, status);
 
@@ -147,7 +154,7 @@ FILE* flu_asfio(
                 *status = SAI__ERROR;
             }
             else if (pathname) {
-                strncpy(pathname, path2, pathname_size);
+                one_strlcpy(pathname, path2, pathname_size, status);
             }
         }
 
