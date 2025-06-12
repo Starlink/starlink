@@ -684,14 +684,23 @@ sub scuba2_header {
       $mode =~ s/FIELD/FLD/i;
     }
 
+    # Prepend in-beam information to mode unless the shutter is closed
+    my $inbeam =  '';
+    $inbeam = $S{INBEAM} unless $fitsitem->{SHUTTER} < 0.5;
+
     my $mode_extra = '-';
     if ($mode =~ /focus/i) {
       $mode_extra = $fitsitem->{'FOCAXIS'};
     }
-
-    # Prepend in-beam information to mode unless the shutter is closed
-    my $inbeam =  '';
-    $inbeam = $S{INBEAM} unless $fitsitem->{SHUTTER} < 0.5;
+    elsif ($mode =~ /stare/i and $inbeam =~ /fts/i) {
+      my $ftsmode = $fitsitem->{'FTS_MODE'};
+      unless (defined $ftsmode) {
+        $mode_extra = '?';
+      }
+      else {
+        $mode_extra = $ftsmode;
+      }
+    }
 
 #    print "$S{RUN} $mode $S{UT} \'$S{OBJECT}\' $S{PROJECT} $rx $boloms $filter $S{CSOTAU} $S{SEEING}\n";
 
