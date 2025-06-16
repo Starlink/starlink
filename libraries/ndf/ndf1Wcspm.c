@@ -102,6 +102,7 @@ void ndf1Wcspm( AstMapping *map, const hdsdim lbnd[], const hdsdim ubnd[],
    int good;
    int icell;
    int ipix;
+   int ipix_plus_one;
    int iwcs;
    int jpix;
    int jwcs;
@@ -129,7 +130,8 @@ void ndf1Wcspm( AstMapping *map, const hdsdim lbnd[], const hdsdim ubnd[],
    axis. */
    more = 0;
    for( ipix = 0; ipix < npix; ipix++ ){
-      astMapSplit( map, 1, &ipix + 1, wcsax, &tmap );
+      ipix_plus_one = ipix + 1;
+      astMapSplit( map, 1, &ipix_plus_one, wcsax, &tmap );
       if( tmap ) {
          if( astGetI( tmap, "Nout" ) == 1 ) {
             perm[ ipix ] = wcsax[ 0 ];
