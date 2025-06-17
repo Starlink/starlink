@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_add_spectral_axis
+*     smf_add_scuba2_spectral_axis
 
 *  Purpose:
 *     Add a spectral axis to a 2D SCUBA-2 map.
@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status );
+*     smf_add_scuba2_spectral_axis( int indf, AstFitsChan *fc, int *status );
 
 *  Arguments:
 *     indf = int (Given)
@@ -40,6 +40,11 @@
 *  History:
 *     27-OCT-2009 (DSB):
 *        Initial version.
+*     27-JUN-2025 (GSB):
+*        Split into two functions: this one to add specifically
+*        the spectral axis for a regular SCUBA-2 observation,
+*        and "smf_add_spectral_axis" (retaining the original name)
+*        to add any spectral axis to a given frameset.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -76,19 +81,16 @@
 /* Smurf includes */
 #include "smf.h"
 
-void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
+void smf_add_scuba2_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 
 /* Local Variables */
    AstFrame *cfrm;         /* Pointer to the current WCS Frame in the NDF */
    AstFrameSet *wcs;       /* Pointer to the WCS FrameSet for the NDF */
    AstSpecFrame *specfrm;  /* Pointer to the new SpecFrame */
    AstWinMap *specmap;     /* Pointer to Mapping from GRID to wavelength */
-   char attrib[ 10 ];      /* Buffer for attribute name */
    double bandwid;         /* Bandwidth, in metres */
    double grid_hi;         /* GRID coord at upper edge of spectral pixel */
    double grid_lo;         /* GRID coord at lower edge of spectral pixel */
-   double ref_lat;         /* Celestial latitude at reference point */
-   double ref_lon;         /* Celestial longitude at reference point */
    double spec_hi;         /* Wavelength at upper edge of spectral pixel */
    double spec_lo;         /* Wavelength at lower edge of spectral pixel */
    double wavelen;         /* Central wavelength, in metres */
@@ -124,31 +126,6 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
    WCS axis. */
          specfrm = astSpecFrame( "System=wavelen,StdOfRest=topo,Unit=m" );
 
-/* We set the RefRA and RefDec attributes for the SpecFrame to the FK5
-   J2000 equivalent of the SkyRef attribute in the current Frame. */
-         sprintf( attrib, "SkyRef(%d)", astGetI( cfrm, "LonAxis" ) );
-         ref_lon = astGetD( cfrm, attrib );
-
-         sprintf( attrib, "SkyRef(%d)", astGetI( cfrm, "LatAxis" ) );
-         ref_lat = astGetD( cfrm, attrib );
-
-         astSetRefPos( specfrm, cfrm, ref_lon, ref_lat );
-
-/* Inherit other relevant Frame attributes from the SkyFrame. */
-#define OVERLAY(attr) \
-         if( astTest( cfrm, attr ) ) { \
-            astSetC( specfrm, attr, astGetC( cfrm, attr ) ); \
-         }
-
-         OVERLAY( "Dut1" );
-         OVERLAY( "Dtai" );
-         OVERLAY( "Epoch" );
-         OVERLAY( "ObsAlt" );
-         OVERLAY( "ObsLat" );
-         OVERLAY( "ObsLon" );
-
-#undef OVERLAY
-
 /* Create a WinMap that gives wavelength as a function of spectral GRID
    position. Assume the pixel centre maps onto WAVELEN and the pixel
    width is BANDWID. */
@@ -158,13 +135,8 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
          spec_hi = spec_lo + bandwid;
          specmap = astWinMap( 1, &grid_lo, &grid_hi, &spec_lo, &spec_hi, " " );
 
-/* Modify the WCS FrameSet so that the base and current Frames are
-   3-dimensional. The current Frame is expanded by adding in the
-   SpecFrame, and the base Frame is expanded by adding in a 3rd GRID
-   axis. Other Frames are left unchanged. The SpecFrame and the new GRID
-   axis are connected using the WinMap created above. */
-         atlAddWcsAxis( wcs, (AstMapping *) specmap, (AstFrame *) specfrm,
-                        NULL, NULL, status );
+         smf_add_spectral_axis(
+            wcs, (AstSkyFrame*) cfrm, specfrm, (AstMapping*) specmap, status);
 
 /* Change the NDF bounds to include a 3rd axis with pixel bounds "1:1". */
          lbnd[ 2 ] = 1;
@@ -179,4 +151,55 @@ void smf_add_spectral_axis( int indf, AstFitsChan *fc, int *status ){
 /* End the AST Object context. This will annull annull the AST Objects
    created in this function. */
    astEnd;
+}
+
+/**
+*  Description:
+*     This function was extracted from smf_add_scuba2_spectral_axis (above)
+*     to perform the addition of a spectral axis to a frameset.
+*/
+void smf_add_spectral_axis(
+      AstFrameSet* wcs, AstSkyFrame* cfrm, AstSpecFrame* specfrm,
+      AstMapping* specmap, int *status ) {
+
+/* Local Variables */
+   char attrib[ 10 ];      /* Buffer for attribute name */
+   double ref_lon;         /* Celestial longitude at reference point */
+   double ref_lat;         /* Celestial latitude at reference point */
+
+/* Check inherited status */
+   if( *status != SAI__OK ) return;
+
+/* We set the RefRA and RefDec attributes for the SpecFrame to the FK5
+   J2000 equivalent of the SkyRef attribute in the current Frame. */
+   sprintf( attrib, "SkyRef(%d)", astGetI( cfrm, "LonAxis" ) );
+   ref_lon = astGetD( cfrm, attrib );
+
+   sprintf( attrib, "SkyRef(%d)", astGetI( cfrm, "LatAxis" ) );
+   ref_lat = astGetD( cfrm, attrib );
+
+   astSetRefPos( specfrm, cfrm, ref_lon, ref_lat );
+
+/* Inherit other relevant Frame attributes from the SkyFrame. */
+#define OVERLAY(attr) \
+   if( astTest( cfrm, attr ) ) { \
+      astSetC( specfrm, attr, astGetC( cfrm, attr ) ); \
+   }
+
+   OVERLAY( "Dut1" );
+   OVERLAY( "Dtai" );
+   OVERLAY( "Epoch" );
+   OVERLAY( "ObsAlt" );
+   OVERLAY( "ObsLat" );
+   OVERLAY( "ObsLon" );
+
+#undef OVERLAY
+
+/* Modify the WCS FrameSet so that the base and current Frames are
+   3-dimensional. The current Frame is expanded by adding in the
+   SpecFrame, and the base Frame is expanded by adding in a 3rd GRID
+   axis. Other Frames are left unchanged. The SpecFrame and the new GRID
+   axis are connected using the WinMap created above. */
+   atlAddWcsAxis( wcs, specmap, (AstFrame *) specfrm,
+                  NULL, NULL, status );
 }

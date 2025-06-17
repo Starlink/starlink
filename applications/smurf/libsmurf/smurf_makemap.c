@@ -1620,12 +1620,12 @@ void smurf_makemap( int *status ) {
 
       /* If the FitsChan is not empty, store it in the FITS extension of the
          output NDF (any existing FITS extension is deleted). Do not annul
-         it as it is needed by smf_add_spectral_axis below, and will be
+         it as it is needed by smf_add_scuba2_spectral_axis below, and will be
          annulled automatically by astEnd anyway. */
       if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
       /* Clone the main output NDF identifier so it will be available to
-         smf_add_spectral_axis below. */
+         smf_add_scuba2_spectral_axis below. */
       ndfClone( ondf, &tndf, status );
 
       /* For each open output NDF (the main tile NDF, and any extension NDFs),
@@ -1645,7 +1645,7 @@ void smurf_makemap( int *status ) {
       }
 
       /* Add a spectral axis to the main output NDF for this tile. */
-      if( tndf != NDF__NOID ) smf_add_spectral_axis( tndf, fchan, status );
+      if( tndf != NDF__NOID ) smf_add_scuba2_spectral_axis( tndf, fchan, status );
 
       /* End contexts for current tile*/
       ndfEnd(status);
@@ -2023,15 +2023,15 @@ void smurf_makemap( int *status ) {
        annul the FitsChan as it will be annulled when astEnd is called in
        the monolith function (there should really be an all-encompassing
        astBegin/astEnd block in this function too). Also, the FitsChan is
-       needed below by smf_add_spectral_axis. */
+       needed below by smf_add_scuba2_spectral_axis. */
     if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
     /* Before closing the output file, clone the NDF identifier so that
-       we can pass it to smf_add_spectral_axis later (smf_close_file
+       we can pass it to smf_add_scuba2_spectral_axis later (smf_close_file
        annuls the NDF identifier from which "ondf" was copied). Do it
-       this way, rather than calling smf_add_spectral_axis now, before
+       this way, rather than calling smf_add_scuba2_spectral_axis now, before
        closing the file, to avoid any chance of the changes introduced by
-       smf_add_spectral_axis upsetting the behaviour of smf_close_file. */
+       smf_add_scuba2_spectral_axis upsetting the behaviour of smf_close_file. */
     ndfClone( ondf, &tndf, status );
     smf_close_file ( wf, &tdata, status );
     smf_close_file ( wf, &wdata, status );
@@ -2044,7 +2044,7 @@ void smurf_makemap( int *status ) {
 
     /* Convert the output NDF form 2D to 3D by adding a spectral axis
        spanning a single pixel. Then the output NDF identifier. */
-    smf_add_spectral_axis( tndf, fchan, status );
+    smf_add_scuba2_spectral_axis( tndf, fchan, status );
 
     /* If required, split the output map up into JSA tiles. Delete the
        original output NDF afterwards. Always delete the output NDF if
