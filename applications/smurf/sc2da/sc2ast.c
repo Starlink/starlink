@@ -22,8 +22,8 @@
 #define COLROW 1
 
 /* Prototypes for private functions defined in this file. */
-static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
-                                    const fts2Port fts_port, int *status );
+static void sc2ast_fts_image_port( AstFrameSet *fs, AstMapping *map,
+                                   int subnum, const fts2Port fts_port, int *status );
 static AstMapping *sc2ast_make_fts2_portmap( const fts2Port fts_port,
                                              int subnum,
                                              int *status );
@@ -358,6 +358,7 @@ int *status             /* global status (given and returned) */
    AstMapping *bmap;
    AstMapping *mapping;
    AstMapping *rotmap;
+   AstMapping *arcsecmap;
    AstPolyMap *polymap = NULL;
    AstShiftMap *instapmap;
    AstShiftMap *jigglemap;
@@ -1608,10 +1609,12 @@ int *status             /* global status (given and returned) */
    using a UnitMap). We use the cached Mapping in series with a ZoomMap
    that converts radians (as produced by the cached Mapping) to arc-seconds
    (as described by the FPLANE Frame). */
-       astRemapFrame( cache->frameset[ subnum ], FPLANE_IFRAME,
-                      astCmpMap( cache->map[ subnum ],
-                                 astZoomMap( 2, AST__DR2D*3600.0, " " ), 1,
-                                 " " ) );
+      arcsecmap = (AstMapping *) astCmpMap( cache->map[ subnum ],
+                                            astZoomMap( 2, AST__DR2D*3600.0, " " ),
+                                            1, " " );
+
+      if (! fts_port) {
+         astRemapFrame( cache->frameset[ subnum ], FPLANE_IFRAME, arcsecmap );
 
 /* The GRID->FPLANE Mapping in the FrameSet will currently describe the tracking
    FTS-2 port (if any). Create an alternative GRID->FPLANE Mapping that describes
@@ -1619,9 +1622,9 @@ int *status             /* global status (given and returned) */
    FrameSet. The FrameSet can then be switched between these two Mappings by
    setting the "Variant" attribute of the FrameSet to "IMAGE" or "TRACKING" (when
    the FPLANE Frame is the current Frame). */
-      if (fts_port) {
-         sc2ast_fts_image_port( cache->frameset[ subnum ], subnum, fts_port,
-                                status );
+      } else {
+         sc2ast_fts_image_port( cache->frameset[ subnum ], arcsecmap,
+                                subnum, fts_port, status );
       }
 
 /* Exempt the cached AST objects from AST context handling. This means
@@ -2360,14 +2363,14 @@ void sc2ast_make_bolo_frame
 }
 
 
-static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
-                                    const fts2Port fts_port, int *status ){
+static void sc2ast_fts_image_port( AstFrameSet *fs, AstMapping *map,
+                                   int subnum, const fts2Port fts_port, int *status ){
 /*
 *  Purpose:
 *    Add a description of the image FTS port to the supplied FrameSet.
 
 *  Description:
-*    It is assumed that the supplied FrameSet already contains a
+*    It is assumed that "map" should be added to the supplied FrameSet as it is a
 *    Mapping that describes the Mapping from GRID to FPLANE and the
 *    port indicated by argument "fts_port" is the one desired.
 */
@@ -2378,7 +2381,6 @@ static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
    AstMapping *map1;
    AstMapping *map2;
    AstMapping *map5;
-   AstMapping *map;
    AstMapping *im_portmap; /* IMAGE */
    AstMapping *tr_portmap; /* TRACKING */
    int icur;
@@ -2389,10 +2391,6 @@ static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
 /* Start an AST context so that we do not need to annul AST objects
    explicitly. */
    astBegin;
-
-/* Get the GRID->FPLANE (using the selected port) Mapping from the supplied
-   FrameSet. */
-   map = astGetMapping( fs, AST__BASE, FPLANE_IFRAME );
 
 /* Construct the CmpMap for the image port. */
    im_portmap = sc2ast_make_fts2_portmap( FTS_IMAGE, subnum, status );
@@ -2415,6 +2413,9 @@ static void sc2ast_fts_image_port( AstFrameSet *fs, int subnum,
    allows the Mapping to be simplified. */
       astClear( tr_portmap, "Ident" );
       tr_portmap = astAnnul( tr_portmap );
+
+/* Add the given mapping, with the "ftsportmap" Ident cleared, to the FrameSet. */
+      astRemapFrame( fs, FPLANE_IFRAME, map );
 
 /* Construct the total GRID->FPLANE (using the image port) Mapping. */
       map3 = astCmpMap( map1, im_portmap, 1, " " );
