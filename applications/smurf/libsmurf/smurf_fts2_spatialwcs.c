@@ -112,6 +112,7 @@ void smurf_fts2_spatialwcs(int* status)
   Grp* outputGrp              = NULL;
 
   smfData* outputData         = NULL;
+  const JCMTState *tmpState   = NULL;
 
   size_t fIndex               = 0;
   size_t inSize               = 0;
@@ -171,18 +172,23 @@ void smurf_fts2_spatialwcs(int* status)
 
     astBegin;
 
+    // Get state for first time slice.
+    if (outputData->hdr->allState) {
+      tmpState = &((outputData->hdr->allState)[0]);
+    }
+
     // Create a 2D WCS
     smf_find_subarray(outputData->hdr, NULL, 0, &subnum, status);
     if(subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B) {
       fts2ast_createwcs( subnum,
-                         outputData->hdr->state,
+                         tmpState,
                          outputData->hdr->instap,
                          outputData->hdr->telpos,
                          &gridfset,
                          status);
     } else {
       sc2ast_createwcs( subnum,
-                        outputData->hdr->state,
+                        tmpState,
                         outputData->hdr->instap,
                         outputData->hdr->telpos,
                         NO_FTS,
