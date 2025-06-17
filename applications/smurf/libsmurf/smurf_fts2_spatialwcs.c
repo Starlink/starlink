@@ -119,8 +119,6 @@ void smurf_fts2_spatialwcs(int* status)
 
   int indf;
   int outndf;
-  size_t nout;
-  void *outdata[1] = { NULL };
 
   double refra                = 0.0;
   double refdec               = 0.0;
@@ -153,8 +151,6 @@ void smurf_fts2_spatialwcs(int* status)
       ndgNdfas(inputGrp, fIndex, "READ", &indf, status);
       ndgNdfpr(indf, "TITLE,LABEL,UNITS,DATA,WCS", outputGrp, fIndex, &outndf, status);
       ndfAnnul(&indf, status);
-      ndfStype("_DOUBLE", outndf, "DATA", status);
-      ndfMap(outndf, "DATA", "_DOUBLE", "WRITE", &(outdata[0]), &nout, status);
       ndfHsmod("SKIP", outndf, status);
       ndfAnnul(&outndf, status);
     } else {
