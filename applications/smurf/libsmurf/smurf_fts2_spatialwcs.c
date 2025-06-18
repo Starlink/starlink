@@ -25,6 +25,14 @@
 *     field rotation.
 
 *  ADAM Parameters:
+*     FTSPORT = _CHAR (Read)
+*          The FTS-2 port to use in calculating the mapping to sky
+*          coordinates. This parameter should be "tracking" or
+*          "image".  If null, the original FTS-2-specific coordinate
+*          model will be applied.  If the data do not appear to relate
+*          to a subarray associated with an FTS-2 port then the standard
+*          SCUBA-2 mapping (without FTS-2) is used regardless
+*          of this parameter. [!]
 *     IN = NDF (Read)
 *          Input files to be transformed.
 *     OUT = NDF (Write)
@@ -88,6 +96,7 @@
 #include "star/grp.h"
 #include "ndf.h"
 #include "mers.h"
+#include "par.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
@@ -120,8 +129,11 @@ void smurf_fts2_spatialwcs(int* status)
 
   int indf;
   int outndf;
+  fts2Port fts_port;
+  char fts_port_name[10];
 
   sc2ast_subarray_t subnum    = 0;
+  int subnum_is_fts;
   AstFrameSet* gridfset       = NULL;
   AstSkyFrame* gridframe      = NULL;
   AstSpecFrame* specframe     = NULL;
@@ -135,6 +147,20 @@ void smurf_fts2_spatialwcs(int* status)
              "Equal number of input and output files expected!",
              &outputGrp, &outSize, status);
 
+  // Determine for which FTS port WCS information should be prepared.
+  parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);
+  if (*status == PAR__NULL) {
+    errAnnul(status);
+    fts_port = NO_FTS;
+  }
+  else {
+    if (! strcmp("TRACKING", fts_port_name)) {
+      fts_port = FTS_TRACKING;
+    }
+    else {
+      fts_port = FTS_IMAGE;
+    }
+  }
 
   ndfBegin();
 
@@ -179,7 +205,9 @@ void smurf_fts2_spatialwcs(int* status)
 
     // Create a 2D WCS
     smf_find_subarray(outputData->hdr, NULL, 0, &subnum, status);
-    if(subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B) {
+    subnum_is_fts = (subnum == S8C || subnum == S8D || subnum == S4A || subnum == S4B);
+
+    if(subnum_is_fts && (fts_port == NO_FTS)) {
       fts2ast_createwcs( subnum,
                          tmpState,
                          outputData->hdr->instap,
@@ -191,7 +219,7 @@ void smurf_fts2_spatialwcs(int* status)
                         tmpState,
                         outputData->hdr->instap,
                         outputData->hdr->telpos,
-                        NO_FTS,
+                        (subnum_is_fts ? fts_port : NO_FTS),
                         &gridfset,
                         status);
     }

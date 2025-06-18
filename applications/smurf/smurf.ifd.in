@@ -2320,6 +2320,17 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
+            parameter ftsport {
+                access READ
+                default !
+                helpkey *
+                position 3
+                ppath DEFAULT
+                prompt {FTS-2 port: tracking, image or null}
+                type _CHAR
+                vpath DEFAULT
+            }
+
             parameter in {
                 position 1
                 type NDF
