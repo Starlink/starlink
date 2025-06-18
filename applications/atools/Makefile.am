@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+SUBDIRS = sun273
+
 dist_bin_SCRIPTS = atools.csh atools.sh atools.icl astshow.tcl \
                    astviewer/astviewer/astviewer
 
@@ -63,6 +65,15 @@ history.help: atools.news
 # Rule for creating various components from the ifd file.
 atools.csh atools.sh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
+
+# Rule to prepare LaTeX documenation to include in SUN/273.
+atools_mon.tex: $(atools_mon_TASKS:=.f)
+	rm -f $@
+	cat $(atools_mon_TASKS:=.f) > all.f
+	PATH="$(PATH):$(STARLINK)/bin/sst"; \
+	export PATH ;\
+	@PROLAT@ in=all.f out=$@ single=no page=yes atask=yes document=no
+	rm all.f
 
 ##  Any misc ATOOLS files that have no where else.
 dist_pkgdata_DATA = ATOOLS_CONDITIONS \

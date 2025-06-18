@@ -14,7 +14,7 @@ to one of the functions within the AST library. ATOOLS thus provides a
 high-level interface to the AST library.
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset>
+    <build>pcs</build><build>ast</build><build>cnf</build><build>hds</build><build>fio</build><build>grp</build><build>ifd</build><build>ndf</build><build>par</build><build>sae</build><build option='link'>kaplibs</build><build option='link'>atl</build><build option='link'>ast</build><build option='link'>shl</build><sourceset>sst</sourceset><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
@@ -24,7 +24,7 @@ high-level interface to the AST library.
       <role>owner</role>
     </person>
   </developers>
-  <documentation></documentation>
+  <documentation> sun273</documentation>
   <bugreports>starlink@jiscmail.ac.uk</bugreports>
   <copyright>
     <year></year>

@@ -34,8 +34,9 @@ STAR_DECLARE_DEPENDENCIES([build], [kaplibs atl ast shl], [link])
 dnl Other dependencies
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
-dnl    Need prohlp to create help.
+dnl    Need prohlp to create help and prolat for documentation.
 STAR_CHECK_PROGS(prohlp, sst)
+STAR_CHECK_PROGS(prolat, sst)
 
 dnl    Need "hlib" command to build the help library.
 STAR_CHECK_PROGS(hlib)
@@ -48,8 +49,10 @@ STAR_CHECK_PROGS(perl)
 dnl    Need a version of Tk wish for astshow script.
 STAR_CHECK_PROGS(wish)
 
+STAR_LATEX_DOCUMENTATION(sun273)
+
 dnl    Configure files.
-AC_CONFIG_FILES([Makefile component.xml atools.ifd])
+AC_CONFIG_FILES([Makefile component.xml atools.ifd sun273/Makefile])
 AC_CONFIG_FILES([make_history_help], [chmod 755 make_history_help])
 
 dnl    And the fat lady sings.
