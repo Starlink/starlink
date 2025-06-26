@@ -17,22 +17,99 @@ atools_mon_SOURCES = \
 
 atools_mon_LDADD = $(LDADD) `$(srcdir)/atools_link_adam`
 
-atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
- astcmpframe astcmpmap astframe astgetframe astgetmapping astunitmap \
- atlhelp astskyframe astframeset astpermmap astremoveframe astremapframe \
- astmatrixmap astconvert astlutmap astpcdmap astwinmap astshiftmap \
- astfindframe astmatchaxes astpermaxes astpickaxes astsimplify asttrann astmapbox \
- astinvert astspecframe asttimeframe astsetrefpos astgetrefpos astformat \
- astgetregbounds astgetregframe astunformat asttran1 asttran2 astmapregion astcmpregion \
- astmathmap astsetactunit astgetactunit astpolymap astswitchmap asttranmap \
- astdsbframe astfluxframe astsfluxframe astpolygon astellipse astmapsplit \
- astselectormap astinterval astbox astshowmesh astzoommap astdistance \
- astcircle astlinearapprox astnegate astremoveregion astdownsize \
- astoutline astrate astoverlap astmask asttrangrid astquadapprox \
- astratemap astwcsmap astpolytran astangle asttohds astfromhds astsphmap \
- astaddvariant astmirrorvars astprism astgetunc astconvex astchebymap \
- astchebydomain astmoc astaddpixelmask astaddregion astgetregdisc \
- astdecompose
+atools_mon_TASKS = \
+ astaddframe \
+ astaddpixelmask \
+ astaddregion \
+ astaddvariant \
+ astangle \
+ astbox \
+ astchebydomain \
+ astchebymap \
+ astcircle \
+ astclear \
+ astcmpframe \
+ astcmpmap \
+ astcmpregion \
+ astconvert \
+ astconvex \
+ astcopy \
+ astdecompose \
+ astdistance \
+ astdownsize \
+ astdsbframe \
+ astellipse \
+ astfindframe \
+ astfluxframe \
+ astformat \
+ astframe \
+ astframeset \
+ astfromhds \
+ astget \
+ astgetactunit \
+ astgetframe \
+ astgetmapping \
+ astgetrefpos \
+ astgetregbounds \
+ astgetregdisc \
+ astgetregframe \
+ astgetunc \
+ astinterval \
+ astinvert \
+ astlinearapprox \
+ astlutmap \
+ astmapbox \
+ astmapregion \
+ astmapsplit \
+ astmask \
+ astmatchaxes \
+ astmathmap \
+ astmatrixmap \
+ astmirrorvars \
+ astmoc \
+ astnegate \
+ astoutline \
+ astoverlap \
+ astpcdmap \
+ astpermaxes \
+ astpermmap \
+ astpickaxes \
+ astpolygon \
+ astpolymap \
+ astpolytran \
+ astprism \
+ astquadapprox \
+ astrate \
+ astratemap \
+ astremapframe \
+ astremoveframe \
+ astremoveregion \
+ astselectormap \
+ astset \
+ astsetactunit \
+ astsetrefpos \
+ astsfluxframe \
+ astshiftmap \
+ astshowmesh \
+ astsimplify \
+ astskyframe \
+ astspecframe \
+ astsphmap \
+ astswitchmap \
+ asttest \
+ asttimeframe \
+ asttohds \
+ asttran1 \
+ asttran2 \
+ asttrangrid \
+ asttranmap \
+ asttrann \
+ astunformat \
+ astunitmap \
+ astwcsmap \
+ astwinmap \
+ astzoommap \
+ atlhelp
 
 FSRC = \
  atl1_gtfrm.f \
