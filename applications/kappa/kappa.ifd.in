@@ -4087,6 +4087,15 @@ package kappa {
             helpkey *
          }
 
+         parameter downsample {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Should the spectral axis be downsampled for plotting?}
+            helpkey *
+            default TRUE
+         }
+
          parameter fill {
             type _LOGICAL
             prompt {Fill the plotting area?}

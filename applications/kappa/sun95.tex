@@ -14195,6 +14195,14 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          the range 0 to 255).  \texttt{["Data"]}
       }
       \sstsubsection{
+         DOWNSAMPLE = \_LOGICAL (Read)
+      }{
+         If \texttt{TRUE} each spectrum is downsampled prior to plotting so that
+         there are no more samples than device pixels.  If MODE is
+         "Histogram" or "GapHistogram" there should be four pixels
+         per sample.  \texttt{[TRUE]}
+      }
+      \sstsubsection{
          DEVICE = \htmlref{DEVICE}{se:selgradev} (Read)
       }{
          The name of the graphics device used to display the cube.

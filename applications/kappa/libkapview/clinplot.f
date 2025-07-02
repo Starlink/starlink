@@ -122,6 +122,11 @@
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
 *        the range 0 to 255).  ["Data"]
+*     DOWNSAMPLE = _LOGICAL (Read)
+*        If TRUE each spectrum is downsampled prior to plotting so that
+*        there are no more samples than device pixels.  If MODE is
+*        "Histogram" or "GapHistogram" there should be four pixels
+*        per sample.  [TRUE]
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device used to display the cube.
 *        [current graphics device]
@@ -503,6 +508,9 @@
 *        The new mode renamed to GapHistogram.
 *     2010 October 13 (MJC):
 *        Permit temporary style attributes.
+*     2025 July 1 (GSB):
+*        Add DOWNSAMPLE parameter and correct logic regarding histogram
+*        modes.
 *     {enter_further_changes_here}
 
 *-
@@ -649,6 +657,7 @@
       LOGICAL BLEDGE             ! Leaves edge spec plots bare?
       LOGICAL CGOOD( MXSPEC, MXSPEC )! Was a spectrum drawn in the cell?
       LOGICAL CLEAR              ! Is screen to be cleared on opening?
+      LOGICAL DOWNSAMP           ! Downsample spectrum for plotting?
       LOGICAL FIRST              ! Is first cell yet to be annotated?
       LOGICAL KEY                ! Make a key of the grid co-ordinates?
       LOGICAL REFLAB             ! Draw labels around first spectrum?
@@ -1063,11 +1072,14 @@
 *  across a single cell.  Reduce it even further for histogram-style
 *  to demand at least four device pixels per sample point.
          NSAMP = DIM( 3 )
-         IF ( MODE .EQ. 2 ) THEN
-            IF ( NSAMP .GT. NINT( DX2 / NX / 4 ) )
-     :        NSAMP = NINT( DX2 / NX / 4 )
-         ELSE IF( NSAMP .GT. NINT( DX2/NX ) ) THEN
-            NSAMP = NINT( DX2/NX )
+         CALL PAR_GET0L( 'DOWNSAMPLE', DOWNSAMP, STATUS )
+         IF ( DOWNSAMP ) THEN
+            IF ( MODE .EQ. 1 .OR. MODE .EQ. 6 ) THEN
+               IF ( NSAMP .GT. NINT( DX2 / NX / 4 ) )
+     :           NSAMP = NINT( DX2 / NX / 4 )
+            ELSE IF( NSAMP .GT. NINT( DX2/NX ) ) THEN
+               NSAMP = NINT( DX2/NX )
+            END IF
          END IF
 
 *  Draw all the spectra (but not the axes or borders).
