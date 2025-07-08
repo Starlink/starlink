@@ -98,6 +98,8 @@
 *  History:
 *     1991 November 26 (MJC):
 *        Original version.
+*     2025 July 7 (GSB):
+*        Adjust calculation of JUMP values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -232,9 +234,9 @@
 *  the next higher dimension and applying the origins of the lower
 *  dimensions.
       DO  I = 2, NDIM
-         JUMP( I ) = STRID( I ) * ( COMPRS( I ) - 1 )
+         JUMP( I ) = 1 + ( STRID( I ) * ( COMPRS( I ) - 1 ) )
          DO J = 1, I - 1
-            JUMP( I ) = JUMP( I ) + ORIGIN( J ) * STRID( J )
+            JUMP( I ) = JUMP( I ) + ( ORIGIN( J ) - 1 ) * STRID( J )
          END DO
       END DO
       
