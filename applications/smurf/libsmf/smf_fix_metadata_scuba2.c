@@ -749,7 +749,7 @@ static int smf__validate_scan( smfHead *hdr, int setbad, int *status ) {
 
 /* Get the maximum expected distance of the boresight from the map
    centre, and convert from arc-seconds to radians. */
-      rad = AST__DD2R*sqrt( map_hght*map_hght + map_hght*map_hght )/3600.0;
+      rad = AST__DD2R*sqrt( map_hght*map_hght + map_wdth*map_wdth )/3600.0;
 
 /* Set the maximum number of bad time slices that can be found before the
    whole scan is rejected as bad. This is 10% of the total number of frames. */
