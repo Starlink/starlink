@@ -185,6 +185,8 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed,
   AstKeyMap * objmap = NULL; /* All the object names used */
   double scanvel;            /* Value of SCAN_VEL header */
   int validate_scans;        /* Should scan patterns be validated? */
+  double posn_tolerance;     /* Tolerance for TCS position validation */
+
   if (*status != SAI__OK) return have_fixed;
 
   /* Validate arguments - need smfFile and smfHead */
@@ -608,6 +610,17 @@ int smf_fix_metadata_scuba2 ( msglev_t msglev, smfData * data, int have_fixed,
         msgOut( "", INDENT "WARNING: Rejecting subscan due to extreme excursion",
                 status );
       }
+      have_fixed |= SMF__FIXED_JCMTSTATE;
+    }
+  }
+
+  /* Check for invalid TCS position (i.e. discrepancy between demand and
+     actual position.  This is a copy of the option in smf_fix_metadata_acsis
+     and is provided as an alternative to the original validate_scans
+     method above. */
+  posn_tolerance = smf_get_global0D( "TEL_POS_TOLERANCE", 0.0, status );
+  if( posn_tolerance != 0.0 ) {
+    if( ! smf_validate_tcs_position( hdr, posn_tolerance, 1, status ) ) {
       have_fixed |= SMF__FIXED_JCMTSTATE;
     }
   }

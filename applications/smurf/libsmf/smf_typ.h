@@ -1041,12 +1041,12 @@ typedef enum {
   DRCNTRL__FTS2_BIT = 16,
   DRCNTRL__POL2_BIT = 32,
 
-  /* Dummy value for internal use in ACSIS data processing: */
+  /* Dummy value for internal use in data processing: */
   DRCNTRL__TCS_POSN_BIT = 16384,
 } drcntrl_bits;
 
-/* and define a combo value to indicate loss of telescope-ness */
-#define DRCNTRL__POSITION ( DRCNTRL__SMU_BIT | DRCNTRL__PTCS_BIT )
+/* and define a combo value to indicate loss of telescope-ness for SCUBA-2 */
+#define DRCNTRL__POSITION ( DRCNTRL__SMU_BIT | DRCNTRL__PTCS_BIT | DRCNTRL__TCS_POSN_BIT )
 
 /* Sub-instruments */
 

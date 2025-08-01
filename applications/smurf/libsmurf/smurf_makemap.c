@@ -932,6 +932,7 @@ void smurf_makemap( int *status ) {
   int iters;                 /* If interupted, the no. of completed iterations */
   dim_t itile;               /* Output tile index */
   int ival;                  /* Integer parameter value */
+  double dval;               /* Double parameter value */
   int jin;                   /* Input NDF index within igrp */
   int jsatiles;              /* Create JSA tiles? */
   int junk;                  /* Unused integer */
@@ -1157,6 +1158,9 @@ void smurf_makemap( int *status ) {
 
        astMapGet0I( keymap, "FILLGAPS_NOISE", &ival );
        smf_put_global0I( "FILLGAPS_NOISE", ival, status );
+
+       astMapGet0D( keymap, "TELPOSERRMAX", &dval );
+       smf_put_global0D( "TEL_POS_TOLERANCE", dval, status );
     }
 
     parChoic("FTSPORT", "", "TRACKING,IMAGE", 0, fts_port_name, 10, status);

@@ -3060,6 +3060,23 @@ ssn.zero_union = 1
 startup = 0
 
 #-----------------------------------------------------------------
+#  Name: 	telposerrmax
+#  Type: 	real
+#  Default: 	0.0
+#  Purpose: 	Checks telescope actual position against demand position
+#  Description: Maximum separation between the actual position (TCS_TR_AC1/2)
+#               and demand position (TCS_TR_DC1/2) in the JCMTSTATE extension
+#               (arcsec).  If non-zero, time slices which exceed this
+#               separation will be excluded.
+#
+#               This parameter allows the use of the same telescope position
+#               checking as the makecube parameter TELPOSERRMAX (for ACSIS
+#               data) as an alternative to that given by the validate_scans
+#               parameter.  Therefore this parameter could be combined with
+#               "validate_scans=0" to avoid applying both types of check.
+telposerrmax = 0.0
+
+#-----------------------------------------------------------------
 #  Name: 	tmp.docos
 #  Type: 	integer
 #  Default: 	0
