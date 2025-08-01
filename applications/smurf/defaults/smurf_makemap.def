@@ -3173,6 +3173,15 @@ two.bmap = <undef>
 #               MAP_WDTH FITS headers, and is assumed to be centred on
 #               the tracking centre. If more than 10% of the frames are
 #               outside this area, the whole subscan is rejected.
+#
+#               If the value is set to 2, in addition to excluding whole
+#               subscans as described above, individual time slices are
+#               excluded if their position is outside the expected map area.
+#
+#               If the value is set to -1, an error should be raised if any
+#               subscans are rejected. (This error stops MAKEMAP but in
+#               CALCQU, where -1 is the default value, the time-series
+#               is instead split into chunks at rejected scans.)
 validate_scans = 1
 
 #-----------------------------------------------------------------
