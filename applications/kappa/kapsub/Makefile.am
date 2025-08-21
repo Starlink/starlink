@@ -44,6 +44,7 @@ kps1_polyv.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f kps1_psdim.f \
 kps1_psevl.f kps1_psplt.f kps1_pswcs.f kps1_putc.f  kps1_putl.f \
 kps1_puts.f  kps1_putvl.f kps1_pxdpm.f kps1_robos.f kps1_rofwd.f \
 kps1_rosiz.f kps1_saxlk.f kps1_scat1.f kps1_skyf2.f kps1_skyf3.f kps1_skyf4.f \
+kps1_sqals.f \
 kps1_skyfn.f kps1_skyft.f kps1_stqa0.f kps1_stqa1.f kps1_rmask.f \
 kps1_supeb.f kps1_supei.f kps1_supev.f kps1_supf.f  kps1_suseb.f \
 kps1_susei.f kps1_susev.f kps1_susf.f  kps1_trop1.f kps1_trop2.f \
