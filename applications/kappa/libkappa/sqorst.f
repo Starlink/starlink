@@ -108,9 +108,9 @@
 *                          PARAMS for squashes by a factor of two or
 *                          more, otherwise equivalent to "Linear".
 *
-*        -  "Nearest"   -- Nearest neighbour sampling.
-*
 *        -  "Linear"    -- Linear interpolation.
+*
+*        -  "Nearest"   -- Nearest-neighbour sampling.
 *
 *        -  "Sinc"      -- Sum of surrounding pixels weighted using
 *                          a 1-d sinc(pi*x) kernel.
@@ -314,10 +314,10 @@
 *        its current scale.
 *     27-NOV-2020 (DSB):
 *        - Added parameter CENTRE. The original centring method (zooming
-*        around the centre of the array rather than the pixel origin) seems
-*        like a bug to me. But some users may have now got code that
-*        depends on that behaviour, so add the new improved centring method
-*        as an option, defaulting to the old method.
+*        around the centre of the array rather than the pixel origin)
+*        seems like a bug to me. But some users may have now got code
+*        that depends on that behaviour, so add the new improved
+*        centring method as an option, defaulting to the old method.
 *        - Ensure that the same mapping that is used to modify the WCS
 *        FrameSet is also used to do the resampling. Without this, it is
 *        possible for the two Mapping to get out of sync.
@@ -500,7 +500,7 @@
             CALL PAR_GET0D( 'FACTORS', FACTS( AXIS ), STATUS )
          END IF
 
-*  Calclulate the upper and lower output bounds from the factors.
+*  Calculate the upper and lower output bounds from the factors.
          DO I = 1, NDIM
             LBNDO( I ) = NINT( DBLE( LBNDI( I ) - 1 ) * FACTS( I ) )
      :                   + 1
@@ -565,17 +565,17 @@
 *  Now deal with MODE=PIXELSCALE...
       ELSE
 
-*  Get the WCS FrameSet from the iput NDF.
+*  Get the WCS FrameSet from the input NDF.
          CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
 
-*  See how many axes there are in the current WCS coordinate Frame.
+*  See how many axes there are in the current WCS co-ordinate Frame.
 *  Note, this need not necesarily be the same as the number of pixel
 *  axes (NDIM).
          NWCS = AST_GETI( IWCS, 'Nout', STATUS )
 
 *  The pixel scales are determined at the first pixel in the array (the
-*  pixel scales may be different at other pixels). Set up the grid
-*  coordinates at the first pixel in the array.
+*  pixel scales may be different at other pixels).  Set up the grid
+*  co-ordinates at the first pixel in the array.
          DO I = 1, NDIM
             GFIRST( I ) = 1.0
          END DO
@@ -586,7 +586,7 @@
          CALL KPG1_PIXSC( IWCS, GFIRST, PIXSC, FPIXSC, UPIXSC, STATUS )
 
 *  Concatenate the formatted pixel scales in to a comma-separated list
-*  and use it as the dynamic default for parameter PIXSCALE.
+*  and use it as the dynamic default for Parameter PIXSCALE.
          TEXT = ' '
          IAT = 0
          IF ( AXIS .EQ. 0 ) THEN
@@ -668,8 +668,8 @@
                      GO TO 999
                   END IF
 
-*  If the scale units are arc-seconds, scale the new scale from
-*  arc-seconds to radians.
+*  If the scale units are arcseconds, scale the new scale from
+*  arcseconds to radians.
                   IF ( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
                      NEWSCL( I ) = AST__DD2R*NEWSCL( I )/3600.0D0
                   END IF
@@ -717,7 +717,7 @@
 *  Get a title from the parameter system.
       CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
 
-*  Reshape it according to the reqested lower and upper bounds.
+*  Reshape it according to the requested lower and upper bounds.
       CALL NDF_SBND( NDIM, LBNDO, UBNDO, NDFO, STATUS )
 
 *  Set the Data and possibly VARIANCE component data types.
@@ -795,7 +795,7 @@
      :                .FALSE., CENTRE, STATUS )
 
 *  Construct a Mapping representing the transformation from the
-*  old pixel coordinates to the new ones.  This is used here to
+*  old pixel co-ordinates to the new ones.  This is used here to
 *  fix up the WCS FrameSet, and is also passed to the resampling
 *  routine to ensure the same Mapping is used in both places. The
 *  first option is effectively a zoom about the centre of the

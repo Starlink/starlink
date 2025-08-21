@@ -114,7 +114,7 @@
 *        by default spectral axes will be aligned in the Heliocentric rest
 *        frame.
 *
-*        As an example, if you are mosaicing two spectra which both use
+*        As an example, if you are mosaicking two spectra which both use
 *        radio velocity as the current WCS, but which have different rest
 *        frequencies, then setting ALIGNREF to TRUE will cause alignment
 *        to be performed in radio velocity, meaning that the differences
@@ -127,7 +127,7 @@
 *        will be mapping onto which ever output channel has the same
 *        wavelength, taking into account the different rest frequencies.
 *
-*        As another example, consider mosaicing two maps which both have
+*        As another example, consider mosaicking two maps which both have
 *        (azimuth,elevation) axes. If ALIGNREF is TRUE, then any given
 *        (az,el) values in one image will be mapped onto the exact same
 *        (az,el) values in the other image, regardless of whether the
@@ -138,7 +138,7 @@
 *        different in the observation time of the two images will result
 *        in an additional shift.
 *
-*        As yet another example, consider mosaicing two spectra which are
+*        As yet another example, consider mosaicking two spectra which are
 *        both in frequency with respect to the LSRK, but which refer to
 *        different points on the sky. If ALIGNREF is TRUE, then a given
 *        LSRK frequency in one spectra will be mapped onto the exact same

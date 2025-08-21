@@ -30494,7 +30494,7 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
 }{
    \sstdescription{
       This application manipulates the dimensionality of an \NDFref{NDF}.
-      The input NDF can be projected on to any \textit{n}-dimensional surface 
+      The input NDF can be projected on to any \textit{n}-dimensional surface
       (line, plane, \emph{etc.}) by averaging or taking the median the pixels in
       perpendicular directions, or grown into new dimensions by duplicating an
       existing \textit{n}-dimensional surface.  The order of the axes can also
@@ -30598,7 +30598,7 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
       \sstexamplesubsection{
          manic in=cube out=summ axis=3 estimator=median
       }{
-         The same as the previous example, except each output value is 
+         The same as the previous example, except each output value is
          equal to the median data value in the corresponding \textit{xy} plane of
          the input cube.
       }
@@ -45508,10 +45508,10 @@ KAPPA: \htmlref{REGRID}{REGRID},
                               otherwise equivalent to \texttt{"Linear"}.
 
             \sstitem
-            \texttt{"Nearest"}   --- Nearest-neighbour sampling.
+            \texttt{"Linear"}    --- Linear interpolation.
 
             \sstitem
-            \texttt{"Linear"}    --- Linear interpolation.
+            \texttt{"Nearest"}   --- Nearest-neighbour sampling.
 
             \sstitem
             \texttt{"Sinc"}      --- Sum of surrounding pixels weighted using
@@ -49338,7 +49338,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          by default spectral axes will be aligned in the Heliocentric rest
          frame.
 
-         As an example, if you are mosaicing two spectra which both use
+         As an example, if you are mosaicking two spectra which both use
          radio velocity as the current WCS, but which have different rest
          frequencies, then setting ALIGNREF to \texttt{TRUE} will cause alignment
          to be performed in radio velocity, meaning that the differences
@@ -49351,7 +49351,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          will be mapping onto which ever output channel has the same
          wavelength, taking into account the different rest frequencies.
 
-         As another example, consider mosaicing two maps which both have
+         As another example, consider mosaicking two maps which both have
          (azimuth,elevation) axes. If ALIGNREF is \texttt{TRUE}, then any given
          (az,el) values in one image will be mapped onto the exact same
          (az,el) values in the other image, regardless of whether the
