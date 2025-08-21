@@ -51,13 +51,22 @@
 *        stretching or squashing. The following values are permitted.
 *
 *        -  "Centre"    -- The WCS co-ordinates at the centre of the
-*                          output NDF are the same as those at the centre
-*                          of the input NDF.
+*                          output NDF are the same as those at the
+*                          centre of the input NDF.
 *
-*        -  "Origin"    -- The WCS co-ordinates at the pixel origin of the
-*                          output NDF are the same as those at the pixel
-*                          origin of the input NDF.
+*        -  "Origin"    -- The WCS co-ordinates at the pixel origin of
+*                          the output NDF are the same as those at the
+*                          pixel origin of the input NDF.
 *
+*        -  "Edge"      -- The WCS co-ordinates at the edges of each
+*                          rebinned pixel in the output NDF is a
+*                          multiple of any new pixel width along each
+*                          axis.
+*
+*        -  "Middle"    -- The WCS co-ordinates at the centre of each
+*                          rebinned pixel of the output NDF is a
+*                          multiple of any new pixel width along each
+*                          axis.
 *        ["Centre"]
 *     CONSERVE = _LOGICAL (Read)
 *        If set TRUE, then the output pixel values will be scaled in
@@ -197,6 +206,15 @@
 *     sqorst fred mode=pixelscale pixscale=5 axis=3
 *        This resamples a cube NDF called fred on to a velocity scale
 *        of 5 km/s per pixel along its third axis.
+*     sqorst in=^tilecubes out=*aligned mode=pixelscale pixscale=0.5 \
+*            axis=3 centre=Middle
+*        This resamples a list of spectral cubes stored in text file
+*        tilecubes, forming a new set of NDFs with the suffix "aligned".
+*        As the cubes form a larger survey, not only are they compressed
+*        to a common velocity scale of 0.5 km/s per channel along the
+*        third axis, but they are also aligned so that channel centres
+*        are the same for all the cubes, being are a multiple of
+*        0.5 km/s.
 *
 *  Sub-Pixel Interpolation Schemes:
 *     When squashing or stretching an NDF, a separate one-dimensional
@@ -244,7 +262,8 @@
 *  Copyright:
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
 *     Councils.
-*     Copyright (C) 2012, 2015 Science & Technology Facilities Council.
+*     Copyright (C) 2012, 2015, 2025 Science & Technology Facilities
+*     Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -302,6 +321,8 @@
 *        - Ensure that the same mapping that is used to modify the WCS
 *        FrameSet is also used to do the resampling. Without this, it is
 *        possible for the two Mapping to get out of sync.
+*     2025 July 21 (MJC):
+*        Added the Edge and Middle options to CENTRE.
 *     {enter_further_changes_here}
 
 *-
@@ -332,6 +353,7 @@
       CHARACTER MODE*10          ! Mode for getting output bounds
       CHARACTER TEXT*255         ! List of pixel scales
       CHARACTER UPIXSC( NDF__MXDIM )*15 ! Scale units
+      DOUBLE PRECISION ASHIFT( NDF__MXDIM ) ! Alignment co-ord shifts
       DOUBLE PRECISION FACTS( NDF__MXDIM ) ! Expansion factors
       DOUBLE PRECISION GFIRST( NDF__MXDIM )! GRID pos at centre of 1st pixel
       DOUBLE PRECISION NEWSCL( NDF__MXDIM )! New pixel scales
@@ -379,12 +401,14 @@
       INTEGER IPWV1              ! Pointer to workspace
       INTEGER IPWV2              ! Pointer to workspace
       INTEGER IWCS               ! WCS FrameSet from input NDF
+      INTEGER IWCSO              ! WCS FrameSet from output NDF
       INTEGER J                  ! Loop variable
       INTEGER L                  ! Index of last non-nlank character
       INTEGER LASTDM             ! Index of last dimension needing resampling
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER MAP                ! AST Mapping representing modifications
+      INTEGER MTXMAP             ! A copy of a MatrixMap
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFO               ! Output NDF identifier
       INTEGER NDIM               ! Number of dimensions of NDFs
@@ -396,6 +420,7 @@
       INTEGER TMAP               ! Mapping from input GRID to output PIXEL
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER WINMAP             ! A WinMap
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL COMMA              ! Has a comma been found?
       LOGICAL CONSRV             ! Conserve flux?
@@ -758,12 +783,16 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
+      DO I = 1, NDIM
+         ASHIFT( I ) = 0.0D0
+      END DO
+
 *  Put the correct WCS FrameSet in the new NDF.
 *  ============================================
 
-*  Find out where the stretching or squashing is to be cenetred.
-      CALL PAR_CHOIC( 'CENTRE', 'CENTRE', 'CENTRE,ORIGIN', .FALSE.,
-     :                CENTRE, STATUS )
+*  Find out where the stretching or squashing is to be centred.
+      CALL PAR_CHOIC( 'CENTRE', 'CENTRE', 'CENTRE,ORIGIN,EDGE,MIDDLE',
+     :                .FALSE., CENTRE, STATUS )
 
 *  Construct a Mapping representing the transformation from the
 *  old pixel coordinates to the new ones.  This is used here to
@@ -780,13 +809,51 @@
          END DO
          MAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
 
-*  The second option is a zoom about the pixel origin.
+*  The Origin option is a zoom about the pixel origin, as are the
+*  Edge and Middle options initially.
       ELSE
          MAP = AST_MATRIXMAP( NDIM, NDIM, 1, FACTS, ' ', STATUS )
       ENDIF
 
 *  Fix it up according to the changes we will make.
+
+*  The final two options are like Origin with a slight shift to align
+*  the edge or centre to a multiple of the output scale.  In order to
+*  determine the sub-element shifts to align the middles or edges
+*  with an integer multiple of the new scale sizes, the initial mapping
+*  must be applied to get the new WCS pre-alignment.
       CALL KPG1_ASFIX( MAP, NDFI, NDFO, STATUS )
+
+      IF ( CENTRE .EQ. 'EDGE' .OR. CENTRE .EQ. 'MIDDLE' ) THEN
+
+*   Get the default WCS FrameSet for the output NDF.
+         CALL NDF_GTWCS( NDFO, IWCSO, STATUS )
+
+*  Find the alignment shifts.
+         CALL KPS1_SQALS( NDFO, IWCSO, AXIS, CENTRE, NEWSCL,
+     :                    ASHIFT, STATUS )
+
+*  Apply the shifts to a unit box.
+         DO I = 1, NDIM
+            PIA( I ) = 0.0D0
+            PIB( I ) = 1.0D0
+            POA( I ) = PIA( I ) - ASHIFT( I ) / NEWSCL( I )
+            POB( I ) = PIB( I ) - ASHIFT( I ) / NEWSCL( I )
+         END DO
+
+*  Create a WinMap to implement the alignment shift.
+         WINMAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
+
+*  Copy the original MAP, so that a new compound mapping can be formed.
+         MTXMAP = AST_COPY( MAP, STATUS )
+
+*  Join the two mappings in sequence.
+         MAP = AST_CMPMAP( MTXMAP, WINMAP, 1, ' ', STATUS )
+
+*  Fix it up according to the changes we will make.
+         CALL KPG1_ASFIX( MAP, NDFI, NDFO, STATUS )
+
+      END IF
 
 *  The above Mapping connects input and output PIXEL co-cordinates.
 *  Modify it so that it connects GRID co-ordinates, as required by the

@@ -3,12 +3,12 @@
 % -----------------------------------------------------------------------------
 \stardoccategory  {Starlink User Note}
 \stardocinitials  {SUN}
-\stardocsource    {sun95.45}
-\stardocnumber    {95.45}
+\stardocsource    {sun95.46}
+\stardocnumber    {95.46}
 \stardocauthors   {Malcolm J. Currie \& David S. Berry}
-\stardocdate      {2021 May 21}
+\stardocdate      {2025 July 23}
 \stardoctitle     {KAPPA --- Kernel Application Package}
-\stardocversion   {2.6-12}
+\stardocversion   {2.6-13}
 \stardocmanual    {User's Guide}
 % -----------------------------------------------------------------------------
 \stardocabstract{
@@ -45428,14 +45428,23 @@ KAPPA: \htmlref{REGRID}{REGRID},
          \sstitemlist{
 
             \sstitem
-             \texttt{"Centre"} --- The WCS co-ordinates at the centre of the
+            \texttt{"Centre"} --- The WCS co-ordinates at the centre of the
                               output NDF are the same as those at the centre
                               of the input NDF.
 
             \sstitem
-             \texttt{"Origin"} --- The WCS co-ordinates at the pixel origin of the
+            \texttt{"Origin"} --- The WCS co-ordinates at the pixel origin of the
                               output NDF are the same as those at the pixel
                               origin of the input NDF.
+            \sstitem
+            \texttt{"Edge"}   --- The WCS co-ordinates at the edges of each
+                              rebinned pixel in the output NDF is a multiple of
+                              any new pixel width along each axis.
+
+            \sstitem
+            \texttt{"Middle"} --- The WCS co-ordinates at the centre of each
+                              rebinned pixel of the output NDF is a multiple
+                              of any new pixel width along each axis.
 
          }
          \texttt{["Centre"]}
@@ -45644,6 +45653,17 @@ KAPPA: \htmlref{REGRID}{REGRID},
          This resamples a cube NDF called fred on to a velocity scale
          of 5 km/s per pixel along its third axis.
       }
+      \sstexamplesubsection{
+         sqorst in=\^tilecubes out=*aligned mode=pixelscale pixscale=0.5 axis=3 centre=Middle
+      }{
+         This resamples a list of spectral cubes stored in text file
+         tilecubes, forming a new set of NDFs with the suffix \texttt{"aligned"}.
+         As the cubes form a larger survey, not only are they compressed
+         to a common velocity scale of 0.5 km/s per channel along the
+         third axis, but they are also aligned so that channel centres
+         are the same in all the cubes, being a multiple of 0.5 km/s.
+      }
+
    }
    \sstnotes{
       If the input NDF contains a \htmlref{VARIANCE}{apndf:variance}~ component,
