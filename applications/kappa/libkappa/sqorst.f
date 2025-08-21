@@ -355,19 +355,21 @@
       CHARACTER UPIXSC( NDF__MXDIM )*15 ! Scale units
       DOUBLE PRECISION ASHIFT( NDF__MXDIM ) ! Alignment co-ord shifts
       DOUBLE PRECISION FACTS( NDF__MXDIM ) ! Expansion factors
-      DOUBLE PRECISION GFIRST( NDF__MXDIM )! GRID pos at centre of 1st pixel
+      DOUBLE PRECISION GFIRST( NDF__MXDIM )! GRID position at centre of
+                                           ! first pixel
       DOUBLE PRECISION NEWSCL( NDF__MXDIM )! New pixel scales
       DOUBLE PRECISION PARAMS( 8 ) ! Auxiliary parameters for resampling
       DOUBLE PRECISION PIA( NDF__MXDIM ) ! First input point
       DOUBLE PRECISION PIB( NDF__MXDIM ) ! Second input point
-      DOUBLE PRECISION PIXSC( NDF__MXDIM )! Original pixel scales
+      DOUBLE PRECISION PIXSC( NDF__MXDIM ) ! Original pixel scales
       DOUBLE PRECISION POA( NDF__MXDIM ) ! First output point
       DOUBLE PRECISION POB( NDF__MXDIM ) ! Second output point
-      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! GIRD <> PIXEL shift
+      DOUBLE PRECISION SHIFT( NDF__MXDIM ) ! GRID <> PIXEL shift
       DOUBLE PRECISION ZOOM      ! Zoom factor for 1d expansion
       INTEGER AXIS               ! Axis to squash or stretch
       INTEGER BMAX( NDF__MXDIM ) ! Maximum values for pixel index bounds
-      INTEGER BMIN( NDF__MXDIM ) ! Invalid values for pixel index bound defaults
+      INTEGER BMIN( NDF__MXDIM ) ! Invalid values for pixel index bound
+                                 ! defaults
       INTEGER BPV                ! Bytes per value for selected data type
       INTEGER DIM1( NDF__MXDIM ) ! Dimensions of intermediate input array
       INTEGER DIM2( NDF__MXDIM ) ! Dimensions of intermediate output array
@@ -558,7 +560,7 @@
 
 *  Calculate the expansion factors
          DO I = 1, NDIM
-            FACTS( I ) = DBLE( LBNDO( I ) - 1 - UBNDO( I ) )/
+            FACTS( I ) = DBLE( LBNDO( I ) - 1 - UBNDO( I ) ) /
      :                   DBLE( LBNDI( I ) - 1 - UBNDI( I ) )
          END DO
 
@@ -577,7 +579,7 @@
 *  pixel scales may be different at other pixels).  Set up the grid
 *  co-ordinates at the first pixel in the array.
          DO I = 1, NDIM
-            GFIRST( I ) = 1.0
+            GFIRST( I ) = 1.0D0
          END DO
 
 *  Get the current pixel scales for each WCS axis. This returns both
@@ -637,7 +639,7 @@
 *  If the next field contains a single asterisk, retain the current axis
 *  scale.
                CALL CHR_FANDL( TEXT( START : IAT - 1 ), F, L )
-               IF( TEXT( START + F - 1 : START + L - 1 ) .EQ. '*' ) THEN
+               IF ( TEXT( START + F - 1:START + L - 1 ) .EQ. '*' ) THEN
                   NEWSCL( I ) = PIXSC( I )
 
 *  Otherwise, read a floating point value from the beginning of the
@@ -671,7 +673,7 @@
 *  If the scale units are arcseconds, scale the new scale from
 *  arcseconds to radians.
                   IF ( UPIXSC( I ) .EQ. 'arc-sec' ) THEN
-                     NEWSCL( I ) = AST__DD2R*NEWSCL( I )/3600.0D0
+                     NEWSCL( I ) = AST__DD2R * NEWSCL( I ) / 3600.0D0
                   END IF
                END IF
 
@@ -800,12 +802,12 @@
 *  routine to ensure the same Mapping is used in both places. The
 *  first option is effectively a zoom about the centre of the
 *  input array.
-      IF( CENTRE .EQ. 'CENTRE' ) then
+      IF ( CENTRE .EQ. 'CENTRE' ) THEN
          DO I = 1, NDIM
-            PIA( I ) = 0.5D0*DBLE( LBNDI( I ) - 1 + UBNDI( I ) )
+            PIA( I ) = 0.5D0 * DBLE( LBNDI( I ) - 1 + UBNDI( I ) )
             PIB( I ) = DBLE( UBNDI( I ) )
-            POA( I ) = 0.5D0*DBLE( LBNDO( I ) - 1 + UBNDO( I ) )
-            POB( I ) = ( PIB( I ) - PIA( I ) )*FACTS( I ) + POA( I )
+            POA( I ) = 0.5D0 * DBLE( LBNDO( I ) - 1 + UBNDO( I ) )
+            POB( I ) = ( PIB( I ) - PIA( I ) ) * FACTS( I ) + POA( I )
          END DO
          MAP = AST_WINMAP( NDIM, PIA, PIB, POA, POB, ' ', STATUS )
 
@@ -813,9 +815,8 @@
 *  Edge and Middle options initially.
       ELSE
          MAP = AST_MATRIXMAP( NDIM, NDIM, 1, FACTS, ' ', STATUS )
-      ENDIF
 
-*  Fix it up according to the changes we will make.
+      END IF
 
 *  The final two options are like Origin with a slight shift to align
 *  the edge or centre to a multiple of the output scale.  In order to
@@ -871,7 +872,6 @@
       END DO
       SMAP = AST_SHIFTMAP( NDIM, SHIFT, ' ', STATUS )
       GMAP = AST_CMPMAP( TMAP, SMAP, .TRUE., ' ', STATUS )
-
 
 *  Check if any resampling is required.
       IF ( LASTDM .GT. 0 ) THEN
@@ -971,25 +971,27 @@
                   DO J = 1, NDIM
                      EL2 = EL2 * DIM2( J )
                   END DO
-                  CALL PSX_MALLOC( EL2*BPV, IPDAT2, STATUS )
+                  CALL PSX_MALLOC( EL2 * BPV, IPDAT2, STATUS )
                   IF ( HASVAR ) THEN
-                     CALL PSX_MALLOC( EL2*BPV, IPVAR2, STATUS )
+                     CALL PSX_MALLOC( EL2 * BPV, IPVAR2, STATUS )
                   END IF
                   IF ( HASQUA ) THEN
-                     CALL PSX_MALLOC( EL2*VAL__NBUB, IPQUA2, STATUS )
+                     CALL PSX_MALLOC( EL2 * VAL__NBUB, IPQUA2, STATUS )
                   END IF
                END IF
 
 *  Allocate additional temporary workspace.
-               CALL PSX_MALLOC( DIM1( I )*BPV, IPWD1, STATUS )
-               CALL PSX_MALLOC( DIM2( I )*BPV, IPWD2, STATUS )
+               CALL PSX_MALLOC( DIM1( I ) * BPV, IPWD1, STATUS )
+               CALL PSX_MALLOC( DIM2( I ) * BPV, IPWD2, STATUS )
                IF ( HASVAR ) THEN
-                  CALL PSX_MALLOC( DIM1( I )*BPV, IPWV1, STATUS )
-                  CALL PSX_MALLOC( DIM2( I )*BPV, IPWV2, STATUS )
+                  CALL PSX_MALLOC( DIM1( I ) * BPV, IPWV1, STATUS )
+                  CALL PSX_MALLOC( DIM2( I ) * BPV, IPWV2, STATUS )
                END IF
                IF ( HASQUA ) THEN
-                  CALL PSX_MALLOC( DIM1( I )*VAL__NBUB, IPWQ1, STATUS )
-                  CALL PSX_MALLOC( DIM2( I )*VAL__NBUB, IPWQ2, STATUS )
+                  CALL PSX_MALLOC( DIM1( I ) * VAL__NBUB, IPWQ1,
+     :                             STATUS )
+                  CALL PSX_MALLOC( DIM2( I ) * VAL__NBUB, IPWQ2,
+     :                             STATUS )
                END IF
 
 *  Do the resampling along the current dimension.
