@@ -1662,9 +1662,16 @@ receptors}.
 \item Define environment variables to ensure the data are read from,
 and written to, the right place. Many are set automatically when the
 pipeline is initialised but others must be set manually. Details of
-the optional variables are given in \acsispipelinesun\ but you should
+the optional variables are given in \acsispipelinesun, but you should
 specify where to find the raw data and where to write any files that
-are created.
+are created.  These are specified by two environment variables.
+For the bash and zsh shell these variables are assigned like this
+\begin{terminalv}
+% export ORAC_DATA_IN=<path to raw data>
+% export ORAC_DATA_OUT=<where you want reduced data to go>
+\end{terminalv}
+
+while for csh and tcsh shells use the following commands.
 \begin{terminalv}
 % setenv ORAC_DATA_IN <path to raw data>
 % setenv ORAC_DATA_OUT <where you want reduced data to go>
@@ -1689,11 +1696,15 @@ you should also set \param{ORAC\_KEEP}.
 \begin{terminalv}
 % setenv ORAC_KEEP 1
 \end{terminalv}
-However, this still excludes temporary files made during a recipe step,
-whose names have the \file{oractemp} prefix.  To retain these set
+for tcsh and csh, and
 \begin{terminalv}
-% setenv ORAC_KEEP temp
+% export ORAC_KEEP=1
 \end{terminalv}
+for bash and zsh.
+
+However, this still excludes temporary files made during a recipe step,
+whose names have the \file{oractemp} prefix.  To retain these too, set
+ORAC\_KEEP to value \texttt{temp} rather than 1.
 
 Retention of temporary and intermediate will require plenty of storage,
 but it can be invaluable during debugging.
