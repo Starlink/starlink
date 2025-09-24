@@ -47,12 +47,18 @@ of 2010 (which essentially means S2SRO data). After that date MCE data
 is written in a different form and is not supported. For modern data
 use the separate MCEHEAD2CAT command.
 
+=item B<--fast>
+
+Do not include additional derived columns.  This can reduce the time taken
+to prepare the state information catalogue.
+
 =back
 
 =head1 NOTES
 
 Additional derived columns are included in addition to those stored
-directly in the JCMTSTATE extension. All telescope values include
+directly in the JCMTSTATE extension, unless the C<--fast> option
+is given. All telescope values include
 a correction for motion of the secondary mirror.
 
 =over 4
@@ -126,11 +132,12 @@ use Astro::FITS::Header::NDF;
 use NDF; # For VAL__BADD
 use Scalar::Util qw/ looks_like_number /;
 
-my ($help, $man, $version, $with_mce);
+my ($help, $man, $version, $with_mce, $without_computed);
 my $ostatus = GetOptions( "help" => \$help,
                           "man" => \$man,
                           "version" => \$version,
                           "with-mce" => \$with_mce,
+                          "fast" => \$without_computed,
                         );
 pod2usage(1) if $help;
 pod2usage(-exitstatus => 0, -verbose =>2) if $man;
@@ -153,10 +160,10 @@ my @fitcol;
 # Read the CSO and WVM fit information from the Starlink install tree
 my $fitfile = File::Spec->catfile( $ENV{STARLINK_DIR}, "share", "smurf", "csofit2.dat" );
 my $csofit;
-$csofit = JCMT::Tau::CsoFit2->new( $fitfile ) if -e $fitfile;
+$csofit = JCMT::Tau::CsoFit2->new( $fitfile ) if -e $fitfile && ! $without_computed;
 $fitfile = File::Spec->catfile($ENV{'STARLINK_DIR'}, qw/share smurf wvmfit2.dat/);
 my $wvmfit = undef;
-$wvmfit = JCMT::Tau::CsoFit2->new($fitfile) if -e $fitfile;
+$wvmfit = JCMT::Tau::CsoFit2->new($fitfile) if -e $fitfile && ! $without_computed;
 
 for my $f (@files) {
 
@@ -176,7 +183,7 @@ for my $f (@files) {
     $isfirst = 1;
 
     # See if we have WVM columns
-    if (exists $local{WVM_T12} && exists $local{WVM_T42} && exists $local{WVM_T78}) {
+    if (exists $local{WVM_T12} && exists $local{WVM_T42} && exists $local{WVM_T78} && ! $without_computed) {
       push(@wvmcol, "WVMTAU", "PWVZEN", "PWVLOS");
     }
   }
@@ -212,9 +219,11 @@ for my $f (@files) {
 
   # now dump the contents
   if ($isfirst_file) {
+    my @computedcol = ();
+    push @computedcol, qw/RA DEC DRA DDEC AZ EL DAZ DEL TELSPEED/ unless $without_computed;
     print "# This is a TST formatted file\n";
-    print join("\t", "Id", "RA", "DEC", "DRA", "DDEC", "AZ","EL", "DAZ", "DEL", "TELSPEED", @wvmcol, @fitcol, @columns) ,"\n";
-    print join("\t", map { "--" } (0..($#columns+3))),"\n";
+    print join("\t", "Id", @computedcol, @wvmcol, @fitcol, @columns) ,"\n";
+    print join("\t", map { "--" } (0..($#columns+$#fitcol+$#wvmcol+$#computedcol+4))),"\n";
     $isfirst_file = 0;
   }
 
@@ -237,37 +246,39 @@ for my $f (@files) {
     # Use the RTS sequence number as the ID
     push(@slice, $local{RTS_NUM}->[$i]);
 
-    push(@slice, calc_pos( "TR", $i, \%local) );
-    push(@slice, calc_pos( "AZ", $i, \%local) );
+    unless ($without_computed) {
+        push(@slice, calc_pos( "TR", $i, \%local) );
+        push(@slice, calc_pos( "AZ", $i, \%local) );
 
-    # Calculate telescope speed
-    my $telspeed = &NDF::VAL__BADD();
-    my @speedkeys = (qw/ TCS_TAI TCS_TR_AC1 TCS_TR_AC2 /);
-    my $isokay = 1;
-    if ($i > 0) {
-      for my $islice ( $i-1, $i ) {
-        for my $key (@speedkeys) {
-          if ($local{$key}->[$islice] == &NDF::VAL__BADD()) {
-            # invalid non-bad position or time
-            $isokay = 0;
-            last;
+        # Calculate telescope speed
+        my $telspeed = &NDF::VAL__BADD();
+        my @speedkeys = (qw/ TCS_TAI TCS_TR_AC1 TCS_TR_AC2 /);
+        my $isokay = 1;
+        if ($i > 0) {
+          for my $islice ( $i-1, $i ) {
+            for my $key (@speedkeys) {
+              if ($local{$key}->[$islice] == &NDF::VAL__BADD()) {
+                # invalid non-bad position or time
+                $isokay = 0;
+                last;
+              }
+            }
+          }
+          if ($isokay) {
+            # Calculate the tangent plane distance travelled between
+            # this and previous position
+            my ($xoffset, $yoffset, $j) = Astro::PAL::palDs2tp( $local{TCS_TR_AC1}->[$i], $local{TCS_TR_AC2}->[$i],
+                                                                $local{TCS_TR_AC1}->[$i-1], $local{TCS_TR_AC2}->[$i-1]);
+            if ($j == 0) {
+              my $distsq = $xoffset**2 + $yoffset**2;
+              my $dist = sqrt($distsq) * Astro::PAL::DR2AS;
+              my $deltat = ( $local{TCS_TAI}->[$i] - $local{TCS_TAI}->[$i-1]) * 86400;
+              $telspeed = $dist / $deltat if $deltat > 0.0;
+            }
           }
         }
-      }
-      if ($isokay) {
-        # Calculate the tangent plane distance travelled between
-        # this and previous position
-        my ($xoffset, $yoffset, $j) = Astro::PAL::palDs2tp( $local{TCS_TR_AC1}->[$i], $local{TCS_TR_AC2}->[$i],
-                                                            $local{TCS_TR_AC1}->[$i-1], $local{TCS_TR_AC2}->[$i-1]);
-        if ($j == 0) {
-          my $distsq = $xoffset**2 + $yoffset**2;
-          my $dist = sqrt($distsq) * Astro::PAL::DR2AS;
-          my $deltat = ( $local{TCS_TAI}->[$i] - $local{TCS_TAI}->[$i-1]) * 86400;
-          $telspeed = $dist / $deltat if $deltat > 0.0;
-        }
-      }
+        push(@slice, $telspeed);
     }
-    push(@slice, $telspeed);
 
     # Calculate the WVM tau
     if ( @wvmcol ) {
