@@ -36,6 +36,10 @@ Print debugging information.
 
 Print extended lines. Can add AZ, EL, pointing offsets and bandwidth.
 
+=item B<-msbtitle>
+
+Include MSB titles.
+
 =item B<-force>
 
 Force a subdirectory search. If no files are found in the directory itself, as
@@ -148,7 +152,7 @@ my $scuba2_root  = File::Spec->catdir($root, "raw/scuba2",${default_array});
 # Store the arguments for debugging purposes
 my @args = @ARGV;
 
-my ($help, $man, $doversion, $debug, $extended, $ocscfg, $force, $prtall);
+my ($help, $man, $doversion, $debug, $extended, $ocscfg, $force, $prtall, $msbtitle);
 my ($cal_only, $skip, $tsys, $trx, $stdev);
 my $use_scuba2;
 my $result = GetOptions(
@@ -157,6 +161,7 @@ my $result = GetOptions(
                         "version" => \$doversion, # Version information
                         "debug" => \$debug,       # Debugging (debug = 2 prints header items)
                         "extended" => \$extended, # Print extended lines?
+                        "msbtitle" => \$msbtitle, # Show MSB titles?
                         "ocscfg" => \$ocscfg,     # Print ocs config file
                         "force" => \$force,       # Force subdirectory search
                         "all" => \$prtall,        # Print info on all files even if headers identical
@@ -611,6 +616,7 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode_extra, $mode, $A{INBEAM}, $A{OBJ
       if ((not $cal_only) or ($cal_only and  $A{PROJECT} =~ /cal/i)) {
         write if ("$A{RUN}_$A{UT}" ne "${prev_obs}" || ($prtall));
         print "    OCSCFG: $A{OCSCFG}  ($A{OBSTYPE})\n" if $ocscfg;
+        print "    MSBTITLE: $A{MSBTITLE}\n" if $msbtitle;
       }
 
     }
@@ -622,7 +628,7 @@ $A{RUN}, substr($A{UT},0,5), $A{PROJECT}, $mode_extra, $mode, $A{INBEAM}, $A{OBJ
       if ((not $cal_only) or ($cal_only and  $A{PROJECT} =~ /cal/i)) {
 
         print "---------------------------------------------------\n"
-              if (($ocscfg) or ($tsys or $trx));
+              if ($ocscfg or $msbtitle or $tsys or $trx);
       }
     }
 
@@ -739,6 +745,7 @@ $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode_extra, $mode, $inbeam, $S{OBJECT
       if ((not $cal_only) or ($cal_only and  $S{PROJECT} =~ /cal/i)) {
         write if ("$S{RUN}_$S{UT}" ne "${prev_obs}" || ($prtall));
         print "    OCSCFG: $S{OCSCFG}  ($S{OBSTYPE}\n" if ($ocscfg);
+        print "    MSBTITLE: $S{MSBTITLE}\n" if $msbtitle;
       }
 
     }
@@ -748,7 +755,7 @@ $S{RUN}, substr($S{UT},0,5), $S{PROJECT}, $mode_extra, $mode, $inbeam, $S{OBJECT
       if ((not $cal_only) or ($cal_only and  $S{PROJECT} =~ /cal/i)) {
 
         print "---------------------------------------------------\n"
-              if (($ocscfg) or ($tsys or $trx));
+              if ($ocscfg or $msbtitle);
       }
     }
 
@@ -1096,6 +1103,9 @@ sub calc_shared_scuba2_acsis {
   $results{OBSTYPE}  = uc($fitsitem->{OBS_TYPE});
   $results{OBJECT}   = (defined $fitsitem->{OBJECT} ? "$fitsitem->{OBJECT}" : "");
   $results{OBJECT} =~ s/\s+//g;
+  $results{'MSBTITLE'} = ((defined $fitsitem->{'MSBTITLE'})
+    ? $fitsitem->{'MSBTITLE'}
+    : '<No title>');
 
   my $az     = ((defined $fitsitem->{AZSTART} and defined $fitsitem2->{'AZEND'}) ?
                 sprintf("%6.2f",0.5*($fitsitem->{AZSTART}+$fitsitem2->{AZEND})) :
