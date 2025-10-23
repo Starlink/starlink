@@ -27,8 +27,9 @@ EXTRA_DIST = perl
 install-starperl:
 	- $(mkdir_p) $(DESTDIR)$(bindir)
 	cd $(DESTDIR)$(bindir) ;\
+	rm -f starperldoc ;\
+	$(LN_S) ../Perl/bin/perldoc starperldoc ;\
 	rm -f starperl ;\
-	echo $(LN_S) ../Perl/bin/perl starperl ;\
 	$(LN_S) ../Perl/bin/perl starperl
 
 ##  Before distributing subdirectories we need to clean then up (we get all
