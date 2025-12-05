@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT([cfitsio],[4.6.2],[starlink@jiscmail.ac.uk])
+AC_INIT([cfitsio],[4.6.3],[starlink@jiscmail.ac.uk])
 AC_CONFIG_AUX_DIR([.])
 
 dnl    Require autoconf-2.50 at least

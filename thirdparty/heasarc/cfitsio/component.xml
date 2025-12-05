@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="cfitsio" support="U">
-  <version>4.6.2</version>
+  <version>4.6.3</version>
   <path>thirdparty/heasarc/cfitsio</path>
   <description>CFITSIO -- C and Fortran libraries for access to FITS files
         </description>
