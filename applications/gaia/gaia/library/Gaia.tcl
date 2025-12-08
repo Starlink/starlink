@@ -2224,9 +2224,9 @@ itcl::class gaia::Gaia {
    #  If user has a local config file then this may need to be updated
    #  from time to time as features are added to the default file.
    #  The match string should be set to something new in the
-   #  default file.
+   #  default file, or as time passes something removed.
    public proc check_config_file { config_file } {
-      set newmatch {*APASS*}
+      set newmatch {*gsc2@eso*}
 
       #  Search the file for the string match.
       set ok 0
@@ -2238,7 +2238,7 @@ itcl::class gaia::Gaia {
          }
       }
       ::close $fileid
-      if { !$ok } {
+      if { $ok } {
          set msg \
             "Your local catalogue configuration file '$config_file'
 is out of date. Do you want to update it?"
@@ -2249,9 +2249,9 @@ is out of date. Do you want to update it?"
                "The local catalogue configuration file '$config_file'
 contains a description of catalogues that are shown in the
 Data-Servers menus. It appears that this file is now out of date with
-respect to the system default version \(which may contain new
-catalogues and image servers\) and you should probably allow it to be
-updated.
+respect to the system default version \(which may contain
+catalogues and image servers that no longer work\) and you should probably
+allow it to be updated.
 When you open local catalogues of your own, or have ones created for
 you locally \(the object detection toolbox does this\), or apply
 configuration changes \(such as changing the colour of the overlay
