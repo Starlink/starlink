@@ -241,6 +241,7 @@
 *     9-FEB-2026 (GSB):
 *        In non-merge case, find JCMTSTATE components in output NDF
 *        by name in case the ordering is different (e.g. with HDSv5).
+*        Add "TSYS_C" and "TSYS_TAU" to list of ACSIS extension arrays.
 
 *  Copyright:
 *     Copyright (C) 2007-2009,2012,2015 Science and Technology Facilities Council.
@@ -296,7 +297,7 @@
 #include "smurflib.h"
 
 /* Number of ACSIS extension components that need to be re-ordered. */
-#define NACSIS 3
+#define NACSIS 5
 
 #pragma GCC diagnostic ignored "-Wcast-qual"
 
@@ -461,7 +462,8 @@ void smurf_timesort( int *status ) {
    static const char *comp[2] = {"DATA", "VARIANCE"};
 
 /* ACSIS arrays to be masked and re-ordered */
-   static const char *acsis[NACSIS] = { "RECEPPOS", "TSYS", "TRX" };
+   static const char *acsis[NACSIS] = {
+      "RECEPPOS", "TSYS", "TRX", "TSYS_C", "TSYS_TAU" };
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -730,6 +732,10 @@ void smurf_timesort( int *status ) {
 
 /* Loop round each component to be re-ordered. */
             for( i = 0; i < NACSIS && *status == SAI__OK; i++ ) {
+               datThere( loc1, acsis[ i ], &there, status );
+               if( ! there ) {
+                  continue;
+               }
 
 /* Get a locator for the current ACSIS component in the input NDF. */
                datFind( loc1, acsis[ i ], &loc1c, status );

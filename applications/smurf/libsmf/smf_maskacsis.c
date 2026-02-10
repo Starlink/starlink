@@ -39,6 +39,8 @@
 *  History:
 *     3-APR-2008 (DSB):
 *        Initial version.
+*     9-FEB-2026 (GSB):
+*        Add "TSYS_C" and "TSYS_TAU" to list of ACSIS extension arrays.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -72,7 +74,7 @@
 #include "sae_par.h"
 #include "star/hds.h"
 
-#define NCOMP 6
+#define NCOMP 8
 #define TEMP_NAME "SMURF_TEMP"
 
 void smf_maskacsis( int indf, dim_t *mask, int *status ){
@@ -91,14 +93,16 @@ void smf_maskacsis( int indf, dim_t *mask, int *status ){
    int j;
    int maxis;
    int ndim;
+   int there;
    size_t el;
    size_t len;
    void *pin = NULL;
    void *pout = NULL;
 
    const char *comp[ NCOMP ] = { "RECEPTORS", "FPLANEX", "FPLANEY",
-                                 "RECEPPOS", "TSYS", "TRX" };
-   int axis[ NCOMP ] = { 0, 0, 0, 1, 0, 0 };
+                                 "RECEPPOS", "TSYS", "TRX",
+                                 "TSYS_C", "TSYS_TAU" };
+   int axis[ NCOMP ] = { 0, 0, 0, 1, 0, 0, 0, 0 };
 
 
 /* Check inherited status */
@@ -112,6 +116,12 @@ void smf_maskacsis( int indf, dim_t *mask, int *status ){
 
 /* Loop round each component that is to be masked. */
    for( i = 0; i < NCOMP; i++ ) {
+
+/* Does the desired component exist? */
+      datThere( loc1, comp[ i ], &there, status );
+      if( ! there ) {
+         continue;
+      }
 
 /* Note the index of the detector axis in the current component. */
       maxis = axis[ i ];
