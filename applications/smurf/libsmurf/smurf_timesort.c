@@ -238,6 +238,9 @@
 *        avoids a GRP__INVID error in such cases.
 *     12-JAN-2015 (DSB):
 *        Added parameter SPECBND.
+*     9-FEB-2026 (GSB):
+*        In non-merge case, find JCMTSTATE components in output NDF
+*        by name in case the ordering is different (e.g. with HDSv5).
 
 *  Copyright:
 *     Copyright (C) 2007-2009,2012,2015 Science and Technology Facilities Council.
@@ -330,6 +333,7 @@ void smurf_timesort( int *status ) {
    char *qts_out;
    char basename[ GRP__SZNAM + 1 ];
    char fullname[ GRP__SZNAM + 10 ];
+   char hdsname[ DAT__SZNAM + 1 ];
    char ltbuf[ 11 ];
    char specbnd[20];
    char timeorg[32];
@@ -670,9 +674,11 @@ void smurf_timesort( int *status ) {
             for( i = 1; i <= ncomp && *status == SAI__OK; i++ ) {
 
 /* Get locators for the current JCMTSTATE component in both input and
-   output NDF. */
+   output NDF.  Find the component in the output by name in case the
+   ordering is different in the two structures. */
                datIndex( loc1, i, &loc1c, status );
-               datIndex( loc2, i, &loc2c, status );
+               datName( loc1c, hdsname, status );
+               datFind( loc2, hdsname, &loc2c, status );
 
 /* Determine the shape and type of the array component. */
                datShape( loc1c, 3, dims, &ndim, status );
