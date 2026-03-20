@@ -47,6 +47,10 @@ of 2010 (which essentially means S2SRO data). After that date MCE data
 is written in a different form and is not supported. For modern data
 use the separate MCEHEAD2CAT command.
 
+=item B<--with-acsis>
+
+Include some information from the ACSIS extension.
+
 =item B<--fast>
 
 Do not include additional derived columns.  This can reduce the time taken
@@ -132,11 +136,12 @@ use Astro::FITS::Header::NDF;
 use NDF; # For VAL__BADD
 use Scalar::Util qw/ looks_like_number /;
 
-my ($help, $man, $version, $with_mce, $without_computed);
+my ($help, $man, $version, $with_mce, $with_acsis, $without_computed);
 my $ostatus = GetOptions( "help" => \$help,
                           "man" => \$man,
                           "version" => \$version,
                           "with-mce" => \$with_mce,
+                          "with-acsis" => \$with_acsis,
                           "fast" => \$without_computed,
                         );
 pod2usage(1) if $help;
@@ -214,6 +219,14 @@ for my $f (@files) {
     if (defined $cols) {
       push(@columns, @$cols);
       %local = (%local, %$mcedata);
+    }
+  }
+
+  if ($with_acsis) {
+    my ($cols, $acsisdata) = read_acsis($f);
+    if (defined $cols) {
+      push @columns, @$cols;
+      %local = (%local, %$acsisdata);
     }
   }
 
@@ -645,6 +658,66 @@ sub ver6slot40 {
   my @unpack = unpack( "vv", pack("j", $_[0]));
   return (PSUCCurr4 => $unpack[0],
 	  PSUCCurr5 => $unpack[1]);
+}
+
+# Function to read ACSIS data similarly to read_mce.
+# Would be good to include all arrays which are [nrow] or [nrecep,nrow]
+# but these are currently only the TRX and TSYS columns, so use these for now.
+
+sub read_acsis {
+  my $f = shift;
+  my $status = NDF::SAI__OK();
+  err_begin($status );
+
+  my @col = ();
+  my %acsisdata = ();
+
+  hds_open($f, 'READ', my $loc, $status);
+  dat_find($loc, 'MORE', my $mloc, $status);
+  dat_find($mloc, 'ACSIS', my $aloc, $status );
+
+  dat_find($aloc, 'RECEPTORS', my $rloc, $status);
+  dat_shape($rloc, 7, my @dim, my $ndim, $status);
+  dat_getvc($rloc, $dim[0], my @recep, my $nrecep, $status)
+    if $status == NDF::SAI__OK();
+  dat_annul($rloc, $status);
+
+  foreach my $c (qw/TRX TSYS TSYS_C TSYS_TAU/) {
+    dat_there($aloc, $c, my $there, $status);
+    next unless $there;
+
+    dat_find($aloc, $c, my $cloc, $status);
+    dat_shape($cloc, 7, @dim, $ndim, $status);
+
+    if ($ndim == 2 and $dim[0] == $nrecep) {
+      dat_getvr($cloc, ($dim[0] * $dim[1]), my @data, my $ndata, $status);
+
+      for (my $i = 0; $i < $nrecep; $i ++) {
+        my $title = sprintf '%s_%s', $c, $recep[$i];
+        my @recep_data = ();
+
+        for (my $j = $i; $j < $ndata; $j += $nrecep) {
+            push @recep_data, $data[$j];
+        }
+
+        push @col, $title;
+        $acsisdata{$title} = \@recep_data;
+      }
+    }
+
+    dat_annul($cloc, $status);
+  }
+
+  dat_annul($aloc, $status);
+  dat_annul($mloc, $status);
+  dat_annul($loc, $status);
+
+  if ($status != NDF::SAI__OK()) {
+    err_flush($status);
+  }
+  err_end($status);
+
+  return (\@col, \%acsisdata);
 }
 
 # Simple routine to convert TAI MJD to unix epoch seconds
