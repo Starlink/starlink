@@ -10,6 +10,7 @@ Params::Util
 DateTime
 DateTime::Format::Strptime
 DateTime::Format::ISO8601
+DateTime::Format::Epoch
 Starlink::AST
 Tk
 Tk::TextANSIColor
