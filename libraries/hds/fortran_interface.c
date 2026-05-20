@@ -2029,6 +2029,7 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2037,10 +2038,10 @@ F77_SUBROUTINE(dat_alter)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datAlter( locator_c, *ndim, cdims, status );
+   datAlter( locator_c, cndim, cdims, status );
 }
 
 F77_SUBROUTINE(dat_basic)( CHARACTER(locator),
@@ -2095,6 +2096,7 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
    HDSLoc *locator2_c = NULL;
    hdsdim subsbuf[DAT__MXDIM];
    hdsdim *csubs;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2102,10 +2104,10 @@ F77_SUBROUTINE(dat_cell)( CHARACTER(locator1),
    datImportFloc( locator1, locator1_length, &locator1_c, status);
 
 /* Ensure that array subscripts are correct         */
-   csubs = hdsDimF2C( *ndim, subs, subsbuf, status );
+   csubs = hdsDimF2C( cndim, subs, subsbuf, status );
 
 /* Call pure C routine                                       */
-   datCell( locator1_c, *ndim, csubs, &locator2_c, status);
+   datCell( locator1_c, cndim, csubs, &locator2_c, status);
 
 /* Export returned locator */
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
@@ -2132,6 +2134,7 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
    int ischar = 0;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 
 /* Enter routine.	*/
@@ -2146,13 +2149,13 @@ F77_SUBROUTINE(dat_get)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
    if (ischar) {
-     datGetC( locator_c, *ndim, cdims, (char*)values, values_length, status );
+     datGetC( locator_c, cndim, cdims, (char*)values, values_length, status );
    } else {
-     datGet( locator_c, type_c, *ndim, cdims, values, status);
+     datGet( locator_c, type_c, cndim, cdims, values, status);
    }
 }
 
@@ -2174,6 +2177,7 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2181,10 +2185,10 @@ F77_SUBROUTINE(dat_getc)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetC( locator_c, *ndim, cdims, values, values_length, status);
+   datGetC( locator_c, cndim, cdims, values, values_length, status);
 }
 
 F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
@@ -2203,6 +2207,7 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2210,10 +2215,10 @@ F77_SUBROUTINE(dat_getd)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetD( locator_c, *ndim, cdims, values, status);
+   datGetD( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -2233,6 +2238,7 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2240,10 +2246,10 @@ F77_SUBROUTINE(dat_geti)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetI( locator_c, *ndim, cdims, values, status);
+   datGetI( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -2263,6 +2269,7 @@ F77_SUBROUTINE(dat_getk)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2270,10 +2277,10 @@ F77_SUBROUTINE(dat_getk)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetK( locator_c, *ndim, cdims, values, status);
+   datGetK( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -2293,6 +2300,7 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2300,10 +2308,10 @@ F77_SUBROUTINE(dat_getl)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetL( locator_c, *ndim, cdims, values, status);
+   datGetL( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -2323,6 +2331,7 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2330,10 +2339,10 @@ F77_SUBROUTINE(dat_getr)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetR( locator_c, *ndim, cdims, values, status);
+   datGetR( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -2579,6 +2588,7 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    void *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2590,10 +2600,10 @@ F77_SUBROUTINE(dat_map)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMap( locator_c, type_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMap( locator_c, type_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2619,6 +2629,7 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
    unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2629,10 +2640,10 @@ F77_SUBROUTINE(dat_mapc)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapC( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapC( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2658,6 +2669,7 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
    double *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2668,10 +2680,10 @@ F77_SUBROUTINE(dat_mapd)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapD( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapD( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2697,6 +2709,7 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2707,10 +2720,10 @@ F77_SUBROUTINE(dat_mapi)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapI( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapI( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2736,6 +2749,7 @@ F77_SUBROUTINE(dat_mapk)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2746,10 +2760,10 @@ F77_SUBROUTINE(dat_mapk)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapK( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapK( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2775,6 +2789,7 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2785,10 +2800,10 @@ F77_SUBROUTINE(dat_mapl)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapL( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapL( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2814,6 +2829,7 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
    float *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2824,10 +2840,10 @@ F77_SUBROUTINE(dat_mapr)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapR( locator_c, mode_c, *ndim, cdims, &cpntr, status );
+   datMapR( locator_c, mode_c, cndim, cdims, &cpntr, status );
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2855,6 +2871,7 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim cdims[DAT__MXDIM];
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2866,10 +2883,10 @@ F77_SUBROUTINE(dat_mapn)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Call pure C routine                                       */
-   datMapN( locator_c, type_c, mode_c, *ndim, &cpntr, cdims, status);
+   datMapN( locator_c, type_c, mode_c, cndim, &cpntr, cdims, status);
 
 /* Handle copying to Fortran dims */
-   (void)hdsDimC2F( *ndim, cdims, dims, status );
+   (void)hdsDimC2F( cndim, cdims, dims, status );
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -2927,6 +2944,7 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2934,10 +2952,10 @@ F77_SUBROUTINE(dat_mould)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMould( locator_c, *ndim, cdims, status );
+   datMould( locator_c, cndim, cdims, status );
 }
 
 F77_SUBROUTINE(dat_new)( CHARACTER(locator),
@@ -2961,6 +2979,7 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -2972,10 +2991,10 @@ F77_SUBROUTINE(dat_new)( CHARACTER(locator),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datNew( locator_c, name_c, type_c, *ndim, cdims, status);
+   datNew( locator_c, name_c, type_c, cndim, cdims, status);
 
 }
 
@@ -2998,6 +3017,7 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
    char name_c[DAT__SZNAM+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3008,10 +3028,10 @@ F77_SUBROUTINE(dat_newc)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datNewC( locator_c, name_c, *len, *ndim, cdims, status );
+   datNewC( locator_c, name_c, *len, cndim, cdims, status );
 
 }
 
@@ -3249,6 +3269,7 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3256,10 +3277,10 @@ F77_SUBROUTINE(dat_putc)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call C routine                                       */
-   datPutC( locator_c, *ndim, cdims, values, values_length, status);
+   datPutC( locator_c, cndim, cdims, values, values_length, status);
 
 }
 
@@ -3279,6 +3300,7 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3286,10 +3308,10 @@ F77_SUBROUTINE(dat_putd)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutD( locator_c, *ndim, cdims, values, status );
+   datPutD( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -3309,6 +3331,7 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3316,10 +3339,10 @@ F77_SUBROUTINE(dat_puti)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutI( locator_c, *ndim, cdims, values, status );
+   datPutI( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -3339,6 +3362,7 @@ F77_SUBROUTINE(dat_putk)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3346,10 +3370,10 @@ F77_SUBROUTINE(dat_putk)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutK( locator_c, *ndim, cdims, values, status );
+   datPutK( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -3369,6 +3393,7 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3376,10 +3401,10 @@ F77_SUBROUTINE(dat_putr)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutR( locator_c, *ndim, cdims, values, status );
+   datPutR( locator_c, cndim, cdims, values, status );
 }
 
 F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
@@ -3398,6 +3423,7 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3405,10 +3431,10 @@ F77_SUBROUTINE(dat_putl)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutL( locator_c, *ndim, cdims, values, status );
+   datPutL( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -3434,6 +3460,7 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
    int ischar = 0;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3448,13 +3475,13 @@ F77_SUBROUTINE(dat_put)( CHARACTER(locator),
    if (strncmp(type,"_CHAR",5) == 0) ischar = 1;
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
    if (ischar) {
-     datPutC( locator_c, *ndim, cdims, (char *)values, values_length, status );
+     datPutC( locator_c, cndim, cdims, (char *)values, values_length, status );
    } else {
-     datPut( locator_c, type_c, *ndim, cdims, values, status );
+     datPut( locator_c, type_c, cndim, cdims, values, status );
    }
 
 }
@@ -3654,6 +3681,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc * locator_c = NULL;
    hdsdim cdims[DAT__MXDIM];
+   int maxdim = HDS_MIN(*ndimx, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3661,7 +3689,7 @@ F77_SUBROUTINE(dat_shape)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datShape( locator_c, *ndimx, cdims, ndim, status );
+   datShape( locator_c, maxdim, cdims, ndim, status );
 
 /* Handle copying to Fortran dims */
    (void)hdsDimC2F( *ndim, cdims, dims, status );
@@ -3712,6 +3740,7 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
    hdsdim dimubuf[DAT__MXDIM];
    hdsdim * cldims;
    hdsdim * cudims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3719,11 +3748,11 @@ F77_SUBROUTINE(dat_slice)( CHARACTER(locator1),
    datImportFloc( locator1, locator1_length, &locator1_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cldims = hdsDimF2C( *ndim, diml, dimlbuf, status );
-   cudims = hdsDimF2C( *ndim, dimu, dimubuf, status );
+   cldims = hdsDimF2C( cndim, diml, dimlbuf, status );
+   cudims = hdsDimF2C( cndim, dimu, dimubuf, status );
 
 /* Call pure C routine                                       */
-   datSlice( locator1_c, *ndim, cldims, cudims, &locator2_c, status );
+   datSlice( locator1_c, cndim, cldims, cudims, &locator2_c, status );
 
 /* Export returned locator */
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
@@ -3747,6 +3776,7 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
    char type_c[DAT__SZTYP+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3754,10 +3784,10 @@ F77_SUBROUTINE(dat_temp)( CHARACTER(type),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datTemp( type_c, *ndim, cdims, &locator_c, status);
+   datTemp( type_c, cndim, cdims, &locator_c, status);
 
 /* Export returned locator */
    datExportFloc( &locator_c, 1, locator_length, locator, status );
@@ -3787,6 +3817,7 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    char type_c[DAT__SZTYP + 1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3798,10 +3829,10 @@ F77_SUBROUTINE(hds_new)( CHARACTER(file),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   hdsNew( file_c, name_c, type_c, *ndim, cdims, &locator_c, status );
+   hdsNew( file_c, name_c, type_c, cndim, cdims, &locator_c, status );
 
 /* Export returned locator */
    datExportFloc( &locator_c, 1, locator_length, locator, status );
@@ -3832,6 +3863,7 @@ F77_SUBROUTINE(dat_alter8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3840,10 +3872,10 @@ F77_SUBROUTINE(dat_alter8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datAlter( locator_c, *ndim, cdims, status );
+   datAlter( locator_c, cndim, cdims, status );
 }
 
 F77_SUBROUTINE(dat_basic8)( CHARACTER(locator),
@@ -3898,6 +3930,7 @@ F77_SUBROUTINE(dat_cell8)( CHARACTER(locator1),
    HDSLoc *locator2_c = NULL;
    hdsdim subsbuf[DAT__MXDIM];
    hdsdim *csubs;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3905,10 +3938,10 @@ F77_SUBROUTINE(dat_cell8)( CHARACTER(locator1),
    datImportFloc( locator1, locator1_length, &locator1_c, status);
 
 /* Ensure that array subscripts are correct         */
-   csubs = hdsDimF2C8( *ndim, subs, subsbuf, status );
+   csubs = hdsDimF2C8( cndim, subs, subsbuf, status );
 
 /* Call pure C routine                                       */
-   datCell( locator1_c, *ndim, csubs, &locator2_c, status);
+   datCell( locator1_c, cndim, csubs, &locator2_c, status);
 
 /* Export returned locator */
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
@@ -3935,6 +3968,7 @@ F77_SUBROUTINE(dat_get8)( CHARACTER(locator),
    int ischar = 0;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 
 /* Enter routine.	*/
@@ -3949,13 +3983,13 @@ F77_SUBROUTINE(dat_get8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
    if (ischar) {
-     datGetC( locator_c, *ndim, cdims, (char*)values, values_length, status );
+     datGetC( locator_c, cndim, cdims, (char*)values, values_length, status );
    } else {
-     datGet( locator_c, type_c, *ndim, cdims, values, status);
+     datGet( locator_c, type_c, cndim, cdims, values, status);
    }
 }
 
@@ -3977,6 +4011,7 @@ F77_SUBROUTINE(dat_getc8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -3984,10 +4019,10 @@ F77_SUBROUTINE(dat_getc8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetC( locator_c, *ndim, cdims, values, values_length, status);
+   datGetC( locator_c, cndim, cdims, values, values_length, status);
 }
 
 F77_SUBROUTINE(dat_getd8)( CHARACTER(locator),
@@ -4006,6 +4041,7 @@ F77_SUBROUTINE(dat_getd8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4013,10 +4049,10 @@ F77_SUBROUTINE(dat_getd8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetD( locator_c, *ndim, cdims, values, status);
+   datGetD( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -4036,6 +4072,7 @@ F77_SUBROUTINE(dat_geti8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4043,10 +4080,10 @@ F77_SUBROUTINE(dat_geti8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetI( locator_c, *ndim, cdims, values, status);
+   datGetI( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -4066,6 +4103,7 @@ F77_SUBROUTINE(dat_getk8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4073,10 +4111,10 @@ F77_SUBROUTINE(dat_getk8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetK( locator_c, *ndim, cdims, values, status);
+   datGetK( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -4096,6 +4134,7 @@ F77_SUBROUTINE(dat_getl8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4103,10 +4142,10 @@ F77_SUBROUTINE(dat_getl8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetL( locator_c, *ndim, cdims, values, status);
+   datGetL( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -4126,6 +4165,7 @@ F77_SUBROUTINE(dat_getr8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4133,10 +4173,10 @@ F77_SUBROUTINE(dat_getr8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datGetR( locator_c, *ndim, cdims, values, status);
+   datGetR( locator_c, cndim, cdims, values, status);
 
 }
 
@@ -4381,6 +4421,7 @@ F77_SUBROUTINE(dat_map8)( CHARACTER(locator),
    void *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4392,10 +4433,10 @@ F77_SUBROUTINE(dat_map8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMap( locator_c, type_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMap( locator_c, type_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4421,6 +4462,7 @@ F77_SUBROUTINE(dat_mapc8)( CHARACTER(locator),
    unsigned char *cpntr = NULL; /* Initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4431,10 +4473,10 @@ F77_SUBROUTINE(dat_mapc8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapC( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapC( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4460,6 +4502,7 @@ F77_SUBROUTINE(dat_mapd8)( CHARACTER(locator),
    double *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4470,10 +4513,10 @@ F77_SUBROUTINE(dat_mapd8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapD( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapD( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4499,6 +4542,7 @@ F77_SUBROUTINE(dat_mapi8)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4509,10 +4553,10 @@ F77_SUBROUTINE(dat_mapi8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapI( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapI( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4538,6 +4582,7 @@ F77_SUBROUTINE(dat_mapk8)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4548,10 +4593,10 @@ F77_SUBROUTINE(dat_mapk8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapK( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapK( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4577,6 +4622,7 @@ F77_SUBROUTINE(dat_mapl8)( CHARACTER(locator),
    int *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4587,10 +4633,10 @@ F77_SUBROUTINE(dat_mapl8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapL( locator_c, mode_c, *ndim, cdims, &cpntr, status);
+   datMapL( locator_c, mode_c, cndim, cdims, &cpntr, status);
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4616,6 +4662,7 @@ F77_SUBROUTINE(dat_mapr8)( CHARACTER(locator),
    float *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4626,10 +4673,10 @@ F77_SUBROUTINE(dat_mapr8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMapR( locator_c, mode_c, *ndim, cdims, &cpntr, status );
+   datMapR( locator_c, mode_c, cndim, cdims, &cpntr, status );
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4657,6 +4704,7 @@ F77_SUBROUTINE(dat_mapn8)( CHARACTER(locator),
    char mode_c[DAT__SZMOD+1];
    void *cpntr = NULL; /* initialise in case of bad return status */
    hdsdim cdims[DAT__MXDIM];
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4668,10 +4716,10 @@ F77_SUBROUTINE(dat_mapn8)( CHARACTER(locator),
    cnfImpn( mode, mode_length, DAT__SZMOD,  mode_c);
 
 /* Call pure C routine                                       */
-   datMapN( locator_c, type_c, mode_c, *ndim, &cpntr, cdims, status);
+   datMapN( locator_c, type_c, mode_c, cndim, &cpntr, cdims, status);
 
 /* Handle copying to Fortran dims */
-   (void)hdsDimC2F8( *ndim, cdims, dims, status );
+   (void)hdsDimC2F8( cndim, cdims, dims, status );
 
 /* Export the C pointer as a FORTRAN POINTER */
    *pntr = cnfFptr( cpntr );
@@ -4729,6 +4777,7 @@ F77_SUBROUTINE(dat_mould8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4736,10 +4785,10 @@ F77_SUBROUTINE(dat_mould8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datMould( locator_c, *ndim, cdims, status );
+   datMould( locator_c, cndim, cdims, status );
 }
 
 F77_SUBROUTINE(dat_new8)( CHARACTER(locator),
@@ -4763,6 +4812,7 @@ F77_SUBROUTINE(dat_new8)( CHARACTER(locator),
    char type_c[DAT__SZTYP+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4774,10 +4824,10 @@ F77_SUBROUTINE(dat_new8)( CHARACTER(locator),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datNew( locator_c, name_c, type_c, *ndim, cdims, status);
+   datNew( locator_c, name_c, type_c, cndim, cdims, status);
 
 }
 
@@ -4800,6 +4850,7 @@ F77_SUBROUTINE(dat_newc8)( CHARACTER(locator),
    char name_c[DAT__SZNAM+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -4810,10 +4861,10 @@ F77_SUBROUTINE(dat_newc8)( CHARACTER(locator),
    cnfImpn( name, name_length, DAT__SZNAM,  name_c );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datNewC( locator_c, name_c, *len, *ndim, cdims, status );
+   datNewC( locator_c, name_c, *len, cndim, cdims, status );
 
 }
 
@@ -5035,6 +5086,7 @@ F77_SUBROUTINE(dat_putc8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5042,10 +5094,10 @@ F77_SUBROUTINE(dat_putc8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call C routine                                       */
-   datPutC( locator_c, *ndim, cdims, values, values_length, status);
+   datPutC( locator_c, cndim, cdims, values, values_length, status);
 
 }
 
@@ -5065,6 +5117,7 @@ F77_SUBROUTINE(dat_putd8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5072,10 +5125,10 @@ F77_SUBROUTINE(dat_putd8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutD( locator_c, *ndim, cdims, values, status );
+   datPutD( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -5095,6 +5148,7 @@ F77_SUBROUTINE(dat_puti8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5102,10 +5156,10 @@ F77_SUBROUTINE(dat_puti8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutI( locator_c, *ndim, cdims, values, status );
+   datPutI( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -5125,6 +5179,7 @@ F77_SUBROUTINE(dat_putr8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5132,10 +5187,10 @@ F77_SUBROUTINE(dat_putr8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutR( locator_c, *ndim, cdims, values, status );
+   datPutR( locator_c, cndim, cdims, values, status );
 }
 
 F77_SUBROUTINE(dat_putl8)( CHARACTER(locator),
@@ -5154,6 +5209,7 @@ F77_SUBROUTINE(dat_putl8)( CHARACTER(locator),
    HDSLoc * locator_c = NULL;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5161,10 +5217,10 @@ F77_SUBROUTINE(dat_putl8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datPutL( locator_c, *ndim, cdims, values, status );
+   datPutL( locator_c, cndim, cdims, values, status );
 
 }
 
@@ -5190,6 +5246,7 @@ F77_SUBROUTINE(dat_put8)( CHARACTER(locator),
    int ischar = 0;
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5204,13 +5261,13 @@ F77_SUBROUTINE(dat_put8)( CHARACTER(locator),
    if (strncmp(type,"_CHAR",5) == 0) ischar = 1;
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
    if (ischar) {
-     datPutC( locator_c, *ndim, cdims, (char *)values, values_length, status );
+     datPutC( locator_c, cndim, cdims, (char *)values, values_length, status );
    } else {
-     datPut( locator_c, type_c, *ndim, cdims, values, status );
+     datPut( locator_c, type_c, cndim, cdims, values, status );
    }
 
 }
@@ -5409,6 +5466,7 @@ F77_SUBROUTINE(dat_shape8)( CHARACTER(locator),
 /* Local variables.     */
    HDSLoc * locator_c = NULL;
    hdsdim cdims[DAT__MXDIM];
+   int maxdim = HDS_MIN(*ndimx, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5416,7 +5474,7 @@ F77_SUBROUTINE(dat_shape8)( CHARACTER(locator),
    datImportFloc( locator, locator_length, &locator_c, status );
 
 /* Call pure C routine                                       */
-   datShape( locator_c, *ndimx, cdims, ndim, status );
+   datShape( locator_c, maxdim, cdims, ndim, status );
 
 /* Handle copying to Fortran dims */
    (void)hdsDimC2F8( *ndim, cdims, dims, status );
@@ -5467,6 +5525,7 @@ F77_SUBROUTINE(dat_slice8)( CHARACTER(locator1),
    hdsdim dimubuf[DAT__MXDIM];
    hdsdim * cldims;
    hdsdim * cudims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5474,11 +5533,11 @@ F77_SUBROUTINE(dat_slice8)( CHARACTER(locator1),
    datImportFloc( locator1, locator1_length, &locator1_c, status );
 
 /* Ensure that array subscripts are correct         */
-   cldims = hdsDimF2C8( *ndim, diml, dimlbuf, status );
-   cudims = hdsDimF2C8( *ndim, dimu, dimubuf, status );
+   cldims = hdsDimF2C8( cndim, diml, dimlbuf, status );
+   cudims = hdsDimF2C8( cndim, dimu, dimubuf, status );
 
 /* Call pure C routine                                       */
-   datSlice( locator1_c, *ndim, cldims, cudims, &locator2_c, status );
+   datSlice( locator1_c, cndim, cldims, cudims, &locator2_c, status );
 
 /* Export returned locator */
    datExportFloc( &locator2_c, 1, locator2_length, locator2, status );
@@ -5502,6 +5561,7 @@ F77_SUBROUTINE(dat_temp8)( CHARACTER(type),
    char type_c[DAT__SZTYP+1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5509,10 +5569,10 @@ F77_SUBROUTINE(dat_temp8)( CHARACTER(type),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c );
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   datTemp( type_c, *ndim, cdims, &locator_c, status);
+   datTemp( type_c, cndim, cdims, &locator_c, status);
 
 /* Export returned locator */
    datExportFloc( &locator_c, 1, locator_length, locator, status );
@@ -5542,6 +5602,7 @@ F77_SUBROUTINE(hds_new8)( CHARACTER(file),
    char type_c[DAT__SZTYP + 1];
    hdsdim dimbuf[DAT__MXDIM];
    hdsdim * cdims;
+   int cndim = HDS_MIN(*ndim, DAT__MXDIM);
 
 /* Enter routine.	*/
 
@@ -5553,10 +5614,10 @@ F77_SUBROUTINE(hds_new8)( CHARACTER(file),
    cnfImpn( type, type_length, DAT__SZTYP,  type_c);
 
 /* Ensure that array subscripts are correct         */
-   cdims = hdsDimF2C8( *ndim, dims, dimbuf, status );
+   cdims = hdsDimF2C8( cndim, dims, dimbuf, status );
 
 /* Call pure C routine                                       */
-   hdsNew( file_c, name_c, type_c, *ndim, cdims, &locator_c, status );
+   hdsNew( file_c, name_c, type_c, cndim, cdims, &locator_c, status );
 
 /* Export returned locator */
    datExportFloc( &locator_c, 1, locator_length, locator, status );
