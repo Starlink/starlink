@@ -69,6 +69,8 @@
  *     2020-Dec-11 (DSB):
  *        - Add HDSDIM_LCODE and remove unnecessary junk.
  *        - Add HDS_DIM_SIZEOF
+ *     2026-May-20 (GSB):
+ *        - Add HDS_MIN, HDS_MAX macros (copy of NDF_MIN, NDF_MAX).
 
  *  Copyright:
  *     Copyright (C) 2017-2020 East Asian Observatory
@@ -368,7 +370,10 @@ int main (int argc, char ** argv ) {
            "   expands to datFredK or datFredI, as required. */\n"
            "#define HDS_GLUE_HELPER(a,b) a##b\n"
            "#define HDS_GLUE(a,b) HDS_GLUE_HELPER(a,b)\n"
-           "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n");
+           "#define HDSDIM_CODE(a) HDS_GLUE(a,HDS_DIM_CODE)\n\n"
+           "/* Copy of NDF_MIN/MAX macros from ndf_types.h (beware of side effects!). */\n"
+            "#define HDS_MIN(a,b) (((a)<(b))?(a):(b))\n"
+            "#define HDS_MAX(a,b) (((a)>(b))?(a):(b))\n\n");
 
   fprintf( OutputFile,
            "/* Lower case version of HDSDIM_CODE. For instance HDSDIM_LCODE(datFred)\n"
