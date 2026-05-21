@@ -1479,6 +1479,7 @@
 
 *            Loop through all the extensions.
                IKOUNT = 0
+               NMSTA3 = 0
                DO WHILE ( NMSTA3 .EQ. 0 )
                   IKOUNT = IKOUNT + 1
 
