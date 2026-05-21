@@ -1438,7 +1438,7 @@ datMapN(HDSLoc *locator, const char *type_str, const char *mode_str, int ndim, v
        LOCK_MUTEX;
        retval = datMapN_v4(locator, type_str, mode_str, ndim, pntr, (hdsdim *) dims_v4, status);
        UNLOCK_MUTEX;
-       for( i = 0; i < ndim; i++ ) dims[ i ] = (hdsdim) dims_v4[ i ];
+       for( i = 0; i < HDS_MIN(ndim, DAT__MXDIM); i++ ) dims[ i ] = (hdsdim) dims_v4[ i ];
        starFree( dims_v4 );
     } else {
        *status = DAT__NOMEM;
