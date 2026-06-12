@@ -849,8 +849,8 @@ def StoreNomFCF( maps, coadd, filter ):
       exptime = float( get_fits_header( maps[key], "EXP_TIME" ) )
 
 #  Increment the sums needed to find the weighted mean FCF.
-      s1 = exptime*nomfcf
-      s2 = exptime
+      s1 += exptime*nomfcf
+      s2 += exptime
 
 #  Calculate the weighted mean FCF.
    if s2 > 0.0:
@@ -3485,15 +3485,6 @@ try:
 #  these maps will be equal to the value of parameter BINSIZE.
       if imap_cat and qmap_cat and umap_cat:
 
-#  Get the nominal FCF values. Report an error if they differ.
-         nomfcf = GetNomFCF( imap_cat, filter )
-         qfcf = GetNomFCF( qmap_cat, filter )
-         ufcf = GetNomFCF( umap_cat, filter )
-         if qfcf != nomfcf or ufcf != nomfcf:
-            raise starutil.InvalidParameterError("I, Q and U coadds have "
-                  "different nominal FCF values (I={0}, Q={1}, U={2}).".
-                  format(nomfcffcf,qfcf,ufcf))
-
 #  If the I coadd was created from non-POL2 data incorporate the POL2
 #  degradation factor.
          inbeam = get_fits_header( imap_cat, "INBEAM" )
@@ -3543,6 +3534,14 @@ try:
 #  If no FCF was supplied on the command line, use the nominal beam
 #  FCF from the map reduced by the POL2 degradation factor.
             if fcf is None:
+#  Get the nominal FCF values. Report an error if they differ.
+               nomfcf = GetNomFCF( imap_cat, filter )
+               qfcf = GetNomFCF( qmap_cat, filter )
+               ufcf = GetNomFCF( umap_cat, filter )
+               if qfcf != nomfcf or ufcf != nomfcf:
+                  raise starutil.InvalidParameterError("I, Q and U coadds have "
+														 "different nominal FCF values (I={0}, Q={1}, U={2}).".
+														 format(nomfcf,qfcf,ufcf))
                msg_out( "Converting catalogue values to Jy using FCF {0}*{1}".format(degrade,nomfcf) )
                fcf = degrade*nomfcf
             else:
