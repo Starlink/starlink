@@ -16,6 +16,7 @@
       real y(n)
 *-
       logical change
+      external split
 
       call s3r( y, n ,change)
       call split( y, n, change )
