@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(tkimg, 1.3.0, starlink@jiscmail.ac.uk)
+AC_INIT(tkimg, 2.1.1, starlink@jiscmail.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -46,7 +46,7 @@ dnl    macOS when using CFLAGS="... -I/opt/X11/include ..."), prepend "-I." to
 dnl    CFLAGS and use a local config.cache file.
 (
    if test -n "$CFLAGS"; then
-      export CFLAGS="-I. $CFLAGS"
+      export CFLAGS="-I. $CFLAGS -std=c99"
    fi
 
    cd tkimg; \
