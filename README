@@ -610,6 +610,11 @@ Rocky Linux 8:
    libjpeg-turbo-devel
 
 macOS:
-    gfortran
     XCode
-    xcode commandline tools
+    XCode commandline tools
+    XQuartz
+    Homebrew packages:
+        gcc (for gfortran)
+        jpeg-turbo
+        openssl
+        libyaml
