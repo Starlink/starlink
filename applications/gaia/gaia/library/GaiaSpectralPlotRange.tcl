@@ -256,7 +256,7 @@ itcl::class gaia::GaiaSpectralPlotRange {
       }
    }
 
-   itk_option define -to to To 100 {
+   itk_option define -to to To 1 {
       if { [info exists itk_component(index1)] } {
          $itk_component(index1) configure -to $itk_option(-to)
          $itk_component(index2) configure -to $itk_option(-to)
