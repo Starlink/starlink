@@ -1,7 +1,7 @@
       SUBROUTINE CCD1_MVDT<T>( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
      :                         DATIN, VARIN, I1, I2, IZ, SCALE, DSCALE,
      :                         ZERO, DZERO, ORIG, LBOUT, UBOUT, OUT,
-     :                         NBAD, STATUS )
+     :                         NBAD, XCHKVAR, STATUS )
 *+
 *  Name:
 *     CCD1_MVDTx
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL CCD1_MVDTx( ADJUST, BAD, ISVAR, LBIN, UBIN, NY, DATIN,
 *                      VARIN, I1, I2, IZ, SCALE, DSCALE, ZERO, DZERO,
-*                      ORIG, LBOUT, UBOUT, OUT, NBAD, STATUS )
+*                      ORIG, LBOUT, UBOUT, OUT, NBAD, XCHKVAR, STATUS )
 
 *  Description:
 *     The routine moves values from a range of columns in an array
@@ -91,6 +91,11 @@
 *        at least equal to IZ.
 *     NBAD = INTEGER (Returned)
 *        Number of bad values generated amongst the output values.
+*     XCHKVAR = LOGICAL (Given)
+*        Whether, when processing data values (ISVAR is false), to
+*        check for bad variance values.  Currently only implemented
+*        for the case where corrections are not being applied
+*        (ADJUST is false).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -133,6 +138,9 @@
 *     27-JUL-1992 (RFWS):
 *        Allow zero variance values to be processed without producing a
 *        bad result.
+*     17-NOV-2026 (GSB):
+*        Add XCHKVAR argument and implemented case where corrections are
+*        not being applied (ADJUST is false).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -151,6 +159,8 @@
       LOGICAL ADJUST
       LOGICAL BAD
       LOGICAL ISVAR
+      LOGICAL XCHKVAR
+      LOGICAL ISBAD
       INTEGER LBIN
       INTEGER UBIN
       INTEGER NY
@@ -236,10 +246,21 @@
 *  values may be present, then the data must be checked and the bad
 *  values counted. The good values are simply copied.
          ELSE
-            IF ( BAD ) THEN
+            IF ( BAD .OR. XCHKVAR ) THEN
                DO 6 J = 1, NY
                   DO 5 I = I1, I2
-                     IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                     ISBAD = .FALSE.
+                     IF ( BAD ) THEN
+                        IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                           ISBAD = .TRUE.
+                        END IF
+                     END IF
+                     IF ( XCHKVAR ) THEN
+                        IF ( VARIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                           ISBAD = .TRUE.
+                        END IF
+                     END IF
+                     IF ( ISBAD ) THEN
                         OUT( I, J, IZ ) = VAL__BAD<T>
                         NBAD = NBAD + 1
                      ELSE

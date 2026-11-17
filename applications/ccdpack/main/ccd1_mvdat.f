@@ -1,7 +1,7 @@
       SUBROUTINE CCD1_MVDAT( TYPE, ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
      :                       DATIN, VARIN, I1, I2, IZ, SCALE, DSCALE,
      :                       ZERO, DZERO, ORIG, LBOUT, UBOUT, OUT, NBAD,
-     :                       STATUS )
+     :                       XCHKVAR, STATUS )
 *+
 *  Name:
 *     CCD1_MVDAT
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL CCD1_MVDAT( TYPE, ADJUST, BAD, ISVAR, LBIN, UBIN, NY, DATIN,
 *                      VARIN, I1, I2, IZ, SCALE, DSCALE, ZERO, DZERO,
-*                      ORIG, LBOUT, UBOUT, OUT, NBAD, STATUS )
+*                      ORIG, LBOUT, UBOUT, OUT, NBAD, XCHKVAR, STATUS )
 
 *  Description:
 *     The routine moves values from a range of columns in an array
@@ -101,6 +101,10 @@
 *        its data type should be as specified via the TYPE argument.
 *     NBAD = INTEGER (Returned)
 *        Number of bad values generated amongst the output values.
+*     XCHKVAR = LOGICAL (Given)
+*        Whether, when processing data values (ISVAR is false), to
+*        check for bad variance values.  May only be applied in
+*        limited situations - see CCD1_MVDTx for details.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -130,6 +134,8 @@
 *  History:
 *     2-JUN-1992 (RFWS):
 *        Original version.
+*     17-NOV-2026 (GSB):
+*        Add XCHKVAR argument, passed on to CCD1_MVDTx.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -149,6 +155,7 @@
       LOGICAL ADJUST
       LOGICAL BAD
       LOGICAL ISVAR
+      LOGICAL XCHKVAR
       INTEGER LBIN
       INTEGER UBIN
       INTEGER NY
@@ -185,14 +192,14 @@
      :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
      :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ),
-     :                    NBAD, STATUS )
+     :                    NBAD, XCHKVAR, STATUS )
       ELSE IF ( TYPE .EQ. '_DOUBLE' ) THEN
          CALL CCD1_MVDTD( ADJUST, BAD, ISVAR, LBIN, UBIN, NY,
      :                    %VAL( CNF_PVAL( DATIN ) ),
      :                    %VAL( CNF_PVAL( VARIN ) ), I1, I2, IZ,
      :                    SCALE, DSCALE, ZERO, DZERO, ORIG,
      :                    LBOUT, UBOUT, %VAL( CNF_PVAL( OUT ) ),
-     :                    NBAD, STATUS )
+     :                    NBAD, XCHKVAR, STATUS )
       END IF
 
       END

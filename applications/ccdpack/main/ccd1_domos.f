@@ -334,6 +334,11 @@
 *        if the first chunk had no contributing pixels.  Think I've done
 *        this correctly, but it is slightly surprising that it hasn't
 *        been spotted before.
+*     17-NOV-2026 (GSB):
+*        Pass new XCHKVAR argument to CCD1_MVDAT.  Set this to true
+*        in the case that only one NDF contributes to an interval and
+*        that NDF has bad values in its variance array and we are using
+*        input variance arrays.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -826,7 +831,8 @@
      :                     PNTR( 1, II ), PNTR( 2, II ), ISTART,
      :                     IEND, 1, SCALE( II ), DSCALE( II ),
      :                     ZERO( II ), DZERO( II ), ORIGIN( II ), LBC,
-     :                     UBC, PNTR2( 1 ), NBADD, STATUS )
+     :                     UBC, PNTR2( 1 ), NBADD,
+     :                     ( UVAR .AND. BAD( 2, II ) ), STATUS )
                         IF ( GVAR ) CALL CCD1_MVDAT( ITYPE1,
      :                     ( ADJUST .AND. ( .NOT. MODIFY ) ),
      :                     BAD( 2, II ), .TRUE.,
@@ -835,7 +841,7 @@
      :                     PNTR( 1, II ), PNTR( 2, II ), ISTART,
      :                     IEND, 1, SCALE( II ), DSCALE( II ),
      :                     ZERO( II ), DZERO( II ), ORIGIN( II ), LBC,
-     :                     UBC, PNTR2( 2 ), NBADV, STATUS )
+     :                     UBC, PNTR2( 2 ), NBADV, .FALSE., STATUS )
 
 *  If creating variances and input NDF has none then set bad.
                         IF ( EVAR .AND. .NOT. GVAR )
@@ -875,7 +881,8 @@
      :                        PNTR( 1, II ), PNTR( 2, II ), ISTART,
      :                        IEND, I, SCALE( II ), DSCALE( II ),
      :                        ZERO( II ), DZERO( II ), ORIGIN( II ),
-     :                        ISTART, IEND, DATSTK, NBADD, STATUS )
+     :                        ISTART, IEND, DATSTK, NBADD, .FALSE.,
+     :                        STATUS )
                            IF ( UVAR ) THEN
                               CALL CCD1_MVDAT( ITYPE1,
      :                        ( ADJUST .AND. ( .NOT. MODIFY ) ),
@@ -885,7 +892,8 @@
      :                        PNTR( 1, II ), PNTR( 2, II ), ISTART,
      :                        IEND, I, SCALE( II ), DSCALE( II ),
      :                        ZERO( II ), DZERO( II ), ORIGIN( II ),
-     :                        ISTART, IEND, VARSTK, NBADV, STATUS )
+     :                        ISTART, IEND, VARSTK, NBADV, .FALSE.,
+     :                        STATUS )
                            ELSE
 
 *  Set up an array of variances indexed by line using the array of
@@ -1035,13 +1043,13 @@
      :                     .FALSE., ISTART, IEND, NLINES, RESDAT,
      :                     RESVAR , ISTART, IEND, 1, 1.0D0, 0.0D0,
      :                     0.0D0, 0.0D0, 0.0D0, LBC, UBC, PNTR2( 1 ),
-     :                     NBADD, STATUS )
+     :                     NBADD, .FALSE., STATUS )
                         IF ( GVAR .OR. EVAR )
      :                     CALL CCD1_MVDAT( ITYPE1, .FALSE.,
      :                     .TRUE., .TRUE., ISTART, IEND, NLINES,
      :                     RESDAT, RESVAR, ISTART, IEND, 1, 1.0D0,
      :                     0.0D0, 0.0D0, 0.0D0, 0.0D0, LBC, UBC,
-     :                     PNTR2( 2 ), NBADV, STATUS )
+     :                     PNTR2( 2 ), NBADV, .FALSE., STATUS )
 
 *  Note if the output chunk now contains bad pixels.
                         BDOUTD = ( BDOUTD .OR. ( NBADD .GT. 0 ) )
