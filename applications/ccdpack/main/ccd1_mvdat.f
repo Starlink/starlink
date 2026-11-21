@@ -103,8 +103,7 @@
 *        Number of bad values generated amongst the output values.
 *     XCHKVAR = LOGICAL (Given)
 *        Whether, when processing data values (ISVAR is false), to
-*        check for bad variance values.  May only be applied in
-*        limited situations - see CCD1_MVDTx for details.
+*        check for bad variance values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

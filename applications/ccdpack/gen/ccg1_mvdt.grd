@@ -93,9 +93,7 @@
 *        Number of bad values generated amongst the output values.
 *     XCHKVAR = LOGICAL (Given)
 *        Whether, when processing data values (ISVAR is false), to
-*        check for bad variance values.  Currently only implemented
-*        for the case where corrections are not being applied
-*        (ADJUST is false).
+*        check for bad variance values.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -139,8 +137,7 @@
 *        Allow zero variance values to be processed without producing a
 *        bad result.
 *     17-NOV-2026 (GSB):
-*        Add XCHKVAR argument and implemented case where corrections are
-*        not being applied (ADJUST is false).
+*        Add XCHKVAR argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,13 +210,24 @@
 
 *  Treat the case where bad values may be present.  Loop through the
 *  array region to be moved.
-            IF ( BAD ) THEN
+            IF ( BAD .OR. XCHKVAR ) THEN
                DO 2 J = 1, NY
                   DO 1 I = I1, I2
 
 *  Test for bad input values, producing corresponding bad values in the
 *  output array and counting them.
-                     IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                     ISBAD = .FALSE.
+                     IF ( BAD ) THEN
+                        IF ( DATIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                           ISBAD = .TRUE.
+                        END IF
+                     END IF
+                     IF ( XCHKVAR ) THEN
+                        IF ( VARIN( I, J ) .EQ. VAL__BAD<T> ) THEN
+                           ISBAD = .TRUE.
+                        END IF
+                     END IF
+                     IF ( ISBAD ) THEN
                         OUT( I, J, IZ ) = VAL__BAD<T>
                         NBAD = NBAD + 1
 
